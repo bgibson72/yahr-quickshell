@@ -1,0 +1,12 @@
+#!/bin/bash
+# Toggle theme switcher widget
+# Uses file-based IPC since Quickshell IPC calls don't work reliably
+
+SOCKET="/tmp/quickshell-themeswitcher.sock"
+
+# Toggle socket file
+if [ -f "$SOCKET" ]; then
+    rm "$SOCKET"
+else
+    touch "$SOCKET"
+fi

@@ -1,0 +1,654 @@
+#!/bin/bash
+
+# Quickshell Theme Switcher
+# A theme changer for Quickshell that reads from Hyprland theme files
+
+HYPR_DIR="$HOME/.config/hypr"
+QUICKSHELL_DIR="$HOME/.config/quickshell"
+THEMES_DIR="$HYPR_DIR/themes"
+CURRENT_THEME_FILE="$HYPR_DIR/.current-theme"
+
+# Function to convert hex color to QML color format
+hex_to_qml() {
+    local hex="$1"
+    # Remove any 'rgb(' prefix and ')' suffix, keep just the hex
+    hex=$(echo "$hex" | sed 's/rgb(\([^)]*\))/\1/' | sed 's/^#//')
+    echo "#$hex"
+}
+
+# Function to update Hyprland theme
+update_hyprland_theme() {
+    local theme_file="$1"
+    local theme_name="$2"
+    
+    # Update Hyprland theme by sourcing the theme file
+    if [[ -f "$HYPR_DIR/hyprland.conf" ]]; then
+        # Remove any existing theme source lines
+        sed -i '/source.*themes.*\.conf/d' "$HYPR_DIR/hyprland.conf"
+        
+        # Add theme source at the beginning of the file (before other configs that might use the variables)
+        temp_file=$(mktemp)
+        echo "source = $theme_file" > "$temp_file"
+        cat "$HYPR_DIR/hyprland.conf" >> "$temp_file"
+        mv "$temp_file" "$HYPR_DIR/hyprland.conf"
+        
+        # Reload Hyprland configuration
+        hyprctl reload >/dev/null 2>&1
+    fi
+}
+
+# Function to update wofi theme
+update_wofi_theme() {
+    local theme_file="$1" 
+    local theme_name="$2"
+    
+    # Parse colors from theme file
+    local accent_blue=$(grep '\$accent-blue = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
+    local accent_purple=$(grep '\$accent-purple = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
+    local fg_primary=$(grep '\$fg-primary = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
+    local bg_base=$(grep '\$bg-base = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
+    local surface_0=$(grep '\$surface-0 = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
+    
+    # Create wofi style.css
+    mkdir -p "$HOME/.config/wofi"
+    cat > "$HOME/.config/wofi/style.css" << EOF
+window {
+    margin: 0px;
+    border: 1px solid #$accent_blue;
+    background-color: #$bg_base;
+    border-radius: 10px;
+}
+
+#input {
+    margin: 5px;
+    border: none;
+    color: #$fg_primary;
+    background-color: #$surface_0;
+    border-radius: 5px;
+}
+
+#inner-box {
+    margin: 5px;
+    border: none;
+    background-color: #$bg_base;
+}
+
+#outer-box {
+    margin: 5px;
+    border: none;
+    background-color: #$bg_base;
+}
+
+#scroll {
+    margin: 0px;
+    border: none;
+}
+
+#text {
+    margin: 5px;
+    border: none;
+    color: #$fg_primary;
+} 
+
+#entry:selected {
+    background-color: #$accent_blue;
+}
+
+#text:selected {
+    color: #$bg_base;
+}
+EOF
+}
+
+# Function to update GTK theme and icons
+update_gtk_theme() {
+    local theme_name="$1"
+    
+    # Map Hyprland theme names to GTK theme names and icon themes
+    local gtk_theme=""
+    local icon_theme=""
+    
+    case "$theme_name" in
+        "tokyonight-night")
+            gtk_theme="Tokyonight-Dark"
+            icon_theme="Tokyonight-Dark"
+            ;;
+        "catppuccin-mocha")
+            gtk_theme="Catppuccin-Dark"
+            icon_theme="Catppuccin-Mocha"
+            ;;
+        "gruvbox-dark")
+            gtk_theme="Gruvbox-Dark"
+            icon_theme="Gruvbox-Dark"
+            ;;
+        "material-deepocean")
+            gtk_theme="Material-Dark-Palenight"
+            icon_theme="Material - DeepOcean"
+            ;;
+        "everforest-dark")
+            gtk_theme="Everforest-Dark"
+            icon_theme="Everforest-Dark"
+            ;;
+        "kanagawa-dark")
+            gtk_theme="Kanagawa-Dark-Dragon"
+            icon_theme="Kanagawa"
+            ;;
+        "nightfox-dusk")
+            gtk_theme="Nightfox-Dark-Duskfox"
+            icon_theme="Nightfox - Duskfox"
+            ;;
+        "rosepine-dark")
+            gtk_theme="Rosepine-Dark"
+            icon_theme="Rose-Pine-Moon"
+            ;;
+        *)
+            # Default fallback
+            gtk_theme="Adwaita-dark"
+            icon_theme="Adwaita"
+            ;;
+    esac
+    
+        # Apply the themes
+    if [[ -n "$gtk_theme" && -n "$icon_theme" ]]; then
+        gsettings set org.gnome.desktop.interface gtk-theme "$gtk_theme"
+        gsettings set org.gnome.desktop.interface icon-theme "$icon_theme"
+        echo "Updated GTK theme to: $gtk_theme"
+        echo "Updated icon theme to: $icon_theme"
+    else
+        echo "No matching GTK theme found for: $theme_name"
+    fi
+}
+
+# Function to set random wallpaper for theme
+set_theme_wallpaper() {
+    local theme_name="$1"
+    local wallpaper_base="$HOME/Pictures/Wallpapers"
+    
+    # Map theme names to wallpaper directories
+    local wallpaper_dir=""
+    
+    case "$theme_name" in
+        "tokyonight-night")
+            wallpaper_dir="$wallpaper_base/TokyoNight"
+            ;;
+        "catppuccin-mocha")
+            wallpaper_dir="$wallpaper_base/Catppuccin"
+            ;;
+        "gruvbox-dark")
+            wallpaper_dir="$wallpaper_base/Gruvbox"
+            ;;
+        "material-deepocean")
+            wallpaper_dir="$wallpaper_base/Material"
+            ;;
+        "everforest-dark")
+            wallpaper_dir="$wallpaper_base/Everforest"
+            ;;
+        "kanagawa-dark")
+            wallpaper_dir="$wallpaper_base/Kanagawa"
+            ;;
+        "nightfox-dusk")
+            wallpaper_dir="$wallpaper_base/Nightfox"
+            ;;
+        "rosepine-dark")
+            wallpaper_dir="$wallpaper_base/RosePine"
+            ;;
+        *)
+            echo "No wallpaper directory found for theme: $theme_name"
+            return 1
+            ;;
+    esac
+    
+    # Check if directory exists and has wallpapers
+    if [[ ! -d "$wallpaper_dir" ]]; then
+        echo "Wallpaper directory not found: $wallpaper_dir"
+        return 1
+    fi
+    
+    # Find all image files (common formats)
+    mapfile -t wallpapers < <(find "$wallpaper_dir" -maxdepth 1 -type f \( -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" -o -iname "*.webp" \) 2>/dev/null)
+    
+    if [[ ${#wallpapers[@]} -eq 0 ]]; then
+        echo "No wallpapers found in: $wallpaper_dir"
+        return 1
+    fi
+    
+    # Select random wallpaper
+    local random_wallpaper="${wallpapers[RANDOM % ${#wallpapers[@]}]}"
+    
+    echo "Setting wallpaper: $random_wallpaper"
+    
+    # Use swww if available, otherwise try other wallpaper setters
+    if command -v swww &> /dev/null; then
+        swww img "$random_wallpaper" --transition-type fade --transition-duration 2
+    elif command -v hyprpaper &> /dev/null; then
+        # Configure hyprpaper
+        cat > "$HOME/.config/hypr/hyprpaper.conf" << EOF
+preload = $random_wallpaper
+wallpaper = ,$random_wallpaper
+EOF
+        killall hyprpaper 2>/dev/null
+        hyprpaper &
+    elif command -v swaybg &> /dev/null; then
+        killall swaybg 2>/dev/null
+        swaybg -i "$random_wallpaper" -m fill &
+    else
+        echo "No wallpaper setter found (swww, hyprpaper, or swaybg)"
+        return 1
+    fi
+    
+    echo "Wallpaper set successfully"
+}
+
+# Function to update dunst theme
+update_dunst_theme() {
+    local theme_file="$1"
+    local theme_name="$2"
+    
+    # Parse colors from theme file
+    local accent_blue=$(grep '\$accent-blue = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
+    local accent_red=$(grep '\$accent-red = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
+    local fg_primary=$(grep '\$fg-primary = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
+    local bg_base=$(grep '\$bg-base = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
+    local border_0=$(grep '\$border-0 = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
+    
+    # Update dunst config
+    local dunst_config="$HOME/.config/dunst/dunstrc"
+    mkdir -p "$HOME/.config/dunst"
+    
+    # Create or update dunstrc with theme colors
+    cat > "$dunst_config" << EOF
+[global]
+    monitor = 0
+    follow = mouse
+    width = 300
+    height = 300
+    origin = top-right
+    offset = 20x60
+    scale = 0
+    notification_limit = 5
+    
+    progress_bar = true
+    progress_bar_height = 10
+    progress_bar_frame_width = 1
+    progress_bar_min_width = 150
+    progress_bar_max_width = 300
+    
+    indicate_hidden = yes
+    transparency = 0
+    separator_height = 2
+    padding = 8
+    horizontal_padding = 8
+    text_icon_padding = 0
+    frame_width = 3
+    frame_color = "#$accent_blue"
+    gap_size = 0
+    separator_color = frame
+    sort = yes
+    
+    font = Monospace 10
+    line_height = 0
+    markup = full
+    format = "<b>%s</b>  ✕\\n%b"
+    alignment = left
+    vertical_alignment = center
+    show_age_threshold = 60
+    ellipsize = middle
+    ignore_newline = no
+    stack_duplicates = true
+    hide_duplicate_count = false
+    show_indicators = yes
+    
+    icon_position = left
+    min_icon_size = 32
+    max_icon_size = 64
+    icon_path = /usr/share/icons/gnome/16x16/status/:/usr/share/icons/gnome/16x16/devices/
+    
+    sticky_history = yes
+    history_length = 20
+    
+    dmenu = /usr/bin/dmenu -p dunst:
+    browser = /usr/bin/xdg-open
+    
+    always_run_script = true
+    title = Dunst
+    class = Dunst
+    corner_radius = 20
+    ignore_dbusclose = false
+    
+    force_xwayland = false
+    force_xinerama = false
+    
+    mouse_left_click = close_current
+    mouse_middle_click = do_action, close_current
+    mouse_right_click = close_all
+
+[urgency_low]
+    background = "#$bg_base"
+    foreground = "#$fg_primary"
+    frame_color = "#$border_0"
+    timeout = 5
+
+[urgency_normal]
+    background = "#$bg_base"
+    foreground = "#$fg_primary"
+    frame_color = "#$accent_blue"
+    timeout = 10
+
+[urgency_critical]
+    background = "#$bg_base"
+    foreground = "#$fg_primary"
+    frame_color = "#$accent_red"
+    timeout = 0
+EOF
+
+    # Restart dunst to apply changes
+    echo "Updating dunst theme..."
+    killall dunst 2>/dev/null
+    dunst &>/dev/null & disown
+    
+    echo "Dunst theme updated successfully"
+}
+
+# Function to update SwayNC theme
+update_swaync_theme() {
+    local theme_file="$1"
+    local theme_name="$2"
+    
+    # Parse colors from theme file
+    local accent_blue=$(grep '\$accent-blue = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
+    local accent_red=$(grep '\$accent-red = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
+    local fg_primary=$(grep '\$fg-primary = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
+    local fg_secondary=$(grep '\$fg-secondary = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
+    local fg_tertiary=$(grep '\$fg-tertiary = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
+    local bg_base=$(grep '\$bg-base = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
+    local surface_0=$(grep '\$surface-0 = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
+    local border_0=$(grep '\$border-0 = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
+    
+    # Update SwayNC CSS
+    local swaync_css="$HOME/.config/swaync/style.css"
+    
+    # Replace placeholders with actual colors
+    sed -i "s/#BG_BASE_PLACEHOLDER/#$bg_base/g" "$swaync_css"
+    sed -i "s/#ACCENT_BLUE_PLACEHOLDER/#$accent_blue/g" "$swaync_css"
+    sed -i "s/#ACCENT_RED_PLACEHOLDER/#$accent_red/g" "$swaync_css"
+    sed -i "s/#FG_PRIMARY_PLACEHOLDER/#$fg_primary/g" "$swaync_css"
+    sed -i "s/#FG_SECONDARY_PLACEHOLDER/#$fg_secondary/g" "$swaync_css"
+    sed -i "s/#FG_TERTIARY_PLACEHOLDER/#$fg_tertiary/g" "$swaync_css"
+    sed -i "s/#SURFACE_0_PLACEHOLDER/#$surface_0/g" "$swaync_css"
+    sed -i "s/#BORDER_0_PLACEHOLDER/#$border_0/g" "$swaync_css"
+    
+    # Reload SwayNC
+    echo "Updating SwayNC theme..."
+    swaync-client --reload-css
+    swaync-client --reload-config
+    
+    echo "SwayNC theme updated successfully"
+}
+
+# Function to update kitty theme
+update_kitty_theme() {
+    local theme_file="$1"
+    local theme_name="$2"
+    
+    # Parse colors from theme file  
+    local accent_blue=$(grep '\$accent-blue = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
+    local accent_red=$(grep '\$accent-red = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
+    local accent_green=$(grep '\$accent-green = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
+    local accent_yellow=$(grep '\$accent-yellow = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
+    local accent_purple=$(grep '\$accent-purple = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
+    local accent_cyan=$(grep '\$accent-cyan = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
+    local fg_primary=$(grep '\$fg-primary = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
+    local fg_secondary=$(grep '\$fg-secondary = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
+    local bg_base=$(grep '\$bg-base = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
+    local surface_0=$(grep '\$surface-0 = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
+    
+    # Update kitty theme
+    if [[ -f "$HOME/.config/kitty/current-theme.conf" ]] || mkdir -p "$HOME/.config/kitty"; then
+        cat > "$HOME/.config/kitty/current-theme.conf" << EOF
+# $theme_name theme for kitty
+foreground #$fg_primary
+background #$bg_base
+selection_foreground #$bg_base
+selection_background #$accent_blue
+cursor #$fg_primary
+cursor_text_color #$bg_base
+
+# Black
+color0 #$bg_base
+color8 #$surface_0
+
+# Red  
+color1 #$accent_red
+color9 #$accent_red
+
+# Green
+color2 #$accent_green
+color10 #$accent_green
+
+# Yellow
+color3 #$accent_yellow
+color11 #$accent_yellow
+
+# Blue
+color4 #$accent_blue
+color12 #$accent_blue
+
+# Magenta
+color5 #$accent_purple
+color13 #$accent_purple
+
+# Cyan
+color6 #$accent_cyan
+color14 #$accent_cyan
+
+# White
+color7 #$fg_secondary
+color15 #$fg_primary
+EOF
+
+        # Include the theme in kitty.conf if not already included
+        if [[ -f "$HOME/.config/kitty/kitty.conf" ]]; then
+            if ! grep -q "include current-theme.conf" "$HOME/.config/kitty/kitty.conf"; then
+                echo "include current-theme.conf" >> "$HOME/.config/kitty/kitty.conf"
+            fi
+        fi
+    fi
+}
+
+# Function to parse theme file and update ThemeManager
+apply_theme() {
+    local theme_file="$1"
+    local theme_name="$2"
+    
+    if [[ ! -f "$theme_file" ]]; then
+        echo "Error: Theme file not found: $theme_file"
+        return 1
+    fi
+    
+    echo "Applying theme: $theme_name"
+    
+    # Create backup of current ThemeManager
+    cp "$QUICKSHELL_DIR/ThemeManager.qml" "$QUICKSHELL_DIR/ThemeManager.qml.backup" 2>/dev/null || true
+    
+    # Create new ThemeManager.qml with colors from the theme file
+    cat > "$QUICKSHELL_DIR/ThemeManager.qml.tmp" << 'EOF'
+pragma Singleton
+
+import QtQuick
+
+QtObject {
+    // Theme name
+    property string themeName: "THEME_NAME_PLACEHOLDER"
+    
+    // Accent colors
+    property color accentRose: "ACCENT_ROSE_PLACEHOLDER"
+    property color accentCoral: "ACCENT_CORAL_PLACEHOLDER" 
+    property color accentPink: "ACCENT_PINK_PLACEHOLDER"
+    property color accentPurple: "ACCENT_PURPLE_PLACEHOLDER"
+    property color accentRed: "ACCENT_RED_PLACEHOLDER"
+    property color accentMaroon: "ACCENT_MAROON_PLACEHOLDER"
+    property color accentOrange: "ACCENT_ORANGE_PLACEHOLDER"
+    property color accentYellow: "ACCENT_YELLOW_PLACEHOLDER"
+    property color accentGreen: "ACCENT_GREEN_PLACEHOLDER"
+    property color accentTeal: "ACCENT_TEAL_PLACEHOLDER"
+    property color accentCyan: "ACCENT_CYAN_PLACEHOLDER"
+    property color accentSapphire: "ACCENT_SAPPHIRE_PLACEHOLDER"
+    property color accentBlue: "ACCENT_BLUE_PLACEHOLDER"
+    property color accentLavender: "ACCENT_LAVENDER_PLACEHOLDER"
+    
+    // Text colors  
+    property color fgPrimary: "FG_PRIMARY_PLACEHOLDER"
+    property color fgSecondary: "FG_SECONDARY_PLACEHOLDER"
+    property color fgTertiary: "FG_TERTIARY_PLACEHOLDER"
+    
+    // Border colors
+    property color border2: "BORDER_2_PLACEHOLDER"
+    property color border1: "BORDER_1_PLACEHOLDER"
+    property color border0: "BORDER_0_PLACEHOLDER"
+    
+    // Surface colors
+    property color surface2: "SURFACE_2_PLACEHOLDER"
+    property color surface1: "SURFACE_1_PLACEHOLDER"
+    property color surface0: "SURFACE_0_PLACEHOLDER"
+    
+    // Background colors
+    property color bgBase: "BG_BASE_PLACEHOLDER"
+    property color bgBaseAlpha: "BG_BASE_ALPHA_PLACEHOLDER"
+    property color bgMantle: "BG_MANTLE_PLACEHOLDER"
+    property color bgCrust: "BG_CRUST_PLACEHOLDER"
+    
+    // Font sizes
+    property int fontSizeSmall: 11
+    property int fontSizeNormal: 13
+    property int fontSizeLarge: 15
+    property int fontSizeIcon: 14
+}
+EOF
+
+    # Parse the theme file and extract colors
+    local accent_rose=$(grep '\$accent-rose = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
+    local accent_coral=$(grep '\$accent-coral = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
+    local accent_pink=$(grep '\$accent-pink = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
+    local accent_purple=$(grep '\$accent-purple = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
+    local accent_red=$(grep '\$accent-red = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
+    local accent_maroon=$(grep '\$accent-maroon = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
+    local accent_orange=$(grep '\$accent-orange = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
+    local accent_yellow=$(grep '\$accent-yellow = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
+    local accent_green=$(grep '\$accent-green = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
+    local accent_teal=$(grep '\$accent-teal = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
+    local accent_cyan=$(grep '\$accent-cyan = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
+    local accent_sapphire=$(grep '\$accent-sapphire = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
+    local accent_blue=$(grep '\$accent-blue = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
+    local accent_lavender=$(grep '\$accent-lavender = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
+    
+    local fg_primary=$(grep '\$fg-primary = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
+    local fg_secondary=$(grep '\$fg-secondary = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
+    local fg_tertiary=$(grep '\$fg-tertiary = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
+    
+    local border_2=$(grep '\$border-2 = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
+    local border_1=$(grep '\$border-1 = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
+    local border_0=$(grep '\$border-0 = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
+    
+    local surface_2=$(grep '\$surface-2 = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
+    local surface_1=$(grep '\$surface-1 = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
+    local surface_0=$(grep '\$surface-0 = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
+    
+    local bg_base=$(grep '\$bg-base = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
+    local bg_base_alpha=$(grep '\$bg-baseAlpha =' "$theme_file" | sed 's/.*= \([a-f0-9]*\).*/\1/')
+    local bg_mantle=$(grep '\$bg-mantle = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
+    local bg_crust=$(grep '\$bg-crust = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
+    
+    # Replace placeholders with actual colors
+    sed -i "s/THEME_NAME_PLACEHOLDER/$theme_name/g" "$QUICKSHELL_DIR/ThemeManager.qml.tmp"
+    sed -i "s/ACCENT_ROSE_PLACEHOLDER/#$accent_rose/g" "$QUICKSHELL_DIR/ThemeManager.qml.tmp"
+    sed -i "s/ACCENT_CORAL_PLACEHOLDER/#$accent_coral/g" "$QUICKSHELL_DIR/ThemeManager.qml.tmp"
+    sed -i "s/ACCENT_PINK_PLACEHOLDER/#$accent_pink/g" "$QUICKSHELL_DIR/ThemeManager.qml.tmp"
+    sed -i "s/ACCENT_PURPLE_PLACEHOLDER/#$accent_purple/g" "$QUICKSHELL_DIR/ThemeManager.qml.tmp"
+    sed -i "s/ACCENT_RED_PLACEHOLDER/#$accent_red/g" "$QUICKSHELL_DIR/ThemeManager.qml.tmp"
+    sed -i "s/ACCENT_MAROON_PLACEHOLDER/#$accent_maroon/g" "$QUICKSHELL_DIR/ThemeManager.qml.tmp"
+    sed -i "s/ACCENT_ORANGE_PLACEHOLDER/#$accent_orange/g" "$QUICKSHELL_DIR/ThemeManager.qml.tmp"
+    sed -i "s/ACCENT_YELLOW_PLACEHOLDER/#$accent_yellow/g" "$QUICKSHELL_DIR/ThemeManager.qml.tmp"
+    sed -i "s/ACCENT_GREEN_PLACEHOLDER/#$accent_green/g" "$QUICKSHELL_DIR/ThemeManager.qml.tmp"
+    sed -i "s/ACCENT_TEAL_PLACEHOLDER/#$accent_teal/g" "$QUICKSHELL_DIR/ThemeManager.qml.tmp"
+    sed -i "s/ACCENT_CYAN_PLACEHOLDER/#$accent_cyan/g" "$QUICKSHELL_DIR/ThemeManager.qml.tmp"
+    sed -i "s/ACCENT_SAPPHIRE_PLACEHOLDER/#$accent_sapphire/g" "$QUICKSHELL_DIR/ThemeManager.qml.tmp"
+    sed -i "s/ACCENT_BLUE_PLACEHOLDER/#$accent_blue/g" "$QUICKSHELL_DIR/ThemeManager.qml.tmp"
+    sed -i "s/ACCENT_LAVENDER_PLACEHOLDER/#$accent_lavender/g" "$QUICKSHELL_DIR/ThemeManager.qml.tmp"
+    
+    sed -i "s/FG_PRIMARY_PLACEHOLDER/#$fg_primary/g" "$QUICKSHELL_DIR/ThemeManager.qml.tmp"
+    sed -i "s/FG_SECONDARY_PLACEHOLDER/#$fg_secondary/g" "$QUICKSHELL_DIR/ThemeManager.qml.tmp"
+    sed -i "s/FG_TERTIARY_PLACEHOLDER/#$fg_tertiary/g" "$QUICKSHELL_DIR/ThemeManager.qml.tmp"
+    
+    sed -i "s/BORDER_2_PLACEHOLDER/#$border_2/g" "$QUICKSHELL_DIR/ThemeManager.qml.tmp"
+    sed -i "s/BORDER_1_PLACEHOLDER/#$border_1/g" "$QUICKSHELL_DIR/ThemeManager.qml.tmp"
+    sed -i "s/BORDER_0_PLACEHOLDER/#$border_0/g" "$QUICKSHELL_DIR/ThemeManager.qml.tmp"
+    
+    sed -i "s/SURFACE_2_PLACEHOLDER/#$surface_2/g" "$QUICKSHELL_DIR/ThemeManager.qml.tmp"
+    sed -i "s/SURFACE_1_PLACEHOLDER/#$surface_1/g" "$QUICKSHELL_DIR/ThemeManager.qml.tmp"
+    sed -i "s/SURFACE_0_PLACEHOLDER/#$surface_0/g" "$QUICKSHELL_DIR/ThemeManager.qml.tmp"
+    
+    sed -i "s/BG_BASE_PLACEHOLDER/#$bg_base/g" "$QUICKSHELL_DIR/ThemeManager.qml.tmp"
+    sed -i "s/BG_BASE_ALPHA_PLACEHOLDER/#FF$bg_base_alpha/g" "$QUICKSHELL_DIR/ThemeManager.qml.tmp"  # Add alpha (FF = 100% opacity)
+    sed -i "s/BG_MANTLE_PLACEHOLDER/#$bg_mantle/g" "$QUICKSHELL_DIR/ThemeManager.qml.tmp"
+    sed -i "s/BG_CRUST_PLACEHOLDER/#$bg_crust/g" "$QUICKSHELL_DIR/ThemeManager.qml.tmp"
+    
+    # Move temp file to final location atomically
+    mv "$QUICKSHELL_DIR/ThemeManager.qml.tmp" "$QUICKSHELL_DIR/ThemeManager.qml"
+    
+    # Restart Quickshell to reload the singleton ThemeManager
+    echo "Restarting Quickshell..."
+    pkill quickshell
+    sleep 0.5
+    quickshell &>/dev/null & disown
+    
+    # Update other applications
+    echo "Updating application themes..."
+    update_hyprland_theme "$theme_file" "$theme_name"
+    update_wofi_theme "$theme_file" "$theme_name" 
+    update_kitty_theme "$theme_file" "$theme_name"
+    update_dunst_theme "$theme_file" "$theme_name"
+    update_gtk_theme "$theme_name"
+    set_theme_wallpaper "$theme_name"
+    
+    # Save current theme
+    echo "$theme_name" > "$CURRENT_THEME_FILE"
+    
+    echo "Theme applied successfully: $theme_name"
+    echo "Updated: Quickshell, Hyprland, wofi, kitty, dunst, GTK theme, wallpaper"
+    echo "GTK applications (Thunar, gnome-text-editor, waypaper) will now use matching theme"
+}
+
+# Show wofi theme selector
+if [[ "$1" == "--wofi" ]]; then
+    # Get list of available themes
+    themes=()
+    for theme_file in "$THEMES_DIR"/*.conf; do
+        if [[ -f "$theme_file" ]]; then
+            theme_name=$(basename "$theme_file" .conf)
+            # Convert to display name (capitalize and replace dashes)
+            display_name=$(echo "$theme_name" | sed 's/-/ /g' | sed 's/\b\w/\u&/g')
+            themes+=("$display_name")
+        fi
+    done
+    
+    # Show wofi selector
+    selected=$(printf '%s\n' "${themes[@]}" | wofi --dmenu --prompt "Select Theme:" --width 300 --height 400)
+    
+    if [[ -n "$selected" ]]; then
+        # Convert display name back to filename
+        theme_filename=$(echo "$selected" | tr '[:upper:]' '[:lower:]' | sed 's/ /-/g')
+        theme_file="$THEMES_DIR/${theme_filename}.conf"
+        
+        apply_theme "$theme_file" "$theme_filename"
+    fi
+else
+    echo "Quickshell Theme Switcher"
+    echo "Usage: $0 --wofi"
+    echo "Available themes:"
+    for theme_file in "$THEMES_DIR"/*.conf; do
+        if [[ -f "$theme_file" ]]; then
+            theme_name=$(basename "$theme_file" .conf)
+            echo "  - $theme_name"
+        fi
+    done
+fi

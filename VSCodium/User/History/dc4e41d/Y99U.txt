@@ -1,0 +1,89 @@
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                    QUICKSHELL QUICK REFERENCE CARD                           ║
+╠══════════════════════════════════════════════════════════════════════════════╣
+║                                                                              ║
+║  📦 INSTALLATION                                                             ║
+║  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━  ║
+║  $ yay -S quickshell-git              # Install from AUR                     ║
+║  $ yay -S ttf-nerd-fonts-symbols      # Install fonts                        ║
+║  $ ~/.config/quickshell/install.sh    # Run install script                   ║
+║                                                                              ║
+║  🚀 RUNNING                                                                   ║
+║  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━  ║
+║  $ killall waybar                     # Stop Waybar                          ║
+║  $ quickshell                         # Start Quickshell                     ║
+║  $ quickshell &                       # Start in background                  ║
+║  $ killall quickshell                 # Stop Quickshell                      ║
+║                                                                              ║
+║  🐛 DEBUGGING                                                                 ║
+║  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━  ║
+║  $ QT_LOGGING_RULES="quickshell.*=true" quickshell                           ║
+║  $ qmllint ~/.config/quickshell/*.qml # Check syntax                         ║
+║  $ quickshell 2>&1 | tee ~/qs.log     # Save debug output                    ║
+║                                                                              ║
+║  📂 KEY FILES                                                                 ║
+║  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━  ║
+║  ~/.config/quickshell/shell.qml       # Main entry point                     ║
+║  ~/.config/quickshell/Bar.qml         # Layout definition                    ║
+║  ~/.config/quickshell/[Component].qml # Individual widgets                   ║
+║  ~/.config/hypr/hyprland.conf         # Hyprland config (autostart)          ║
+║                                                                              ║
+║  ⚙️  HYPRLAND INTEGRATION                                                     ║
+║  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━  ║
+║  Add to ~/.config/hypr/hyprland.conf:                                        ║
+║  exec-once = quickshell                                                      ║
+║                                                                              ║
+║  Remove or comment out:                                                      ║
+║  # exec-once = waybar                                                        ║
+║                                                                              ║
+║  ✏️  EDITING                                                                  ║
+║  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━  ║
+║  Colors:         Edit hex values in .qml files (#RRGGBB or #AARRGGBB)       ║
+║  Layout:         Modify Bar.qml to rearrange modules                         ║
+║  New Widget:     Create NewWidget.qml, import in Bar.qml                     ║
+║  Fonts:          Change font.family properties                               ║
+║  Timers:         Adjust interval values (in milliseconds)                    ║
+║                                                                              ║
+║  🎨 USEFUL QML PROPERTIES                                                     ║
+║  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━  ║
+║  color: "#7aa2f7"                     # Solid color                          ║
+║  opacity: 0.85                        # Transparency (0-1)                    ║
+║  visible: true/false                  # Show/hide                            ║
+║  width: 100                           # Fixed width                          ║
+║  Layout.fillWidth: true               # Fill available space                 ║
+║  anchors.centerIn: parent             # Center element                       ║
+║  radius: 8                            # Rounded corners                      ║
+║  spacing: 10                          # Space between items                  ║
+║                                                                              ║
+║  🔧 COMMON TASKS                                                              ║
+║  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━  ║
+║  Change bar height:   Edit height: 42 in shell.qml                           ║
+║  Add workspace:       Increase model value in WorkspaceBar.qml               ║
+║  Change update freq:  Edit Timer { interval } in components                  ║
+║  Add new button:      Copy IconButton pattern, change icon & command         ║
+║  Rearrange modules:   Reorder components in Bar.qml RowLayouts               ║
+║                                                                              ║
+║  📚 DOCUMENTATION                                                             ║
+║  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━  ║
+║  Quickshell:  https://quickshell.outfoxxed.me/                               ║
+║  QML:         https://doc.qt.io/qt-6/qmlapplications.html                    ║
+║  Local Docs:  ~/.config/quickshell/README.md                                 ║
+║  Examples:    ~/.config/quickshell/AdvancedExamples.qml                      ║
+║  Help:        ~/.config/quickshell/TROUBLESHOOTING.md                        ║
+║                                                                              ║
+║  💡 QUICK TIPS                                                                ║
+║  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━  ║
+║  • Changes to .qml files reload automatically (hot reload)                   ║
+║  • Use console.log("text") for debugging in QML                              ║
+║  • Timer intervals are in milliseconds (1000 = 1 second)                     ║
+║  • Alpha channel in colors: #AARRGGBB (AA = transparency)                    ║
+║  • Behaviors add smooth transitions (ColorAnimation, NumberAnimation)        ║
+║  • Process.execute() for fire-and-forget, Process.exec() for output          ║
+║                                                                              ║
+║  🔄 REVERT TO WAYBAR                                                          ║
+║  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━  ║
+║  $ killall quickshell                                                        ║
+║  $ waybar &                                                                  ║
+║  (Your Waybar config is still at ~/.config/waybar)                           ║
+║                                                                              ║
+╚══════════════════════════════════════════════════════════════════════════════╝

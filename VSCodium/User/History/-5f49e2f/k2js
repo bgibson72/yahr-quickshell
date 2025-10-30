@@ -1,0 +1,36 @@
+# OS-specific
+.DS_Store
+Thumbs.db
+*~
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*.kate-swp
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.temp
+
+# Cache
+.cache/
+__pycache__/
+
+# User-specific (these should stay local)
+config/quickshell/settings.json
+config/vesktop/sessionData/
+config/VSCodium/User/globalStorage/
+config/VSCodium/User/workspaceStorage/
+config/VSCodium/logs/
+config/VSCodium/CachedData/
+
+# Sensitive data
+*.pem
+*.key
+**/secrets/
+**/tokens/

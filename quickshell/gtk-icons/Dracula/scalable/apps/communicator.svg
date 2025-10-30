@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="64"
+   height="64"
+   version="1.1"
+   id="svg4"
+   sodipodi:docname="communicator.svg"
+   inkscape:version="1.3.2 (091e20ef0f, 2023-11-25, custom)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview4"
+     pagecolor="#505050"
+     bordercolor="#ffffff"
+     borderopacity="1"
+     inkscape:showpageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="1"
+     inkscape:deskcolor="#505050"
+     inkscape:zoom="12.453125"
+     inkscape:cx="32"
+     inkscape:cy="32"
+     inkscape:window-width="1920"
+     inkscape:window-height="1013"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg4" />
+  <defs
+     id="defs1">
+    <style
+       id="current-color-scheme"
+       type="text/css">.ColorScheme-Text{color:#44475a}</style>
+  </defs>
+  <rect
+     width="46"
+     height="52"
+     x="8"
+     y="-58"
+     fill="#478aeb"
+     stroke-width="3.78"
+     rx="4.978"
+     ry="4.978"
+     transform="scale(1 -1)"
+     id="rect1"
+     style="fill:#515d85" />
+  <path
+     fill="#44c367"
+     stroke-width="3.78"
+     d="M53.904 10.016c.064.318.098.643.098.983v16.018a1.992 1.992 0 0 0 1.992-2V12.02a1.992 1.992 0 0 0-1.996-2z"
+     id="path1"
+     style="fill:#50fa7b" />
+  <path
+     fill="#ff5555"
+     stroke-width="3.78"
+     d="M54.002 23.016v17.001a1.992 1.992 0 0 0 1.996-2V25.017a1.992 1.992 0 0 0-1.996-2z"
+     id="path2" />
+  <path
+     fill="#ffb86c"
+     stroke-width="3.78"
+     d="M54.002 37.016v15.999a1.996 1.996 0 0 0 1.996-2.003v-12a1.992 1.992 0 0 0-1.996-1.996z"
+     id="path3"
+     style="fill:#f1fa8c" />
+  <circle
+     cx="31.002"
+     cy="32.016"
+     r="16"
+     fill="#f8f8f2"
+     stroke-linecap="round"
+     stroke-linejoin="round"
+     stroke-width="1.911"
+     opacity=".2"
+     id="circle3" />
+  <path
+     fill="#f8f8f2"
+     d="M31.002 22.016a5 5 0 1 0 0 10 5 5 0 0 0 0-10zm0 2a3 3 0 1 1 0 6 3 3 0 0 1 0-6zm-5.182 10a2.813 2.813 0 0 0-2.818 2.818v5.182h2v-6h12v6h2v-5.182a2.813 2.813 0 0 0-2.818-2.818z"
+     id="path4" />
+</svg>

@@ -1,0 +1,32 @@
+/* Pluck Color Palette Extractor Styles */
+
+.color-card {
+    padding: 12px;
+    border-radius: 8px;
+    background-color: @theme_bg_color;
+    border: 1px solid alpha(@borders, 0.2);
+}
+
+.color-preview {
+    border-radius: 6px;
+    border: 1px solid alpha(@borders, 0.3);
+    box-shadow: 0 2px 4px alpha(@shade_color, 0.1);
+}
+
+.color-hex {
+    font-family: monospace;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.color-rgb {
+    font-family: monospace;
+    font-size: 12px;
+    color: @insensitive_fg_color;
+}
+
+.status-bar {
+    padding: 8px 12px;
+    background-color: alpha(@theme_selected_bg_color, 0.1);
+    border-radius: 6px;
+}

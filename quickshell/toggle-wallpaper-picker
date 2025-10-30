@@ -1,0 +1,7 @@
+#!/bin/bash
+# Toggle wallpaper picker by simulating button click
+# This sends a notification that triggers the Quickshell wallpaper picker
+
+# Simple workaround: just exec the wofi fallback for now
+# TODO: Find a way to trigger QML picker from keyboard
+~/.config/quickshell/wallpaper-picker

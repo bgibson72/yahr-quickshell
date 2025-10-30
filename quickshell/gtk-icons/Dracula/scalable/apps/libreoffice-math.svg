@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="64"
+   height="64"
+   viewBox="0 0 16.933 16.933"
+   version="1.1"
+   id="svg5"
+   sodipodi:docname="libreoffice-math.svg"
+   inkscape:version="1.3.2 (091e20ef0f, 2023-11-25, custom)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs5" />
+  <sodipodi:namedview
+     id="namedview5"
+     pagecolor="#f8f8f2"
+     bordercolor="#282a36"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="12.875"
+     inkscape:cx="31.961165"
+     inkscape:cy="32"
+     inkscape:window-width="1920"
+     inkscape:window-height="1040"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="g1" />
+  <g
+     paint-order="markers stroke fill"
+     transform="translate(0 -280.07)"
+     id="g1">
+    <rect
+       width="12.7"
+       height="13.758"
+       x="2.117"
+       y="281.65"
+       fill="#009688"
+       rx="2.117"
+       ry="2.117"
+       id="rect1"
+       style="fill:#13b1d5" />
+    <path
+       fill="#f8f8f2"
+       d="M4.233 282.716c-.586 0-1.058.472-1.058 1.058v9.525c0 .586.472 1.058 1.058 1.058H12.7c.586 0 1.058-.472 1.058-1.058v-6.35l-4.233-4.233zm6.879 0 2.646 2.645v-1.587c0-.586-.472-1.058-1.058-1.058z"
+       id="path1" />
+  </g>
+  <g
+     fill="#cbcccc"
+     style="paint-order:markers stroke fill"
+     id="g5">
+    <g
+       transform="translate(-.265 -280.6)"
+       id="g3">
+      <rect
+         width="3.44"
+         height=".529"
+         x="5.292"
+         y="290.39"
+         rx="0"
+         ry="0"
+         id="rect2" />
+      <circle
+         cx="7.011"
+         cy="289.59"
+         r=".397"
+         id="circle2" />
+      <circle
+         cx="7.011"
+         cy="291.84"
+         r=".397"
+         id="circle3" />
+    </g>
+    <g
+       transform="translate(.132 -280.6)"
+       id="g4">
+      <rect
+         width="3.44"
+         height=".529"
+         x="211.25"
+         y="197.81"
+         rx="0"
+         ry="0"
+         transform="rotate(45)"
+         id="rect3" />
+      <rect
+         width="3.44"
+         height=".529"
+         x="196.35"
+         y="212.7"
+         rx="0"
+         ry="0"
+         transform="scale(-1 1) rotate(45)"
+         id="rect4" />
+    </g>
+  </g>
+</svg>

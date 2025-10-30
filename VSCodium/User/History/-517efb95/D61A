@@ -1,0 +1,49 @@
+# Mako Notification Daemon Configuration
+# Theme: Eldritch
+
+# General settings
+font=JetBrainsMono Nerd Font 13
+max-visible=5
+max-history=100
+sort=-time
+layer=overlay
+anchor=top-right
+margin=8
+padding=12
+border-size=2
+border-radius=12
+background-color=#212337
+text-color=#ebfafa
+border-color=#a48cf2
+progress-color=over #a48cf2
+
+# Default timeout
+default-timeout=10000
+
+# Dimensions
+width=400
+height=150
+max-icon-size=48
+
+# Grouping
+group-by=app-name
+
+# Urgency levels
+[urgency=low]
+border-color=#37f499
+default-timeout=5000
+
+[urgency=normal]
+border-color=#a48cf2
+default-timeout=10000
+
+[urgency=critical]
+border-color=#f16c75
+default-timeout=0
+
+# Icons
+icons=1
+icon-path=/usr/share/icons/Papirus-Dark
+
+# Format
+format=<b>%s</b>\n%b

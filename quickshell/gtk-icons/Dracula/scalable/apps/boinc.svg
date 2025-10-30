@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="64"
+   height="64"
+   version="1.1"
+   id="svg3"
+   sodipodi:docname="boinc.svg"
+   inkscape:version="1.3.2 (091e20ef0f, 2023-11-25, custom)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs3" />
+  <sodipodi:namedview
+     id="namedview3"
+     pagecolor="#505050"
+     bordercolor="#f8f8f2"
+     borderopacity="1"
+     inkscape:showpageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="1"
+     inkscape:deskcolor="#505050"
+     inkscape:zoom="12.453125"
+     inkscape:cx="32"
+     inkscape:cy="32"
+     inkscape:window-width="1920"
+     inkscape:window-height="1013"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg3" />
+  <path
+     fill="#282a36"
+     d="M32 5c14.912 0 27 12.088 27 27S46.912 59 32 59 5 46.912 5 32 17.088 5 32 5z"
+     id="path1"
+     style="fill:#44475a" />
+  <path
+     fill="#fc3"
+     d="M37.87 32c0 3.24-2.63 5.87-5.87 5.87s-5.87-2.63-5.87-5.87 2.63-5.87 5.87-5.87 5.87 2.63 5.87 5.87"
+     id="path2"
+     style="fill:#f1fa8c" />
+  <path
+     fill="#157cc1"
+     d="m18.637 16.739-1.898 1.898 8.694 8.721C26.89 25.3 29.284 23.947 32 23.947c1.05 0 2.045.224 2.961.587l2.014-2.009A10.524 10.524 0 0 0 32 21.265c-2.476 0-4.751.856-6.567 2.265m19.93-6.791-8.722 8.662A8.058 8.058 0 0 1 40.048 32a8.016 8.016 0 0 1-.587 2.99l2.013 2.013A10.578 10.578 0 0 0 42.735 32c0-2.476-.857-4.751-2.266-6.567l6.791-6.791-1.902-1.903M22.526 26.997A10.51 10.51 0 0 0 21.266 32c0 2.475.857 4.75 2.265 6.566l-6.79 6.792 1.897 1.902 8.667-8.72a8.048 8.048 0 0 1-3.356-6.544c0-1.054.22-2.064.587-2.99m14.032 7.635A8.03 8.03 0 0 1 32 40.048a8.006 8.006 0 0 1-3.045-.614l-2.013 2.013A10.583 10.583 0 0 0 32 42.731c2.476 0 4.75-.853 6.567-2.26l6.79 6.79 1.904-1.902-8.694-8.721"
+     id="path3"
+     style="fill:#13b1d5" />
+</svg>

@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=GPU Screen Recorder
+GenericName=Screen Recorder
+Comment=Record your screen with GPU acceleration
+Exec=gsr-ui
+Icon=media-record
+Terminal=false
+Type=Application
+Categories=AudioVideo;Video;Recorder;
+Keywords=screen;recorder;video;capture;screencast;
+StartupNotify=true

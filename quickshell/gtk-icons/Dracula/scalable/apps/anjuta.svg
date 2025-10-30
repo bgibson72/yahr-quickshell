@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="64"
+   height="64"
+   version="1.1"
+   id="svg1"
+   sodipodi:docname="anjuta.svg"
+   inkscape:version="1.3.2 (091e20ef0f, 2023-11-25, custom)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs1" />
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#505050"
+     bordercolor="#f8f8f2"
+     borderopacity="1"
+     inkscape:showpageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="1"
+     inkscape:deskcolor="#505050"
+     inkscape:zoom="12.453125"
+     inkscape:cx="32"
+     inkscape:cy="32"
+     inkscape:window-width="1920"
+     inkscape:window-height="1013"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="g1" />
+  <g
+     stroke-width=".741"
+     transform="matrix(1.35 0 0 1.35 -519.39 -675.24)"
+     id="g1">
+    <rect
+       width="40"
+       height="40"
+       x="388.44"
+       y="503.88"
+       fill="#8b50a2"
+       rx="20"
+       id="rect1"
+       style="fill:#c7639f" />
+    <path
+       fill="#f8f8f2"
+       d="M411.693 508.8s-3.197 2.193-3.416 3.438c0 0-6.764-2.139-12.707 3.562h3s-7.863 4.914-8 8c.137-.086 1.445-.768 2-1 0 0-1.91 4.4-.457 8.691a17.895 17.895 0 0 0 16.32 10.395c.22 0 .433-.023.65-.03.251-.86 1.412-5.283-.722-8.038-1.837-2.377-5.042-8.824-.791-11.018 0 0 2.686 3.77 5.841 4.137 0 0 .369 3.232 4.182 1.18 1.018-.546 1.396-2.35.37-3.815l-.81-1.17s-2.677-6.43-4.583-8.332c0 0-1-3 0-5 0 0-1.133.841-1.5 1.5 0 0 .255-2.137.623-2.5z"
+       id="path1" />
+  </g>
+</svg>

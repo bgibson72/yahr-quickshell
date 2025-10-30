@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="64"
+   height="64"
+   version="1.1"
+   id="svg3"
+   sodipodi:docname="utilities-energy-monitor.svg"
+   inkscape:version="1.3.2 (091e20ef0f, 2023-11-25, custom)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs3" />
+  <sodipodi:namedview
+     id="namedview3"
+     pagecolor="#f8f8f2"
+     bordercolor="#282a36"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="12.875"
+     inkscape:cx="31.961165"
+     inkscape:cy="32"
+     inkscape:window-width="1920"
+     inkscape:window-height="1040"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="g3" />
+  <g
+     stroke-width=".741"
+     transform="translate(-167.87 -184.02) scale(.44021)"
+     id="g3">
+    <rect
+       width="122.67"
+       height="122.67"
+       x="392.7"
+       y="429.4"
+       fill="#276262"
+       rx="61.33"
+       id="rect1"
+       style="fill:#168daa" />
+    <g
+       fill-rule="evenodd"
+       id="g2">
+      <path
+         fill="#24b97a"
+         stroke-width=".241"
+         d="M422.524 485.873a18.212 18.212 0 0 0-3.612.193c-13.193 1.932-14.276 16.285-21.952 27.073 8.921 22.82 31.03 38.926 57.08 38.926 20.21 0 38.022-9.722 49.19-24.718-22.947-28.692-30.065 3.898-49.19-5.29-13.72-8.436-14.578-35.331-31.516-36.19"
+         id="path1"
+         style="fill:#44c367" />
+      <path
+         fill="#f8f8f2"
+         d="m457.44 461.2-17.038 27.26h10.222v20.445l17.038-27.26H457.44z"
+         id="path2" />
+    </g>
+  </g>
+</svg>

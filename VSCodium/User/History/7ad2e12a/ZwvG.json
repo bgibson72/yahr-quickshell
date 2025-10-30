@@ -1,0 +1,40 @@
+{
+    "chat.tools.terminal.autoApprove": {
+
+        "~/.local/bin/theme-switcher": true
+    },
+    "chat.agent.maxRequests": 25000,
+    "chat.yoloMode": true,
+    "qt-core.additionalQtPaths": [
+        {
+            "name": "Qt-5.15.17-linux-g++_from_PATH",
+            "path": "/usr/bin/qmake"
+        }
+    ],
+    "editor.fontFamily": "'MapleMono Nerd Font', 'Symbols Nerd Font', 'JetBrains Mono', monospace",
+    "editor.fontLigatures": true,
+    "terminal.integrated.fontFamily": "'MapleMono Nerd Font', 'Symbols Nerd Font', monospace",
+    "editor.unicodeHighlight.allowedCharacters": {
+        "󰣇": true,
+        "": true,
+        "󰈹": true,
+        "󰹑": true,
+        "󰐥": true,
+        "󰚰": true,
+        "󰤨": true,
+        "󰈀": true,
+        "󰌙": true,
+        "󰕾": true,
+        "󰖀": true,
+        "󰕿": true,
+        "󰝟": true,
+        "󰁹": true,
+        "󰂂": true,
+        "󰁺": true,
+        "󰂃": true
+    },
+    "editor.unicodeHighlight.invisibleCharacters": false,
+    "editor.unicodeHighlight.ambiguousCharacters": false,
+    "editor.unicodeHighlight.nonBasicASCII": false,
+    "chat.editing.confirmEditRequestRetry": false
+}

@@ -1,0 +1,12 @@
+Type=X-GNOME-Metatheme
+[Desktop Entry]
+Name=Nightfox-Dark-Duskfox
+Comment=An Flat Gtk+ theme based on Elegant Design
+Encoding=UTF-8
+
+[X-GNOME-Metatheme]
+GtkTheme=Nightfox-Dark-Duskfox
+MetacityTheme=Nightfox-Dark-Duskfox
+IconTheme=Tela-circle-Dark
+CursorTheme=Nightfox-cursors
+ButtonLayout=close,minimize,maximize:menu

@@ -1,0 +1,79 @@
+╔══════════════════════════════════════════════════════════════════╗
+║          FASTFETCH IMAGES - TERMINAL COMPATIBILITY               ║
+╚══════════════════════════════════════════════════════════════════╝
+
+✅ CHAFA IS INSTALLED AND WORKING!
+
+⚠  CURRENT TERMINAL: VS Code/Codium (xterm-256color)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+WHY IMAGES DON'T SHOW IN VSCODE:
+
+VSCode's integrated terminal has limited support for advanced terminal
+graphics protocols like chafa. The images ARE being processed correctly,
+but VSCode can't display them.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✨ SOLUTION - Use a Real Terminal:
+
+Open Kitty (which you have installed) and run:
+
+    ~/.config/fastfetch/run-fastfetch.sh
+
+Or simply:
+
+    fastfetch --chafa ~/.config/fastfetch/images/Eldritch/Eldritch.png --logo-width 40
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+TERMINALS THAT SUPPORT IMAGES:
+
+✅ Kitty (recommended - you have this!)
+✅ WezTerm
+✅ iTerm2 (macOS)
+✅ Alacritty (with chafa)
+✅ foot
+✅ konsole
+
+❌ VSCode/Codium integrated terminal
+❌ Basic xterm
+❌ Most IDE integrated terminals
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+TESTING:
+
+1. Open Kitty terminal:
+   $ kitty
+
+2. Run the wrapper script:
+   $ ~/.config/fastfetch/run-fastfetch.sh
+
+3. You should see your Eldritch image! 🎨
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+ALIAS FOR SHELL STARTUP:
+
+Add to ~/.zshrc to run fastfetch on terminal startup:
+
+# Only run with images in real terminals, not in VSCode
+if [[ "$TERM" != "xterm-256color" ]] || [[ -z "$VSCODE_PID" ]]; then
+    ~/.config/fastfetch/run-fastfetch.sh
+else
+    # Fallback to regular fastfetch in VSCode
+    fastfetch
+fi
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Current Status:
+✅ Chafa installed
+✅ Scripts working
+✅ Eldritch image ready
+✅ Theme detection working
+⚠  Need to test in Kitty terminal to see images
+
+Run in Kitty to see your theme image!

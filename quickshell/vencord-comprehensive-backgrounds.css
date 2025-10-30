@@ -1,0 +1,50 @@
+/* ===== COMPREHENSIVE BACKGROUND THEMING ===== */
+/* This approach uses Discord's CSS variables to theme everything at once */
+
+/* Override ALL background-related CSS variables */
+.theme-dark,
+.theme-light {
+    /* Primary backgrounds */
+    --background-primary: #2b3339 !important;
+    --background-secondary: #272e33 !important;
+    --background-secondary-alt: #1e2326 !important;
+    --background-tertiary: #292e42 !important;
+    --background-accent: #33467c !important;
+    --background-floating: #292e42 !important;
+    
+    /* Mobile backgrounds */
+    --background-mobile-primary: #2b3339 !important;
+    --background-mobile-secondary: #272e33 !important;
+    
+    /* Nested backgrounds */
+    --bg-backdrop: #1e2326 !important;
+    --bg-base-primary: #2b3339 !important;
+    --bg-base-secondary: #272e33 !important;
+    --bg-base-tertiary: #1e2326 !important;
+    
+    /* Overlay backgrounds */
+    --bg-overlay-1: #1e2326 !important;
+    --bg-overlay-2: #272e33 !important;
+    --bg-overlay-3: #2b3339 !important;
+    --bg-overlay-app-frame: #1e2326 !important;
+}
+
+/* Force app-level backgrounds */
+body,
+html,
+#app-mount,
+.app_bd26cc,
+.bg_b02b02,
+.wrapper_a7e7a8 {
+    background-color: #1e2326 !important;
+}
+
+/* Catch-all for any remaining black backgrounds */
+[class*="bg_"],
+[class*="background"],
+div[style*="background-color: rgb(0, 0, 0)"],
+div[style*="background-color: black"],
+div[style*="background: rgb(0, 0, 0)"],
+div[style*="background: black"] {
+    background-color: #1e2326 !important;
+}

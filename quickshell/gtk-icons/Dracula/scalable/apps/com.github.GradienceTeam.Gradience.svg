@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="64"
+   height="64"
+   viewBox="0 0 16.933 16.933"
+   version="1.1"
+   id="svg7"
+   sodipodi:docname="com.github.GradienceTeam.Gradience.svg"
+   inkscape:version="1.3.2 (091e20ef0f, 2023-11-25, custom)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs7" />
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#505050"
+     bordercolor="#f8f8f2"
+     borderopacity="1"
+     inkscape:showpageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="1"
+     inkscape:deskcolor="#505050"
+     inkscape:zoom="12.453125"
+     inkscape:cx="32"
+     inkscape:cy="32"
+     inkscape:window-width="1920"
+     inkscape:window-height="1013"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg7" />
+  <rect
+     width="13.758"
+     height="13.758"
+     x="1.587"
+     y="1.587"
+     fill="#ebebeb"
+     fill-rule="evenodd"
+     rx="2.117"
+     ry="2.117"
+     style="paint-order:stroke fill markers"
+     id="rect1" />
+  <rect
+     width="11.641"
+     height="11.641"
+     x="2.646"
+     y="2.646"
+     fill="#f8f8f2"
+     fill-rule="evenodd"
+     rx="1.058"
+     ry="1.058"
+     style="paint-order:stroke fill markers"
+     id="rect2" />
+  <path
+     fill="#9ea0a6"
+     d="M10.921 5.283a.265.265 0 0 0 0 .373.265.265 0 0 0 .374.001l.375-.374 1.309 1.309-3.367 3.367a.265.265 0 0 0-.002.374l4.117 4.117a.265.265 0 0 0 .375-.001.265.265 0 0 0 0-.373l-3.93-3.93 3.369-3.368a.265.265 0 0 0-.001-.374l-1.684-1.683a.265.265 0 0 0-.373 0z"
+     color="#282a36"
+     id="path2" />
+  <path
+     fill="#70a7ea"
+     fill-rule="evenodd"
+     d="M1.587 4.638V7.68l4.285 4.526a.528.528 0 0 0 .748 0l1.123-1.123-6.156-6.445z"
+     style="paint-order:stroke fill markers;fill:#8be9fd"
+     id="path3" />
+  <path
+     fill="#6fdda0"
+     fill-rule="evenodd"
+     d="M2.193 2.22a2.11 2.11 0 0 0-.606 1.484v.934l6.156 6.445 1.496-1.496L2.193 2.22z"
+     style="paint-order:stroke fill markers;fill:#50fa7b"
+     id="path4" />
+  <path
+     fill="#f7de6a"
+     fill-rule="evenodd"
+     d="M3.704 1.587a2.11 2.11 0 0 0-1.511.633l7.046 7.366 1.497-1.496-6.214-6.502h-.818z"
+     style="paint-order:stroke fill markers;fill:#f1fa8c"
+     id="path5" />
+  <path
+     fill="#e35a60"
+     fill-rule="evenodd"
+     d="m4.522 1.587 6.214 6.503 1.122-1.123a.528.528 0 0 0 0-.748L7.466 1.587z"
+     style="paint-order:stroke fill markers;fill:#ff5555"
+     id="path6" />
+  <rect
+     width="8.466"
+     height="3.175"
+     x="-4.479"
+     y="10.137"
+     fill-rule="evenodd"
+     opacity=".5"
+     rx=".529"
+     ry=".529"
+     style="mix-blend-mode:soft-light;paint-order:stroke fill markers"
+     transform="rotate(-45)"
+     id="rect6" />
+  <rect
+     width="1.587"
+     height="4.233"
+     x="-1.04"
+     y="16.22"
+     fill="#ad7c55"
+     fill-rule="evenodd"
+     rx=".529"
+     ry=".529"
+     style="paint-order:stroke fill markers;fill:#c7925b"
+     transform="rotate(-45)"
+     id="rect7" />
+</svg>

@@ -1,0 +1,324 @@
+/**
+ * @name Quickshell Sync (Material)
+ * @author Auto-generated
+ * @description Synced from ~/.config/hypr/themes/Material.conf
+ * @version 1.0
+ */
+
+/**
+ * Theme: Material (Auto-synced from Quickshell)
+ * Generated: Wed Oct 29 04:38:40 PM CDT 2025
+ */
+
+:root {
+    /* ===== APP BACKGROUND (Main fix for black background) ===== */
+    --app-background: #000000;
+    --bg-backdrop: #000000;
+    --bg-base-primary: #0f111a;
+    --bg-base-secondary: #090b10;
+    --bg-base-tertiary: #000000;
+    
+    /* Background Colors */
+    --bg-overlay-1: #000000;
+    --bg-overlay-2: #090b10;
+    --bg-overlay-3: #0f111a;
+    --bg-overlay-app-frame: #000000;
+    
+    /* Surface Colors */
+    --background-primary: #0f111a;
+    --background-secondary: #090b10;
+    --background-secondary-alt: #000000;
+    --background-tertiary: #1b1e2b;
+    --background-accent: #212337;
+    --background-floating: #1b1e2b;
+    --background-mobile-primary: #0f111a;
+    --background-mobile-secondary: #090b10;
+    --background-modifier-hover: #1b1e2b80;
+    --background-modifier-active: #21233780;
+    --background-modifier-selected: #30334880;
+    --background-modifier-accent: #82aaff40;
+    
+    /* Text Colors */
+    --text-normal: #eeffff;
+    --text-muted: #b2ccd6;
+    --text-faint: #89ddff;
+    --text-link: #82aaff;
+    --text-positive: #c3e88d;
+    --text-warning: #ffcb6b;
+    --text-danger: #ff5370;
+    --text-brand: #82aaff;
+    
+    /* Interactive Colors */
+    --interactive-normal: #b2ccd6;
+    --interactive-hover: #eeffff;
+    --interactive-active: #82aaff;
+    --interactive-muted: #89ddff;
+    
+    /* Accent Colors */
+    --brand-experiment: #82aaff;
+    --brand-experiment-hover: #c792ea;
+    --brand-experiment-560: #82aaff;
+    
+    /* Channel/User Status */
+    --status-positive: #c3e88d;
+    --status-warning: #ffcb6b;
+    --status-danger: #ff5370;
+    
+    /* Border Colors */
+    --border-subtle: #3b4f6c;
+    --border-strong: #4a5f7d;
+    --border-faint: #3b4f6c40;
+    
+    /* Scrollbar */
+    --scrollbar-thin-thumb: #212337;
+    --scrollbar-thin-track: transparent;
+    --scrollbar-auto-thumb: #303348;
+    --scrollbar-auto-track: #1b1e2b;
+    
+    /* Deprecated but still used */
+    --deprecated-card-bg: #1b1e2b;
+    --deprecated-card-editable-bg: #212337;
+    --deprecated-store-bg: #0f111a;
+    --deprecated-quickswitcher-input-background: #1b1e2b;
+    --deprecated-text-input-bg: #1b1e2b;
+    --deprecated-text-input-border: #3b4f6c;
+    --deprecated-text-input-border-hover: #4a5f7d;
+    --deprecated-text-input-border-disabled: #3b4f6c40;
+}
+
+/* ===== FORCE APP BACKGROUND (Critical for removing black) ===== */
+body,
+html,
+#app-mount,
+.app_bd26cc,
+.bg_b02b02,
+.wrapper_a7e7a8 {
+    background-color: #000000 !important;
+}
+
+/* Additional custom styling */
+.theme-dark {
+    --background-primary: #0f111a;
+    --background-secondary: #090b10;
+    --background-tertiary: #1b1e2b;
+}
+
+/* Message bar */
+.channelTextArea_a7d72e {
+    background-color: #1b1e2b;
+}
+
+/* User panel */
+.container_ca50b9 {
+    background-color: #000000;
+}
+
+/* Sidebar */
+.sidebar_e031f6 {
+    background-color: #090b10;
+}
+
+/* Server list */
+.wrapper__8436d {
+    background-color: #000000;
+}
+
+/* Chat background */
+.chatContent__5dca8,
+.chat__52833 {
+    background-color: #0f111a;
+}
+
+/* Accent for selected items */
+.selected_fd9051,
+.selected_ae80f7 {
+    background-color: #303348 !important;
+    color: #82aaff !important;
+}
+
+/* Links */
+a {
+    color: #82aaff;
+}
+
+a:hover {
+    color: #c792ea;
+}
+
+
+/* ========================================= */
+/* TARGETED SELECTORS FOR DISCORD AREAS */
+/* Auto-added by vencord-add-catchall.sh */
+/* ========================================= */
+
+/* Main app container */
+[class*="app_"] {
+    background-color: #000000 !important;
+}
+
+/* Chat/Content area */
+[class*="chat_"]:not([class*="input"]):not([class*="button"]),
+[class*="content_"]:not([class*="button"]):not([class*="tab"]):not([class*="message"]) {
+    background-color: #0f111a !important;
+}
+
+/* Sidebar/Channel list */
+[class*="sidebar_"],
+[class*="panels_"],
+[class*="panel_"] {
+    background-color: #090b10 !important;
+}
+
+/* Server list (guilds) */
+[class*="guilds_"],
+[class*="wrapper_"][class*="guilds"] {
+    background-color: #000000 !important;
+}
+
+/* Server icons scroller/stack */
+div[class*="stack_"],
+[class*="scroller_"][class*="none_"],
+[class*="guilds_"] [class*="scroller"] {
+    background-color: #000000 !important;
+}
+
+/* Layers and backdrops */
+[class*="layer"][class*="base"],
+[class*="backdrop"],
+[class*="bg_"][class*="backdrop"] {
+    background-color: #000000 !important;
+}
+
+/* Title bar and top sections */
+[class*="title"][class*="container"],
+[class*="header"][class*="bar"] {
+    background-color: #0f111a !important;
+}
+
+/* Server header/title area (where server name is shown) */
+[class*="container_"][class*="themed"],
+[class*="header_"]:not([class*="message"]):not([class*="search"]),
+[class*="animatedContainer"],
+[class*="bannerImage"] {
+    background-color: #0f111a !important;
+}
+
+/* Message input/text area */
+[class*="channelTextArea"],
+[class*="textArea"],
+[class*="scrollableContainer"],
+form[class*="form"] {
+    background-color: #1b1e2b !important;
+}
+
+/* Message headers in chat - remove background */
+h3.header_c19a55,
+h3[class^="header_"],
+h3[class*="header_c"],
+.header_c19a55 {
+    background-color: #0f111a !important;
+    background: #0f111a !important;
+}
+
+/* Input fields */
+[class*="input"]:not([type="checkbox"]):not([type="radio"]),
+[class*="inputDefault"],
+[class*="inputWrapper"] {
+    background-color: #1b1e2b !important;
+}
+
+/* Scrollbars */
+[class*="scrollbar"],
+[class*="scroller"]::-webkit-scrollbar,
+[class*="scroller"]::-webkit-scrollbar-track,
+[class*="auto_"]::-webkit-scrollbar-track,
+div::-webkit-scrollbar-track {
+    background-color: #0f111a !important;
+}
+
+/* Top bar separators/dividers - aggressive targeting */
+[class*="divider"],
+[class*="separator"],
+[class*="toolbar"] [class*="divider"],
+[class*="children"] > [class*="divider"],
+[class*="children"] [class*="divider"] {
+    background-color: #090b10 !important;
+    border-color: #090b10 !important;
+    box-shadow: none !important;
+}
+
+/* All divider elements by tag */
+div[class*="divider"],
+span[class*="divider"] {
+    background-color: #090b10 !important;
+    border-color: #090b10 !important;
+}
+
+/* Top bar search/toolbar area */
+[class*="searchBar"],
+[class*="search"][class*="bar"],
+[class*="toolbar"],
+[class*="iconWrapper"] {
+    background-color: transparent !important;
+}
+
+/* Lower left panel - split styling */
+/* The panels_c48ade element spans the full bottom width */
+/* We need to style its left portion (under guilds) and right portion (user info) differently */
+
+/* panels container base - this will be overridden by children */
+[class*="panels_"],
+div[class*="panels_"] {
+    background: none !important;
+}
+
+/* Right side: User info panel (under channel list) */
+[class*="panels_"] > div:last-child,
+[class*="container_"][class*="account"],
+section[class*="panels_"],
+[class*="accountProfileCard"],
+[class*="userPanel"],
+[class*="container"][class*="withTag"] {
+    background-color: #090b10 !important;
+}
+
+/* Left side: Area under server/guild icons (if it exists as a separate element) */
+[class*="panels_"] > div:first-child:not(:last-child) {
+    background-color: #000000 !important;
+}
+
+/* Sidebar ::after pseudo-element (bottom panel overlay) */
+div[class*="sidebar_"]::after {
+    background-color: #090b10 !important;
+    background: #090b10 !important;
+}
+
+/* Navigation container in lower left */
+nav[class*="container_"] {
+    background-color: #090b10 !important;
+}
+
+/* Scroller in lower left area */
+div[class*="scroller__"],
+[class*="scroller__"][class*="thin_"],
+[class*="scrollerBase_"] {
+    background-color: #090b10 !important;
+}
+
+/* Top toolbar container */
+[class*="toolbar__"],
+div[class*="toolbar__"],
+[class*="container__"][class*="toolbar"] {
+    background-color: #0f111a !important;
+}
+
+/* Top bar children ::after pseudo-element (separator line) */
+div[class*="children_"]::after {
+    background-color: #090b10 !important;
+    background: #090b10 !important;
+}
+
+/* CRITICAL: Message header background override - must be last */
+[class*="contents_"] > h3[class*="header_"] {
+    background-color: #0f111a !important;
+}

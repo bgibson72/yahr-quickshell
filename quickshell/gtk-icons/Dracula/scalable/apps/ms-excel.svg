@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="64"
+   height="64"
+   viewBox="0 0 16.933 16.933"
+   version="1.1"
+   id="svg15"
+   sodipodi:docname="ms-excel.svg"
+   inkscape:version="1.3.2 (091e20ef0f, 2023-11-25, custom)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview15"
+     pagecolor="#f8f8f2"
+     bordercolor="#282a36"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="12.875"
+     inkscape:cx="31.961165"
+     inkscape:cy="32"
+     inkscape:window-width="1920"
+     inkscape:window-height="1040"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="g15" />
+  <defs
+     id="defs2">
+    <linearGradient
+       xlink:href="#a"
+       id="b"
+       x1="41.088"
+       x2="41.088"
+       y1="56.971"
+       y2="26.486"
+       gradientTransform="translate(31.7 289.992) scale(.26458)"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       id="a">
+      <stop
+         offset="0"
+         id="stop1" />
+      <stop
+         offset="1"
+         stop-opacity="0"
+         id="stop2" />
+    </linearGradient>
+  </defs>
+  <g
+     paint-order="markers stroke fill"
+     id="g15">
+    <g
+       transform="rotate(4.61 3483.044 -274.865)"
+       id="g11">
+      <rect
+         width="6.879"
+         height="12.171"
+         x="42.069"
+         y="279.802"
+         fill="#246541"
+         rx=".529"
+         ry=".529"
+         id="rect2"
+         style="fill:#44c367" />
+      <rect
+         width="5.821"
+         height="11.112"
+         x="42.598"
+         y="280.331"
+         fill="#f8f8f2"
+         rx="0"
+         ry="0"
+         id="rect3" />
+      <rect
+         width="1.852"
+         height="1.587"
+         x="45.773"
+         y="288.533"
+         fill="#246541"
+         rx="0"
+         ry="0"
+         id="rect4"
+         style="fill:#44c367" />
+      <rect
+         width="1.852"
+         height="1.587"
+         x="45.773"
+         y="286.24"
+         fill="#246541"
+         rx="0"
+         ry="0"
+         id="rect5"
+         style="fill:#44c367" />
+      <rect
+         width="1.852"
+         height="1.587"
+         x="45.773"
+         y="283.947"
+         fill="#246541"
+         rx="0"
+         ry="0"
+         id="rect6"
+         style="fill:#44c367" />
+      <rect
+         width="1.852"
+         height="1.587"
+         x="45.773"
+         y="281.654"
+         fill="#246541"
+         rx="0"
+         ry="0"
+         id="rect7"
+         style="fill:#44c367" />
+      <rect
+         width="1.852"
+         height="1.587"
+         x="43.392"
+         y="288.533"
+         fill="#246541"
+         rx="0"
+         ry="0"
+         id="rect8" />
+      <rect
+         width="1.852"
+         height="1.587"
+         x="43.392"
+         y="286.24"
+         fill="#246541"
+         rx="0"
+         ry="0"
+         id="rect9" />
+      <rect
+         width="1.852"
+         height="1.587"
+         x="43.392"
+         y="283.947"
+         fill="#246541"
+         rx="0"
+         ry="0"
+         id="rect10"
+         style="fill:#44c367" />
+      <rect
+         width="1.852"
+         height="1.587"
+         x="43.392"
+         y="281.654"
+         fill="#246541"
+         rx="0"
+         ry="0"
+         id="rect11"
+         style="fill:#44c367" />
+    </g>
+    <g
+       transform="translate(-31.713 -289.992)"
+       id="g12">
+      <rect
+         width="8.996"
+         height="13.758"
+         x="-10.166"
+         y="294.021"
+         fill="#357e56"
+         rx="0"
+         ry="0"
+         transform="rotate(-8.462)"
+         id="rect12"
+         style="fill:#44c367" />
+      <path
+         fill="url(#b)"
+         d="M43.003 297a11.132 17.633 6.416 0 1-.06.665 11.132 17.633 6.416 0 1-1.933 7.4l3.124-.464z"
+         opacity=".25"
+         id="path12" />
+    </g>
+    <g
+       fill="#f8f8f2"
+       id="g14">
+      <path
+         d="m4.249 6.468 1.308-.198 4.112 4.196-1.308.197z"
+         id="path13" />
+      <path
+         d="m8.958 5.756-1.308.198-2.69 5.223 1.308-.198z"
+         id="path14" />
+    </g>
+  </g>
+</svg>

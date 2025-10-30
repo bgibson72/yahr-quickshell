@@ -1,0 +1,52 @@
+# Mako notification daemon configuration
+# Material/Palenight-inspired theme to match quickshell
+
+# Position and size
+anchor=top-right
+margin=12,12,50
+width=400
+height=150
+
+# Style
+font=MapleMono NF 13
+background-color=#0f111aee
+text-color=#eeffff
+border-color=#82aaff
+border-size=2
+border-radius=12
+padding=12
+
+# Urgency-specific colors
+[urgency=low]
+border-color=#c3e88d
+default-timeout=3000
+
+[urgency=normal]
+border-color=#ffcb6b
+default-timeout=5000
+
+[urgency=critical]
+border-color=#ff5370
+default-timeout=0
+ignore-timeout=1
+
+# Icons
+icons=1
+max-icon-size=48
+icon-location=left
+
+# Progress bar
+progress-color=over #82aaff
+
+# Actions
+actions=1
+on-button-left=invoke-default-action
+on-button-middle=none
+on-button-right=dismiss
+
+# Grouping
+group-by=app-name
+max-visible=5
+
+# Format
+format=<b>%s</b>\n%b

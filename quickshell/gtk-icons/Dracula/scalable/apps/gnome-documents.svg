@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="64"
+   height="64"
+   viewBox="0 0 16.933 16.933"
+   version="1.1"
+   id="svg8"
+   sodipodi:docname="gnome-documents.svg"
+   inkscape:version="1.3.2 (091e20ef0f, 2023-11-25, custom)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs8" />
+  <sodipodi:namedview
+     id="namedview8"
+     pagecolor="#f8f8f2"
+     bordercolor="#282a36"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="12.875"
+     inkscape:cx="31.961165"
+     inkscape:cy="32"
+     inkscape:window-width="1920"
+     inkscape:window-height="1040"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg8" />
+  <g
+     fill-rule="evenodd"
+     id="g2">
+    <path
+       fill="#f7d83f"
+       d="M83 9c-1.662 0-3 1.338-3 3v44c0 1.662 1.338 3 3 3h38c1.662 0 3-1.338 3-3V21L112 9z"
+       style="paint-order:fill markers stroke;fill:#bcc373"
+       transform="translate(-17.991 -1.058) scale(.26458)"
+       id="path1" />
+    <path
+       fill="#ffec8c"
+       d="m32.808 5.556-3.175-3.175v2.381c0 .44.354.794.794.794z"
+       style="paint-order:fill markers stroke;fill:#f1fa8c"
+       transform="translate(-17.991 -1.058)"
+       id="path2" />
+  </g>
+  <g
+     fill-rule="evenodd"
+     id="g4">
+    <path
+       fill="#6272a4"
+       d="M83 9c-1.662 0-3 1.338-3 3v44c0 1.662 1.338 3 3 3h38c1.662 0 3-1.338 3-3V21L112 9z"
+       style="paint-order:fill markers stroke;fill:#6272a4"
+       transform="translate(-19.05) scale(.26458)"
+       id="path3" />
+    <path
+       fill="#88aaf8"
+       d="m32.808 5.556-3.175-3.175v2.381c0 .44.354.794.794.794z"
+       style="paint-order:fill markers stroke;fill:#8894b8"
+       transform="translate(-19.05)"
+       id="path4" />
+  </g>
+  <g
+     fill="#f8f8f2"
+     stroke-width=".265"
+     id="g8">
+    <path
+       d="M3.44 4.762v-.264H8.73v.264z"
+       color="#282a36"
+       opacity=".35"
+       style="paint-order:normal"
+       id="path5" />
+    <path
+       d="M7.673 8.466V12.7h4.762v-.265H7.937V8.466z"
+       opacity=".5"
+       id="path6" />
+    <path
+       d="M8.466 10.319h.794v1.587h-.794zM9.789 8.996h.794v2.91h-.794zM11.112 9.525h.794v2.381h-.794z"
+       opacity=".5"
+       id="path7" />
+    <path
+       d="M3.44 6.614V6.35h8.995v.265zM3.44 7.408v-.264h8.995v.264zM3.44 8.202v-.265h3.439v.265zM3.44 8.996V8.73h3.439v.265zM3.44 9.79v-.265h3.439v.264zM3.44 10.583v-.265h3.439v.265zM3.44 11.377v-.265h3.439v.265zM3.44 12.171v-.265h2.116v.265zM3.44 13.493v-.265h8.995v.265zM3.44 14.287v-.265h6.878v.265zM3.44 5.556v-.264H8.73v.264z"
+       color="#282a36"
+       opacity=".35"
+       style="paint-order:normal"
+       id="path8" />
+  </g>
+</svg>

@@ -1,0 +1,55 @@
+# Backup files
+*.backup
+*.bak
+*~
+.backup-*/
+*-backup-*.sh
+*-old.sh
+*-before-*.sh
+*-manual-backup.sh
+toggle-notification-center
+
+# Unused sync scripts
+sync-zed-theme.sh
+
+# Temporary files
+*.tmp
+*.swp
+*.swo
+test-*.qml
+Theme.qml.example
+
+# HTML mockups/prototypes
+*.html
+
+# QML cache
+.qmlcache/
+qmldir.disabled
+qmldir.bak
+
+# User-specific settings (optional - you may want to commit settings.json)
+# settings.json
+
+# Logs
+*.log
+*.qslog
+
+# OS-specific
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.kate-swp
+
+# Documentation - only keep README.md
+*.draft.md
+COMPREHENSIVE_BACKGROUNDS_GUIDE.md
+FINDING_VENCORD_CLASSES.md
+INSTALL.md
+VENCORD_*.md
+*_GUIDE.md
+*_SETUP.md
+*_FIXED.md
+*_COMPLETE.md

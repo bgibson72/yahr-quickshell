@@ -1,0 +1,26 @@
+{
+  "general": {
+    "weatherLatitude": "",
+    "weatherLongitude": "",
+    "useFahrenheit": true,
+    "clockFormat24hr": false,
+    "showSeconds": true
+  },
+  "screenshot": {
+    "defaultDelay": 0,
+    "saveToDisk": false,
+    "copyToClipboard": true,
+    "saveLocation": "~/Pictures/Screenshots"
+  },
+  "theme": {
+    "current": "TokyoNight"
+  },
+  "systemTray": {
+    "showBatteryDetails": true,
+    "showVolumeDetails": true,
+    "showNetworkDetails": true
+  },
+  "bar": {
+    "transparentBackground": true
+  }
+}

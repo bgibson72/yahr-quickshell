@@ -1,0 +1,16 @@
+{
+  "general": {
+    "weatherLatitude": "",
+    "weatherLongitude": "",
+    "clockFormat24hr": true
+  },
+  "screenshot": {
+    "defaultDelay": 0,
+    "saveToDisk": true,
+    "copyToClipboard": false,
+    "saveLocation": "~/Pictures/Screenshots"
+  },
+  "theme": {
+    "current": "TokyoNight"
+  }
+}

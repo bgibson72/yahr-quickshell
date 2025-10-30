@@ -1,0 +1,111 @@
+╔═══════════════════════════════════════════════════════════════🔧 HOW IT WORKS:
+
+The config reads your current theme from:
+  ~/.config/quickshell/ThemeManager.qml
+
+Then displays the matching image from:
+  ~/.config/fastfetch/images/[ThemeName]/[ThemeName].png
+
+When you switch themes, fastfetch automatically uses the new image!
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+💡 TIPS:
+
+- Each theme has its own directory for better organization
+- Images should be named exactly like the theme
+- Images automatically resize to fit your terminal
+- Supports PNG, JPG, JPEG, GIF, WEBP formats
+- Falls back to any image in theme directory if exact name not found
+- Falls back to ASCII art if theme directory doesn't exist
+- Edit config.jsonc to customize modules and colors THEME-AWARE CONFIGURATION - QUICK START                ║
+╚════════════════════════════════════════════════════════════════════╝
+
+✅ SETUP COMPLETE!
+
+Your fastfetch is now configured to automatically display different 
+images based on your current Quickshell/Hyprland theme.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📂 FILES CREATED:
+
+  config.jsonc          - Main fastfetch configuration
+  get-theme-image.sh    - Theme detection script
+  check-images.sh       - Image status checker
+  setup-guide.sh        - Full setup guide
+  README.md             - Detailed documentation
+  images/               - Directory for your theme images
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎨 NEXT STEPS:
+
+1. Add your theme images to: ~/.config/fastfetch/images/
+   
+   Create directories for each theme with the image inside:
+   - Catppuccin/Catppuccin.png
+   - Dracula/Dracula.png
+   - Eldritch/Eldritch.png
+   - Everforest/Everforest.png
+   - Gruvbox/Gruvbox.png
+   - Kanagawa/Kanagawa.png
+   - Material/Material.png
+   - NightFox/NightFox.png
+   - Nord/Nord.png
+   - RosePine/RosePine.png
+   - TokyoNight/TokyoNight.png
+   
+   Example:
+   $ mkdir -p ~/.config/fastfetch/images/Eldritch
+   $ cp /path/to/image.png ~/.config/fastfetch/images/Eldritch/Eldritch.png
+
+2. Check status:
+   $ ~/.config/fastfetch/check-images.sh
+
+3. Run fastfetch:
+   $ fastfetch
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📊 MODULES DISPLAYED:
+
+  ✓ User@Host
+  ✓ OS & Kernel
+  ✓ Package count
+  ✓ Shell & WM
+  ✓ Terminal
+  ✓ Uptime
+  ✓ Current Theme (detected)
+  ✓ Color palette
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔧 HOW IT WORKS:
+
+The config reads your current theme from:
+  ~/.config/quickshell/ThemeManager.qml
+
+Then displays the matching image from:
+  ~/.config/fastfetch/images/[themename].png
+
+When you switch themes, fastfetch automatically uses the new image!
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+💡 TIPS:
+
+- Images automatically resize to fit your terminal
+- Supports PNG, JPG, JPEG, GIF, WEBP formats
+- Falls back to ASCII art if image not found
+- Filenames are case-insensitive
+- Edit config.jsonc to customize modules and colors
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📖 FOR MORE INFO:
+
+View setup guide:    ~/.config/fastfetch/setup-guide.sh
+Read documentation:  ~/.config/fastfetch/README.md
+
+╚════════════════════════════════════════════════════════════════════╝

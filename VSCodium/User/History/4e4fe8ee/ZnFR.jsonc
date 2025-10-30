@@ -1,0 +1,229 @@
+//    ______           __  ______      __//    ______           __  ______      __
+
+//   / ____/___ ______/ /_/ ____/___ _/ /_//   / ____/___ ______/ /_/ ____/___ _/ /_
+
+//  / /_  / __ `/ ___/ __/ /   / __ `/ __///        "type": "player",
+
+// / __/ / /_/ (__  ) /_/ /___/ /_/ / /_      "key": " ",
+
+///_/    \__,_/____/\__/\____/\__,_/\__/      "keyColor": "34"
+
+//  https://github.com/m3tozz/FastCat    },
+
+    {
+
+{      "type": "command",
+
+  "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",      "key": "󰉦 ",
+
+  "logo": {      "keyColor": "34",
+
+    "type": "chafa",      "text": "grep 'themeName:' ~/.config/quickshell/ThemeManager.qml 2>/dev/null | sed -E 's/.*\"(.+)\".*/\\1/' || echo 'Unknown'"
+
+    "source": "~/.config/fastfetch/current-theme-logo.png",    },
+
+    "width": 35,    "break",
+
+    "height": 18,    "colors",
+
+    "padding": {    "break",
+
+      "top": 1,    "break"
+
+      "right": 2  ]
+
+    }}_/ __/ /   / __ `/ __/
+
+  },// / __/ / /_/ (__  ) /_/ /___/ /_/ / /_
+
+  "display": {///_/    \__,_/____/\__/\____/\__,_/\__/
+
+    "separator": " ",//  https://github.com/m3tozz/FastCat
+
+    "pipe": false
+
+  },{
+
+  "modules": [  "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
+
+    "break",  "logo": {
+
+    "break",    "type": "chafa",
+
+    "break",    "source": "~/.config/fastfetch/current-theme-logo.png",
+
+    {    "width": 35,
+
+      "type": "title",    "height": 18,
+
+      "keyWidth": 10    "padding": {
+
+    },      "top": 1,
+
+    "break",      "right": 2
+
+    {    }
+
+      "type": "os",  },
+
+      "key": "󰌽 ",  "display": {
+
+      "keyColor": "34"    "separator": " ",
+
+    },    "pipe": false
+
+    {  },
+
+      "type": "kernel",  "modules": [
+
+      "key": " ",    "break",
+
+      "keyColor": "34"    "break",
+
+    },    "break",
+
+    {    {
+
+      "type": "packages",      "type": "title",
+
+      "key": " ",      "keyWidth": 10,
+
+      "keyColor": "34"    },
+
+    },    "break",
+
+    {    {
+
+      "type": "shell",      "type": "os",
+
+      "key": " ",      "key": "󰌽 ",
+
+      "keyColor": "34"      "keyColor": "34",
+
+    },    },
+
+    {    {
+
+      "type": "terminal",      "type": "kernel",
+
+      "key": " ",      "key": " ",
+
+      "keyColor": "34"      "keyColor": "34",
+
+    },    },
+
+    {    {
+
+      "type": "wm",      "type": "packages",
+
+      "key": " ",      "key": " ",
+
+      "keyColor": "34"      "keyColor": "34",
+
+    },    },
+
+    {    {
+
+      "type": "cursor",      "type": "shell",
+
+      "key": "󰇀 ",      "key": " ",
+
+      "keyColor": "34"      "keyColor": "34",
+
+    },    },
+
+    {    {
+
+      "type": "theme",      "type": "terminal",
+
+      "key": " ",      "key": " ",
+
+      "keyColor": "34"      "keyColor": "34",
+
+    },    },
+
+    {    {
+
+      "type": "icons",      "type": "wm",
+
+      "key": "󰀻 ",      "key": " ",
+
+      "keyColor": "34"      "keyColor": "34",
+
+    },    },
+
+    {    {
+
+      "type": "font",      "type": "cursor",
+
+      "key": " ",      "key": "󰇀 ",
+
+      "keyColor": "34"      "keyColor": "34",
+
+    },    },
+
+    {    {
+
+      "type": "cpu",      "type": "terminalfont",
+
+      "key": " ",      "key": " ",
+
+      "keyColor": "34"      "keyColor": "34",
+
+    },    },
+
+    {    {
+
+      "type": "memory",      "type": "uptime",
+
+      "key": " ",      "key": " ",
+
+      "keyColor": "34"      "keyColor": "34",
+
+    },    },
+
+    {    {
+
+      "type": "player",      "type": "datetime",
+
+      "key": " ",      "format": "{1}-{3}-{11}",
+
+      "keyColor": "34"      "key": "󰃭 ",
+
+    },      "keyColor": "34",
+
+    {    },
+
+      "type": "command",    {
+
+      "key": "󰉦 ",      "type": "media",
+
+      "keyColor": "34",      "key": "󰝚 ",
+
+      "text": "grep 'themeName:' ~/.config/quickshell/ThemeManager.qml 2>/dev/null | sed -E 's/.*\"(.+)\".*/\\1/' || echo 'Unknown'"      "keyColor": "34",
+
+    },    },
+
+    "break",    {
+
+    "colors",      "type": "player",
+
+    "break",      "key": " ",
+
+    "break"      "keyColor": "34",
+
+  ]    },
+
+}    {
+
+      "type": "command",
+      "key": "󰉦 ",
+      "keyColor": "34",
+      "text": "grep 'themeName:' ~/.config/quickshell/ThemeManager.qml 2>/dev/null | sed -E 's/.*\"(.+)\".*/\\1/' || echo 'Unknown'",
+    },
+    "break",
+    "colors",
+    "break",
+    "break",
+  ],
+}

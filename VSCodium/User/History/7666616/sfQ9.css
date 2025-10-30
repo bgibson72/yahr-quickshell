@@ -1,0 +1,173 @@
+/* SwayNC Stylesheet - Theme-aware */
+
+* {
+  all: unset;
+  font-family: "JetBrainsMono Nerd Font", monospace;
+  font-size: 13px;
+}
+
+.notification-row {
+  outline: none;
+  margin: 8px;
+}
+
+.notification {
+  background: #2e3440;
+  border: 2px solid #81a1c1;
+  border-radius: 12px;
+  margin: 0;
+  padding: 0;
+}
+
+.notification.critical {
+  border-color: #bf616a;
+}
+
+.notification-content {
+  background: transparent;
+  padding: 12px;
+  margin: 0;
+}
+
+.close-button {
+  background: #3b4252;
+  color: #eceff4;
+  border-radius: 8px;
+  margin: 8px;
+  padding: 4px 8px;
+  min-width: 24px;
+  min-height: 24px;
+}
+
+.close-button:hover {
+  background: #bf616a;
+  color: #2e3440;
+}
+
+.notification-default-action {
+  background: transparent;
+  margin: 0;
+  padding: 0;
+}
+
+.notification-default-action:hover {
+  background: #3b4252;
+}
+
+.summary {
+  font-weight: bold;
+  color: #eceff4;
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+
+.body {
+  color: #e5e9f0;
+  font-size: 12px;
+}
+
+.time {
+  color: #d8dee9;
+  font-size: 11px;
+  margin-top: 4px;
+}
+
+.control-center {
+  background: #2e3440;
+  border: 2px solid #4c566a;
+  border-radius: 12px;
+  margin: 8px;
+  padding: 8px;
+}
+
+.control-center-list {
+  background: transparent;
+}
+
+.control-center-list-placeholder {
+  color: #d8dee9;
+  font-size: 1.2em;
+  margin: 20px;
+}
+
+.floating-notifications {
+  background: transparent;
+}
+
+.blank-window {
+  background: transparent;
+}
+
+.notification-window {
+  background: rgba(0, 0, 0, 0);
+}
+
+.widget-title {
+  background: #3b4252;
+  color: #eceff4;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 8px;
+  padding: 12px;
+  margin: 4px;
+}
+
+.widget-title > button {
+  background: #81a1c1;
+  color: #2e3440;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.widget-title > button:hover {
+  background: #bf616a;
+}
+
+.widget-dnd {
+  background: #3b4252;
+  color: #eceff4;
+  border-radius: 8px;
+  padding: 12px;
+  margin: 4px;
+}
+
+.widget-dnd > switch {
+  background: #4c566a;
+  border-radius: 12px;
+  min-width: 48px;
+  min-height: 24px;
+}
+
+.widget-dnd > switch:checked {
+  background: #81a1c1;
+}
+
+.widget-dnd > switch slider {
+  background: #eceff4;
+  border-radius: 50%;
+}
+
+.notification-action {
+  background: #3b4252;
+  color: #eceff4;
+  border-radius: 6px;
+  padding: 8px 12px;
+  margin: 4px;
+}
+
+.notification-action:hover {
+  background: #81a1c1;
+  color: #2e3440;
+}
+
+.image {
+  margin: 8px;
+  border-radius: 8px;
+}
+
+.body-image {
+  margin: 8px;
+  border-radius: 8px;
+}

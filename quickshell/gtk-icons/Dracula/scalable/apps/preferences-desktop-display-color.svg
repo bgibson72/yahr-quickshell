@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="64"
+   height="64"
+   viewBox="0 0 16.933 16.933"
+   version="1.1"
+   id="svg20"
+   sodipodi:docname="preferences-desktop-display-color.svg"
+   inkscape:version="1.3.2 (091e20ef0f, 2023-11-25, custom)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview20"
+     pagecolor="#f8f8f2"
+     bordercolor="#282a36"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="12.875"
+     inkscape:cx="31.961165"
+     inkscape:cy="32"
+     inkscape:window-width="1920"
+     inkscape:window-height="1040"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg20" />
+  <defs
+     id="defs6">
+    <clipPath
+       id="f">
+      <rect
+         width="15.875"
+         height="12.171"
+         x=".529"
+         y="282.45"
+         fill="url(#a)"
+         stroke-opacity=".039"
+         stroke-width=".554"
+         paint-order="stroke markers fill"
+         ry=".265"
+         id="rect1" />
+    </clipPath>
+    <clipPath
+       id="e">
+      <rect
+         width="15.875"
+         height="12.171"
+         x=".529"
+         y="282.45"
+         fill="url(#a)"
+         stroke-opacity=".039"
+         stroke-width=".554"
+         paint-order="stroke markers fill"
+         ry=".265"
+         id="rect2" />
+    </clipPath>
+    <clipPath
+       id="d">
+      <rect
+         width="15.875"
+         height="12.171"
+         x=".529"
+         y="282.45"
+         fill="url(#a)"
+         stroke-opacity=".039"
+         stroke-width=".554"
+         paint-order="stroke markers fill"
+         ry=".265"
+         id="rect3" />
+    </clipPath>
+    <clipPath
+       id="c">
+      <rect
+         width="15.875"
+         height="12.171"
+         x=".529"
+         y="282.45"
+         fill="url(#a)"
+         stroke-opacity=".039"
+         stroke-width=".554"
+         paint-order="stroke markers fill"
+         ry=".265"
+         id="rect4" />
+    </clipPath>
+    <clipPath
+       id="b">
+      <rect
+         width="15.875"
+         height="12.171"
+         x=".529"
+         y="282.45"
+         fill="url(#a)"
+         stroke-opacity=".039"
+         stroke-width=".554"
+         paint-order="stroke markers fill"
+         ry=".265"
+         id="rect5" />
+    </clipPath>
+    <linearGradient
+       id="a"
+       x1="13.229"
+       x2="2.117"
+       y1="297"
+       y2="280.07"
+       gradientTransform="matrix(1.0714 0 0 1 -.605 0)"
+       gradientUnits="userSpaceOnUse">
+      <stop
+         offset="0"
+         stop-color="#66bcff"
+         id="stop5" />
+      <stop
+         offset="1"
+         stop-color="#b29aff"
+         id="stop6" />
+    </linearGradient>
+  </defs>
+  <path
+     fill="#9ab9dd"
+     d="M2.381 284.25c-.733 0-1.323.413-1.323.926v7.037c0 .513.59.926 1.323.926H3.44v-8.889H2.381z"
+     clip-path="url(#b)"
+     transform="matrix(1 0 0 1.4288 0 -404.01)"
+     id="path6"
+     style="fill:#6272a4" />
+  <path
+     fill="#9add9c"
+     d="M3.44 284.25v8.889h2.886v-8.889H3.44z"
+     clip-path="url(#c)"
+     transform="matrix(1 0 0 1.4288 0 -404.01)"
+     id="path7"
+     style="fill:#50fa7b" />
+  <path
+     fill="#f3f284"
+     d="M6.326 284.25v8.889h4.33v-8.889h-4.33z"
+     clip-path="url(#d)"
+     transform="matrix(1 0 0 1.4288 0 -404.01)"
+     id="path8"
+     style="fill:#f1fa8c" />
+  <path
+     fill="#edb968"
+     d="M10.655 284.25v8.889h2.887v-8.889h-2.887z"
+     clip-path="url(#e)"
+     transform="matrix(1 0 0 1.4288 0 -404.01)"
+     id="path9"
+     style="fill:#ffb86c" />
+  <path
+     fill="#ed8e68"
+     d="M13.542 284.25v8.889h1.01c.732 0 1.322-.413 1.322-.926v-7.037c0-.513-.59-.926-1.323-.926h-1.009z"
+     clip-path="url(#f)"
+     transform="matrix(1 0 0 1.4288 0 -404.01)"
+     id="path10"
+     style="fill:#ff5555" />
+  <rect
+     width="13.229"
+     height="1.058"
+     x="1.852"
+     y="2.646"
+     opacity=".35"
+     rx=".529"
+     ry=".529"
+     id="rect10" />
+  <rect
+     width="1.058"
+     height=".529"
+     x="2.117"
+     y="2.91"
+     opacity=".35"
+     ry=".265"
+     style="paint-order:stroke markers fill"
+     id="rect11" />
+  <rect
+     width="2.646"
+     height=".529"
+     x="7.144"
+     y="2.91"
+     opacity=".35"
+     ry=".265"
+     style="paint-order:stroke markers fill"
+     id="rect12" />
+  <rect
+     width=".529"
+     height=".529"
+     x="14.287"
+     y="2.91"
+     opacity=".35"
+     ry=".265"
+     style="paint-order:stroke markers fill"
+     id="rect13" />
+  <rect
+     width=".794"
+     height=".529"
+     x="13.229"
+     y="2.91"
+     opacity=".35"
+     ry=".265"
+     style="paint-order:stroke markers fill"
+     id="rect14" />
+  <rect
+     width=".529"
+     height=".529"
+     x="12.435"
+     y="2.91"
+     opacity=".35"
+     ry=".265"
+     style="paint-order:stroke markers fill"
+     id="rect15" />
+  <rect
+     width="10.053"
+     height="1.323"
+     x="3.44"
+     y="12.7"
+     fill="#f8f8f2"
+     opacity=".35"
+     paint-order="markers stroke fill"
+     rx=".265"
+     ry=".265"
+     id="rect16" />
+  <g
+     fill="#f8f8f2"
+     transform="translate(0 1.722)"
+     id="g20">
+    <rect
+       width="1.323"
+       height="1.323"
+       x="4.233"
+       y="10.448"
+       rx=".264"
+       ry=".264"
+       style="paint-order:stroke markers fill"
+       id="rect17" />
+    <rect
+       width="1.323"
+       height="1.323"
+       x="6.614"
+       y="10.448"
+       rx=".264"
+       ry=".264"
+       style="paint-order:stroke markers fill"
+       id="rect18" />
+    <rect
+       width="1.323"
+       height="1.323"
+       x="8.996"
+       y="10.448"
+       rx=".264"
+       ry=".264"
+       style="paint-order:stroke markers fill"
+       id="rect19" />
+    <rect
+       width="1.323"
+       height="1.323"
+       x="11.376"
+       y="10.448"
+       rx=".264"
+       ry=".264"
+       style="paint-order:stroke markers fill"
+       id="rect20" />
+  </g>
+</svg>

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="64"
+   height="64"
+   viewBox="0 0 16.933 16.933"
+   version="1.1"
+   id="svg4"
+   sodipodi:docname="software-properties.svg"
+   inkscape:version="1.3.2 (091e20ef0f, 2023-11-25, custom)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs4" />
+  <sodipodi:namedview
+     id="namedview4"
+     pagecolor="#505050"
+     bordercolor="#ffffff"
+     borderopacity="1"
+     inkscape:showpageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="1"
+     inkscape:deskcolor="#505050"
+     inkscape:zoom="12.453125"
+     inkscape:cx="32"
+     inkscape:cy="32"
+     inkscape:window-width="1920"
+     inkscape:window-height="1013"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg4" />
+  <rect
+     width="12.7"
+     height="13.758"
+     x="2.117"
+     y="1.587"
+     fill="#549bff"
+     rx="1.587"
+     ry="1.587"
+     id="rect1"
+     style="fill:#6272a4" />
+  <path
+     fill="#00f"
+     d="m8.467 1.587-4.78.001c-.871.01-1.57.713-1.57 1.587v4.211a9.26 9.63 0 0 0 8.466 5.758 9.26 9.63 0 0 0 4.234-1.068V3.175c0-.88-.708-1.587-1.588-1.587H8.467z"
+     opacity=".1"
+     style="paint-order:stroke markers fill;fill:#f8f8f2"
+     id="path1" />
+  <path
+     fill="#00f"
+     d="m8.467 1.587-4.78.001c-.871.01-1.57.713-1.57 1.587v10.583c0 .88.708 1.588 1.587 1.588h4.853a10.583 11.007 0 0 0 6.26-5.69V3.175c0-.88-.708-1.588-1.588-1.588H8.467z"
+     opacity=".1"
+     style="paint-order:stroke markers fill;fill:#515d85"
+     id="path2" />
+  <path
+     fill="#f8f8f2"
+     d="M5.292 3.969a3.175 3.175 0 0 0 3.175 3.175 3.175 3.175 0 0 0 3.175-3.175h-.794A2.381 2.381 0 0 1 8.467 6.35a2.381 2.381 0 0 1-2.382-2.381z"
+     style="paint-order:stroke markers fill"
+     id="path3" />
+  <circle
+     cx="11.641"
+     cy="12.171"
+     r="4.233"
+     fill="#7ba3f4"
+     id="circle3" />
+  <path
+     fill="#f8f8f2"
+     d="m9.79 12.7 1.851 2.117 1.852-2.117h-1.058v-2.646h-1.587V12.7z"
+     id="path4" />
+</svg>

@@ -1,0 +1,6 @@
+{
+    "chat.tools.terminal.autoApprove": {
+        "~/.local/bin/theme-switcher": true
+    },
+    "chat.agent.maxRequests": 25000
+}

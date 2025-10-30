@@ -1,0 +1,10 @@
+#!/bin/bash
+# Toggle screenshot widget
+# Uses file-based IPC since Quickshell IPC calls don't work reliably
+
+SOCKET="/tmp/quickshell-screenshot.sock"
+
+# Create file briefly to signal toggle, then remove it
+touch "$SOCKET"
+sleep 0.2
+rm -f "$SOCKET"

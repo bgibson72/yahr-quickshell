@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="64"
+   height="64"
+   version="1.1"
+   id="svg8"
+   sodipodi:docname="calamares.svg"
+   inkscape:version="1.3.2 (091e20ef0f, 2023-11-25, custom)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs8" />
+  <sodipodi:namedview
+     id="namedview8"
+     pagecolor="#505050"
+     bordercolor="#f8f8f2"
+     borderopacity="1"
+     inkscape:showpageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="1"
+     inkscape:deskcolor="#505050"
+     inkscape:zoom="12.453125"
+     inkscape:cx="32"
+     inkscape:cy="32"
+     inkscape:window-width="1920"
+     inkscape:window-height="1013"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="g8" />
+  <g
+     transform="translate(0 -1058.5)"
+     id="g8">
+    <circle
+       cx="-251.33"
+       cy="1061.6"
+       r="27"
+       fill="#cbcccc"
+       transform="rotate(-15)"
+       id="circle1" />
+    <circle
+       cx="32"
+       cy="1090.5"
+       r="10"
+       fill="#bdbdbd"
+       id="circle2" />
+    <circle
+       cx="32"
+       cy="1090.5"
+       r="5"
+       fill="#424242"
+       id="circle3" />
+    <rect
+       width="9"
+       height="10"
+       x="44"
+       y="1089.5"
+       fill="#4a606a"
+       ry="1"
+       id="rect3"
+       style="fill:#44475a" />
+    <path
+       fill="#f6744a"
+       d="M43 1097.5c-.554 0-1 .446-1 1v16c0 1.662 1.338 3 3 3h7c1.662 0 3-1.338 3-3v-16c0-.554-.446-1-1-1H43z"
+       id="path3"
+       style="fill:#fd7e7c" />
+    <g
+       fill="#f8f8f2"
+       id="g6">
+      <rect
+         width="7"
+         height="1"
+         x="45"
+         y="1100.5"
+         ry=".5"
+         id="rect4" />
+      <rect
+         width="5"
+         height="1"
+         x="46"
+         y="1102.5"
+         ry=".453"
+         id="rect5" />
+      <rect
+         width="3"
+         height="1"
+         x="47"
+         y="1104.5"
+         ry=".453"
+         id="rect6" />
+    </g>
+    <g
+       fill="#ffd54f"
+       id="g7"
+       style="fill:#f1fa8c">
+      <path
+         d="M46 1091.5h1v5h-1zM50 1091.5h1v5h-1zM48 1093.5h1v3h-1z"
+         id="path6"
+         style="fill:#f1fa8c" />
+    </g>
+  </g>
+</svg>

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="64"
+   height="64"
+   viewBox="0 0 16.933 16.933"
+   version="1.1"
+   id="svg4"
+   sodipodi:docname="login.svg"
+   inkscape:version="1.3.2 (091e20ef0f, 2023-11-25, custom)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs4" />
+  <sodipodi:namedview
+     id="namedview4"
+     pagecolor="#505050"
+     bordercolor="#ffffff"
+     borderopacity="1"
+     inkscape:showpageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="1"
+     inkscape:deskcolor="#505050"
+     inkscape:zoom="12.453125"
+     inkscape:cx="32"
+     inkscape:cy="32"
+     inkscape:window-width="1920"
+     inkscape:window-height="1013"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg4" />
+  <rect
+     width="13.758"
+     height="13.758"
+     x="1.587"
+     y="1.587"
+     fill="#2d96ee"
+     rx="2.117"
+     ry="2.117"
+     id="rect1"
+     style="fill:#6272a4" />
+  <path
+     d="M3.704 2.646c-.586 0-1.058.472-1.058 1.058v9.525c0 .586.472 1.058 1.058 1.058h1.852c0-.44.354-.794.794-.794h4.233c.44 0 .794.354.794.794h1.852c.586 0 1.058-.472 1.058-1.058V3.704c0-.586-.472-1.058-1.058-1.058h-1.852c0 .44-.354.794-.794.794H6.35a.792.792 0 0 1-.794-.794H3.704z"
+     opacity=".15"
+     id="path1" />
+  <rect
+     width="8.466"
+     height="6.35"
+     x="4.233"
+     y="5.292"
+     fill="#f8f8f2"
+     fill-rule="evenodd"
+     opacity=".35"
+     rx=".794"
+     ry=".794"
+     id="rect2" />
+  <rect
+     width="6.35"
+     height="1.323"
+     x="5.292"
+     y="7.937"
+     fill="#f8f8f2"
+     fill-rule="evenodd"
+     rx=".265"
+     ry=".265"
+     id="rect3" />
+  <path
+     fill="#2d2d2d"
+     d="M6.35 8.599a.397.397 0 1 1-.794 0 .397.397 0 0 1 .794 0m1.06 0a.397.397 0 1 1-.795 0 .397.397 0 0 1 .794 0m1.058 0a.397.397 0 1 1-.794 0 .397.397 0 0 1 .794 0"
+     id="path3" />
+  <path
+     fill="#f8f8f2"
+     d="M5.356 7.144h1.99c.035 0 .064.028.064.063v.137a.064.064 0 0 1-.064.064h-1.99a.064.064 0 0 1-.064-.064v-.137c0-.035.029-.063.064-.063"
+     id="path4" />
+</svg>

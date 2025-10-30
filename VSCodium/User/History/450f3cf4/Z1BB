@@ -1,0 +1,4 @@
+#!/bin/bash
+# Toggle wallpaper picker
+qdbus org.quickshell /WallpaperPickerManager show 2>/dev/null || \
+    ~/.config/quickshell/wallpaper-picker

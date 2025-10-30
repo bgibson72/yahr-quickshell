@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="64"
+   height="64"
+   version="1"
+   id="svg1"
+   sodipodi:docname="bitwarden.svg"
+   inkscape:version="1.3.2 (091e20ef0f, 2023-11-25, custom)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs1" />
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#505050"
+     bordercolor="#f8f8f2"
+     borderopacity="1"
+     inkscape:showpageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="1"
+     inkscape:deskcolor="#505050"
+     inkscape:zoom="12.453125"
+     inkscape:cx="32"
+     inkscape:cy="32"
+     inkscape:window-width="1920"
+     inkscape:window-height="1013"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg1" />
+  <rect
+     width="52"
+     height="52"
+     x="-58"
+     y="-58"
+     fill="#175ddc"
+     rx="7"
+     ry="7"
+     transform="matrix(0 -1 -1 0 0 0)"
+     id="rect1"
+     style="fill:#168daa" />
+  <path
+     fill="#f8f8f2"
+     d="M17.714 15C17 15 17 14.892 17 25.398c0 10.661-.013 10.448.807 12.515.943 2.378 2.462 4.388 4.956 6.572 2.093 1.833 4.574 3.493 7.342 4.902.936.476 1.42.693 1.895.685.476.008.959-.209 1.895-.685 2.768-1.41 5.25-3.069 7.342-4.902 2.494-2.184 4.013-4.194 4.956-6.572.82-2.067.807-1.854.807-12.515C47 14.892 47 15 46.286 15zM32 20h9.706v14.191s-.006.69-.434 1.772c-.603 1.518-1.439 2.717-3.523 4.542-1.582 1.385-3.576 2.668-5.749 3.826z"
+     id="path1" />
+</svg>

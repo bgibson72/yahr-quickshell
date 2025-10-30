@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="64"
+   height="64"
+   version="1.1"
+   id="svg3"
+   sodipodi:docname="calibre-ebook-edit.svg"
+   inkscape:version="1.3.2 (091e20ef0f, 2023-11-25, custom)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs3" />
+  <sodipodi:namedview
+     id="namedview3"
+     pagecolor="#505050"
+     bordercolor="#f8f8f2"
+     borderopacity="1"
+     inkscape:showpageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="1"
+     inkscape:deskcolor="#505050"
+     inkscape:zoom="12.453125"
+     inkscape:cx="32"
+     inkscape:cy="32"
+     inkscape:window-width="1920"
+     inkscape:window-height="1013"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg3" />
+  <g
+     stroke-width=".852"
+     id="g2">
+    <path
+       fill="#c7484a"
+       d="M32 5c14.912 0 27 12.087 27 27S46.911 59 32 59 5 46.91 5 32 17.088 5 32 5z"
+       id="path1"
+       style="fill:#c7484a" />
+    <path
+       fill="#f8f8f2"
+       d="M17.908 19.087v19.956l10.565 7.044V25.544zm2.348 0 9.391 5.87h4.696l9.391-5.87c-4.696 0-7.043.61-11.739 4.696-4.696-3.986-7.043-4.696-11.739-4.696zm25.826 0-10.565 6.457v20.543l10.565-7.044zM29.647 26.13v21.13h4.696V26.13z"
+       id="path2" />
+  </g>
+  <circle
+     cx="48"
+     cy="46"
+     r="15"
+     fill="#8561c5"
+     id="circle2"
+     style="fill:#9576c5" />
+  <path
+     fill="#f8f8f2"
+     d="m46 38-.176 2.107a6.286 6.286 0 0 0-1.837 1.063l-1.916-.902-2 3.464 1.74 1.208a6.286 6.286 0 0 0-.097 1.06 6.286 6.286 0 0 0 .092 1.065l-1.734 1.204 2 3.464 1.91-.9a6.286 6.286 0 0 0 1.842 1.056L46 54.001h4l.177-2.107a6.286 6.286 0 0 0 1.837-1.063l1.915.902 2-3.464-1.739-1.208a6.286 6.286 0 0 0 .096-1.06 6.286 6.286 0 0 0-.091-1.065l1.734-1.203-2-3.464-1.91.9a6.286 6.286 0 0 0-1.842-1.056L50 38h-4zm2 5.714A2.286 2.286 0 0 1 50.286 46 2.286 2.286 0 0 1 48 48.286 2.286 2.286 0 0 1 45.714 46 2.286 2.286 0 0 1 48 43.714z"
+     id="path3" />
+</svg>

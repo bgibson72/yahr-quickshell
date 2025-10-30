@@ -1,0 +1,2 @@
+singleton ThemeManager 1.0 ThemeManager.qml
+singleton NotificationService 1.0 NotificationService.qml

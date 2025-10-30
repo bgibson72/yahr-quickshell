@@ -1,0 +1,19 @@
+[package]
+name = "pluck"
+version = "0.1.0"
+edition = "2021"
+authors = ["Your Name <your.email@example.com>"]
+description = "A GTK4 application for extracting color palettes from images"
+
+[dependencies]
+gtk = { version = "0.9", package = "gtk4", features = ["v4_12"] }
+relm4 = "0.9"
+relm4-components = "0.9"
+image = "0.25"
+color-thief = "0.2"
+anyhow = "1.0"
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1

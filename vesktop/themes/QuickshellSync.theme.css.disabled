@@ -1,0 +1,4 @@
+/* Theme disabled temporarily - causing blank screen
+   Run: mv QuickshellSync.theme.css.disabled QuickshellSync.theme.css
+   To re-enable after fixing
+*/

@@ -1,0 +1,13 @@
+{
+    "chat.tools.terminal.autoApprove": {
+        
+        "~/.local/bin/theme-switcher": true
+    },
+    "chat.agent.maxRequests": 25000,
+    "qt-core.additionalQtPaths": [
+        {
+            "name": "Qt-5.15.17-linux-g++_from_PATH",
+            "path": "/usr/bin/qmake"
+        }
+    ]
+}

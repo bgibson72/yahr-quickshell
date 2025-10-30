@@ -1,0 +1,111 @@
+// Theme.qml - Centralized theme configuration
+// This is an example of how you can centralize your theme colors
+// To use this, you would import it in each component and reference Theme.colors
+
+pragma Singleton
+import QtQuick
+
+QtObject {
+    id: theme
+    
+    // Tokyo Night Colors (current theme)
+    readonly property QtObject colors: QtObject {
+        // Background colors
+        property color background: "#1a1b26"
+        property color backgroundAlpha: "#D91A1B26"  // 85% opacity
+        property color surface: "#292e42"
+        property color surfaceHover: "#33467c"
+        
+        // Text colors
+        property color text: "#c0caf5"
+        property color textDim: "#a9b1d6"
+        property color textMuted: "#565f89"
+        property color separator: "#737aa2"
+        
+        // Accent colors
+        property color primary: "#7aa2f7"
+        property color primaryDark: "#9d7cd8"
+        property color success: "#9ece6a"
+        property color warning: "#e0af68"
+        property color error: "#f7768e"
+        property color errorDark: "#db4b4b"
+        
+        // Module specific colors
+        property color arch: "#7aa2f7"
+        property color archHover: "#9d7cd8"
+        property color network: "#9ece6a"
+        property color networkEthernet: "#7aa2f7"
+        property color networkDisconnected: "#f7768e"
+        property color audio: "#e0af68"
+        property color audioMuted: "#565f89"
+        property color battery: "#9ece6a"
+        property color batteryWarning: "#e0af68"
+        property color batteryCritical: "#f7768e"
+        property color updates: "#7aa2f7"
+        property color power: "#f7768e"
+        property color powerHover: "#db4b4b"
+    }
+    
+    // Font settings
+    readonly property QtObject fonts: QtObject {
+        property string main: "MapleMono NF"
+        property string icons: "Symbols Nerd Font"
+        property int sizeSmall: 12
+        property int sizeNormal: 13
+        property int sizeMedium: 16
+        property int sizeLarge: 20
+        property int sizeXLarge: 24
+    }
+    
+    // Spacing and sizing
+    readonly property QtObject spacing: QtObject {
+        property int small: 4
+        property int medium: 8
+        property int large: 12
+    }
+    
+    readonly property QtObject border: QtObject {
+        property int radius: 8
+        property int width: 2
+    }
+    
+    // Animation timings
+    readonly property QtObject animation: QtObject {
+        property int fast: 100
+        property int normal: 200
+        property int slow: 300
+    }
+}
+
+/* 
+ * ALTERNATIVE THEME EXAMPLES
+ * 
+ * To switch themes, replace the colors object above with one of these:
+ * 
+ * CATPPUCCIN MOCHA:
+ * property color background: "#1e1e2e"
+ * property color surface: "#313244"
+ * property color primary: "#89b4fa"
+ * property color success: "#a6e3a1"
+ * property color warning: "#f9e2af"
+ * property color error: "#f38ba8"
+ * property color text: "#cdd6f4"
+ * 
+ * GRUVBOX DARK:
+ * property color background: "#282828"
+ * property color surface: "#3c3836"
+ * property color primary: "#83a598"
+ * property color success: "#b8bb26"
+ * property color warning: "#fabd2f"
+ * property color error: "#fb4934"
+ * property color text: "#ebdbb2"
+ * 
+ * NORD:
+ * property color background: "#2e3440"
+ * property color surface: "#3b4252"
+ * property color primary: "#88c0d0"
+ * property color success: "#a3be8c"
+ * property color warning: "#ebcb8b"
+ * property color error: "#bf616a"
+ * property color text: "#eceff4"
+ */

@@ -1,0 +1,332 @@
+import QtQuick
+import Quickshell
+import Quickshell.Io
+
+Rectangle {
+    id: root
+    
+    width: 400
+    height: 400
+    color: ThemeManager.surface0
+    radius: 24
+    
+    property bool isVisible: false
+    property int selectedIndex: -1  // Hover state only
+    
+
+    
+    Column {
+        anchors.fill: parent
+        anchors.margins: 16
+        spacing: 12
+        
+        // Title
+        Text {
+            width: parent.width
+            height: 44
+            text: "Power Options"
+            font.family: "MapleMono NF"
+            font.pixelSize: 16
+            font.weight: Font.Medium
+            color: ThemeManager.fgPrimary
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
+        }
+        
+        // Power options grid
+        Grid {
+            width: parent.width
+            columns: 3
+            columnSpacing: 12
+            rowSpacing: 12
+            
+            // Lock
+            Rectangle {
+                width: (parent.width - 24) / 3
+                height: 120
+                color: selectedIndex === 0 ? ThemeManager.surface2 : ThemeManager.surface1
+                radius: 16
+                border.width: 2
+                border.color: selectedIndex === 0 ? ThemeManager.accentBlue : "transparent"
+                
+                Column {
+                    anchors.centerIn: parent
+                    spacing: 12
+                    
+                    Text {
+                        text: "󰌾"  // lock icon
+                        font.family: "Symbols Nerd Font"
+                        font.pixelSize: 40
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        color: ThemeManager.fgPrimary
+                    }
+                    
+                    Text {
+                        text: "Lock"
+                        font.family: "MapleMono NF"
+                        font.pixelSize: 13
+                        font.weight: Font.Medium
+                        color: ThemeManager.fgPrimary
+                        anchors.horizontalCenter: parent.horizontalCenter
+                    }
+                }
+                
+                MouseArea {
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+                    
+                    onEntered: selectedIndex = 0
+                    onClicked: executeAction("lock")
+                }
+            }
+            
+            // Logout
+            Rectangle {
+                width: (parent.width - 24) / 3
+                height: 120
+                color: selectedIndex === 1 ? ThemeManager.surface2 : ThemeManager.surface1
+                radius: 16
+                border.width: 2
+                border.color: selectedIndex === 1 ? ThemeManager.accentBlue : "transparent"
+                
+                Column {
+                    anchors.centerIn: parent
+                    spacing: 12
+                    
+                    Text {
+                        text: "󰍃"  // logout icon
+                        font.family: "Symbols Nerd Font"
+                        font.pixelSize: 40
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        color: ThemeManager.fgPrimary
+                    }
+                    
+                    Text {
+                        text: "Logout"
+                        font.family: "MapleMono NF"
+                        font.pixelSize: 13
+                        font.weight: Font.Medium
+                        color: ThemeManager.fgPrimary
+                        anchors.horizontalCenter: parent.horizontalCenter
+                    }
+                }
+                
+                MouseArea {
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+                    
+                    onEntered: selectedIndex = 1
+                    onClicked: executeAction("logout")
+                }
+            }
+            
+            // Suspend
+            Rectangle {
+                width: (parent.width - 24) / 3
+                height: 120
+                color: selectedIndex === 2 ? ThemeManager.surface2 : ThemeManager.surface1
+                radius: 16
+                border.width: 2
+                border.color: selectedIndex === 2 ? ThemeManager.accentBlue : "transparent"
+                
+                Column {
+                    anchors.centerIn: parent
+                    spacing: 12
+                    
+                    Text {
+                        text: "󰒲"  // sleep/suspend icon
+                        font.family: "Symbols Nerd Font"
+                        font.pixelSize: 40
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        color: ThemeManager.fgPrimary
+                    }
+                    
+                    Text {
+                        text: "Suspend"
+                        font.family: "MapleMono NF"
+                        font.pixelSize: 13
+                        font.weight: Font.Medium
+                        color: ThemeManager.fgPrimary
+                        anchors.horizontalCenter: parent.horizontalCenter
+                    }
+                }
+                
+                MouseArea {
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+                    
+                    onEntered: selectedIndex = 2
+                    onClicked: executeAction("suspend")
+                }
+            }
+            
+            // Reboot
+            Rectangle {
+                width: (parent.width - 24) / 3
+                height: 120
+                color: selectedIndex === 3 ? ThemeManager.surface2 : ThemeManager.surface1
+                radius: 16
+                border.width: 2
+                border.color: selectedIndex === 3 ? ThemeManager.accentRed : "transparent"
+                
+                Column {
+                    anchors.centerIn: parent
+                    spacing: 12
+                    
+                    Text {
+                        text: "󰜉"  // restart icon
+                        font.family: "Symbols Nerd Font"
+                        font.pixelSize: 40
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        color: ThemeManager.fgPrimary
+                    }
+                    
+                    Text {
+                        text: "Reboot"
+                        font.family: "MapleMono NF"
+                        font.pixelSize: 13
+                        font.weight: Font.Medium
+                        color: ThemeManager.fgPrimary
+                        anchors.horizontalCenter: parent.horizontalCenter
+                    }
+                }
+                
+                MouseArea {
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+                    
+                    onEntered: selectedIndex = 3
+                    onClicked: executeAction("reboot")
+                }
+            }
+            
+            // Shutdown
+            Rectangle {
+                width: (parent.width - 24) / 3
+                height: 120
+                color: selectedIndex === 4 ? ThemeManager.surface2 : ThemeManager.surface1
+                radius: 16
+                border.width: 2
+                border.color: selectedIndex === 4 ? ThemeManager.accentRed : "transparent"
+                
+                Column {
+                    anchors.centerIn: parent
+                    spacing: 12
+                    
+                    Text {
+                        text: "󰐥"  // power icon
+                        font.family: "Symbols Nerd Font"
+                        font.pixelSize: 40
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        color: ThemeManager.fgPrimary
+                    }
+                    
+                    Text {
+                        text: "Shutdown"
+                        font.family: "MapleMono NF"
+                        font.pixelSize: 13
+                        font.weight: Font.Medium
+                        color: ThemeManager.fgPrimary
+                        anchors.horizontalCenter: parent.horizontalCenter
+                    }
+                }
+                
+                MouseArea {
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+                    
+                    onEntered: selectedIndex = 4
+                    onClicked: executeAction("shutdown")
+                }
+            }
+            
+            // Cancel
+            Rectangle {
+                width: (parent.width - 24) / 3
+                height: 120
+                color: selectedIndex === 5 ? ThemeManager.surface2 : ThemeManager.surface1
+                radius: 16
+                border.width: 2
+                border.color: selectedIndex === 5 ? ThemeManager.accentBlue : "transparent"
+                
+                Column {
+                    anchors.centerIn: parent
+                    spacing: 12
+                    
+                    Text {
+                        text: "󰜺"  // close/cancel icon
+                        font.family: "Symbols Nerd Font"
+                        font.pixelSize: 40
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        color: ThemeManager.fgPrimary
+                    }
+                    
+                    Text {
+                        text: "Cancel"
+                        font.family: "MapleMono NF"
+                        font.pixelSize: 13
+                        font.weight: Font.Medium
+                        color: ThemeManager.fgPrimary
+                        anchors.horizontalCenter: parent.horizontalCenter
+                    }
+                }
+                
+                MouseArea {
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+                    
+                    onEntered: selectedIndex = 5
+                    onClicked: root.isVisible = false
+                }
+            }
+        }
+    }
+    
+    // ESC key to close
+    Keys.onEscapePressed: {
+        root.isVisible = false
+    }
+    
+    Timer {
+        id: executeTimer
+        interval: 150
+        property string pendingAction: ""
+        onTriggered: {
+            let command = []
+            if (pendingAction === "lock") command = ["hyprlock"]
+            else if (pendingAction === "logout") command = ["hyprctl", "dispatch", "exit"]
+            else if (pendingAction === "suspend") command = ["systemctl", "suspend"]
+            else if (pendingAction === "reboot") command = ["systemctl", "reboot"]
+            else if (pendingAction === "shutdown") command = ["systemctl", "poweroff"]
+            
+            if (command.length > 0) {
+                console.log("Executing command:", command.join(" "))
+                Quickshell.execDetached(command)
+            }
+            pendingAction = ""
+        }
+    }
+    
+    function executeAction(action) {
+        console.log("Executing power action:", action)
+        
+        // Close the menu first
+        root.isVisible = false
+        
+        // Use timer to ensure window closes before executing
+        executeTimer.pendingAction = action
+        executeTimer.start()
+    }
+    
+    onIsVisibleChanged: {
+        if (isVisible) {
+            selectedIndex = -1  // Reset hover state
+        }
+    }
+}

@@ -1,0 +1,3 @@
+#!/bin/bash
+# Toggle wallpaper picker - use the old bash script for keyboard shortcut
+~/.config/quickshell/wallpaper-picker

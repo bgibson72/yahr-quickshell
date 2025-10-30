@@ -1,0 +1,949 @@
+#!/bin/bash
+
+# Hyprland Theme Switcher
+# A simple TUI theme changer for Arch Hyprland
+
+# ============================================
+# Configuration
+# ============================================
+HYPR_DIR="$HOME/.config/hypr"
+WAYBAR_DIR="$HOME/.config/waybar"
+THEMES_DIR="$HYPR_DIR/themes"
+THEME_CONFIG="$HYPR_DIR/theme-switcher.conf"
+CURRENT_THEME_FILE="$HYPR_DIR/.current-theme"
+
+# ============================================
+# Color Variables
+# ============================================
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+# ============================================
+# Helper Functions
+# ============================================
+print_info() {
+    echo -e "${BLUE}[INFO]${NC} $1"
+}
+
+print_success() {
+    echo -e "${GREEN}[SUCCESS]${NC} $1"
+}
+
+print_error() {
+    echo -e "${RED}[ERROR]${NC} $1"
+}
+
+print_warning() {
+    echo -e "${YELLOW}[WARNING]${NC} $1"
+}
+
+check_dependencies() {
+    local required_deps=("nwg-look" "hyprctl")
+    local missing=()
+    
+    for dep in "${required_deps[@]}"; do
+        if ! command -v "$dep" &> /dev/null; then
+            missing+=("$dep")
+        fi
+    done
+    
+    if [ ${#missing[@]} -gt 0 ]; then
+        print_error "Missing dependencies: ${missing[*]}"
+        print_info "Install with: sudo pacman -S ${missing[*]}"
+        exit 1
+    fi
+    
+    # Check for at least one selector (fzf or wofi)
+    if ! command -v "fzf" &> /dev/null && ! command -v "wofi" &> /dev/null; then
+        print_error "Missing theme selector: need either 'fzf' or 'wofi'"
+        print_info "Install with: sudo pacman -S fzf  OR  sudo pacman -S wofi"
+        exit 1
+    fi
+}
+
+create_default_config() {
+    if [ ! -f "$THEME_CONFIG" ]; then
+        print_info "Creating default theme configuration..."
+        cat > "$THEME_CONFIG" << 'EOF'
+# Theme Configuration
+# Format: theme_name|hyprland_colors_file|gtk_theme|icon_theme
+
+catppuccin-mocha|catppuccin-mocha.conf|Catppuccin-Dark|Catppuccin-Mocha
+tokyonight|tokyonight-night.conf|Tokyonight-Dark|Tokyonight-Dark
+everforest-dark|everforest-dark.conf|Everforest-Dark|Everforest-Dark
+rose-pine|rosepine-dark.conf|Rosepine-Dark|Rose-Pine-Moon
+material|material-deepocean.conf|Material-Dark-Palenight|Material-DeepOcean
+nightfox-dusk|nightfox-dusk.conf|Nightfox-Dark-Duskfox|NightFox-Dusk
+kanagawa|kanagawa-dark.conf|Kanagawa-Dark-Dragon|Kanagawa
+gruvbox|gruvbox-dark.conf|Gruvbox-Dark|Gruvbox-Dark
+EOF
+        print_success "Created default configuration at $THEME_CONFIG"
+    fi
+}
+
+parse_theme_colors() {
+    local theme_file="$1"
+    
+    if [ ! -f "$theme_file" ]; then
+        print_error "Theme file not found: $theme_file"
+        return 1
+    fi
+    
+    # Extract color values using grep and sed (using semantic names)
+    bg_base=$(grep '^\$bg-base = ' "$theme_file" | sed 's/.*rgb(\(.*\)).*/\1/')
+    fg_primary=$(grep '^\$fg-primary = ' "$theme_file" | sed 's/.*rgb(\(.*\)).*/\1/')
+    accent_blue=$(grep '^\$accent-blue = ' "$theme_file" | sed 's/.*rgb(\(.*\)).*/\1/')
+    accent_red=$(grep '^\$accent-red = ' "$theme_file" | sed 's/.*rgb(\(.*\)).*/\1/')
+    accent_green=$(grep '^\$accent-green = ' "$theme_file" | sed 's/.*rgb(\(.*\)).*/\1/')
+    accent_yellow=$(grep '^\$accent-yellow = ' "$theme_file" | sed 's/.*rgb(\(.*\)).*/\1/')
+    accent_purple=$(grep '^\$accent-purple = ' "$theme_file" | sed 's/.*rgb(\(.*\)).*/\1/')
+    accent_maroon=$(grep '^\$accent-maroon = ' "$theme_file" | sed 's/.*rgb(\(.*\)).*/\1/')
+    surface_0=$(grep '^\$surface-0 = ' "$theme_file" | sed 's/.*rgb(\(.*\)).*/\1/')
+    surface_1=$(grep '^\$surface-1 = ' "$theme_file" | sed 's/.*rgb(\(.*\)).*/\1/')
+    border_0=$(grep '^\$border-0 = ' "$theme_file" | sed 's/.*rgb(\(.*\)).*/\1/')
+    border_1=$(grep '^\$border-1 = ' "$theme_file" | sed 's/.*rgb(\(.*\)).*/\1/')
+    bg_mantle=$(grep '^\$bg-mantle = ' "$theme_file" | sed 's/.*rgb(\(.*\)).*/\1/')
+    fg_secondary=$(grep '^\$fg-secondary = ' "$theme_file" | sed 's/.*rgb(\(.*\)).*/\1/')
+    
+    # Export for use in other functions
+    export THEME_BG_BASE="$bg_base"
+    export THEME_FG_PRIMARY="$fg_primary"
+    export THEME_ACCENT_BLUE="$accent_blue"
+    export THEME_ACCENT_RED="$accent_red"
+    export THEME_ACCENT_GREEN="$accent_green"
+    export THEME_ACCENT_YELLOW="$accent_yellow"
+    export THEME_ACCENT_PURPLE="$accent_purple"
+    export THEME_ACCENT_MAROON="$accent_maroon"
+    export THEME_SURFACE_0="$surface_0"
+    export THEME_SURFACE_1="$surface_1"
+    export THEME_BORDER_0="$border_0"
+    export THEME_BORDER_1="$border_1"
+    export THEME_BG_MANTLE="$bg_mantle"
+    export THEME_FG_SECONDARY="$fg_secondary"
+}
+
+apply_hyprland_colors() {
+    local theme_file="$1"
+    
+    print_info "Applying Hyprland colors..."
+    
+    # Update hyprland.conf to source the correct theme
+    if grep -q "^source = $THEMES_DIR/" "$HYPR_DIR/hyprland.conf"; then
+        sed -i "s|^source = $THEMES_DIR/.*|source = $THEMES_DIR/$theme_file|" "$HYPR_DIR/hyprland.conf"
+    else
+        echo "source = $THEMES_DIR/$theme_file" >> "$HYPR_DIR/hyprland.conf"
+    fi
+    
+    # Reload Hyprland configuration
+    hyprctl reload &> /dev/null
+    
+    # Give it a moment to process
+    sleep 0.3
+    
+    # Force refresh by reloading specific color keywords
+    # This ensures borders update immediately
+    local theme_path="$THEMES_DIR/$theme_file"
+    if [ -f "$theme_path" ]; then
+        # Extract colors and apply them directly via hyprctl
+        local accent_blue=$(grep '^\$accent-blue = ' "$theme_path" | sed 's/.*rgb(\(.*\)).*/\1/')
+        local accent_purple=$(grep '^\$accent-purple = ' "$theme_path" | sed 's/.*rgb(\(.*\)).*/\1/')
+        local border_0=$(grep '^\$border-0 = ' "$theme_path" | sed 's/.*rgb(\(.*\)).*/\1/')
+        
+        if [ -n "$accent_blue" ] && [ -n "$border_0" ]; then
+            # Update border colors in real-time
+            hyprctl keyword general:col.active_border "rgb($accent_blue)" &> /dev/null
+            hyprctl keyword general:col.inactive_border "rgb($border_0)" &> /dev/null
+        fi
+    fi
+    
+    print_success "Hyprland colors applied"
+}
+
+apply_waybar_colors() {
+    local theme_file="$THEMES_DIR/$1"
+    
+    print_info "Applying Waybar colors..."
+    
+    # Parse colors from theme file
+    if ! parse_theme_colors "$theme_file"; then
+        print_error "Failed to parse theme colors"
+        return 1
+    fi
+    
+    # Create or update waybar style
+    local waybar_style="$WAYBAR_DIR/style.css"
+    
+    # Backup existing style
+    if [ -f "$waybar_style" ]; then
+        cp "$waybar_style" "$waybar_style.backup"
+    fi
+    
+    # Convert base background hex to RGB for transparency
+    local r=$((16#${THEME_BG_BASE:0:2}))
+    local g=$((16#${THEME_BG_BASE:2:2}))
+    local b=$((16#${THEME_BG_BASE:4:2}))
+    
+    # Generate new style with theme colors
+    cat > "$waybar_style" << EOF
+/* Waybar Style - Auto-generated by theme-switcher */
+
+* {
+    border: none;
+    border-radius: 0;
+    font-family: "MapleMono NF", "MapleMono Nerd Font", sans-serif;
+    font-size: 13px;
+    min-height: 0;
+}
+
+window#waybar {
+    background: rgba(${r}, ${g}, ${b}, 0.85);
+    color: #${THEME_FG_PRIMARY};
+}
+
+/* LEFT MODULES */
+#custom-arch,
+#custom-kitty,
+#custom-nautilus,
+#custom-firefox, 
+#custom-wallpaper-picker,
+#custom-screenshot,
+#network,
+#pulseaudio,
+#battery,
+#custom-updates,
+#custom-power {
+    font-family: "Symbols Nerd Font", "MapleMono NF", sans-serif;
+}
+
+#custom-arch {
+    padding: 4px 12px;
+    margin: 4px 5px 4px 0;
+    background: #${THEME_ACCENT_BLUE};
+    color: #${THEME_BG_BASE};
+    font-size: 24px;
+    border-radius: 8px;
+}
+
+#custom-arch:hover {
+    background: #${THEME_ACCENT_PURPLE};
+}
+
+#workspaces {
+    margin: 0 5px;
+    font-size: 20pt;
+}
+
+#workspaces button {
+    padding: 0 8px;
+    background: transparent;
+    color: #${THEME_FG_SECONDARY};
+    border-bottom: 2px solid transparent;
+}
+
+#workspaces button.active {
+    color: #${THEME_ACCENT_BLUE};
+    border-bottom: 2px solid #${THEME_ACCENT_BLUE};
+}
+
+#workspaces button.urgent {
+    color: #${THEME_ACCENT_RED};
+    border-bottom: 2px solid #${THEME_ACCENT_RED};
+}
+
+#workspaces button:hover {
+    background: #${THEME_SURFACE_0};
+    color: #${THEME_FG_PRIMARY};
+}
+
+#custom-separator {
+    padding: 0 8px;
+    margin: 0 4px;
+    color: #${THEME_BORDER_1};
+}
+
+#custom-kitty,
+#custom-nautilus,
+#custom-firefox, 
+#custom-wallpaper-picker,
+#custom-screenshot,
+#custom-theme-switcher{
+    padding: 0 10px;
+    margin: 0 4px;
+    color: #${THEME_FG_PRIMARY};
+    font-size: 16pt;
+}
+
+#custom-kitty:hover,
+#custom-nautilus:hover,
+#custom-firefox:hover,
+#custom-wallpaper-picker:hover,
+#custom-screenshot:hover,
+#custom-theme-switcher:hover{
+    color: #${THEME_ACCENT_BLUE};
+}
+
+/* CENTER MODULES */
+#clock {
+    padding: 4px 15px;
+    margin: 4px;
+    background: #${THEME_SURFACE_0};
+    color: #${THEME_FG_PRIMARY};
+    border-radius: 8px;
+    font-size: 12pt;
+}
+
+#clock:hover {
+    background: #${THEME_SURFACE_1};
+}
+
+/* RIGHT MODULES */
+#custom-updates {
+    padding: 4px 10px;
+    margin: 4px 10px 4px 0;
+    background: #${THEME_SURFACE_0};
+    color: #${THEME_ACCENT_BLUE};
+    border-radius: 8px;
+    font-size: 16pt;
+}
+
+#custom-updates:hover {
+    background: #${THEME_SURFACE_1};
+}
+
+/* Combined background for network, audio, battery */
+#network {
+    padding: 4px 8px;
+    margin: 4px 0 4px 0;
+    background: #${THEME_SURFACE_0};
+    color: #${THEME_ACCENT_GREEN};
+    font-size: 16pt;
+    border-radius: 8px 0 0 8px;
+}
+
+#network.ethernet {
+    color: #${THEME_ACCENT_BLUE};
+}
+
+#network.disconnected {
+    color: #${THEME_ACCENT_RED};
+}
+
+#network:hover {
+    background: #${THEME_SURFACE_1};
+}
+
+#pulseaudio {
+    padding: 4px 8px;
+    margin: 4px 0;
+    background: #${THEME_SURFACE_0};
+    color: #${THEME_ACCENT_YELLOW};
+    font-size: 16pt;
+    border-radius: 0;
+}
+
+#pulseaudio.muted {
+    color: #${THEME_BORDER_0};
+}
+
+#pulseaudio:hover {
+    background: #${THEME_SURFACE_1};
+}
+
+#battery {
+    padding: 4px 8px;
+    margin: 4px 10px 4px 0;
+    background: #${THEME_SURFACE_0};
+    color: #${THEME_ACCENT_GREEN};
+    font-size: 16pt;
+    border-radius: 0 8px 8px 0;
+}
+
+#battery.charging {
+    color: #${THEME_ACCENT_GREEN};
+}
+
+#battery.plugged {
+    color: #${THEME_ACCENT_GREEN};
+}
+
+#battery.warning:not(.charging) {
+    color: #${THEME_ACCENT_YELLOW};
+}
+
+#battery.critical:not(.charging) {
+    color: #${THEME_ACCENT_RED};
+}
+
+#battery:hover {
+    background: #${THEME_SURFACE_1};
+}
+
+#custom-power {
+    padding: 4px 10px;
+    margin: 4px 0 4px 10px;
+    background: #${THEME_ACCENT_RED};
+    color: #${THEME_BG_BASE};
+    border-radius: 8px;
+    font-size: 16pt;
+}
+
+#custom-power:hover {
+    background: #${THEME_ACCENT_MAROON};
+}
+
+/* Tooltip Styling */
+tooltip {
+    background: #${THEME_BG_MANTLE};
+    border: 2px solid #${THEME_ACCENT_BLUE};
+    border-radius: 8px;
+    padding: 10px;
+}
+
+tooltip label {
+    color: #${THEME_FG_PRIMARY};
+}
+EOF
+    
+    # Reload waybar
+    killall waybar
+    waybar &> /dev/null &
+    
+    # Import custom CSS if it exists
+    local custom_css="$WAYBAR_DIR/custom.css"
+    if [ -f "$custom_css" ]; then
+        echo "" >> "$waybar_style"
+        echo "/* Custom user styles */" >> "$waybar_style"
+        echo "@import 'custom.css';" >> "$waybar_style"
+    fi
+    
+    print_success "Waybar colors applied"
+}
+
+apply_wofi_theme() {
+    local theme_file="$THEMES_DIR/$1"
+    
+    print_info "Applying Wofi colors..."
+    
+    # Parse colors from theme file
+    if ! parse_theme_colors "$theme_file"; then
+        print_error "Failed to parse theme colors"
+        return 1
+    fi
+    
+    # Create wofi config directory if it doesn't exist
+    mkdir -p "$HOME/.config/wofi"
+    
+    # Create or update main wofi style
+    local wofi_style="$HOME/.config/wofi/style.css"
+    
+    # Backup existing style
+    if [ -f "$wofi_style" ]; then
+        cp "$wofi_style" "$wofi_style.backup"
+    fi
+    
+    # Convert hex to RGB for rgba (with validation)
+    if [ -z "$THEME_BG_BASE" ] || [ ${#THEME_BG_BASE} -ne 6 ]; then
+        print_error "Invalid background color value"
+        return 1
+    fi
+    
+    local r=$((16#${THEME_BG_BASE:0:2}))
+    local g=$((16#${THEME_BG_BASE:2:2}))
+    local b=$((16#${THEME_BG_BASE:4:2}))
+    
+    # Generate new wofi style with theme colors
+    cat > "$wofi_style" << EOF
+/* Wofi Style - Auto-generated by theme-switcher */
+
+* {
+    font-family: "MapleMono", monospace;
+    font-size: 14px;
+}
+
+window {
+    background-color: rgba($r, $g, $b, 0.95);
+    border: 2px solid #${THEME_ACCENT_BLUE};
+    border-radius: 8px;
+}
+
+#input {
+    margin: 10px;
+    padding: 8px 12px;
+    border: 2px solid #${THEME_SURFACE_1};
+    border-radius: 6px;
+    background-color: #${THEME_BG_BASE};
+    color: #${THEME_FG_PRIMARY};
+}
+
+#input:focus {
+    border-color: #${THEME_ACCENT_BLUE};
+}
+
+#inner-box {
+    margin: 5px;
+    padding: 5px;
+    background-color: transparent;
+}
+
+#outer-box {
+    margin: 5px;
+    padding: 5px;
+    background-color: transparent;
+}
+
+#scroll {
+    margin: 0px;
+    padding: 5px;
+}
+
+#text {
+    margin: 5px;
+    padding: 5px;
+    color: #${THEME_FG_PRIMARY};
+}
+
+#entry {
+    padding: 8px;
+    margin: 2px;
+    border-radius: 4px;
+    background-color: transparent;
+}
+
+#entry:selected {
+    background-color: #${THEME_SURFACE_1};
+    color: #${THEME_ACCENT_BLUE};
+}
+
+#entry:hover {
+    background-color: #${THEME_SURFACE_0};
+}
+
+#text:selected {
+    color: #${THEME_ACCENT_BLUE};
+    font-weight: bold;
+}
+EOF
+    
+    print_success "Wofi colors applied"
+}
+
+apply_kitty_theme() {
+    local theme_file="$THEMES_DIR/$1"
+    
+    print_info "Applying Kitty terminal colors..."
+    
+    # Parse colors from theme file
+    if ! parse_theme_colors "$theme_file"; then
+        print_error "Failed to parse theme colors"
+        return 1
+    fi
+    
+    # Create kitty themes directory if it doesn't exist
+    mkdir -p "$HOME/.config/kitty/themes"
+    
+    # Create or update kitty theme file
+    local kitty_theme="$HOME/.config/kitty/themes/current-theme.conf"
+    
+    # Backup existing theme
+    if [ -f "$kitty_theme" ]; then
+        cp "$kitty_theme" "$kitty_theme.backup"
+    fi
+    
+    # Generate Kitty theme configuration
+    cat > "$kitty_theme" << EOF
+# Kitty Theme - Auto-generated by theme-switcher
+# Based on Hyprland theme colors
+
+# The basic colors
+foreground              #${THEME_FG_PRIMARY}
+background              #${THEME_BG_BASE}
+selection_foreground    #${THEME_BG_BASE}
+selection_background    #${THEME_ACCENT_BLUE}
+
+# Cursor colors
+cursor                  #${THEME_FG_PRIMARY}
+cursor_text_color       #${THEME_BG_BASE}
+
+# URL underline color when hovering with mouse
+url_color               #${THEME_ACCENT_BLUE}
+
+# Tab bar colors
+active_tab_foreground   #${THEME_BG_BASE}
+active_tab_background   #${THEME_ACCENT_BLUE}
+inactive_tab_foreground #${THEME_FG_SECONDARY}
+inactive_tab_background #${THEME_SURFACE_0}
+
+# The 16 terminal colors
+
+# black
+color0  #${THEME_BG_MANTLE}
+color8  #${THEME_SURFACE_0}
+
+# red
+color1  #${THEME_ACCENT_RED}
+color9  #${THEME_ACCENT_RED}
+
+# green
+color2  #${THEME_ACCENT_GREEN}
+color10 #${THEME_ACCENT_GREEN}
+
+# yellow
+color3  #${THEME_ACCENT_YELLOW}
+color11 #${THEME_ACCENT_YELLOW}
+
+# blue
+color4  #${THEME_ACCENT_BLUE}
+color12 #${THEME_ACCENT_BLUE}
+
+# magenta
+color5  #${THEME_ACCENT_PURPLE}
+color13 #${THEME_ACCENT_PURPLE}
+
+# cyan
+color6  #${THEME_ACCENT_BLUE}
+color14 #${THEME_ACCENT_BLUE}
+
+# white
+color7  #${THEME_FG_SECONDARY}
+color15 #${THEME_FG_PRIMARY}
+EOF
+    
+    # Reload all Kitty instances
+    killall -SIGUSR1 kitty 2>/dev/null || true
+    
+    print_success "Kitty theme applied"
+}
+
+apply_gtk_theme() {
+    local gtk_theme="$1"
+    local icon_theme="$2"
+    
+    print_info "Applying GTK theme: $gtk_theme"
+    print_info "Applying icon theme: $icon_theme"
+    
+    # Check which GTK applications are currently running
+    local thunar_was_running=false
+    local nautilus_was_running=false
+    local nemo_was_running=false
+    
+    if pgrep -x thunar > /dev/null; then
+        thunar_was_running=true
+    fi
+    if pgrep -x nautilus > /dev/null; then
+        nautilus_was_running=true
+    fi
+    if pgrep -x nemo > /dev/null; then
+        nemo_was_running=true
+    fi
+    
+    # Kill GTK applications FIRST before changing settings
+    if [ "$thunar_was_running" = true ] || [ "$nautilus_was_running" = true ] || [ "$nemo_was_running" = true ]; then
+        print_info "Closing GTK applications for theme refresh..."
+    fi
+    
+    # Kill file managers
+    killall thunar 2>/dev/null
+    killall nautilus 2>/dev/null
+    killall nemo 2>/dev/null
+    
+    # Give them time to fully close
+    sleep 1
+    
+    # Clear GTK icon cache to force reload
+    rm -rf "$HOME/.cache/icon-cache.kcache" 2>/dev/null
+    rm -rf "$HOME/.cache/gdk-pixbuf-loaders.cache" 2>/dev/null
+    
+    # Update GTK3 settings file directly
+    mkdir -p "$HOME/.config/gtk-3.0"
+    cat > "$HOME/.config/gtk-3.0/settings.ini" << EOF
+[Settings]
+gtk-theme-name=$gtk_theme
+gtk-icon-theme-name=$icon_theme
+gtk-font-name=MapleMono 11
+gtk-application-prefer-dark-theme=1
+gtk-cursor-theme-name=Adwaita
+gtk-enable-animations=true
+EOF
+    
+    # Update GTK4 settings file directly
+    mkdir -p "$HOME/.config/gtk-4.0"
+    cat > "$HOME/.config/gtk-4.0/settings.ini" << EOF
+[Settings]
+gtk-theme-name=$gtk_theme
+gtk-icon-theme-name=$icon_theme
+gtk-font-name=MapleMono 11
+gtk-application-prefer-dark-theme=1
+gtk-cursor-theme-name=Adwaita
+gtk-enable-animations=true
+EOF
+    
+    # Apply themes using nwg-look
+    nwg-look -x -a "$gtk_theme" &> /dev/null
+    nwg-look -x -i "$icon_theme" &> /dev/null
+    
+    # Update gsettings for runtime apps
+    gsettings set org.gnome.desktop.interface gtk-theme "$gtk_theme" 2>/dev/null
+    gsettings set org.gnome.desktop.interface icon-theme "$icon_theme" 2>/dev/null
+    gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark' 2>/dev/null
+    
+    # Update dconf directly (more reliable than gsettings sometimes)
+    dconf write /org/gnome/desktop/interface/gtk-theme "'$gtk_theme'" 2>/dev/null
+    dconf write /org/gnome/desktop/interface/icon-theme "'$icon_theme'" 2>/dev/null
+    
+    # Force xsettings daemon to update if present
+    if command -v xsettingsd &> /dev/null; then
+        killall -HUP xsettingsd 2>/dev/null
+    fi
+    
+    # Give settings time to propagate
+    sleep 0.5
+    
+    # Relaunch file managers that were running before
+    if [ "$thunar_was_running" = true ]; then
+        print_info "Relaunching Thunar..."
+        thunar &> /dev/null &
+    fi
+    if [ "$nautilus_was_running" = true ]; then
+        print_info "Relaunching Nautilus..."
+        nautilus &> /dev/null &
+    fi
+    if [ "$nemo_was_running" = true ]; then
+        print_info "Relaunching Nemo..."
+        nemo &> /dev/null &
+    fi
+    
+    print_success "GTK and icon themes applied"
+}
+
+select_theme() {
+    local use_wofi="${1:-false}"
+    
+    # Check if config file exists
+    if [ ! -f "$THEME_CONFIG" ]; then
+        print_error "Theme config file not found: $THEME_CONFIG"
+        print_info "Run the script again to create a default config"
+        exit 1
+    fi
+    
+    # Read theme configurations and format for selector
+    local themes=()
+    while IFS='|' read -r name hypr_file gtk_theme icon_theme; do
+        # Skip comments and empty lines
+        [[ "$name" =~ ^#.*$ ]] && continue
+        [[ -z "$name" ]] && continue
+        
+        themes+=("$name|$hypr_file|$gtk_theme|$icon_theme")
+    done < "$THEME_CONFIG"
+    
+    # Check if any themes were loaded
+    if [ ${#themes[@]} -eq 0 ]; then
+        print_error "No themes found in config file"
+        exit 1
+    fi
+    
+    # Get current theme
+    local current=""
+    if [ -f "$CURRENT_THEME_FILE" ]; then
+        current=$(cat "$CURRENT_THEME_FILE")
+    fi
+    
+    local selected
+    
+    if [ "$use_wofi" = true ]; then
+        # Use wofi for GUI selection
+        selected=$(printf '%s\n' "${themes[@]}" | \
+            awk -F'|' -v current="$current" '{
+                if ($1 == current) 
+                    printf "✓ %s\n", $1
+                else 
+                    printf "  %s\n", $1
+            }' | \
+            wofi --dmenu \
+                --prompt "Select Theme" \
+                --width 400 \
+                --height 300 \
+                --style ~/.config/wofi/theme-selector.css 2>/dev/null | \
+            sed 's/^[✓ ]*//' | sed 's/^[ \t]*//' | sed 's/[ \t]*$//')
+    else
+        # Use fzf for terminal selection
+        if ! command -v fzf &> /dev/null; then
+            print_error "fzf not found. Install it or use --wofi flag"
+            exit 1
+        fi
+        
+        selected=$(printf '%s\n' "${themes[@]}" | \
+            awk -F'|' -v current="$current" '{
+                if ($1 == current) 
+                    printf "* %s (current)\n", $1
+                else 
+                    printf "  %s\n", $1
+            }' | \
+            fzf --height=40% \
+                --border=rounded \
+                --prompt="Theme: " \
+                --header="Select a theme (ESC to cancel)" \
+                --color=16 | \
+            sed 's/^[* ] //' | sed 's/ (current)$//' | sed 's/^[ \t]*//' | sed 's/[ \t]*$//')
+    fi
+    
+    if [ -z "$selected" ]; then
+        print_warning "No theme selected"
+        return 1
+    fi
+    
+    # Find the full theme data by matching the theme name
+    local theme_data=""
+    for theme in "${themes[@]}"; do
+        local name=$(echo "$theme" | cut -d'|' -f1)
+        if [ "$name" = "$selected" ]; then
+            theme_data="$theme"
+            break
+        fi
+    done
+    
+    if [ -z "$theme_data" ]; then
+        print_error "Theme data not found for: '$selected'"
+        print_error "Available themes:"
+        for theme in "${themes[@]}"; do
+            local tname=$(echo "$theme" | cut -d'|' -f1)
+            echo "  - '$tname'"
+        done
+        return 1
+    fi
+    
+    # Parse theme data
+    IFS='|' read -r theme_name hypr_file gtk_theme icon_theme <<< "$theme_data"
+    
+    # Validate all required fields are present
+    if [ -z "$theme_name" ]; then
+        print_error "Theme name is empty"
+        return 1
+    fi
+    
+    if [ -z "$hypr_file" ]; then
+        print_error "Hyprland file is empty for theme: $theme_name"
+        return 1
+    fi
+    
+    echo "$theme_name|$hypr_file|$gtk_theme|$icon_theme"
+    return 0
+}
+
+apply_theme() {
+    local theme_name="$1"
+    local hypr_file="$2"
+    local gtk_theme="$3"
+    local icon_theme="$4"
+    
+    print_info "Applying theme: $theme_name"
+    echo
+    
+    # Apply all theme components
+    apply_hyprland_colors "$hypr_file"
+    apply_waybar_colors "$hypr_file"
+    apply_wofi_theme "$hypr_file"
+    apply_kitty_theme "$hypr_file"
+    apply_gtk_theme "$gtk_theme" "$icon_theme"
+    
+    # Save current theme
+    echo "$theme_name" > "$CURRENT_THEME_FILE"
+    
+    echo
+    print_success "Theme '$theme_name' applied successfully!"
+}
+
+show_current_theme() {
+    if [ -f "$CURRENT_THEME_FILE" ]; then
+        local current=$(cat "$CURRENT_THEME_FILE")
+        print_info "Current theme: $current"
+    else
+        print_warning "No theme currently set"
+    fi
+}
+
+# ============================================
+# Main Script
+# ============================================
+main() {
+    local use_wofi=false
+    
+    # Parse command line arguments
+    while [[ $# -gt 0 ]]; do
+        case "${1}" in
+            -w|--wofi)
+                use_wofi=true
+                shift
+                ;;
+            -l|--list)
+                print_info "Available themes:"
+                grep -v '^#' "$THEME_CONFIG" | grep -v '^$' | cut -d'|' -f1 | sed 's/^/  - /'
+                exit 0
+                ;;
+            -c|--current)
+                show_current_theme
+                exit 0
+                ;;
+            -h|--help)
+                echo "Hyprland Theme Switcher"
+                echo
+                echo "Usage: $(basename "$0") [OPTIONS]"
+                echo
+                echo "Options:"
+                echo "  -w, --wofi     Use wofi for GUI selection (default: fzf)"
+                echo "  -l, --list     List available themes"
+                echo "  -c, --current  Show current theme"
+                echo "  -h, --help     Show this help message"
+                echo
+                echo "Without options, launches the theme selector TUI with fzf"
+                exit 0
+                ;;
+            *)
+                print_error "Unknown option: $1"
+                echo "Use -h or --help for usage information"
+                exit 1
+                ;;
+        esac
+    done
+    
+    # Check dependencies
+    check_dependencies
+    
+    # Create directories if they don't exist
+    mkdir -p "$THEMES_DIR"
+    mkdir -p "$WAYBAR_DIR"
+    
+    # Create default config if needed
+    create_default_config
+    
+    # Show current theme if not using wofi
+    if [ "$use_wofi" = false ]; then
+        show_current_theme
+        echo
+    fi
+    
+    # Select theme
+    local theme_result
+    theme_result=$(select_theme $use_wofi)
+    local select_status=$?
+    
+    if [ $select_status -ne 0 ] || [ -z "$theme_result" ]; then
+        print_warning "Theme selection cancelled or failed"
+        exit 0
+    fi
+    
+    IFS='|' read -r theme_name hypr_file gtk_theme icon_theme <<< "$theme_result"
+    
+    # Validate the theme data
+    if [ -z "$theme_name" ] || [ -z "$hypr_file" ]; then
+        print_error "Invalid theme selection: name='$theme_name' file='$hypr_file'"
+        exit 1
+    fi
+    
+    echo
+    apply_theme "$theme_name" "$hypr_file" "$gtk_theme" "$icon_theme"
+}
+
+main "$@"

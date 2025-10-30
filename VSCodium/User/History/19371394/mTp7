@@ -1,0 +1,39 @@
+# Backup files
+*.backup
+*.bak
+*~
+.backup-*/
+
+# Temporary files
+*.tmp
+*.swp
+*.swo
+test-*.qml
+Theme.qml.example
+
+# HTML mockups/prototypes
+*.html
+
+# QML cache
+.qmlcache/
+qmldir.disabled
+qmldir.bak
+
+# User-specific settings (optional - you may want to commit settings.json)
+# settings.json
+
+# Logs
+*.log
+*.qslog
+
+# OS-specific
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.kate-swp
+
+# Documentation drafts
+*.draft.md

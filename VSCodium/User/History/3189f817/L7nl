@@ -1,0 +1,106 @@
+#!/bin/bash
+# Custom wallpaper picker using wofi
+# Automatically uses the current theme's wallpaper directory
+
+THEMES_DIR="$HOME/.config/hypr/themes"
+CURRENT_THEME_FILE="$HOME/.config/quickshell/.current-theme"
+WALLPAPERS_BASE="$HOME/Pictures/Wallpapers"
+
+# Get current theme
+if [[ -f "$CURRENT_THEME_FILE" ]]; then
+    current_theme=$(cat "$CURRENT_THEME_FILE")
+else
+    # Try to detect from currently loaded theme file
+    current_theme="TokyoNight"  # fallback default
+fi
+
+# Map theme names to wallpaper directories
+case "$current_theme" in
+    "TokyoNight")
+        wallpaper_dir="$WALLPAPERS_BASE/TokyoNight"
+        ;;
+    "Catppuccin")
+        wallpaper_dir="$WALLPAPERS_BASE/Catppuccin"
+        ;;
+    "Gruvbox")
+        wallpaper_dir="$WALLPAPERS_BASE/Gruvbox"
+        ;;
+    "Material")
+        wallpaper_dir="$WALLPAPERS_BASE/Material"
+        ;;
+    "Everforest")
+        wallpaper_dir="$WALLPAPERS_BASE/Everforest"
+        ;;
+    "Kanagawa")
+        wallpaper_dir="$WALLPAPERS_BASE/Kanagawa"
+        ;;
+    "NightFox")
+        wallpaper_dir="$WALLPAPERS_BASE/NightFox"
+        ;;
+    "RosePine")
+        wallpaper_dir="$WALLPAPERS_BASE/RosePine"
+        ;;
+    "Dracula")
+        wallpaper_dir="$WALLPAPERS_BASE/Dracula"
+        ;;
+    "Nord")
+        wallpaper_dir="$WALLPAPERS_BASE/Nord"
+        ;;
+    *)
+        wallpaper_dir="$WALLPAPERS_BASE"
+        ;;
+esac
+
+# Check if directory exists
+if [[ ! -d "$wallpaper_dir" ]]; then
+    notify-send "Wallpaper Picker" "Wallpaper directory not found: $wallpaper_dir"
+    exit 1
+fi
+
+# Create temp directory for thumbnails
+THUMB_DIR="/tmp/wallpaper-thumbs-$$"
+mkdir -p "$THUMB_DIR"
+
+# Generate list of wallpapers with preview
+wallpapers=()
+declare -A wallpaper_paths
+
+# Find all image files
+while IFS= read -r -d '' wallpaper; do
+    filename=$(basename "$wallpaper")
+    # Store the full path
+    wallpaper_paths["$filename"]="$wallpaper"
+    wallpapers+=("$filename")
+done < <(find "$wallpaper_dir" -maxdepth 1 -type f \( -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" -o -iname "*.webp" \) -print0 | sort -z)
+
+if [[ ${#wallpapers[@]} -eq 0 ]]; then
+    notify-send "Wallpaper Picker" "No wallpapers found in: $wallpaper_dir"
+    exit 1
+fi
+
+# Show wofi with image list
+selected=$(printf '%s\n' "${wallpapers[@]}" | wofi --dmenu \
+    --prompt "Select Wallpaper (${current_theme}):" \
+    --width 600 \
+    --height 400 \
+    --cache-file=/dev/null)
+
+# Cleanup temp directory
+rm -rf "$THUMB_DIR"
+
+if [[ -n "$selected" ]]; then
+    wallpaper_path="${wallpaper_paths[$selected]}"
+    
+    if [[ -f "$wallpaper_path" ]]; then
+        # Check if swww-daemon is running
+        if ! pgrep -x swww-daemon > /dev/null; then
+            swww-daemon &
+            sleep 1
+        fi
+        
+        # Set wallpaper with grow animation
+        swww img "$wallpaper_path" --transition-type grow --transition-pos 0.5,0.5 --transition-duration 2
+        
+        notify-send "Wallpaper Changed" "$(basename "$wallpaper_path")"
+    fi
+fi

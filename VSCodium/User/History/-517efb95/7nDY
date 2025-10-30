@@ -1,0 +1,48 @@
+# Mako Notification Daemon Configuration
+# Theme: Nord
+
+# General settings
+font=JetBrainsMono Nerd Font 13
+max-visible=5
+sort=-time
+layer=overlay
+anchor=top-right
+margin=8
+padding=12
+border-size=2
+border-radius=12
+background-color=#2e3440
+text-color=#eceff4
+border-color=#81a1c1
+progress-color=over #81a1c1
+
+# Default timeout
+default-timeout=10000
+
+# Dimensions
+width=400
+height=150
+max-icon-size=48
+
+# Grouping
+group-by=app-name
+
+# Urgency levels
+[urgency=low]
+border-color=#a3be8c
+default-timeout=5000
+
+[urgency=normal]
+border-color=#81a1c1
+default-timeout=10000
+
+[urgency=critical]
+border-color=#bf616a
+default-timeout=0
+
+# Icons
+icons=1
+icon-path=/usr/share/icons/Papirus-Dark
+
+# Format
+format=<b>%s</b>\n%b

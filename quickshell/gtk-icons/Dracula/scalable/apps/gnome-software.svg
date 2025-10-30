@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="64"
+   height="64"
+   viewBox="0 0 16.933 16.933"
+   version="1.1"
+   id="svg3"
+   sodipodi:docname="gnome-software.svg"
+   inkscape:version="1.3.2 (091e20ef0f, 2023-11-25, custom)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs3" />
+  <sodipodi:namedview
+     id="namedview3"
+     pagecolor="#f8f8f2"
+     bordercolor="#282a36"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="12.875"
+     inkscape:cx="31.961165"
+     inkscape:cy="31.961165"
+     inkscape:window-width="1920"
+     inkscape:window-height="1013"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg3" />
+  <rect
+     width="12.7"
+     height="13.758"
+     x="2.117"
+     y="1.587"
+     fill="#549bff"
+     rx="1.587"
+     ry="1.587"
+     id="rect1"
+     style="fill:#6272a4" />
+  <path
+     fill="#00f"
+     d="m32 6-18.064.002A5.985 5.985 0 0 0 8 12v15.916A34.999 36.399 0 0 0 40 49.68a34.999 36.399 0 0 0 16-4.037V12c0-3.324-2.675-6-6-6H32z"
+     opacity=".1"
+     style="paint-order:stroke markers fill;fill:#f8f8f2"
+     transform="scale(.26458)"
+     id="path1" />
+  <path
+     fill="#00f"
+     d="m32 6-18.064.002A5.985 5.985 0 0 0 8 12v40c0 3.324 2.676 6 6 6h18.34A40 41.6 0 0 0 56 36.496V12c0-3.324-2.675-6-6-6H32z"
+     opacity=".1"
+     style="paint-order:stroke markers fill;fill:#515d85"
+     transform="scale(.26458)"
+     id="path2" />
+  <path
+     fill="#f8f8f2"
+     d="M5.292 3.969a3.175 3.175 0 0 0 3.175 3.175 3.175 3.175 0 0 0 3.175-3.175h-.794A2.381 2.381 0 0 1 8.467 6.35a2.381 2.381 0 0 1-2.382-2.381z"
+     style="paint-order:stroke markers fill"
+     id="path3" />
+</svg>

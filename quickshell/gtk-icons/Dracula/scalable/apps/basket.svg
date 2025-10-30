@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="64"
+   height="64"
+   viewBox="0 0 16.933 16.933"
+   version="1.1"
+   id="svg4"
+   sodipodi:docname="basket.svg"
+   inkscape:version="1.3.2 (091e20ef0f, 2023-11-25, custom)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs4" />
+  <sodipodi:namedview
+     id="namedview4"
+     pagecolor="#505050"
+     bordercolor="#f8f8f2"
+     borderopacity="1"
+     inkscape:showpageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="1"
+     inkscape:deskcolor="#505050"
+     inkscape:zoom="12.453125"
+     inkscape:cx="32"
+     inkscape:cy="32"
+     inkscape:window-width="1920"
+     inkscape:window-height="1013"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg4" />
+  <rect
+     width="13.229"
+     height="14.287"
+     x="1.852"
+     y="1.323"
+     fill="#d1ebff"
+     fill-rule="evenodd"
+     rx="1.587"
+     ry="1.587"
+     id="rect1" />
+  <rect
+     width="9.525"
+     height=".265"
+     x="3.704"
+     y="6.614"
+     opacity=".1"
+     paint-order="markers stroke fill"
+     ry="0"
+     id="rect2" />
+  <rect
+     width="9.525"
+     height=".265"
+     x="3.704"
+     y="9.524"
+     opacity=".1"
+     paint-order="markers stroke fill"
+     ry="0"
+     id="rect3" />
+  <rect
+     width="9.525"
+     height=".265"
+     x="3.704"
+     y="12.434"
+     opacity=".1"
+     paint-order="markers stroke fill"
+     ry="0"
+     id="rect4" />
+  <path
+     fill="#55a2ff"
+     fill-rule="evenodd"
+     d="M3.44 1.323c-.88 0-1.588.708-1.588 1.587v1.588h13.229V2.91c0-.88-.708-1.587-1.587-1.587z"
+     id="path4"
+     style="fill:#168daa" />
+</svg>

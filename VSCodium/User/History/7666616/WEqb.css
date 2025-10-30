@@ -1,0 +1,169 @@
+/* SwayNC Stylesheet - Theme-aware */
+
+* {
+  all: unset;
+  font-family: "JetBrainsMono Nerd Font", monospace;
+  font-size: 13px;
+}
+
+.notification-row {
+  outline: none;
+  margin: 8px;
+}
+
+.notification {
+  background: #BG_BASE_PLACEHOLDER;
+  border: 2px solid #ACCENT_BLUE_PLACEHOLDER;
+  border-radius: 12px;
+  margin: 0;
+  padding: 0;
+}
+
+.notification.critical {
+  border-color: #ACCENT_RED_PLACEHOLDER;
+}
+
+.notification-content {
+  background: transparent;
+  padding: 12px;
+  margin: 0;
+}
+
+.close-button {
+  background: #SURFACE_0_PLACEHOLDER;
+  color: #FG_PRIMARY_PLACEHOLDER;
+  border-radius: 8px;
+  margin: 8px;
+  padding: 4px 8px;
+  min-width: 24px;
+  min-height: 24px;
+}
+
+.close-button:hover {
+  background: #ACCENT_RED_PLACEHOLDER;
+  color: #BG_BASE_PLACEHOLDER;
+}
+
+.notification-default-action {
+  background: transparent;
+  margin: 0;
+  padding: 0;
+}
+
+.notification-default-action:hover {
+  background: #SURFACE_0_PLACEHOLDER;
+}
+
+.summary {
+  font-weight: bold;
+  color: #FG_PRIMARY_PLACEHOLDER;
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+
+.body {
+  color: #FG_SECONDARY_PLACEHOLDER;
+  font-size: 12px;
+}
+
+.time {
+  color: #FG_TERTIARY_PLACEHOLDER;
+  font-size: 11px;
+  margin-top: 4px;
+}
+
+.control-center {
+  background: #BG_BASE_PLACEHOLDER;
+  border: 2px solid #BORDER_0_PLACEHOLDER;
+  border-radius: 12px;
+  margin: 8px;
+  padding: 8px;
+}
+
+.control-center-list {
+  background: transparent;
+}
+
+.control-center-list-placeholder {
+  color: #FG_TERTIARY_PLACEHOLDER;
+  font-size: 1.2em;
+  margin: 20px;
+}
+
+.floating-notifications {
+  background: transparent;
+}
+
+.blank-window {
+  background: transparent;
+}
+
+.widget-title {
+  background: #SURFACE_0_PLACEHOLDER;
+  color: #FG_PRIMARY_PLACEHOLDER;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 8px;
+  padding: 12px;
+  margin: 4px;
+}
+
+.widget-title > button {
+  background: #ACCENT_BLUE_PLACEHOLDER;
+  color: #BG_BASE_PLACEHOLDER;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.widget-title > button:hover {
+  background: #ACCENT_RED_PLACEHOLDER;
+}
+
+.widget-dnd {
+  background: #SURFACE_0_PLACEHOLDER;
+  color: #FG_PRIMARY_PLACEHOLDER;
+  border-radius: 8px;
+  padding: 12px;
+  margin: 4px;
+}
+
+.widget-dnd > switch {
+  background: #BORDER_0_PLACEHOLDER;
+  border-radius: 12px;
+  min-width: 48px;
+  min-height: 24px;
+}
+
+.widget-dnd > switch:checked {
+  background: #ACCENT_BLUE_PLACEHOLDER;
+}
+
+.widget-dnd > switch slider {
+  background: #FG_PRIMARY_PLACEHOLDER;
+  border-radius: 50%;
+}
+
+.notification-action {
+  background: #SURFACE_0_PLACEHOLDER;
+  color: #FG_PRIMARY_PLACEHOLDER;
+  border-radius: 6px;
+  padding: 8px 12px;
+  margin: 4px;
+}
+
+.notification-action:hover {
+  background: #ACCENT_BLUE_PLACEHOLDER;
+  color: #BG_BASE_PLACEHOLDER;
+}
+
+.image {
+  margin: 8px;
+  border-radius: 8px;
+}
+
+.body-image {
+  margin: 8px;
+  border-radius: 8px;
+}

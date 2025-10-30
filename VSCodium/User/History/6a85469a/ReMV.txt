@@ -1,0 +1,49 @@
+FASTFETCH WITH THEME IMAGES - QUICK REFERENCE
+==============================================
+
+CURRENT ISSUE:
+--------------
+When you run 'fastfetch', it displays the script code instead of the image.
+
+WHY:
+----
+Fastfetch JSON config doesn't support dynamic command substitution like $(command).
+
+SOLUTION:
+---------
+Use the wrapper script that handles theme detection and runs fastfetch with the correct image.
+
+QUICK FIX:
+----------
+1. sudo pacman -S chafa
+2. ~/.config/fastfetch/run-fastfetch.sh
+
+CREATE ALIAS (Add to ~/.zshrc):
+--------------------------------
+alias ff='~/.config/fastfetch/run-fastfetch.sh'
+
+OR replace fastfetch entirely:
+alias fastfetch='~/.config/fastfetch/run-fastfetch.sh'
+
+Then: source ~/.zshrc
+
+FILES:
+------
+run-fastfetch.sh        → Main wrapper script (use this!)
+get-theme-image.sh      → Theme detection (called by wrapper)
+config.jsonc            → Standard config (uses ASCII logo)
+IMAGE_SETUP.md          → Detailed setup instructions
+
+DIRECTORY STRUCTURE:
+--------------------
+images/ThemeName/ThemeName.png
+
+Example:
+images/Eldritch/Eldritch.png ✓ (you have this)
+
+TESTING:
+--------
+After installing chafa:
+~/.config/fastfetch/run-fastfetch.sh
+
+You should see your Eldritch image!

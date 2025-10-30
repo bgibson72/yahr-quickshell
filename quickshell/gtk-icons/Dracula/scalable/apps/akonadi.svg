@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="64"
+   height="64"
+   image-rendering="optimizeSpeed"
+   version="1.1"
+   id="svg1"
+   sodipodi:docname="akonadi.svg"
+   inkscape:version="1.3.2 (091e20ef0f, 2023-11-25, custom)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs1" />
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#505050"
+     bordercolor="#f8f8f2"
+     borderopacity="1"
+     inkscape:showpageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="1"
+     inkscape:deskcolor="#505050"
+     inkscape:zoom="12.453125"
+     inkscape:cx="32"
+     inkscape:cy="32"
+     inkscape:window-width="1920"
+     inkscape:window-height="1013"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg1" />
+  <circle
+     cx="32"
+     cy="32"
+     r="27"
+     fill="#7b7bbd"
+     fill-rule="evenodd"
+     style="paint-order:fill markers stroke;fill:#6272a4"
+     id="circle1" />
+  <path
+     fill="#f8f8f2"
+     d="M31.997 19.401A12.571 12.571 0 0 0 19.4 31.527a12.548 12.548 0 0 0 11.757 8.074c3.805 0 7.189-1.67 9.49-4.322a12.523 12.523 0 0 1-8.472 9.321A12.556 12.556 0 0 0 44.6 32.003a12.561 12.561 0 0 0-12.597-12.597"
+     id="path1" />
+</svg>

@@ -1,0 +1,14 @@
+# Logs and temp files
+*.log
+*.swp
+*.swo
+*.tmp
+.DS_Store
+
+# User-specific data
+quickshell/settings.json
+vesktop/sessionData/
+VSCodium/User/globalStorage/
+VSCodium/User/workspaceStorage/
+VSCodium/logs/
+VSCodium/CachedData/

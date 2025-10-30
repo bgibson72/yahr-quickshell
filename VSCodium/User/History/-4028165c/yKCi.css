@@ -1,0 +1,122 @@
+/**
+ * @name Quickshell Theme Sync
+ * @author Auto-generated
+ * @description Automatically synced theme from Hyprland/Quickshell configuration
+ * @version 1.0
+ */
+
+/* This file will be updated by sync-vencord-theme.sh */
+/* Run: ~/.config/quickshell/sync-vencord-theme.sh --theme-file */
+/* To regenerate this theme based on your current Quickshell theme */
+
+:root {
+    /* Background Colors */
+    --bg-overlay-1: #0f0f14;
+    --bg-overlay-2: #16161e;
+    --bg-overlay-3: #1a1b26;
+    --bg-overlay-app-frame: #1a1b26;
+    
+    /* Surface Colors */
+    --background-primary: #1a1b26;
+    --background-secondary: #16161e;
+    --background-secondary-alt: #0f0f14;
+    --background-tertiary: #292e42;
+    --background-accent: #33467c;
+    --background-floating: #292e42;
+    --background-mobile-primary: #1a1b26;
+    --background-mobile-secondary: #16161e;
+    --background-modifier-hover: #292e4280;
+    --background-modifier-active: #33467c80;
+    --background-modifier-selected: #41486880;
+    --background-modifier-accent: #7aa2f740;
+    
+    /* Text Colors */
+    --text-normal: #c0caf5;
+    --text-muted: #a9b1d6;
+    --text-faint: #9aa5ce;
+    --text-link: #7aa2f7;
+    --text-positive: #9ece6a;
+    --text-warning: #e0af68;
+    --text-danger: #f7768e;
+    --text-brand: #7aa2f7;
+    
+    /* Interactive Colors */
+    --interactive-normal: #a9b1d6;
+    --interactive-hover: #c0caf5;
+    --interactive-active: #7aa2f7;
+    --interactive-muted: #9aa5ce;
+    
+    /* Accent Colors */
+    --brand-experiment: #7aa2f7;
+    --brand-experiment-hover: #9d7cd8;
+    --brand-experiment-560: #7aa2f7;
+    
+    /* Channel/User Status */
+    --status-positive: #9ece6a;
+    --status-warning: #e0af68;
+    --status-danger: #f7768e;
+    
+    /* Border Colors */
+    --border-subtle: #565f89;
+    --border-strong: #737aa2;
+    --border-faint: #565f8940;
+    
+    /* Scrollbar */
+    --scrollbar-thin-thumb: #33467c;
+    --scrollbar-thin-track: transparent;
+    --scrollbar-auto-thumb: #414868;
+    --scrollbar-auto-track: #292e42;
+    
+    /* Deprecated but still used */
+    --deprecated-card-bg: #292e42;
+    --deprecated-card-editable-bg: #33467c;
+    --deprecated-store-bg: #1a1b26;
+    --deprecated-quickswitcher-input-background: #292e42;
+    --deprecated-text-input-bg: #292e42;
+    --deprecated-text-input-border: #565f89;
+    --deprecated-text-input-border-hover: #737aa2;
+    --deprecated-text-input-border-disabled: #565f8940;
+}
+
+/* Additional custom styling */
+.theme-dark {
+    --background-primary: #1a1b26;
+    --background-secondary: #16161e;
+    --background-tertiary: #292e42;
+}
+
+/* Message bar */
+.channelTextArea_a7d72e {
+    background-color: #292e42;
+}
+
+/* User panel */
+.container_ca50b9 {
+    background-color: #0f0f14;
+}
+
+/* Sidebar */
+.sidebar_e031f6 {
+    background-color: #16161e;
+}
+
+/* Server list */
+.wrapper__8436d {
+    background-color: #0f0f14;
+}
+
+/* Accent for selected items */
+.selected_fd9051,
+.selected_ae80f7 {
+    background-color: #414868 !important;
+    color: #7aa2f7 !important;
+}
+
+/* Links */
+a {
+    color: #7aa2f7;
+}
+
+a:hover {
+    color: #9d7cd8;
+}

@@ -1,0 +1,177 @@
+/**
+ * @name Quickshell Sync (Everforest)
+ * @author Auto-generated
+ * @description Synced from ~/.config/hypr/themes/Everforest.conf
+ * @version 1.0
+ */
+
+/**
+ * Theme: Everforest (Auto-synced from Quickshell)
+ * Generated: Tue Oct 28 10:45:01 AM CDT 2025
+ */
+
+:root {
+    /* ===== APP BACKGROUND (Main fix for black background) ===== */
+    --app-background: #1e2326;
+    --bg-backdrop: #1e2326;
+    --bg-base-primary: #2b3339;
+    --bg-base-secondary: #272e33;
+    --bg-base-tertiary: #1e2326;
+    
+    /* Background Colors */
+    --bg-overlay-1: #1e2326;
+    --bg-overlay-2: #272e33;
+    --bg-overlay-3: #2b3339;
+    --bg-overlay-app-frame: #1e2326;
+    
+    /* Surface Colors */
+    --background-primary: #2b3339;
+    --background-secondary: #272e33;
+    --background-secondary-alt: #1e2326;
+    --background-tertiary: #374247;
+    --background-accent: #3d484d;
+    --background-floating: #374247;
+    --background-mobile-primary: #2b3339;
+    --background-mobile-secondary: #272e33;
+    --background-modifier-hover: #37424780;
+    --background-modifier-active: #3d484d80;
+    --background-modifier-selected: #543a4880;
+    --background-modifier-accent: #7fbbb340;
+    
+    /* Text Colors */
+    --text-normal: #d3c6aa;
+    --text-muted: #bdc3af;
+    --text-faint: #a7c080;
+    --text-link: #7fbbb3;
+    --text-positive: #a7c080;
+    --text-warning: #dbbc7f;
+    --text-danger: #e67e80;
+    --text-brand: #7fbbb3;
+    
+    /* Interactive Colors */
+    --interactive-normal: #bdc3af;
+    --interactive-hover: #d3c6aa;
+    --interactive-active: #7fbbb3;
+    --interactive-muted: #a7c080;
+    
+    /* Accent Colors */
+    --brand-experiment: #7fbbb3;
+    --brand-experiment-hover: #d3869b;
+    --brand-experiment-560: #7fbbb3;
+    
+    /* Channel/User Status */
+    --status-positive: #a7c080;
+    --status-warning: #dbbc7f;
+    --status-danger: #e67e80;
+    
+    /* Border Colors */
+    --border-subtle: #656d5b;
+    --border-strong: #7a8478;
+    --border-faint: #656d5b40;
+    
+    /* Scrollbar */
+    --scrollbar-thin-thumb: #3d484d;
+    --scrollbar-thin-track: transparent;
+    --scrollbar-auto-thumb: #543a48;
+    --scrollbar-auto-track: #374247;
+    
+    /* Deprecated but still used */
+    --deprecated-card-bg: #374247;
+    --deprecated-card-editable-bg: #3d484d;
+    --deprecated-store-bg: #2b3339;
+    --deprecated-quickswitcher-input-background: #374247;
+    --deprecated-text-input-bg: #374247;
+    --deprecated-text-input-border: #656d5b;
+    --deprecated-text-input-border-hover: #7a8478;
+    --deprecated-text-input-border-disabled: #656d5b40;
+}
+
+/* ===== FORCE APP BACKGROUND (Critical for removing black) ===== */
+body,
+html,
+#app-mount,
+.app_bd26cc,
+.bg_b02b02,
+.wrapper_a7e7a8 {
+    background-color: #1e2326 !important;
+}
+
+/* Additional custom styling */
+.theme-dark {
+    --background-primary: #2b3339;
+    --background-secondary: #272e33;
+    --background-tertiary: #374247;
+}
+
+/* Message bar */
+.channelTextArea_a7d72e {
+    background-color: #374247;
+}
+
+/* User panel */
+.container_ca50b9 {
+    background-color: #1e2326;
+}
+
+/* Sidebar */
+.sidebar_e031f6 {
+    background-color: #272e33;
+}
+
+/* Server list */
+.wrapper__8436d {
+    background-color: #1e2326;
+}
+
+/* Chat background */
+.chatContent__5dca8,
+.chat__52833 {
+    background-color: #2b3339;
+}
+
+/* Accent for selected items */
+.selected_fd9051,
+.selected_ae80f7 {
+    background-color: #543a48 !important;
+    color: #7fbbb3 !important;
+}
+
+/* Links */
+a {
+    color: #7fbbb3;
+}
+
+a:hover {
+    color: #d3869b;
+}
+
+
+/* ========================================= */
+/* COMPREHENSIVE CATCH-ALL FOR BLACK BACKGROUNDS */
+/* Auto-added by vencord-add-catchall.sh */
+/* ========================================= */
+
+/* Target any class containing "bg_" (excludes images/avatars) */
+[class*="bg_"]:not([class*="image"]):not([class*="avatar"]):not([class*="icon"]):not([class*="emoji"]):not([class*="banner"]) {
+    background-color: #1e2326 !important;
+}
+
+/* Common Discord container/layer classes */
+[class*="layer"]:not([class*="image"]),
+[class*="layers"]:not([class*="image"]),
+[class*="base_"]:not([class*="image"]),
+[class*="content_"]:not([class*="image"]),
+[class*="wrapper_"]:not([class*="avatar"]),
+[class*="container_"]:not([class*="avatar"]):not([class*="image"]) {
+    background-color: var(--background-secondary-alt, #1e2326) !important;
+}
+
+/* Override literal black inline styles */
+*[style*="background: black"],
+*[style*="background-color: black"],
+*[style*="background: #000000"],
+*[style*="background-color: #000000"],
+*[style*="background: #000"],
+*[style*="background-color: #000"] {
+    background-color: #1e2326 !important;
+}

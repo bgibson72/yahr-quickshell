@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="64"
+   height="64"
+   viewBox="0 0 16.933 16.933"
+   version="1.1"
+   id="svg14"
+   sodipodi:docname="ms-word.svg"
+   inkscape:version="1.3.2 (091e20ef0f, 2023-11-25, custom)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview14"
+     pagecolor="#f8f8f2"
+     bordercolor="#282a36"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="12.875"
+     inkscape:cx="31.961165"
+     inkscape:cy="32"
+     inkscape:window-width="1920"
+     inkscape:window-height="1040"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="g14" />
+  <defs
+     id="defs2">
+    <linearGradient
+       xlink:href="#a"
+       id="b"
+       x1="41.088"
+       x2="41.088"
+       y1="56.971"
+       y2="26.486"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       id="a">
+      <stop
+         offset="0"
+         id="stop1" />
+      <stop
+         offset="1"
+         stop-opacity="0"
+         id="stop2" />
+    </linearGradient>
+  </defs>
+  <g
+     paint-order="markers stroke fill"
+     transform="translate(0 -280.067)"
+     id="g14">
+    <g
+       transform="rotate(4.405 19.271 318.07)"
+       id="g9">
+      <rect
+         width="6.879"
+         height="12.171"
+         x="5.821"
+         y="282.448"
+         fill="#355687"
+         rx=".504"
+         ry=".575"
+         id="rect2"
+         style="fill:#515d85" />
+      <rect
+         width="5.821"
+         height="11.113"
+         x="6.35"
+         y="282.977"
+         fill="#f8f8f2"
+         rx="0"
+         ry="0"
+         id="rect3" />
+      <rect
+         width="4.762"
+         height=".529"
+         x="6.615"
+         y="284.3"
+         fill="#355687"
+         rx="0"
+         ry="0"
+         id="rect4"
+         style="fill:#515d85" />
+      <rect
+         width="4.762"
+         height=".529"
+         x="6.615"
+         y="285.887"
+         fill="#355687"
+         rx="0"
+         ry="0"
+         id="rect5"
+         style="fill:#515d85" />
+      <rect
+         width="4.762"
+         height=".529"
+         x="6.615"
+         y="287.475"
+         fill="#355687"
+         rx="0"
+         ry="0"
+         id="rect6"
+         style="fill:#515d85" />
+      <rect
+         width="4.762"
+         height=".529"
+         x="6.615"
+         y="289.062"
+         fill="#355687"
+         rx="0"
+         ry="0"
+         id="rect7"
+         style="fill:#515d85" />
+      <rect
+         width="4.762"
+         height=".529"
+         x="6.615"
+         y="290.65"
+         fill="#355687"
+         rx="0"
+         ry="0"
+         id="rect8"
+         style="fill:#515d85" />
+      <rect
+         width="4.762"
+         height=".529"
+         x="6.615"
+         y="292.237"
+         fill="#355687"
+         rx="0"
+         ry="0"
+         id="rect9"
+         style="fill:#515d85" />
+    </g>
+    <rect
+       width="8.996"
+       height="13.758"
+       x="-40.062"
+       y="279.539"
+       fill="#4169a5"
+       rx="0"
+       ry="0"
+       transform="rotate(-8.462)"
+       id="rect10"
+       style="fill:#515d85" />
+    <g
+       fill="#f8f8f2"
+       id="g13">
+      <path
+         d="m3.48 286.645 1.047-.156 2.01 4.516-1.047.156z"
+         id="path10" />
+      <path
+         d="m7.144 286.1-1.046.156-.608 4.905 1.047-.156z"
+         id="path11" />
+      <path
+         d="m6.098 286.256 1.046-.156 2.01 4.516-1.047.156z"
+         id="path12" />
+      <path
+         d="m9.761 285.71-1.046.157-.608 4.905 1.047-.156z"
+         id="path13" />
+    </g>
+    <path
+       fill="url(#b)"
+       d="M42.717 26.486A42.073 66.645 6.416 0 1 42.49 29a42.073 66.645 6.416 0 1-7.304 27.97l11.804-1.755z"
+       opacity=".25"
+       transform="translate(0 280.067) scale(.26458)"
+       id="path14" />
+  </g>
+</svg>

@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="64"
+   height="64"
+   version="1.1"
+   viewBox="0 0 16.933 16.933"
+   id="svg12"
+   sodipodi:docname="preferences-desktop-keyboard.svg"
+   inkscape:version="1.3.2 (091e20ef0f, 2023-11-25, custom)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs12" />
+  <sodipodi:namedview
+     id="namedview12"
+     pagecolor="#f8f8f2"
+     bordercolor="#282a36"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="12.875"
+     inkscape:cx="31.961165"
+     inkscape:cy="32"
+     inkscape:window-width="1920"
+     inkscape:window-height="1040"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg12" />
+  <rect
+     x="1.3229"
+     y="3.1749"
+     width="14.287"
+     height="10.583"
+     rx="1.5875"
+     ry="1.5875"
+     fill="#717380"
+     stroke-width=".30144"
+     paint-order="markers stroke fill"
+     id="rect1"
+     style="fill:#282a36" />
+  <rect
+     x="2.91"
+     y="5.29"
+     width="1.587"
+     height="1.323"
+     ry=".265"
+     fill="#f8f8f2"
+     paint-order="markers stroke fill"
+     id="rect2" />
+  <rect
+     x="5.292"
+     y="5.29"
+     width="1.587"
+     height="1.323"
+     ry=".265"
+     fill="#f8f8f2"
+     paint-order="markers stroke fill"
+     id="rect3" />
+  <rect
+     x="7.673"
+     y="5.29"
+     width="1.587"
+     height="1.323"
+     ry=".265"
+     fill="#f8f8f2"
+     paint-order="markers stroke fill"
+     id="rect4" />
+  <rect
+     x="10.054"
+     y="5.29"
+     width="1.587"
+     height="1.323"
+     ry=".265"
+     fill="#f8f8f2"
+     paint-order="markers stroke fill"
+     id="rect5" />
+  <rect
+     x="12.435"
+     y="5.29"
+     width="1.587"
+     height="1.323"
+     ry=".265"
+     fill="#f8f8f2"
+     paint-order="markers stroke fill"
+     id="rect6" />
+  <rect
+     x="2.91"
+     y="7.67"
+     width="1.587"
+     height="1.323"
+     ry=".265"
+     fill="#f8f8f2"
+     paint-order="markers stroke fill"
+     id="rect7" />
+  <rect
+     x="5.292"
+     y="7.67"
+     width="1.587"
+     height="1.323"
+     ry=".265"
+     fill="#f8f8f2"
+     paint-order="markers stroke fill"
+     id="rect8" />
+  <rect
+     x="7.673"
+     y="7.67"
+     width="1.587"
+     height="1.323"
+     ry=".265"
+     fill="#f8f8f2"
+     paint-order="markers stroke fill"
+     id="rect9" />
+  <rect
+     x="10.054"
+     y="7.67"
+     width="1.587"
+     height="1.323"
+     ry=".265"
+     fill="#f8f8f2"
+     paint-order="markers stroke fill"
+     id="rect10" />
+  <rect
+     x="5.292"
+     y="10.04"
+     width="6.35"
+     height="1.323"
+     ry=".271"
+     fill="#f8f8f2"
+     paint-order="markers stroke fill"
+     id="rect11" />
+  <rect
+     x="12.435"
+     y="7.6728"
+     width="1.587"
+     height="1.323"
+     ry=".265"
+     fill="#f8f8f2"
+     paint-order="markers stroke fill"
+     id="rect12" />
+  <circle
+     cx="13.229"
+     cy="11.377"
+     r="3.175"
+     fill="#9ea0a6"
+     id="circle12"
+     style="fill:#44475a" />
+  <path
+     d="m12.753 9.4719-0.042 0.502a1.497 1.497 0 0 0-0.438 0.253l-0.456-0.215-0.476 0.825 0.414 0.287a1.497 1.497 0 0 0-0.023 0.253 1.497 1.497 0 0 0 0.022 0.254l-0.413 0.286 0.476 0.825 0.455-0.214a1.497 1.497 0 0 0 0.439 0.251l0.042 0.503h0.952l0.042-0.502a1.497 1.497 0 0 0 0.438-0.253l0.456 0.215 0.476-0.825-0.414-0.288a1.497 1.497 0 0 0 0.023-0.252 1.497 1.497 0 0 0-0.022-0.254l0.413-0.286-0.476-0.825-0.455 0.214a1.497 1.497 0 0 0-0.439-0.251l-0.042-0.503zm0.476 1.27a0.635 0.635 0 0 1 0.635 0.635 0.635 0.635 0 0 1-0.635 0.635 0.635 0.635 0 0 1-0.635-0.635 0.635 0.635 0 0 1 0.635-0.635z"
+     fill="#f8f8f2"
+     id="path12" />
+</svg>
