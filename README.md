@@ -2,7 +2,7 @@
 
 Complete Arch Linux + Hyprland desktop configuration with unified theme system.
 
-![2025-10-23-0832217_hyprshot.png](./previews/2025-10-23-0832217_hyprshot.png)
+![2025-10-23-0832217_hyprshot.png](previews/2025-10-23-083217_hyprshot.png)
 
 ## Features
 - 🎨 11 beautiful themes with instant switching
