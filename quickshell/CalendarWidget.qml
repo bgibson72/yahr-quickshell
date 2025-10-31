@@ -265,7 +265,12 @@ Rectangle {
                     // Calendar header - single line
                     Text {
                         width: parent.width
-                        text: "October 2025"
+                        text: {
+                            const now = new Date()
+                            const monthNames = ["January", "February", "March", "April", "May", "June",
+                                              "July", "August", "September", "October", "November", "December"]
+                            return monthNames[now.getMonth()] + " " + now.getFullYear()
+                        }
                         font.family: "MapleMono NF"
                         font.pixelSize: 16
                         font.weight: Font.Medium
@@ -297,7 +302,7 @@ Rectangle {
                         }
                     }
                     
-                    // Calendar days (simplified for now - would need JS logic for actual dates)
+                    // Calendar days - properly calculated using current date
                     Repeater {
                         model: 35
                         
@@ -305,29 +310,37 @@ Rectangle {
                             width: 49
                             height: 36
                             radius: 8
+                            
+                            property var now: new Date()
+                            property int currentDay: now.getDate()
+                            property int currentMonth: now.getMonth()
+                            property int currentYear: now.getFullYear()
+                            
+                            // Calculate what day this cell represents
+                            property var firstDay: new Date(currentYear, currentMonth, 1)
+                            property int startOffset: firstDay.getDay()  // 0 = Sunday
+                            property int dayNumber: index - startOffset + 1
+                            property var lastDay: new Date(currentYear, currentMonth + 1, 0)
+                            property int daysInMonth: lastDay.getDate()
+                            property bool isCurrentDay: dayNumber === currentDay
+                            property bool isValidDay: dayNumber >= 1 && dayNumber <= daysInMonth
+                            
                             color: {
-                                // Day 16 is today
-                                if (index === 18) return ThemeManager.accentBlue
+                                if (isValidDay && isCurrentDay) return ThemeManager.accentBlue
                                 return "transparent"
                             }
                             
                             Text {
                                 anchors.centerIn: parent
-                                text: {
-                                    // This is simplified - would need proper date calculation
-                                    let day = index - 2
-                                    if (day < 1) return ""
-                                    if (day > 31) return ""
-                                    return day
-                                }
+                                text: parent.isValidDay ? parent.dayNumber : ""
                                 font.family: "MapleMono NF"
                                 font.pixelSize: 13
                                 color: {
-                                    if (index === 18) return ThemeManager.bgBase
-                                    if (index < 3 || index > 33) return ThemeManager.border0
+                                    if (parent.isValidDay && parent.isCurrentDay) return ThemeManager.bgBase
+                                    if (!parent.isValidDay) return ThemeManager.border0
                                     return ThemeManager.fgPrimary
                                 }
-                                font.weight: index === 18 ? Font.DemiBold : Font.Normal
+                                font.weight: parent.isValidDay && parent.isCurrentDay ? Font.DemiBold : Font.Normal
                             }
                         }
                     }
