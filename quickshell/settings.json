@@ -1,0 +1,26 @@
+{
+  "general": {
+    "weatherLatitude": "",
+    "weatherLongitude": "",
+    "useFahrenheit": true,
+    "clockFormat24hr": false,
+    "showSeconds": true
+  },
+  "screenshot": {
+    "defaultDelay": 3,
+    "saveToDisk": true,
+    "copyToClipboard": true,
+    "saveLocation": "~/Pictures/Screenshots"
+  },
+  "theme": {
+    "current": "Catppuccin"
+  },
+  "systemTray": {
+    "showBatteryDetails": false,
+    "showVolumeDetails": false,
+    "showNetworkDetails": false
+  },
+  "bar": {
+    "transparentBackground": false
+  }
+}

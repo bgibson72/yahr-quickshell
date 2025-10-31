@@ -1,52 +1,48 @@
-# Mako notification daemon configuration
-# Material/Palenight-inspired theme to match quickshell
+# Mako Notification Daemon Configuration
+# Theme: Catppuccin
 
-# Position and size
-anchor=top-right
-margin=12,12,50
-width=400
-height=150
+# General settings
+font=JetBrainsMono Nerd Font 13
 max-visible=5
-
-# Style
-font=MapleMono NF 13
-background-color=#0f111aee
-text-color=#eeffff
-border-color=#82aaff
+sort=-time
+layer=overlay
+anchor=top-right
+margin=8
+padding=12
 border-size=2
 border-radius=12
-padding=12
+background-color=#1e1e2e
+text-color=#cdd6f4
+border-color=#89b4fa
+progress-color=over #89b4fa
 
-# Icons
-icons=1
+# Default timeout
+default-timeout=10000
+
+# Dimensions
+width=400
+height=150
 max-icon-size=48
-icon-location=left
-
-# Progress bar
-progress-color=over #82aaff
-
-# Actions
-actions=1
-on-button-left=invoke-default-action
-on-button-middle=none
-on-button-right=dismiss
 
 # Grouping
 group-by=app-name
 
-# Format
-format=<b>%s</b>\n%b
-
-# Urgency-specific colors
+# Urgency levels
 [urgency=low]
-border-color=#c3e88d
-default-timeout=3000
-
-[urgency=normal]
-border-color=#ffcb6b
+border-color=#a6e3a1
 default-timeout=5000
 
+[urgency=normal]
+border-color=#89b4fa
+default-timeout=10000
+
 [urgency=critical]
-border-color=#ff5370
+border-color=#f38ba8
 default-timeout=0
-ignore-timeout=1
+
+# Icons
+icons=1
+icon-path=/usr/share/icons/Papirus-Dark
+
+# Format
+format=<b>%s</b>\n%b
