@@ -1,14 +1,10 @@
-# Logs and temp files
-*.log
-*.swp
-*.swo
-*.tmp
-.DS_Store
-
-# User-specific data
-quickshell/settings.json
+# Cache and temporary files
+quickshell/gtk-themes/
+quickshell/gtk-icons/
 vesktop/sessionData/
-VSCodium/User/globalStorage/
-VSCodium/User/workspaceStorage/
-VSCodium/logs/
+vesktop/Crashpad/
+VSCodium/Cache/
 VSCodium/CachedData/
+VSCodium/logs/
+VSCodium/User/workspaceStorage/
+VSCodium/User/globalStorage/

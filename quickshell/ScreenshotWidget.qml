@@ -86,6 +86,14 @@ PanelWindow {
     Process {
         id: screenshotProcess
         running: false
+        
+        // Monitor process completion to handle cancellations
+        onRunningChanged: {
+            if (!running && !screenshotWindow.visible) {
+                // If process stopped and widget is hidden, close it properly
+                closeRequested()
+            }
+        }
     }
     
     function takeScreenshot(mode) {
@@ -103,14 +111,44 @@ PanelWindow {
         
         console.log("Executing:", scriptPath, args.join(" "))
         
-        // Set up and run the process
-        screenshotProcess.command = [scriptPath].concat(args)
-        screenshotProcess.running = true
-        
-        // Close widget after a small delay to let the process start
-        Qt.callLater(() => {
+        // For interactive modes (window/region), close widget immediately, then start process
+        if (mode === "window" || mode === "region") {
+            // Close widget immediately so it doesn't interfere with screenshot
             closeRequested()
-        })
+            
+            // Delay process start to let widget fully disappear
+            delayedStartTimer.mode = mode
+            delayedStartTimer.scriptPath = scriptPath
+            delayedStartTimer.args = args
+            delayedStartTimer.start()
+        } else {
+            // For output mode, start immediately and close after
+            screenshotProcess.command = [scriptPath].concat(args)
+            screenshotProcess.running = true
+            closeTimer.start()
+        }
+    }
+    
+    Timer {
+        id: closeTimer
+        interval: 100  // Small delay before closing to let process start
+        repeat: false
+        onTriggered: closeRequested()
+    }
+    
+    Timer {
+        id: delayedStartTimer
+        interval: 100  // Wait for widget to fully hide before starting interactive screenshot
+        repeat: false
+        
+        property string mode: ""
+        property string scriptPath: ""
+        property var args: []
+        
+        onTriggered: {
+            screenshotProcess.command = [scriptPath].concat(args)
+            screenshotProcess.running = true
+        }
     }
     
     Rectangle {

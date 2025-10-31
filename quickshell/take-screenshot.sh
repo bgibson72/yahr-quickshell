@@ -9,6 +9,9 @@ SAVE_TO_DISK="$3"
 COPY_TO_CLIPBOARD="$4"
 SAVE_LOCATION="$5"
 
+# Expand tilde in save location
+SAVE_LOCATION="${SAVE_LOCATION/#\~/$HOME}"
+
 echo "Screenshot script called:"
 echo "  Mode: $MODE"
 echo "  Delay: $DELAY"
@@ -16,14 +19,17 @@ echo "  Save to disk: $SAVE_TO_DISK"
 echo "  Copy to clipboard: $COPY_TO_CLIPBOARD"
 echo "  Save location: $SAVE_LOCATION"
 
+# Give the widget time to close (important for region/window selection to work)
+sleep 0.2
+
 # Apply delay if specified
 if [ "$DELAY" != "0" ] && [ -n "$DELAY" ]; then
     echo "Waiting ${DELAY} seconds..."
     sleep "$DELAY"
 fi
 
-# Build hyprshot command with silent flag to suppress its notifications
-CMD="hyprshot -m $MODE --silent"
+# Build hyprshot command (without --silent so mako notifications work)
+CMD="hyprshot -m $MODE"
 
 # Add output folder if saving to disk
 if [ "$SAVE_TO_DISK" = "true" ]; then
@@ -37,48 +43,5 @@ fi
 
 echo "Executing: $CMD"
 
-# Execute command and capture output
-OUTPUT=$($CMD 2>&1)
-EXIT_CODE=$?
-
-# Check if screenshot was successful
-if [ $EXIT_CODE -eq 0 ]; then
-    # Determine mode text
-    if [ "$MODE" = "region" ]; then
-        MODE_TEXT="Region Screenshot"
-    elif [ "$MODE" = "window" ]; then
-        MODE_TEXT="Window Screenshot"
-    elif [ "$MODE" = "output" ]; then
-        MODE_TEXT="Screen Screenshot"
-    else
-        MODE_TEXT="Screenshot"
-    fi
-    
-    # Extract filename from output if present
-    FILENAME=$(echo "$OUTPUT" | grep -oP '(?<=saved to ).*' | head -1)
-    
-    if [ -n "$FILENAME" ]; then
-        # Get just the filename without path
-        BASENAME=$(basename "$FILENAME")
-        
-        # Send notification with file info
-        notify-send "$MODE_TEXT" "Saved as: $BASENAME\nLocation: $(dirname "$FILENAME")" \
-            --icon=camera-photo \
-            --app-name="Screenshot" \
-            --urgency=low
-    else
-        # Clipboard-only mode
-        notify-send "$MODE_TEXT" "Copied to clipboard" \
-            --icon=camera-photo \
-            --app-name="Screenshot" \
-            --urgency=low
-    fi
-else
-    # Screenshot failed
-    notify-send "Screenshot Failed" "An error occurred while taking the screenshot" \
-        --icon=dialog-error \
-        --app-name="Screenshot" \
-        --urgency=critical
-fi
-
-exit $EXIT_CODE
+# Execute command - hyprshot will handle notifications via mako
+exec $CMD
