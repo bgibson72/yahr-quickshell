@@ -3,8 +3,43 @@ quickshell/gtk-themes/
 quickshell/gtk-icons/
 vesktop/sessionData/
 vesktop/Crashpad/
+
+# VSCodium cache and temporary files
 VSCodium/Cache/
 VSCodium/CachedData/
 VSCodium/logs/
 VSCodium/User/workspaceStorage/
 VSCodium/User/globalStorage/
+VSCodium/User/History/
+VSCodium/IndexedDB/
+VSCodium/Local Storage/
+VSCodium/Service Worker/
+VSCodium/Session Storage/
+
+# System and application configs not related to quickshell
+.mozilla/
+.vscode/
+QtProject.conf
+QtProject/
+Thunar/
+dconf/
+gh/
+go/
+gpu-screen-recorder/
+gtk-3.0/
+gtk-4.0/
+kritadisplayrc
+kritarc
+mimeapps.list
+nohup.out
+nwg-look/
+pacseek/
+pavucontrol.ini
+prepare-yahr-push.sh
+pulse/
+simple-update-notifier/
+systemd/
+xfce4/
+xsettingsd/
+yay/
+~/
