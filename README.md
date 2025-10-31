@@ -86,12 +86,33 @@ Switch themes instantly across all applications with Super + T. Available themes
 
 ### Custom Widgets
 - **App Launcher** - Super + A - Fuzzy search application launcher
+
+![app_launcher.png](previews/app_launcher.png)
+
 - **Calendar** - Super + C - Monthly calendar widget
+
+![calendar.png](previews/calendar.png)
+
 - **Power Menu** - Super + Escape - System controls
+
+![power_menu.png](previews/power_menu.png)
+
 - **Screenshot Tool** - Super + PrtScrn - Multi-mode screenshots
+
+![screenshot_tool.png](previews/screenshot_tool.png)
+
 - **Settings** - Super + Shift + S - Quickshell configuration panel
+
+![settings.png](previews/settings.png)
+
 - **Theme Switcher** - Super + T - Visual theme selector
+
+![theme_switcher.png](previews/theme_switcher.png)
+
 - **Wallpaper Picker** - Super + Shift + W - Browse and select wallpapers
+
+![wallpaper_picker.png](previews/wallpaper_picker.png)
+
 
 ### System Integration
 - Workspace management with visual indicators
