@@ -153,19 +153,18 @@ Contributions, issues, and feature requests are welcome!
 ### Core Technologies
 - [Quickshell](https://github.com/outfoxxed/quickshell) by outfoxxed - Desktop environment framework
 - [Hyprland](https://hyprland.org/) by [Vaxry](https://github.com/vaxerski) - Dynamic tiling Wayland compositor
-- [Mako](https://github.com/emersion/mako) by emersion - Lightweight notification daemon
-- [AstroNvim](https://github.com/AstroNvim/AstroNvim) - Neovim distribution
 
 ### GTK Themes & Icons
 - [Fausto Korpsvart](https://github.com/Fausto-Korpsvart) - GTK themes and icon packs
 - [Dracula GTK](https://github.com/dracula/gtk) by [Eliver Lara](https://github.com/EliverLara) - Dracula theme
 
 ### Inspired By
-- [HyDE Project](https://github.com/prasanthrangan/hyprdots) - Hyprland dotfiles
-- [JaKooLit](https://github.com/JaKooLit) - Hyprland configurations
-- [end-4](https://github.com/end-4) - ags and desktop concepts
-- [Matt-FTW](https://github.com/Matt-FTW) - Dotfiles and setups
-- [Caelestia-dots](https://github.com/Heus-Sueh/Caelestia-dots) - Beautiful configurations
+- [HyDE Project](https://github.com/prasanthrangan/hyprdots) - Hyprland configuration
+- [JaKooLit](https://github.com/JaKooLit) - Hyprland configuration
+- [Stephan Raabe's ML4W](https://www.ml4w.com) - Hyprland configuration
+- [end-4](https://github.com/end-4) - quickshell, ags and desktop concepts
+- [Matt-FTW](https://github.com/Matt-FTW) - quickshell and hyprland configuration
+- [Caelestia-dots](https://github.com/Heus-Sueh/Caelestia-dots) - Beautiful quickshell configuration
 - And many others in the r/unixporn and Hyprland communities
 
 ---
