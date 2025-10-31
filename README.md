@@ -41,11 +41,11 @@ cp -r hypr kitty mako nvim quickshell vesktop VSCodium ~/.config/
 Switch themes instantly across all applications with Super + T. Available themes:
 - Material (Palenight)
 
-![materal_preview.png](previews/materal_preview.png)
+![material_preview.png](previews/material_preview.png)
 
 - Catppuccin (Mocha)
 
-![catppuccin.png](previews/catppuccin.png)
+![catppuccin_preview.png](previews/catppuccin_preview.png)
 
 - Dracula
 
