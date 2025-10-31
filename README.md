@@ -41,47 +41,47 @@ cp -r hypr kitty mako nvim quickshell vesktop VSCodium ~/.config/
 Switch themes instantly across all applications with Super + T. Available themes:
 - Material (Palenight)
 
-![material_preview.png](material_preview.png)
+![material_preview.png](previews/material_preview.png)
 
 - Catppuccin (Mocha)
 
-![catppuccin.png](catppuccin.png)
+![catppuccin.png](previews/catppuccin.png)
 
 - Dracula
 
-![dracula_preview.png](dracula_preview.png)
+![dracula_preview.png](previews/dracula_preview.png)
 
 - Eldritch
 
-![eldritch_preview.png](eldritch_preview.png)
+![eldritch_preview.png](previews/eldritch_preview.png)
 
 - Everforest
 
-![everforest_preview.png](everforest_preview.png)
+![everforest_preview.png](previews/everforest_preview.png)
 
 - Gruvbox
 
-![gruvbox_preview.png](gruvbox_preview.png)
+![gruvbox_preview.png](previews/gruvbox_preview.png)
 
 - Kanagawa
 
-![kanagawa_preview.png](kanagawa_preview.png)
+![kanagawa_preview.png](previews/kanagawa_preview.png)
 
 - NightFox
 
-![nightfox_preview.png](nightfox_preview.png)
+![nightfox_preview.png](previews/nightfox_preview.png)
 
 - Nord
 
-![nord_preview.png](nord_preview.png)
+![nord_preview.png](previews/nord_preview.png)
 
 - Rosé Pine
 
-![rosepine_preview.png](rosepine_preview.png)
+![rosepine_preview.png](previews/rosepine_preview.png)
 
 - TokyoNight
 
-![tokyonight_preview.png](tokyonight_preview.png)
+![tokyonight_preview.png](previews/tokyonight_preview.png)
 
 
 ### Custom Widgets
