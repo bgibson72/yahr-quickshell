@@ -88,52 +88,120 @@ extract_colors() {
     echo "${colors[@]:0:5}"
 }
 
+# Convert hex color to closest color name for search
+hex_to_color_name() {
+    local hex="$1"
+    
+    # Convert hex to RGB
+    local r=$((16#${hex:0:2}))
+    local g=$((16#${hex:2:2}))
+    local b=$((16#${hex:4:2}))
+    
+    # Determine dominant color and brightness
+    local max=$r
+    [[ $g -gt $max ]] && max=$g
+    [[ $b -gt $max ]] && max=$b
+    
+    local brightness=$(( (r + g + b) / 3 ))
+    
+    # Map to color names based on dominant channel and brightness
+    if [[ $brightness -lt 50 ]]; then
+        echo "dark"
+    elif [[ $brightness -gt 200 ]]; then
+        echo "white"
+    elif [[ $r -gt 150 && $g -lt 100 && $b -lt 100 ]]; then
+        echo "red"
+    elif [[ $r -lt 100 && $g -gt 150 && $b -lt 100 ]]; then
+        echo "green"
+    elif [[ $r -lt 100 && $g -lt 100 && $b -gt 150 ]]; then
+        echo "blue"
+    elif [[ $r -gt 150 && $g -gt 150 && $b -lt 100 ]]; then
+        echo "yellow"
+    elif [[ $r -gt 150 && $g -lt 100 && $b -gt 150 ]]; then
+        echo "purple"
+    elif [[ $r -lt 100 && $g -gt 150 && $b -gt 150 ]]; then
+        echo "cyan"
+    elif [[ $r -gt 150 && $g -gt 100 && $b -lt 100 ]]; then
+        echo "orange"
+    else
+        echo "gray"
+    fi
+}
+
 # Fetch wallpapers from Wallhaven for a single color
 fetch_by_color() {
     local color="$1"
     local output_dir="$2"
     local count="$3"
     
-    echo -e "  ${BLUE}→${NC} Searching for color #${color}..."
+    # Convert hex to color name for better search results
+    local color_name=$(hex_to_color_name "$color")
     
-    # Build API request URL
-    local url="${WALLHAVEN_API}?colors=${color}&categories=111&purity=100&sorting=random&atleast=${MIN_RESOLUTION}&page=1"
+    echo -e "  ${BLUE}→${NC} Searching for ${color_name} wallpapers (#${color})..."
+    
+    # Search using color name - more reliable than hex
+    local url="${WALLHAVEN_API}?q=${color_name}&categories=111&purity=100&sorting=random&atleast=${MIN_RESOLUTION}"
     
     # Fetch search results
     local response=$(curl -s "$url")
     
-    # Parse image URLs using grep and sed (no jq dependency)
-    local image_urls=$(echo "$response" | grep -o '"path":"[^"]*"' | sed 's/"path":"//g' | sed 's/"//g' | head -n "$count")
+    # Check if we got any results
+    local total=$(echo "$response" | grep -o '"total":[0-9]*' | cut -d: -f2)
+    
+    if [[ -z "$total" || "$total" == "0" ]]; then
+        echo -e "    ${YELLOW}No results found${NC}"
+        return
+    fi
+    
+    echo -e "    Found $total matching wallpapers"
+    
+    # Parse image URLs - handle escaped slashes in JSON
+    local image_urls=$(echo "$response" | grep -o '"path":"[^"]*"' | sed 's/"path":"//g' | sed 's/"//g' | sed 's/\\\//\//g' | head -n "$count")
     
     if [[ -z "$image_urls" ]]; then
-        echo -e "    ${YELLOW}No results found${NC}"
+        echo -e "    ${YELLOW}No image URLs found in response${NC}"
         return
     fi
     
     # Download each image
     local downloaded=0
+    local skipped=0
     while IFS= read -r image_url; do
-        if [[ -n "$image_url" ]]; then
+        if [[ -n "$image_url" && "$image_url" == http* ]]; then
             local filename=$(basename "$image_url")
             local filepath="$output_dir/$filename"
             
             # Skip if already exists
             if [[ -f "$filepath" ]]; then
-                echo -e "    ${YELLOW}⊘${NC} Skipping $filename (already exists)"
+                ((skipped++))
                 continue
             fi
             
             # Download with progress
-            if curl -s -o "$filepath" "$image_url"; then
-                ((downloaded++))
-                echo -e "    ${GREEN}✓${NC} Downloaded $filename"
+            if curl -s -L -o "$filepath" "$image_url" 2>/dev/null; then
+                # Check if file was actually downloaded (not empty/error page)
+                if [[ -s "$filepath" ]]; then
+                    ((downloaded++))
+                    echo -e "    ${GREEN}✓${NC} Downloaded $filename"
+                else
+                    rm -f "$filepath"
+                fi
             else
                 echo -e "    ${RED}✗${NC} Failed to download $filename"
             fi
         fi
     done <<< "$image_urls"
     
-    echo -e "    ${GREEN}Downloaded $downloaded wallpaper(s)${NC}"
+    if [[ $downloaded -eq 0 && $skipped -eq 0 ]]; then
+        echo -e "    ${YELLOW}No wallpapers downloaded${NC}"
+    elif [[ $downloaded -eq 0 ]]; then
+        echo -e "    ${YELLOW}Skipped $skipped existing wallpaper(s)${NC}"
+    else
+        echo -e "    ${GREEN}Downloaded $downloaded new wallpaper(s)${NC}"
+        if [[ $skipped -gt 0 ]]; then
+            echo -e "    ${YELLOW}Skipped $skipped existing wallpaper(s)${NC}"
+        fi
+    fi
 }
 
 # Main function to fetch wallpapers for a theme
