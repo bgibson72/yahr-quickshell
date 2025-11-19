@@ -83,6 +83,7 @@ quickshell
 - **mako** - Notification daemon with themed styling
 - **nvim** - Neovim with AstroNvim configuration
 - **VSCodium** - VS Code fork with theme integration
+  - **Note**: If you prefer Microsoft's VS Code, you can adapt the theme sync by changing the path in `sync-vscodium-theme.sh` from `~/.config/VSCodium/User/settings.json` to `~/.config/Code/User/settings.json`
 - **vesktop** - Discord client with theme support
 
 ## Key Features
