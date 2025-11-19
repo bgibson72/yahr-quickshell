@@ -63,8 +63,8 @@ Rectangle {
             }
             
             // Properties to store time format settings
-            property bool use24Hour: false
-            property bool showSeconds: true
+            property bool use24Hour: true
+            property bool showSeconds: false
             
             // Load time format settings when widget opens and refresh periodically
             Timer {
@@ -138,19 +138,19 @@ Rectangle {
                             const settings = JSON.parse(buffer)
                             
                             if (settings.general) {
-                                use24Hour = settings.general.clockFormat24hr === true
-                                showSeconds = settings.general.showSeconds === true
-                                console.log("Time settings loaded - 24hr:", use24Hour, "showSeconds:", showSeconds)
+                                timeSection.use24Hour = settings.general.clockFormat24hr === true
+                                timeSection.showSeconds = settings.general.showSeconds === true
+                                console.log("Time settings loaded - 24hr:", timeSection.use24Hour, "showSeconds:", timeSection.showSeconds)
                             }
                             
                             // Update display immediately with new settings
-                            updateTimeDisplay()
+                            timeSection.updateTimeDisplay()
                         } catch (e) {
                             console.error("Failed to parse time settings:", e)
                             // Use defaults
-                            use24Hour = true
-                            showSeconds = false
-                            updateTimeDisplay()
+                            timeSection.use24Hour = true
+                            timeSection.showSeconds = false
+                            timeSection.updateTimeDisplay()
                         }
                         
                         buffer = ""
