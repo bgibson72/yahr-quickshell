@@ -211,6 +211,17 @@ sudo pacman -S gnome-power-manager  # Or: xfce4-power-manager
 yay -S vesktop-bin vscodium-bin neovim
 ```
 
+### Thunar File Manager Thumbnails
+To enable image/video thumbnails in Thunar:
+```bash
+# Core thumbnail service for Thunar
+sudo pacman -S tumbler ffmpegthumbnailer
+
+# Additional format support (optional)
+sudo pacman -S poppler-glib libgsf  # PDF and ODF thumbnails
+```
+Restart Thunar after installation for thumbnails to appear.
+
 ## Documentation
 
 - [Quickshell Configuration Guide](quickshell/README.md)
