@@ -26,6 +26,7 @@ Complete Arch Linux + Hyprland desktop configuration with unified theme system.
 - <a href="https://github.com/VSCodium/vscodium">VSCodium</a>
 - <a href="https://github.com/Vencord/Vesktop">vesktop</a>
 - <a href="https://github.com/Musagy/hypremoji">hypremoji</a>
+- <a href="https://archlinux.org/packages/extra/x86_64/firefox/">firefox</a>
 
 ## Installation
 
