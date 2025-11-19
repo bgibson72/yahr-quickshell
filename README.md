@@ -30,16 +30,49 @@ Complete Arch Linux + Hyprland desktop configuration with unified theme system.
 
 ## Installation
 
+### 1. Install Dependencies
+Make sure you have all required packages installed (see Requirements section above).
+
+### 2. Clone and Install Configurations
 ```bash
 git clone https://github.com/bgibson72/yahr-quickshell.git
 cd yahr-quickshell
 
 # Backup existing configs (recommended)
 mkdir -p ~/config-backup
-cp -r ~/.config/{hypr,kitty,quickshell} ~/config-backup/ 2>/dev/null || true
+cp -r ~/.config/{hypr,kitty,quickshell,mako,nvim,vesktop,VSCodium} ~/config-backup/ 2>/dev/null || true
 
 # Install configurations
-cp -r hypr kitty mako nvim quickshell vesktop VSCodium ~/.config/
+cp -r hypr kitty mako nvim vesktop VSCodium ~/.config/
+
+# Install quickshell configuration
+# Note: This copies all files including shell.qml, scripts, themes, and executables
+cp -r quickshell ~/.config/
+```
+
+### 3. Configure Hyprland Autostart
+Add quickshell to your Hyprland configuration:
+```bash
+# Add quickshell to autostart
+echo 'exec-once = quickshell' >> ~/.config/hypr/hyprland.conf
+
+# If you're migrating from Waybar, remove it from autostart
+sed -i '/exec-once.*waybar/d' ~/.config/hypr/hyprland.conf
+```
+
+### 4. Start Quickshell
+```bash
+# Test quickshell (should launch without errors)
+quickshell
+
+# Or restart Hyprland to start everything fresh
+# Log out and log back in, or press Super + Shift + E (if configured)
+```
+
+### Troubleshooting
+- If `quickshell` can't find the config, ensure `~/.config/quickshell/shell.qml` exists
+- For widget issues, check that all scripts in `~/.config/quickshell/` are executable: `chmod +x ~/.config/quickshell/*.sh ~/.config/quickshell/toggle-*`
+- Check logs: `cat /run/user/$(id -u)/quickshell/by-id/*/log.qslog`
 ```
 
 ## Included Applications
@@ -142,7 +175,11 @@ Switch themes instantly across all applications with Super + T. Available themes
 
 ### Core Dependencies
 ```bash
-sudo pacman -S hyprland quickshell kitty mako swww hyprpolkitagent
+# Install from official repos
+sudo pacman -S hyprland kitty mako swww hyprpolkitagent
+
+# Install from AUR (requires yay or paru)
+yay -S quickshell-git hyprshot
 ```
 
 ### Fonts (for consistent appearance)
@@ -152,7 +189,7 @@ yay -S ttf-maple nerd-fonts-symbols-common
 
 ### Optional Applications
 ```bash
-yay -S vesktop-bin vscodium-bin
+yay -S vesktop-bin vscodium-bin neovim
 ```
 
 ## Documentation
