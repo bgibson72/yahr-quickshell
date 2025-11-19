@@ -203,6 +203,21 @@ yay -S vesktop-bin vscodium-bin neovim
 - [Hyprland Setup](hypr/)
 - [Theme Customization](quickshell/README.md#customization)
 
+### Hyprland Configuration
+
+The Hyprland configuration is now modularized for easier maintenance and customization. Instead of one monolithic config file, settings are organized into separate files:
+
+- **monitors.conf** - Display configuration and monitor settings
+- **programs.conf** - Default application definitions
+- **autostart.conf** - Programs to launch at startup
+- **variables.conf** - Environment variables
+- **look-and-feel.conf** - Appearance, animations, layouts, and window decorations
+- **input.conf** - Keyboard, mouse, touchpad, and gesture settings
+- **keybinds.conf** - All keyboard shortcuts and bindings
+- **rules.conf** - Window and workspace rules
+
+The main `hyprland.conf` file sources all these modules, keeping it clean and organized. Edit individual files in `hypr/` to customize specific aspects of your setup without navigating through a large config file.
+
 ## Contributing
 
 Contributions, issues, and feature requests are welcome!
