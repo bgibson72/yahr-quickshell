@@ -48,6 +48,11 @@ cp -r hypr kitty mako nvim vesktop VSCodium ~/.config/
 # Install quickshell configuration
 # Note: This copies all files including shell.qml, scripts, themes, and executables
 cp -r quickshell ~/.config/
+
+# Install GTK themes and icons
+mkdir -p ~/.themes ~/.icons
+cp -r quickshell/gtk-themes/* ~/.themes/
+cp -r quickshell/gtk-icons/* ~/.icons/
 ```
 
 ### 3. Configure Hyprland Autostart
@@ -176,7 +181,10 @@ Switch themes instantly across all applications with Super + T. Available themes
 # Install from official repos
 sudo pacman -S hyprland kitty mako swww hyprpolkitagent hyprshot
 
-# Install from AUR (requires yay or paru)
+# GTK theme manager (required for theme switching)
+yay -S nwg-look
+
+# Quickshell desktop environment
 yay -S quickshell-git
 ```
 
