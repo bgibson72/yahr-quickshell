@@ -561,6 +561,7 @@ SETTINGSEOF`
                                         onClicked: {
                                             clockFormat24hr.checked = !clockFormat24hr.checked
                                             root.settings.general.clockFormat24hr = clockFormat24hr.checked
+                                            saveSettings()
                                         }
                                     }
                                 }
@@ -606,6 +607,7 @@ SETTINGSEOF`
                                         onClicked: {
                                             showSeconds.checked = !showSeconds.checked
                                             root.settings.general.showSeconds = showSeconds.checked
+                                            saveSettings()
                                         }
                                     }
                                 }

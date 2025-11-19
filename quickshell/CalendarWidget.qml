@@ -66,11 +66,11 @@ Rectangle {
             property bool use24Hour: false
             property bool showSeconds: true
             
-            // Load time format settings when widget opens
+            // Load time format settings when widget opens and refresh periodically
             Timer {
-                interval: 100
+                interval: 1000
                 running: root.isVisible
-                repeat: false
+                repeat: true
                 triggeredOnStart: true
                 
                 onTriggered: {
