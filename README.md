@@ -190,6 +190,22 @@ sudo pacman -S ttf-nerd-fonts-symbols ttf-nerd-fonts-symbols-common
 yay -S maplemono-nf-unhinted
 ```
 
+### System Tray Helper Applications
+The system tray icons are clickable and launch helper applications:
+```bash
+# Network management (nmtui in terminal)
+sudo pacman -S networkmanager
+
+# Audio/Volume control
+sudo pacman -S pavucontrol
+
+# Bluetooth management
+sudo pacman -S blueman
+
+# Battery/Power management (optional - one of these)
+sudo pacman -S gnome-power-manager  # Or: xfce4-power-manager
+```
+
 ### Optional Applications
 ```bash
 yay -S vesktop-bin vscodium-bin neovim

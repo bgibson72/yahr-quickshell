@@ -166,6 +166,45 @@ Rectangle {
             }
         }
         
+        // Bluetooth Icon - clickable
+        Item {
+            width: 35
+            height: 32
+            visible: bluetoothAvailable
+            
+            property bool bluetoothAvailable: false
+            
+            scale: bluetoothMouseArea.pressed ? 0.92 : 1.0
+            opacity: bluetoothMouseArea.pressed ? 0.8 : 1.0
+            
+            Behavior on scale { NumberAnimation { duration: 100; easing.type: Easing.OutQuad } }
+            Behavior on opacity { NumberAnimation { duration: 100 } }
+            
+            Component.onCompleted: {
+                checkBluetoothProcess.running = true
+            }
+            
+            MouseArea {
+                id: bluetoothMouseArea
+                anchors.fill: parent
+                hoverEnabled: true
+                cursorShape: Qt.PointingHandCursor
+                
+                onClicked: {
+                    console.log("Bluetooth icon clicked - launching blueman-manager")
+                    Quickshell.execDetached(["blueman-manager"])
+                }
+            }
+            
+            Text {
+                anchors.centerIn: parent
+                text: "󰂯"  // Bluetooth icon
+                font.family: "Symbols Nerd Font"
+                font.pixelSize: 16
+                color: ThemeManager.accentBlue
+            }
+        }
+        
         // Audio Icon - clickable
         Item {
             width: systemTray.showVolumeDetails ? 70 : 35
@@ -247,7 +286,9 @@ Rectangle {
                 cursorShape: Qt.PointingHandCursor
                 
                 onClicked: {
-                    console.log("Battery icon clicked - toggle disabled, use settings")
+                    console.log("Battery icon clicked - launching power statistics")
+                    // Try different battery management tools in order of preference
+                    Quickshell.execDetached(["sh", "-c", "if command -v gnome-power-statistics >/dev/null 2>&1; then gnome-power-statistics; elif command -v xfce4-power-manager-settings >/dev/null 2>&1; then xfce4-power-manager-settings; else notify-send 'Battery' 'Level: " + systemTray.batteryLevel + "%, Status: " + (systemTray.charging ? "Charging" : "Discharging") + "'; fi"])
                 }
             }
             
@@ -508,6 +549,27 @@ Rectangle {
         
         onTriggered: {
             updateNetworkTraffic()
+        }
+    }
+}    
+    // Bluetooth availability check
+    Process {
+        id: checkBluetoothProcess
+        command: ["sh", "-c", "command -v bluetoothctl >/dev/null 2>&1 && echo 1 || echo 0"]
+        running: false
+        
+        stdout: SplitParser {
+            onRead: data => {
+                // Find the bluetooth item and set its availability
+                for (var i = 0; i < trayRow.children.length; i++) {
+                    var child = trayRow.children[i]
+                    if (child.hasOwnProperty("bluetoothAvailable")) {
+                        child.bluetoothAvailable = (data.trim() === "1")
+                        console.log("Bluetooth available:", child.bluetoothAvailable)
+                        break
+                    }
+                }
+            }
         }
     }
 }
