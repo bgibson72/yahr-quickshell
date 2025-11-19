@@ -174,10 +174,10 @@ Switch themes instantly across all applications with Super + T. Available themes
 ### Core Dependencies
 ```bash
 # Install from official repos
-sudo pacman -S hyprland kitty mako swww hyprpolkitagent
+sudo pacman -S hyprland kitty mako swww hyprpolkitagent hyprshot
 
 # Install from AUR (requires yay or paru)
-yay -S quickshell-git hyprshot
+yay -S quickshell-git
 ```
 
 ### Required Fonts
