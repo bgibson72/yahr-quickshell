@@ -196,11 +196,11 @@ The system tray icons are clickable and launch helper applications:
 # Network management (nmtui in terminal)
 sudo pacman -S networkmanager
 
-# Audio/Volume control
+# Audio/Volume control (required)
 sudo pacman -S pavucontrol
 
-# Bluetooth management
-sudo pacman -S blueman
+# Bluetooth management (required)
+sudo pacman -S bluez bluez-utils blueman
 
 # Battery/Power management (optional - one of these)
 sudo pacman -S gnome-power-manager  # Or: xfce4-power-manager
