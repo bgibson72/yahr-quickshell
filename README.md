@@ -24,7 +24,8 @@ Complete Arch Linux + Hyprland desktop configuration with unified theme system.
 - <a href="https://github.com/emersion/mako">mako</a>
 - <a href="https://github.com/neovim/neovim">nvim</a>
 - <a href="https://github.com/VSCodium/vscodium">VSCodium</a>
-- <a href="https://github.com/end-4/vesktop">vesktop</a>
+- <a href="https://github.com/Vencord/Vesktop">vesktop</a>
+- <a href="https://github.com/Musagy/hypremoji">hypremoji</a>
 
 ## Installation
 
