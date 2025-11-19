@@ -551,7 +551,7 @@ Rectangle {
             updateNetworkTraffic()
         }
     }
-}    
+    
     // Bluetooth availability check
     Process {
         id: checkBluetoothProcess
