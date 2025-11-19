@@ -201,7 +201,7 @@ Rectangle {
                 text: "󰂯"  // Bluetooth icon
                 font.family: "Symbols Nerd Font"
                 font.pixelSize: 16
-                color: ThemeManager.accentBlue
+                color: ThemeManager.accentGreen
             }
         }
         
