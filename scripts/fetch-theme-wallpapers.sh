@@ -7,7 +7,8 @@
 # Usage: ./fetch-theme-wallpapers.sh [theme-name] [count]
 # Example: ./fetch-theme-wallpapers.sh Catppuccin 20
 
-set -e
+# Don't use set -e as we want to continue on download failures
+set -u  # Error on undefined variables
 
 # Configuration
 THEMES_DIR="$HOME/.config/hypr/themes"
@@ -178,16 +179,18 @@ fetch_by_color() {
             fi
             
             # Download with progress
-            if curl -s -L -o "$filepath" "$image_url" 2>/dev/null; then
+            printf "    Downloading %s... " "$filename"
+            if curl --max-time 30 -s -L -o "$filepath" "$image_url"; then
                 # Check if file was actually downloaded (not empty/error page)
                 if [[ -s "$filepath" ]]; then
                     ((downloaded++))
-                    echo -e "    ${GREEN}✓${NC} Downloaded $filename"
+                    echo -e "${GREEN}✓${NC}"
                 else
                     rm -f "$filepath"
+                    echo -e "${RED}✗ (empty)${NC}"
                 fi
             else
-                echo -e "    ${RED}✗${NC} Failed to download $filename"
+                echo -e "${RED}✗ (curl failed with code $?)${NC}"
             fi
         fi
     done <<< "$image_urls"
