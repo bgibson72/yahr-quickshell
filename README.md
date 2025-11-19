@@ -70,13 +70,11 @@ quickshell
 ```
 
 ### Troubleshooting
-- If `quickshell` can't find the config, ensure `~/.config/quickshell/shell.qml` exists
-- For widget issues, check that all scripts in `~/.config/quickshell/` are executable: `chmod +x ~/.config/quickshell/*.sh ~/.config/quickshell/toggle-*`
-- Check logs: `cat /run/user/$(id -u)/quickshell/by-id/*/log.qslog`
+  - If `quickshell` can't find the config, ensure `~/.config/quickshell/shell.qml` exists
+  - For widget issues, check that all scripts in `~/.config/quickshell/` are executable: `chmod +x ~/.config/quickshell/*.sh ~/.config/quickshell/toggle-*`
+  - Check logs: `cat /run/user/$(id -u)/quickshell/by-id/*/log.qslog`
 
-## Included Applications
-
-- **hypr** - Hyprland window manager with 11 theme definitions
+## Included Applications- **hypr** - Hyprland window manager with 11 theme definitions
 - **quickshell** - Custom desktop environment (bar, widgets, controls)
 - **kitty** - Terminal emulator with theme synchronization
 - **mako** - Notification daemon with themed styling
