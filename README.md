@@ -182,9 +182,14 @@ sudo pacman -S hyprland kitty mako swww hyprpolkitagent
 yay -S quickshell-git hyprshot
 ```
 
-### Fonts (for consistent appearance)
+### Required Fonts
+The bar and widgets require specific fonts to display icons and text correctly:
 ```bash
-yay -S ttf-maple nerd-fonts-symbols-common
+# Nerd Fonts Symbols - Required for all icons in the bar and widgets
+sudo pacman -S ttf-nerd-fonts-symbols ttf-nerd-fonts-symbols-common
+
+# Maple Mono Nerd Font - Required for text in bar, workspaces, and widgets
+yay -S maplemono-nf-unhinted
 ```
 
 ### Optional Applications
