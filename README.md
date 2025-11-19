@@ -11,6 +11,21 @@ Complete Arch Linux + Hyprland desktop configuration with unified theme system.
 - 📦 Ready to use configurations
 - 🎭 Includes GTK themes and icon packs
 
+## Prerequisites
+
+### Preinstalled Requirements
+- Preinstalled Hyprland-compatible distro of your choice
+- Preinstalled packages including hyprland and git (minimum requirements)
+
+### Recommended Packages
+- <a href="https://man.archlinux.org/man/xdg-user-dirs.1">xdg-user-dirs</a>
+- <a href="https://github.com/outfoxxed/quickshell">quickshell</a>
+- <a href="https://sw.kovidgoyal.net/kitty/">kitty</a>
+- <a href="https://github.com/emersion/mako">mako</a>
+- <a href="https://github.com/neovim/neovim">nvim</a>
+- <a href="https://github.com/VSCodium/vscodium">VSCodium</a>
+- <a href="https://github.com/end-4/vesktop">vesktop</a>
+
 ## Installation
 
 ```bash
