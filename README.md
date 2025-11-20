@@ -90,14 +90,11 @@ sudo pacman -S thunar
 # Browser (Super + B keybind)
 sudo pacman -S firefox
 
-# Media controls (for media keys)
-sudo pacman -S playerctl
-
 # Brightness control (for brightness keys on laptops)
 sudo pacman -S brightnessctl
 
 # Power management (for battery system tray icon)
-sudo pacman -S gnome-power-manager  # Or: xfce4-power-manager
+sudo pacman -S xfce4-power-manager  # Or: gnome-power-manager
 
 # Emoji picker (Hypremoji - if you want emoji selector)
 yay -S hypremoji
@@ -200,49 +197,72 @@ quickshell
 
 ### Unified Theme System
 Switch themes instantly across all applications with Super + T. Available themes:
-- Material (Palenight)
+
+<details>
+<summary><b>Material (Palenight)</b></summary>
 
 ![material_preview.png](previews/material_preview.png)
+</details>
 
-- Catppuccin (Mocha)
+<details>
+<summary><b>Catppuccin (Mocha)</b></summary>
 
 ![catppuccin_preview.png](previews/catppuccin_preview.png)
+</details>
 
-- Dracula
+<details>
+<summary><b>Dracula</b></summary>
 
 ![dracula_preview.png](previews/dracula_preview.png)
+</details>
 
-- Eldritch
+<details>
+<summary><b>Eldritch</b></summary>
 
 ![eldritch_preview.png](previews/eldritch_preview.png)
+</details>
 
-- Everforest
+<details>
+<summary><b>Everforest</b></summary>
 
 ![everforest_preview.png](previews/everforest_preview.png)
+</details>
 
-- Gruvbox
+<details>
+<summary><b>Gruvbox</b></summary>
 
 ![gruvbox_preview.png](previews/gruvbox_preview.png)
+</details>
 
-- Kanagawa
+<details>
+<summary><b>Kanagawa</b></summary>
 
 ![kanagawa_preview.png](previews/kanagawa_preview.png)
+</details>
 
-- NightFox
+<details>
+<summary><b>NightFox</b></summary>
 
 ![nightfox_preview.png](previews/nightfox_preview.png)
+</details>
 
-- Nord
+<details>
+<summary><b>Nord</b></summary>
 
 ![nord_preview.png](previews/nord_preview.png)
+</details>
 
-- Rosé Pine
+<details>
+<summary><b>Rosé Pine</b></summary>
 
 ![rosepine_preview.png](previews/rosepine_preview.png)
+</details>
 
-- TokyoNight
+<details>
+<summary><b>TokyoNight</b></summary>
 
 ![tokyonight_preview.png](previews/tokyonight_preview.png)
+</details>
 
 
 ### Custom Widgets
@@ -282,15 +302,9 @@ Switch themes instantly across all applications with Super + T. Available themes
 - GTK theme synchronization
 - **Included GTK themes and icons** - Multiple theme-matched GTK themes and icon packs included in quickshell/gtk-themes/ and quickshell/gtk-icons/
 
-## Documentation
+## Hyprland Configuration
 
-- [Quickshell Configuration Guide](quickshell/README.md)
-- [Hyprland Setup](hypr/)
-- [Theme Customization](quickshell/README.md#customization)
-
-### Hyprland Configuration
-
-The Hyprland configuration is now modularized for easier maintenance and customization. Instead of one monolithic config file, settings are organized into separate files:
+The Hyprland configuration is modularized for easier maintenance and customization. Instead of one monolithic config file, settings are organized into separate files:
 
 - **monitors.conf** - Display configuration and monitor settings
 - **programs.conf** - Default application definitions
