@@ -260,7 +260,6 @@ Rectangle {
                     }
                     
                     Text {
-                        id: loginButton
                         anchors.centerIn: parent
                         text: translateLogin
                         font.family: fontFamily
@@ -276,8 +275,6 @@ Rectangle {
                         cursorShape: Qt.PointingHandCursor
                         onClicked: sddm.login(usernameField.text, passwordField.text, sessionCombo.currentIndex)
                     }
-                    
-                    property alias clicked: loginMouseArea.clicked
                 }
                 
                 // Session selector
