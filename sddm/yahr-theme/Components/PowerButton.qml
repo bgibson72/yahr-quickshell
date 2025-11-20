@@ -1,40 +1,47 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 
-Button {
+Rectangle {
     id: powerButton
     width: 64
     height: 64
+    radius: 32
+    color: mouseArea.containsPress ? Qt.lighter("#1e2030", 1.3) :
+           mouseArea.containsMouse ? Qt.lighter("#1e2030", 1.2) : "#1e2030"
+    opacity: 0.95
     
     property string icon: ""
-    property string text: ""
+    property alias text: toolTip.text
+    signal clicked()
     
-    ToolTip.visible: hovered
-    ToolTip.text: text
-    ToolTip.delay: 500
+    Behavior on color {
+        ColorAnimation { duration: 150 }
+    }
     
-    contentItem: Text {
+    Text {
+        anchors.centerIn: parent
         text: getIconText()
         font.family: "MapleMono NF"
         font.pixelSize: 24
-        color: powerButton.down ? Qt.darker("#d9d7ce", 1.2) : "#d9d7ce"
-        horizontalAlignment: Text.AlignHCenter
-        verticalAlignment: Text.AlignVCenter
+        color: mouseArea.containsPress ? Qt.darker("#d9d7ce", 1.2) : "#d9d7ce"
         
         Behavior on color {
             ColorAnimation { duration: 150 }
         }
     }
     
-    background: Rectangle {
-        radius: 32
-        color: powerButton.down ? Qt.lighter("#1e2030", 1.3) :
-               powerButton.hovered ? Qt.lighter("#1e2030", 1.2) : "#1e2030"
-        opacity: 0.95
-        
-        Behavior on color {
-            ColorAnimation { duration: 150 }
-        }
+    MouseArea {
+        id: mouseArea
+        anchors.fill: parent
+        hoverEnabled: true
+        cursorShape: Qt.PointingHandCursor
+        onClicked: powerButton.clicked()
+    }
+    
+    ToolTip {
+        id: toolTip
+        visible: mouseArea.containsMouse
+        delay: 500
     }
     
     function getIconText() {
