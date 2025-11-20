@@ -143,7 +143,7 @@ Rectangle {
                         id: avatar
                         anchors.fill: parent
                         anchors.margins: 2
-                        source: usersList.currentItem ? usersList.currentItem.icon : ""
+                        source: "file://" + config.AvatarPath + userModel.lastUser + ".face.icon"
                         fillMode: Image.PreserveAspectCrop
                         
                         layer.enabled: true
@@ -173,7 +173,7 @@ Rectangle {
                     width: parent.width
                     height: 48
                     placeholderText: translateUsername
-                    text: usersList.currentItem ? usersList.currentItem.name : ""
+                    text: userModel.lastUser
                     font.family: fontFamily
                     font.pixelSize: fontSize
                     color: fgPrimary
@@ -349,9 +349,9 @@ Rectangle {
         onTriggered: currentDateTime = new Date()
     }
     
-    // User list model
-    UsersList {
-        id: usersList
+    // User model
+    UserModel {
+        id: userModel
     }
     
     // Session model
