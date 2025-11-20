@@ -294,26 +294,15 @@ Rectangle {
                     ComboBox {
                         id: sessionCombo
                         width: parent.width - parent.spacing - 80
-                        model: sessionList
-                        currentIndex: sessionList.lastIndex
-                        textRole: "name"
-                        
-                        delegate: ItemDelegate {
-                            width: sessionCombo.width
-                            text: model.name
-                            font.family: fontFamily
-                            font.pixelSize: fontSize
-                            highlighted: sessionCombo.highlightedIndex === index
-                        }
-                        
-                        contentItem: Text {
-                            text: sessionCombo.displayText
-                            font.family: fontFamily
-                            font.pixelSize: fontSize
-                            color: fgPrimary
-                            verticalAlignment: Text.AlignVCenter
-                            leftPadding: 12
-                        }
+                        model: sessionModel
+                        index: sessionModel.lastIndex
+                        textColor: fgPrimary
+                        color: bgBase
+                        borderColor: themeColor
+                        hoverColor: Qt.lighter(bgBase, 1.1)
+                        font.family: fontFamily
+                        font.pixelSize: fontSize
+                        arrowIcon: ""
                     }
                 }
             }
