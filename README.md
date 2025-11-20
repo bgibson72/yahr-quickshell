@@ -96,6 +96,9 @@ sudo pacman -S brightnessctl
 # Power management (for battery system tray icon)
 sudo pacman -S xfce4-power-manager  # Or: gnome-power-manager
 
+# Screen locking and idle management
+sudo pacman -S hyprlock hypridle
+
 # Emoji picker (Hypremoji - if you want emoji selector)
 yay -S hypremoji
 ```
