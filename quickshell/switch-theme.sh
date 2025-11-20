@@ -80,6 +80,14 @@ if [ -f "$HOME/.config/quickshell/sync-vencord-theme.sh" ]; then
     echo ""
 fi
 
+# Sync SDDM theme
+SDDM_SYNC="$HOME/Dev/yahr-quickshell/sddm/sync-sddm-theme.sh"
+if [ -f "$SDDM_SYNC" ]; then
+    echo "Syncing SDDM theme..."
+    "$SDDM_SYNC"
+    echo ""
+fi
+
 echo ""
 
 # Check if quickshell is running
