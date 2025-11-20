@@ -266,33 +266,48 @@ Switch themes instantly across all applications with Super + T. Available themes
 
 
 ### Custom Widgets
-- **App Launcher** - Super + A - Fuzzy search application launcher
+
+<details>
+<summary><b>App Launcher</b> - Super + A - Fuzzy search application launcher</summary>
 
 ![app_launcher.png](previews/app_launcher.png)
+</details>
 
-- **Calendar** - Super + C - Monthly calendar widget
+<details>
+<summary><b>Calendar</b> - Super + C - Monthly calendar widget</summary>
 
 ![calendar.png](previews/calendar.png)
+</details>
 
-- **Power Menu** - Super + Escape - System controls
+<details>
+<summary><b>Power Menu</b> - Super + Escape - System controls</summary>
 
 ![power_menu.png](previews/power_menu.png)
+</details>
 
-- **Screenshot Tool** - Super + PrtScrn - Multi-mode screenshots
+<details>
+<summary><b>Screenshot Tool</b> - Super + PrtScrn - Multi-mode screenshots</summary>
 
 ![screenshot_tool.png](previews/screenshot_tool.png)
+</details>
 
-- **Settings** - Super + Shift + S - Quickshell configuration panel
+<details>
+<summary><b>Settings</b> - Super + Shift + S - Quickshell configuration panel</summary>
 
 ![settings.png](previews/settings.png)
+</details>
 
-- **Theme Switcher** - Super + T - Visual theme selector
+<details>
+<summary><b>Theme Switcher</b> - Super + T - Visual theme selector</summary>
 
 ![theme_switcher.png](previews/theme_switcher.png)
+</details>
 
-- **Wallpaper Picker** - Super + Shift + W - Browse and select wallpapers
+<details>
+<summary><b>Wallpaper Picker</b> - Super + Shift + W - Browse and select wallpapers</summary>
 
 ![wallpaper_picker.png](previews/wallpaper_picker.png)
+</details>
 
 
 ### System Integration
