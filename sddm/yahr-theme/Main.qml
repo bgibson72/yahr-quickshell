@@ -108,44 +108,54 @@ Rectangle {
         Rectangle {
             id: loginCard
             anchors.centerIn: parent
-            width: 400
-            height: column.height + 64
-            radius: 24
+            width: 420
+            height: column.height + 80
+            radius: 28
             color: bgSurface
-            opacity: 0.95
+            opacity: 0.97
             
             layer.enabled: true
             layer.effect: DropShadow {
                 horizontalOffset: 0
-                verticalOffset: 8
-                radius: 24
-                samples: 49
-                color: "#40000000"
+                verticalOffset: 12
+                radius: 32
+                samples: 65
+                color: "#60000000"
+                spread: 0.1
             }
             
             Column {
                 id: column
                 anchors {
                     centerIn: parent
-                    margins: 32
+                    margins: 40
                 }
-                width: parent.width - 64
-                spacing: 24
+                width: parent.width - 80
+                spacing: 20
                 
                 // Avatar
                 Rectangle {
                     id: avatarContainer
-                    width: 96
-                    height: 96
-                    radius: 48
+                    width: 112
+                    height: 112
+                    radius: 56
                     color: bgBase
                     anchors.horizontalCenter: parent.horizontalCenter
                     visible: enableAvatars
                     
+                    layer.enabled: true
+                    layer.effect: DropShadow {
+                        horizontalOffset: 0
+                        verticalOffset: 4
+                        radius: 16
+                        samples: 33
+                        color: "#30000000"
+                    }
+                    
                     Image {
                         id: avatar
                         anchors.fill: parent
-                        anchors.margins: 2
+                        anchors.margins: 3
                         source: userModel.lastUser !== "" ? userModel.icon : ""
                         fillMode: Image.PreserveAspectCrop
                         
@@ -163,7 +173,7 @@ Rectangle {
                         anchors.centerIn: parent
                         text: userModel.lastUser !== "" ? userModel.lastUser.charAt(0).toUpperCase() : ""
                         font.family: fontFamily
-                        font.pixelSize: 48
+                        font.pixelSize: 56
                         font.weight: Font.Medium
                         color: themeColor
                         visible: avatar.status !== Image.Ready
@@ -173,21 +183,33 @@ Rectangle {
                 // Username field
                 Rectangle {
                     width: parent.width
-                    height: 48
-                    radius: 12
+                    height: 52
+                    radius: 14
                     color: bgBase
-                    border.width: usernameField.activeFocus ? 2 : 0
-                    border.color: themeColor
+                    border.width: usernameField.activeFocus ? 2 : 1
+                    border.color: usernameField.activeFocus ? themeColor : Qt.rgba(fgSecondary.r, fgSecondary.g, fgSecondary.b, 0.2)
+                    
+                    Behavior on border.width {
+                        NumberAnimation { duration: 150 }
+                    }
+                    
+                    Behavior on border.color {
+                        ColorAnimation { duration: 150 }
+                    }
                     
                     TextField {
                         id: usernameField
                         anchors.fill: parent
                         anchors.margins: 1
+                        leftPadding: 16
+                        rightPadding: 16
                         placeholderText: translateUsername
                         text: userModel.lastUser
                         font.family: fontFamily
-                        font.pixelSize: fontSize
+                        font.pixelSize: fontSize + 1
                         color: fgPrimary
+                        selectionColor: themeColor
+                        selectedTextColor: bgBase
                         background: Rectangle { color: "transparent" }
                         
                         Keys.onReturnPressed: passwordField.forceActiveFocus()
@@ -198,22 +220,34 @@ Rectangle {
                 // Password field
                 Rectangle {
                     width: parent.width
-                    height: 48
-                    radius: 12
+                    height: 52
+                    radius: 14
                     color: bgBase
-                    border.width: passwordField.activeFocus ? 2 : 0
-                    border.color: themeColor
+                    border.width: passwordField.activeFocus ? 2 : 1
+                    border.color: passwordField.activeFocus ? themeColor : Qt.rgba(fgSecondary.r, fgSecondary.g, fgSecondary.b, 0.2)
+                    
+                    Behavior on border.width {
+                        NumberAnimation { duration: 150 }
+                    }
+                    
+                    Behavior on border.color {
+                        ColorAnimation { duration: 150 }
+                    }
                     
                     TextField {
                         id: passwordField
                         anchors.fill: parent
                         anchors.margins: 1
+                        leftPadding: 16
+                        rightPadding: 16
                         placeholderText: translatePassword
                         font.family: fontFamily
-                        font.pixelSize: fontSize
+                        font.pixelSize: fontSize + 1
                         color: fgPrimary
                         echoMode: TextInput.Password
                         focus: true
+                        selectionColor: themeColor
+                        selectedTextColor: bgBase
                         background: Rectangle { color: "transparent" }
                         
                         Keys.onReturnPressed: loginButton.clicked()
@@ -250,10 +284,19 @@ Rectangle {
                 // Login button
                 Rectangle {
                     width: parent.width
-                    height: 48
-                    radius: 12
+                    height: 52
+                    radius: 14
                     color: loginMouseArea.containsPress ? Qt.darker(themeColor, 1.2) : 
-                           loginMouseArea.containsMouse ? Qt.lighter(themeColor, 1.1) : themeColor
+                           loginMouseArea.containsMouse ? Qt.lighter(themeColor, 1.15) : themeColor
+                    
+                    layer.enabled: true
+                    layer.effect: DropShadow {
+                        horizontalOffset: 0
+                        verticalOffset: 4
+                        radius: 12
+                        samples: 25
+                        color: Qt.rgba(themeColor.r, themeColor.g, themeColor.b, 0.4)
+                    }
                     
                     Behavior on color {
                         ColorAnimation { duration: 150 }
@@ -263,8 +306,9 @@ Rectangle {
                         anchors.centerIn: parent
                         text: translateLogin
                         font.family: fontFamily
-                        font.pixelSize: fontSize + 2
+                        font.pixelSize: fontSize + 3
                         font.weight: Font.Medium
+                        font.capitalization: Font.AllUppercase
                         color: bgBase
                     }
                     

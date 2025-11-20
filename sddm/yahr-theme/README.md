@@ -58,6 +58,29 @@ sudo systemctl enable sddm.service
 
 ### Set Custom Background
 
+#### Automatic Theme Sync (Recommended)
+
+Keep your SDDM theme automatically synced with your current Quickshell theme and wallpaper:
+
+```bash
+# Run the sync script (from repo root)
+./sddm/sync-sddm-theme.sh
+```
+
+This will:
+- Extract colors from your current Quickshell theme
+- Use your current wallpaper from `swww`
+- Update the SDDM theme configuration
+
+**Automate on Theme Change:**
+Add this to your `~/.config/quickshell/switch-theme.sh` (after the theme switch):
+```bash
+# Sync SDDM theme with new colors
+~/Dev/yahr-quickshell/sddm/sync-sddm-theme.sh
+```
+
+#### Manual Configuration
+
 Place your wallpaper in the theme directory and update `theme.conf`:
 
 ```bash
