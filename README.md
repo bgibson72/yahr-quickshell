@@ -13,27 +13,133 @@ Complete Arch Linux + Hyprland desktop configuration with unified theme system.
 
 ## Prerequisites
 
-### Preinstalled Requirements
-- Preinstalled Hyprland-compatible distro of your choice
-- Preinstalled packages including hyprland and git (minimum requirements)
+### System Requirements
+- Linux distribution with Hyprland support (Arch Linux recommended)
+- Preinstalled Hyprland window manager
+- git (for cloning this repository)
+- base-devel (for building packages)
 
-### Recommended Packages
-- <a href="https://man.archlinux.org/man/xdg-user-dirs.1">xdg-user-dirs</a>
-- <a href="https://github.com/outfoxxed/quickshell">quickshell</a>
-- <a href="https://sw.kovidgoyal.net/kitty/">kitty</a>
-- <a href="https://github.com/emersion/mako">mako</a>
-- <a href="https://github.com/neovim/neovim">nvim</a>
-- <a href="https://github.com/VSCodium/vscodium">VSCodium</a>
-- <a href="https://github.com/Vencord/Vesktop">vesktop</a>
-- <a href="https://github.com/Musagy/hypremoji">hypremoji</a>
-- <a href="https://archlinux.org/packages/extra/x86_64/firefox/">firefox</a>
+### AUR Helper (Arch Linux)
+Many packages are installed from the AUR. You'll need an AUR helper like `yay`:
+```bash
+# Install yay if you don't have it
+sudo pacman -S --needed git base-devel
+git clone https://aur.archlinux.org/yay.git
+cd yay
+makepkg -si
+```
+If you prefer `paru` or another AUR helper, substitute `yay` with your preferred tool in the installation commands below.
+
+## Requirements
+
+### Absolute Minimum Requirements
+These packages are **required** for basic functionality:
+```bash
+# Core system (must be pre-installed)
+# - hyprland - Wayland compositor
+# - git - For cloning this repository
+# - base-devel - For building AUR packages
+
+# Desktop environment and shell
+yay -S quickshell-git              # Main desktop environment framework
+sudo pacman -S kitty               # Terminal emulator (used throughout)
+
+# Wallpaper and notifications
+sudo pacman -S swww                # Wallpaper daemon
+sudo pacman -S mako                # Notification daemon
+sudo pacman -S libnotify           # Provides notify-send command
+
+# Authentication and security
+sudo pacman -S hyprpolkitagent     # Polkit authentication agent
+
+# Screenshots
+sudo pacman -S hyprshot            # Screenshot utility
+sudo pacman -S grim slurp          # Screenshot dependencies
+
+# Audio system (PipeWire/PulseAudio)
+sudo pacman -S wireplumber pipewire-pulse  # Or: pulseaudio pulseaudio-alsa
+sudo pacman -S pavucontrol         # Volume control GUI (system tray)
+
+# GTK theme system
+yay -S nwg-look                    # GTK theme/icon manager (REQUIRED)
+
+# Network management
+sudo pacman -S networkmanager      # Network backend
+# nmtui is included with networkmanager
+```
+
+### Required Fonts
+The bar and widgets **will not display correctly** without these fonts:
+```bash
+# Nerd Fonts Symbols - Required for all icons in the bar and widgets
+sudo pacman -S ttf-nerd-fonts-symbols ttf-nerd-fonts-symbols-common
+
+# Maple Mono Nerd Font - Required for text in bar, workspaces, and widgets
+yay -S ttf-maple                   # Or: maplemono-nf-unhinted
+```
+
+### Strongly Recommended
+These packages enable core features and widgets:
+```bash
+# Bluetooth (for system tray icon)
+sudo pacman -S bluez bluez-utils blueman
+
+# File manager (launched by Files button in bar)
+sudo pacman -S thunar
+
+# Browser (Super + B keybind)
+sudo pacman -S firefox
+
+# Media controls (for media keys)
+sudo pacman -S playerctl
+
+# Brightness control (for brightness keys on laptops)
+sudo pacman -S brightnessctl
+
+# Power management (for battery system tray icon)
+sudo pacman -S gnome-power-manager  # Or: xfce4-power-manager
+
+# Emoji picker (Hypremoji - if you want emoji selector)
+yay -S hypremoji
+```
+
+### Application Suite (Optional)
+These are the applications pre-configured with theme support:
+```bash
+# Code editors
+yay -S vscodium-bin                # VS Code fork (theme support included)
+sudo pacman -S neovim              # Terminal editor (AstroNvim config)
+
+# Communication
+yay -S vesktop-bin                 # Discord client (Vencord theme support)
+
+# System tools
+sudo pacman -S htop                # System monitor
+```
+
+### Thunar File Manager Enhancements
+To enable image/video thumbnails and additional file support:
+```bash
+# Core thumbnail service for Thunar
+sudo pacman -S tumbler ffmpegthumbnailer
+
+# Additional format support (optional)
+sudo pacman -S poppler-glib libgsf  # PDF and ODF thumbnails
+
+# Archive support
+sudo pacman -S thunar-archive-plugin file-roller
+
+# Mount support for USB drives, etc.
+sudo pacman -S gvfs thunar-volman
+```
+Restart Thunar after installation for thumbnails and features to appear.
 
 ## Installation
 
-### 1. Install Dependencies
-Make sure you have all required packages installed (see Requirements section above).
+### 1. Install All Required Packages
+Follow the package installation instructions in the **Requirements** section above. At minimum, you must install the packages listed under "Absolute Minimum Requirements" and "Required Fonts".
 
-### 2. Clone and Install Configurations
+###  2. Clone and Install Configurations
 ```bash
 git clone https://github.com/bgibson72/yahr-quickshell.git
 cd yahr-quickshell
@@ -79,7 +185,9 @@ quickshell
   - For widget issues, check that all scripts in `~/.config/quickshell/` are executable: `chmod +x ~/.config/quickshell/*.sh ~/.config/quickshell/toggle-*`
   - Check logs: `cat /run/user/$(id -u)/quickshell/by-id/*/log.qslog`
 
-## Included Applications- **hypr** - Hyprland window manager with 11 theme definitions
+## Included Applications
+
+- **hypr** - Hyprland window manager with 11 theme definitions
 - **quickshell** - Custom desktop environment (bar, widgets, controls)
 - **kitty** - Terminal emulator with theme synchronization
 - **mako** - Notification daemon with themed styling
@@ -173,62 +281,6 @@ Switch themes instantly across all applications with Super + T. Available themes
 - Notification system with urgency-based styling
 - GTK theme synchronization
 - **Included GTK themes and icons** - Multiple theme-matched GTK themes and icon packs included in quickshell/gtk-themes/ and quickshell/gtk-icons/
-
-## Requirements
-
-### Core Dependencies
-```bash
-# Install from official repos
-sudo pacman -S hyprland kitty mako swww hyprpolkitagent hyprshot
-
-# GTK theme manager (required for theme switching)
-yay -S nwg-look
-
-# Quickshell desktop environment
-yay -S quickshell-git
-```
-
-### Required Fonts
-The bar and widgets require specific fonts to display icons and text correctly:
-```bash
-# Nerd Fonts Symbols - Required for all icons in the bar and widgets
-sudo pacman -S ttf-nerd-fonts-symbols ttf-nerd-fonts-symbols-common
-
-# Maple Mono Nerd Font - Required for text in bar, workspaces, and widgets
-yay -S maplemono-nf-unhinted
-```
-
-### System Tray Helper Applications
-The system tray icons are clickable and launch helper applications:
-```bash
-# Network management (nmtui in terminal)
-sudo pacman -S networkmanager
-
-# Audio/Volume control (required)
-sudo pacman -S pavucontrol
-
-# Bluetooth management (required)
-sudo pacman -S bluez bluez-utils blueman
-
-# Battery/Power management (optional - one of these)
-sudo pacman -S gnome-power-manager  # Or: xfce4-power-manager
-```
-
-### Optional Applications
-```bash
-yay -S vesktop-bin vscodium-bin neovim
-```
-
-### Thunar File Manager Thumbnails
-To enable image/video thumbnails in Thunar:
-```bash
-# Core thumbnail service for Thunar
-sudo pacman -S tumbler ffmpegthumbnailer
-
-# Additional format support (optional)
-sudo pacman -S poppler-glib libgsf  # PDF and ODF thumbnails
-```
-Restart Thunar after installation for thumbnails to appear.
 
 ## Documentation
 
