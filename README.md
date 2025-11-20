@@ -117,6 +117,18 @@ yay -S vesktop-bin                 # Discord client (Vencord theme support)
 sudo pacman -S htop                # System monitor
 ```
 
+### SDDM Login Manager (Optional but Recommended)
+For a complete themed experience from boot to desktop:
+```bash
+# Install SDDM and dependencies
+sudo pacman -S sddm qt6-declarative qt6-svg qt6-5compat
+
+# Enable SDDM at boot
+sudo systemctl enable sddm.service
+```
+
+After installing configurations (see Installation section), the SDDM theme will be available at `sddm/yahr-theme/`. See [sddm/yahr-theme/README.md](sddm/yahr-theme/README.md) for setup instructions.
+
 ### Thunar File Manager Enhancements
 To enable image/video thumbnails and additional file support:
 ```bash

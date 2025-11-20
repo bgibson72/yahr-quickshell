@@ -1,0 +1,14 @@
+[SddmGreeterTheme]
+Name=YAHR
+Description=Yet Another Hyprland Rice - Material Design 3 SDDM Theme
+Author=YAHR Project
+Copyright=(c) 2025, YAHR Contributors
+License=MIT
+Type=sddm-theme
+Version=1.0
+Website=https://github.com/bgibson72/yahr-quickshell
+QtVersion=6
+MainScript=Main.qml
+ConfigFile=theme.conf
+Theme-Id=yahr
+Theme-API=2.0
