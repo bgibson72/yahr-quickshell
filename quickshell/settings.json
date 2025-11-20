@@ -7,13 +7,13 @@
     "showSeconds": true
   },
   "screenshot": {
-    "defaultDelay": 3,
+    "defaultDelay": 0,
     "saveToDisk": true,
     "copyToClipboard": true,
     "saveLocation": "~/Pictures/Screenshots"
   },
   "theme": {
-    "current": "Catppuccin"
+    "current": "Gruvbox"
   },
   "systemTray": {
     "showBatteryDetails": false,
