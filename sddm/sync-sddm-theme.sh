@@ -45,6 +45,16 @@ if [[ -z "$current_wallpaper" || ! -f "$current_wallpaper" ]]; then
     current_wallpaper="$HOME/.config/quickshell/themes/wallpapers/default.jpg"
 fi
 
+# Copy wallpaper to SDDM theme directory (so SDDM can access it)
+if [[ -f "$current_wallpaper" ]]; then
+    wallpaper_filename="background-$(basename "$current_wallpaper")"
+    sudo cp "$current_wallpaper" "$SDDM_THEME_DIR/$wallpaper_filename" 2>/dev/null
+    # Use the copied wallpaper path
+    sddm_wallpaper="$wallpaper_filename"
+else
+    sddm_wallpaper="background.jpg"
+fi
+
 echo "Syncing SDDM theme..."
 echo "  Theme: $current_theme"
 echo "  Wallpaper: $current_wallpaper"
@@ -53,7 +63,7 @@ echo "  Colors: $accent_blue, $accent_purple, etc."
 # Update theme.conf with extracted colors and wallpaper
 sudo tee "$THEME_CONF" > /dev/null << EOF
 [General]
-Background="$current_wallpaper"
+Background="$sddm_wallpaper"
 BackgroundBlur=20
 
 # Colors from $current_theme
@@ -76,7 +86,7 @@ ShowSessionButton=true
 ShowPowerButtons=true
 
 # Time and Date
-TimeFormat="hh:mm"
+TimeFormat="h:mm AP"
 DateFormat="dddd, MMMM d"
 
 # Translations (using defaults)
