@@ -214,7 +214,7 @@ SETTINGSEOF`
     Process {
         id: themeLoader
         running: false
-        command: ["sh", "-c", "ls ~/.config/hypr/themes/*.conf 2>/dev/null | xargs -n1 basename | sed 's/.conf$//' | sort"]
+        command: ["sh", "-c", "ls ~/.config/hypr/themes/*.conf 2>/dev/null | xargs -n1 basename | sed 's/.conf$//' | grep -v '^active-theme$' | sort"]
         
         stdout: SplitParser {
             onRead: data => {

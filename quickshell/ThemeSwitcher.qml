@@ -18,7 +18,7 @@ Scope {
     Process {
         id: themeLoader
         running: true
-        command: ["bash", "-c", "ls ~/.config/hypr/themes/*.conf 2>/dev/null | xargs -n1 basename | sed 's/.conf$//' | sort"]
+        command: ["bash", "-c", "ls ~/.config/hypr/themes/*.conf 2>/dev/null | xargs -n1 basename | sed 's/.conf$//' | grep -v '^active-theme$' | sort"]
         
         stdout: SplitParser {
             onRead: data => {
