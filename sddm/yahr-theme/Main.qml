@@ -29,7 +29,7 @@ Rectangle {
     property bool showHostname: config.boolValue("ShowHostname") !== false
     property bool showSessionButton: config.boolValue("ShowSessionButton") !== false
     property bool showPowerButtons: config.boolValue("ShowPowerButtons") !== false
-    property string timeFormat: config.stringValue("TimeFormat") || "hh:mm"
+    property string timeFormat: config.stringValue("TimeFormat") || "h:mm AP"
     property string dateFormat: config.stringValue("DateFormat") || "dddd, MMMM d"
     
     // Translations
@@ -172,11 +172,21 @@ Rectangle {
                     Text {
                         anchors.centerIn: parent
                         text: userModel.lastUser !== "" ? userModel.lastUser.charAt(0).toUpperCase() : ""
-                        font.family: fontFamily
+                        font.family: "MapleMono NF"
                         font.pixelSize: 56
                         font.weight: Font.Medium
                         color: themeColor
                         visible: avatar.status !== Image.Ready
+                    }
+                    
+                    // Fallback user icon when no username
+                    Text {
+                        anchors.centerIn: parent
+                        text: "\uf007"  // Nerd Font user icon
+                        font.family: "MapleMono NF"
+                        font.pixelSize: 56
+                        color: Qt.rgba(themeColor.r, themeColor.g, themeColor.b, 0.5)
+                        visible: avatar.status !== Image.Ready && userModel.lastUser === ""
                     }
                 }
                 
@@ -185,7 +195,7 @@ Rectangle {
                     width: parent.width
                     height: 52
                     radius: 14
-                    color: bgBase
+                    color: Qt.lighter(bgSurface, 1.3)
                     border.width: usernameField.activeFocus ? 2 : 1
                     border.color: usernameField.activeFocus ? themeColor : Qt.rgba(fgSecondary.r, fgSecondary.g, fgSecondary.b, 0.2)
                     
@@ -222,7 +232,7 @@ Rectangle {
                     width: parent.width
                     height: 52
                     radius: 14
-                    color: bgBase
+                    color: Qt.lighter(bgSurface, 1.3)
                     border.width: passwordField.activeFocus ? 2 : 1
                     border.color: passwordField.activeFocus ? themeColor : Qt.rgba(fgSecondary.r, fgSecondary.g, fgSecondary.b, 0.2)
                     
@@ -341,12 +351,15 @@ Rectangle {
                         model: sessionModel
                         index: sessionModel.lastIndex
                         textColor: fgPrimary
-                        color: bgBase
-                        borderColor: themeColor
-                        hoverColor: Qt.lighter(bgBase, 1.1)
+                        color: Qt.lighter(bgSurface, 1.3)
+                        borderColor: Qt.rgba(fgSecondary.r, fgSecondary.g, fgSecondary.b, 0.2)
+                        hoverColor: Qt.lighter(bgSurface, 1.4)
+                        menuColor: Qt.lighter(bgSurface, 1.3)
                         font.family: fontFamily
                         font.pixelSize: fontSize
+                        borderWidth: 0
                         arrowIcon: ""
+                        arrowColor: "transparent"
                     }
                 }
             }
