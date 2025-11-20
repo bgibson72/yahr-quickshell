@@ -13,34 +13,34 @@ Rectangle {
     // SDDM Components
     TextConstants { id: textConstants }
     
-    // Theme configuration
-    property string background: config.Background || ""
-    property int backgroundBlur: config.BackgroundBlur || 20
-    property color themeColor: config.ThemeColor || "#82aaff"
-    property color accentColor: config.AccentColor || "#c792ea"
-    property color bgBase: config.BgBase || "#292d3e"
-    property color bgSurface: config.BgSurface || "#1e2030"
-    property color fgPrimary: config.FgPrimary || "#d9d7ce"
-    property color fgSecondary: config.FgSecondary || "#7d83a1"
-    property string fontFamily: config.Font || "MapleMono NF"
-    property int fontSize: config.FontSize || 11
-    property int titleFontSize: config.TitleFontSize || 32
-    property bool enableAvatars: config.EnableAvatars === "true"
-    property bool showHostname: config.ShowHostname !== "false"
-    property bool showSessionButton: config.ShowSessionButton !== "false"
-    property bool showPowerButtons: config.ShowPowerButtons !== "false"
-    property string timeFormat: config.TimeFormat || "hh:mm"
-    property string dateFormat: config.DateFormat || "dddd, MMMM d"
+    // Theme configuration - use proper config API
+    property string background: config.stringValue("Background") || ""
+    property int backgroundBlur: config.intValue("BackgroundBlur") || 20
+    property color themeColor: config.stringValue("ThemeColor") || "#82aaff"
+    property color accentColor: config.stringValue("AccentColor") || "#c792ea"
+    property color bgBase: config.stringValue("BgBase") || "#292d3e"
+    property color bgSurface: config.stringValue("BgSurface") || "#1e2030"
+    property color fgPrimary: config.stringValue("FgPrimary") || "#d9d7ce"
+    property color fgSecondary: config.stringValue("FgSecondary") || "#7d83a1"
+    property string fontFamily: config.stringValue("Font") || "MapleMono NF"
+    property int fontSize: config.intValue("FontSize") || 11
+    property int titleFontSize: config.intValue("TitleFontSize") || 32
+    property bool enableAvatars: config.boolValue("EnableAvatars")
+    property bool showHostname: config.boolValue("ShowHostname") !== false
+    property bool showSessionButton: config.boolValue("ShowSessionButton") !== false
+    property bool showPowerButtons: config.boolValue("ShowPowerButtons") !== false
+    property string timeFormat: config.stringValue("TimeFormat") || "hh:mm"
+    property string dateFormat: config.stringValue("DateFormat") || "dddd, MMMM d"
     
     // Translations
-    property string translateLogin: config.TranslateLogin || "Login"
-    property string translateLoginFailed: config.TranslateLoginFailed || "Login Failed"
-    property string translateUsername: config.TranslateUsername || "Username"
-    property string translatePassword: config.TranslatePassword || "Password"
-    property string translateSession: config.TranslateSession || "Session"
-    property string translateSuspend: config.TranslateSuspend || "Suspend"
-    property string translateReboot: config.TranslateReboot || "Reboot"
-    property string translateShutdown: config.TranslateShutdown || "Shutdown"
+    property string translateLogin: config.stringValue("TranslateLogin") || textConstants.login
+    property string translateLoginFailed: config.stringValue("TranslateLoginFailed") || textConstants.loginFailed
+    property string translateUsername: config.stringValue("TranslateUsername") || textConstants.userName
+    property string translatePassword: config.stringValue("TranslatePassword") || textConstants.password
+    property string translateSession: config.stringValue("TranslateSession") || textConstants.session
+    property string translateSuspend: config.stringValue("TranslateSuspend") || textConstants.suspend
+    property string translateReboot: config.stringValue("TranslateReboot") || textConstants.reboot
+    property string translateShutdown: config.stringValue("TranslateShutdown") || textConstants.shutdown
     
     // Background
     Image {
@@ -146,7 +146,7 @@ Rectangle {
                         id: avatar
                         anchors.fill: parent
                         anchors.margins: 2
-                        source: userModel.lastUser !== "" ? "file://" + config.AvatarPath + userModel.lastUser + ".face.icon" : ""
+                        source: userModel.lastUser !== "" ? userModel.icon : ""
                         fillMode: Image.PreserveAspectCrop
                         
                         layer.enabled: true
@@ -161,7 +161,7 @@ Rectangle {
                     
                     Text {
                         anchors.centerIn: parent
-                        text: usersList.currentItem ? usersList.currentItem.name.charAt(0).toUpperCase() : ""
+                        text: userModel.lastUser !== "" ? userModel.lastUser.charAt(0).toUpperCase() : ""
                         font.family: fontFamily
                         font.pixelSize: 48
                         font.weight: Font.Medium
