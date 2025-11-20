@@ -171,52 +171,58 @@ Rectangle {
                 }
                 
                 // Username field
-                TextField {
-                    id: usernameField
+                Rectangle {
                     width: parent.width
                     height: 48
-                    placeholderText: translateUsername
-                    text: userModel.lastUser
-                    font.family: fontFamily
-                    font.pixelSize: fontSize
-                    color: fgPrimary
+                    radius: 12
+                    color: bgBase
+                    border.width: usernameField.activeFocus ? 2 : 0
+                    border.color: themeColor
                     
-                    background: Rectangle {
-                        radius: 12
-                        color: bgBase
-                        border.width: usernameField.activeFocus ? 2 : 0
-                        border.color: themeColor
+                    TextField {
+                        id: usernameField
+                        anchors.fill: parent
+                        anchors.margins: 1
+                        placeholderText: translateUsername
+                        text: userModel.lastUser
+                        font.family: fontFamily
+                        font.pixelSize: fontSize
+                        color: fgPrimary
+                        background: Rectangle { color: "transparent" }
+                        
+                        Keys.onReturnPressed: passwordField.forceActiveFocus()
+                        Keys.onTabPressed: passwordField.forceActiveFocus()
                     }
-                    
-                    Keys.onReturnPressed: passwordField.forceActiveFocus()
-                    Keys.onTabPressed: passwordField.forceActiveFocus()
                 }
                 
                 // Password field
-                TextField {
-                    id: passwordField
+                Rectangle {
                     width: parent.width
                     height: 48
-                    placeholderText: translatePassword
-                    font.family: fontFamily
-                    font.pixelSize: fontSize
-                    color: fgPrimary
-                    echoMode: TextInput.Password
-                    focus: true
+                    radius: 12
+                    color: bgBase
+                    border.width: passwordField.activeFocus ? 2 : 0
+                    border.color: themeColor
                     
-                    background: Rectangle {
-                        radius: 12
-                        color: bgBase
-                        border.width: passwordField.activeFocus ? 2 : 0
-                        border.color: themeColor
-                    }
-                    
-                    Keys.onReturnPressed: loginButton.clicked()
-                    Keys.onEscapePressed: passwordField.text = ""
-                    
-                    onTextChanged: {
-                        if (loginFailedText.visible) {
-                            loginFailedText.visible = false
+                    TextField {
+                        id: passwordField
+                        anchors.fill: parent
+                        anchors.margins: 1
+                        placeholderText: translatePassword
+                        font.family: fontFamily
+                        font.pixelSize: fontSize
+                        color: fgPrimary
+                        echoMode: TextInput.Password
+                        focus: true
+                        background: Rectangle { color: "transparent" }
+                        
+                        Keys.onReturnPressed: loginButton.clicked()
+                        Keys.onEscapePressed: passwordField.text = ""
+                        
+                        onTextChanged: {
+                            if (loginFailedText.visible) {
+                                loginFailedText.visible = false
+                            }
                         }
                     }
                 }
@@ -242,33 +248,36 @@ Rectangle {
                 }
                 
                 // Login button
-                Button {
-                    id: loginButton
+                Rectangle {
                     width: parent.width
                     height: 48
-                    text: translateLogin
+                    radius: 12
+                    color: loginMouseArea.containsPress ? Qt.darker(themeColor, 1.2) : 
+                           loginMouseArea.containsMouse ? Qt.lighter(themeColor, 1.1) : themeColor
                     
-                    contentItem: Text {
-                        text: loginButton.text
+                    Behavior on color {
+                        ColorAnimation { duration: 150 }
+                    }
+                    
+                    Text {
+                        id: loginButton
+                        anchors.centerIn: parent
+                        text: translateLogin
                         font.family: fontFamily
                         font.pixelSize: fontSize + 2
                         font.weight: Font.Medium
                         color: bgBase
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter
                     }
                     
-                    background: Rectangle {
-                        radius: 12
-                        color: loginButton.down ? Qt.darker(themeColor, 1.2) : 
-                               loginButton.hovered ? Qt.lighter(themeColor, 1.1) : themeColor
-                        
-                        Behavior on color {
-                            ColorAnimation { duration: 150 }
-                        }
+                    MouseArea {
+                        id: loginMouseArea
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: sddm.login(usernameField.text, passwordField.text, sessionCombo.currentIndex)
                     }
                     
-                    onClicked: sddm.login(usernameField.text, passwordField.text, sessionCombo.currentIndex)
+                    property alias clicked: loginMouseArea.clicked
                 }
                 
                 // Session selector
@@ -298,13 +307,6 @@ Rectangle {
                             font.family: fontFamily
                             font.pixelSize: fontSize
                             highlighted: sessionCombo.highlightedIndex === index
-                        }
-                        
-                        background: Rectangle {
-                            radius: 8
-                            color: bgBase
-                            border.width: sessionCombo.down ? 2 : 0
-                            border.color: themeColor
                         }
                         
                         contentItem: Text {
