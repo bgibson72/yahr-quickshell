@@ -260,7 +260,7 @@ Rectangle {
                         selectedTextColor: bgBase
                         background: Rectangle { color: "transparent" }
                         
-                        Keys.onReturnPressed: loginButton.clicked()
+                        Keys.onReturnPressed: sddm.login(usernameField.text, passwordField.text, sessionCombo.currentIndex)
                         Keys.onEscapePressed: passwordField.text = ""
                         
                         onTextChanged: {
