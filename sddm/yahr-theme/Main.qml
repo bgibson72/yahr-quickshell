@@ -10,6 +10,9 @@ Rectangle {
     width: 1920
     height: 1080
     
+    // SDDM Components
+    TextConstants { id: textConstants }
+    
     // Theme configuration
     property string background: config.Background || ""
     property int backgroundBlur: config.BackgroundBlur || 20
@@ -143,7 +146,7 @@ Rectangle {
                         id: avatar
                         anchors.fill: parent
                         anchors.margins: 2
-                        source: "file://" + config.AvatarPath + userModel.lastUser + ".face.icon"
+                        source: userModel.lastUser !== "" ? "file://" + config.AvatarPath + userModel.lastUser + ".face.icon" : ""
                         fillMode: Image.PreserveAspectCrop
                         
                         layer.enabled: true
@@ -228,6 +231,14 @@ Rectangle {
                     color: "#ff5370"
                     horizontalAlignment: Text.AlignHCenter
                     visible: false
+                    
+                    Connections {
+                        target: sddm
+                        function onLoginFailed() {
+                            loginFailedText.visible = true
+                            passwordField.selectAll()
+                        }
+                    }
                 }
                 
                 // Login button
@@ -277,8 +288,8 @@ Rectangle {
                     ComboBox {
                         id: sessionCombo
                         width: parent.width - parent.spacing - 80
-                        model: sessionModel
-                        currentIndex: sessionModel.lastIndex
+                        model: sessionList
+                        currentIndex: sessionList.lastIndex
                         textRole: "name"
                         
                         delegate: ItemDelegate {
@@ -349,26 +360,7 @@ Rectangle {
         onTriggered: currentDateTime = new Date()
     }
     
-    // User model
-    UserModel {
-        id: userModel
-    }
-    
-    // Session model
-    SessionModel {
-        id: sessionModel
-    }
-    
-    // Connection to handle login result
-    Connections {
-        target: sddm
-        function onLoginFailed() {
-            loginFailedText.visible = true
-            passwordField.text = ""
-            passwordField.forceActiveFocus()
-        }
-    }
-    
+    // Components from SDDM
     Component.onCompleted: {
         if (usernameField.text === "") {
             usernameField.forceActiveFocus()
