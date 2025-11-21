@@ -167,6 +167,9 @@ cp -r hypr kitty mako nvim vesktop VSCodium ~/.config/
 # Note: This copies all files including shell.qml, scripts, themes, and executables
 cp -r quickshell ~/.config/
 
+# Install fastfetch configuration (optional but recommended)
+cp -r fastfetch ~/.config/
+
 # Install GTK themes and icons
 mkdir -p ~/.themes ~/.icons
 cp -r quickshell/gtk-themes/* ~/.themes/
