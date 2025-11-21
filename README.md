@@ -197,6 +197,7 @@ cp dotfiles/starship.toml ~/.config/starship.toml
 # This enables userChrome.css support in Firefox
 ./quickshell/sync-firefox-theme.sh
 # Then follow the on-screen instructions to enable userChrome in Firefox
+# For best results: In Firefox Settings > Extensions & Themes, use the default "Light" or "Dark" theme
 ```
 
 ### 3. Configure Hyprland Autostart
