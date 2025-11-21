@@ -6,7 +6,7 @@ palette = "quickshell"
 
 format = """
 [](bg:bg_base fg:accent_green)\
-[󰣇 ](bg:accent_green fg:bg_base)\
+[󰣇 ](bold bg:accent_green fg:bg_base)\
 [](fg:accent_green bg:surface0)\
 $time\
 [](fg:surface0 bg:accent_blue)\
@@ -21,21 +21,21 @@ $character\
 
 [directory]
 format = "[  $path ]($style)"
-style = "fg:bg_base bg:accent_blue"
+style = "bold fg:bg_base bg:accent_blue"
 
 [git_branch]
 format = '[ $symbol$branch(:$remote_branch) ]($style)'
 symbol = "  "
-style = "fg:bg_base bg:accent_yellow"
+style = "bold fg:bg_base bg:accent_yellow"
 
 [git_status]
 format = '[$all_status]($style)'
-style = "fg:bg_base bg:accent_yellow"
+style = "bold fg:bg_base bg:accent_yellow"
 
 [git_metrics]
 format = "([+$added]($added_style))[]($added_style)"
-added_style = "fg:bg_base bg:accent_yellow"
-deleted_style = "fg:bg_base bg:accent_yellow"
+added_style = "bold fg:bg_base bg:accent_yellow"
+deleted_style = "bold fg:bg_base bg:accent_yellow"
 disabled = false
 
 [hg_branch]
@@ -44,7 +44,7 @@ symbol = " "
 
 [cmd_duration]
 format = "[ 󱎫 $duration ]($style)"
-style = "fg:fg_primary bg:surface1"
+style = "bold fg:fg_primary bg:surface1"
 
 [character]
 success_symbol = '[ ➜](bold accent_green) '
@@ -54,7 +54,7 @@ error_symbol = '[ ✗](bold red) '
 disabled = false
 time_format = "%R"
 style = "bg:surface1"
-format = '[[ 󱑍 $time ](bg:surface0 fg:accent_cyan)]($style)'
+format = '[[ 󱑍 $time ](bold bg:surface0 fg:accent_cyan)]($style)'
 
 # Palettes section - auto-updated by sync-starship-theme.sh
 # DO NOT manually edit these values, they are synced from ThemeManager.qml
