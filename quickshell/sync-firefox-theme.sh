@@ -69,6 +69,14 @@ toolbar {
     background-color: var(--bg-base) !important;
     background-image: none !important;
     border: none !important;
+    box-shadow: none !important;
+}
+
+/* Remove all borders from tab area */
+#tabbrowser-tabs,
+.tabbrowser-arrowscrollbox,
+#TabsToolbar-customization-target {
+    border: none !important;
 }
 
 /* Individual tabs */
@@ -77,6 +85,9 @@ toolbar {
     background-color: var(--surface0) !important;
     color: var(--fg-secondary) !important;
     border: none !important;
+    border-radius: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
 }
 
 /* Selected/active tab */
@@ -84,6 +95,7 @@ toolbar {
 .tabbrowser-tab[selected="true"] > .tab-stack > .tab-background {
     background-color: var(--surface1) !important;
     border: none !important;
+    box-shadow: none !important;
 }
 
 .tabbrowser-tab[selected="true"] .tab-label,
@@ -102,34 +114,47 @@ toolbar {
     color: var(--fg-secondary) !important;
 }
 
-/* Remove tab separators */
+/* Remove tab separators and borders */
 .tabbrowser-tab::after,
-.tabbrowser-tab::before {
+.tabbrowser-tab::before,
+.titlebar-spacer[type="pre-tabs"],
+.titlebar-spacer[type="post-tabs"] {
     display: none !important;
+    border: none !important;
 }
 
-/* URL bar and search bar */
+/* URL bar and search bar - remove all borders */
 #urlbar,
 #urlbar-background,
 #urlbar-input-container,
-#searchbar {
+#searchbar,
+.searchbar-textbox {
     background-color: var(--surface1) !important;
     color: var(--fg-primary) !important;
     border: none !important;
     box-shadow: none !important;
+    outline: none !important;
 }
 
+/* URL bar focused - single accent border */
 #urlbar[focused="true"],
-#urlbar[focused="true"] #urlbar-background,
+#urlbar[focused="true"] #urlbar-background {
+    border: 1px solid var(--accent-blue) !important;
+    box-shadow: none !important;
+    outline: none !important;
+}
+
 #searchbar:focus-within {
     border: 1px solid var(--accent-blue) !important;
     box-shadow: none !important;
+    outline: none !important;
 }
 
-/* Remove default URL bar border */
+/* Remove default URL bar border containers */
 #urlbar-container,
 #search-container {
     border: none !important;
+    box-shadow: none !important;
 }
 
 /* URL bar text */
