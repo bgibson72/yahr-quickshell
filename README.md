@@ -192,6 +192,11 @@ cp dotfiles/.zshrc ~/.zshrc
 
 # Install starship prompt configuration
 cp dotfiles/starship.toml ~/.config/starship.toml
+
+# Enable Firefox theme sync (one-time setup)
+# This enables userChrome.css support in Firefox
+./quickshell/sync-firefox-theme.sh
+# Then follow the on-screen instructions to enable userChrome in Firefox
 ```
 
 ### 3. Configure Hyprland Autostart
@@ -223,6 +228,7 @@ quickshell
 - **hypr** - Hyprland window manager with 11 theme definitions
 - **quickshell** - Custom desktop environment (bar, widgets, controls)
 - **kitty** - Terminal emulator with theme synchronization
+- **firefox** - Browser with UI theme synchronization via userChrome.css
 - **mako** - Notification daemon with themed styling
 - **nvim** - Neovim with AstroNvim configuration
 - **VSCodium** - VS Code fork with theme integration
@@ -351,6 +357,7 @@ Switch themes instantly across all applications with Super + T. Available themes
 - System tray with audio, network, and updates
 - Notification system with urgency-based styling
 - GTK theme synchronization
+- **Firefox theme synchronization** - Automatic Firefox UI theming via userChrome.css
 - **Included GTK themes and icons** - Multiple theme-matched GTK themes and icon packs included in quickshell/gtk-themes/ and quickshell/gtk-icons/
 
 ## Hyprland Configuration
