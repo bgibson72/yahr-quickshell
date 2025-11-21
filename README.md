@@ -148,10 +148,37 @@ Restart Thunar after installation for thumbnails and features to appear.
 
 ## Installation
 
-### 1. Install All Required Packages
+You have two installation options:
+
+### Option 1: Automated Installation (Recommended)
+
+The automated installer will handle everything for you, including backups:
+
+```bash
+# Clone the repository
+git clone https://github.com/bgibson72/yahr-quickshell.git
+cd yahr-quickshell
+
+# Run the installer
+./install.sh
+```
+
+The installer will:
+- Check for required dependencies
+- Backup your existing configurations with timestamps
+- Install all configurations to `~/.config/`
+- Set up Firefox userChrome.css theming
+- Configure executable permissions
+- Provide post-installation instructions
+
+### Option 2: Manual Installation
+
+If you prefer manual control or want to install selectively:
+
+#### 1. Install All Required Packages
 Follow the package installation instructions in the **Requirements** section above. At minimum, you must install the packages listed under "Absolute Minimum Requirements" and "Required Fonts".
 
-###  2. Clone and Install Configurations
+#### 2. Clone and Install Configurations
 ```bash
 git clone https://github.com/bgibson72/yahr-quickshell.git
 cd yahr-quickshell
@@ -201,7 +228,10 @@ cp dotfiles/starship.toml ~/.config/starship.toml
 ```
 
 ### 3. Configure Hyprland Autostart
-Add quickshell to your Hyprland configuration:
+
+**Note:** If you used the automated installer (`./install.sh`), quickshell is already configured to autostart. Skip this section.
+
+For manual installations, add quickshell to your Hyprland configuration:
 ```bash
 # Add quickshell to autostart
 echo 'exec-once = quickshell' >> ~/.config/hypr/hyprland.conf
