@@ -43,6 +43,16 @@ print_header() {
 # Function to backup existing configs
 backup_config() {
     local config_path="$1"
+    
+    # Skip backup if user chose not to backup
+    if [ "$BACKUP_CONFIGS" = false ]; then
+        if [ -d "$config_path" ] || [ -f "$config_path" ]; then
+            rm -rf "$config_path"
+        fi
+        return 0
+    fi
+    
+    # Create timestamped backup if config exists
     if [ -d "$config_path" ] || [ -f "$config_path" ]; then
         local backup_path="${config_path}.backup.$(date +%Y%m%d_%H%M%S)"
         print_warning "Backing up existing config: $config_path -> $backup_path"
@@ -387,12 +397,29 @@ main() {
             echo "  - $config"
         done
         echo ""
-        print_info "All existing configs will be backed up with timestamps to:"
-        echo "  ~/.config/[name].backup.$(date +%Y%m%d_%H%M%S)"
-        echo ""
-        print_info "You can restore any backed up config by moving it back:"
-        echo "  mv ~/.config/quickshell.backup.XXXXXX ~/.config/quickshell"
-        echo ""
+        read -p "Create timestamped backups of existing configs before replacing? (y/n) " -n 1 -r
+        echo
+        if [[ $REPLY =~ ^[Yy]$ ]]; then
+            BACKUP_CONFIGS=true
+            print_info "Existing configs will be backed up with timestamps to:"
+            echo "  ~/.config/[name].backup.$(date +%Y%m%d_%H%M%S)"
+            echo ""
+            print_info "You can restore any backed up config by moving it back:"
+            echo "  mv ~/.config/quickshell.backup.XXXXXX ~/.config/quickshell"
+            echo ""
+        else
+            BACKUP_CONFIGS=false
+            print_warning "Existing configs will be overwritten without backups!"
+            echo ""
+            read -p "Are you sure you want to continue without backups? (y/n) " -n 1 -r
+            echo
+            if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+                print_info "Installation cancelled."
+                exit 0
+            fi
+        fi
+    else
+        BACKUP_CONFIGS=false
     fi
     
     print_warning "Installation will modify configs in: $HOME/.config/"
@@ -416,7 +443,7 @@ main() {
     print_success "Installation complete! Enjoy your new setup! 🚀"
     
     # Remind about backups if any were created
-    if [ ${#existing_configs[@]} -gt 0 ]; then
+    if [ "$BACKUP_CONFIGS" = true ] && [ ${#existing_configs[@]} -gt 0 ]; then
         echo ""
         print_info "Your original configs were backed up and can be found with:"
         echo "  ls -lt ~/.config/*.backup.* | head -10"
