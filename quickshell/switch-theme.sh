@@ -89,9 +89,15 @@ if [ -f "$SDDM_SYNC" ]; then
 fi
 
 # Update fastfetch logo
-if [ -x "$HOME/.config/fastfetch/update-theme-logo.sh" ]; then
+if [ -x "$HOME/.config/quickshell/update-theme-logo.sh" ]; then
     echo "Updating fastfetch logo..."
-    "$HOME/.config/fastfetch/update-theme-logo.sh" > /dev/null 2>&1
+    "$HOME/.config/quickshell/update-theme-logo.sh" > /dev/null 2>&1
+fi
+
+# Sync Starship prompt colors
+if [ -x "$HOME/.config/quickshell/sync-starship-theme.sh" ]; then
+    echo "Syncing Starship prompt colors..."
+    "$HOME/.config/quickshell/sync-starship-theme.sh" > /dev/null 2>&1
 fi
 
 echo ""

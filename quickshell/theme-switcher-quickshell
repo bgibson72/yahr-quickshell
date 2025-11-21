@@ -777,11 +777,17 @@ EOF
         "$QUICKSHELL_DIR/sync-vscodium-theme.sh"
     fi
     
+    # Sync Starship prompt colors
+    if [[ -x "$QUICKSHELL_DIR/sync-starship-theme.sh" ]]; then
+        echo "Syncing Starship prompt colors..."
+        "$QUICKSHELL_DIR/sync-starship-theme.sh" > /dev/null 2>&1
+    fi
+    
     # Save current theme
     echo "$theme_name" > "$CURRENT_THEME_FILE"
     
     echo "Theme applied successfully: $theme_name"
-    echo "Updated: Quickshell, Hyprland, wofi, kitty, mako, hyprlock, GTK theme, wallpaper, VSCodium"
+    echo "Updated: Quickshell, Hyprland, wofi, kitty, mako, hyprlock, GTK theme, wallpaper, VSCodium, Starship"
     echo "GTK applications (Thunar, gnome-text-editor, waypaper) will now use matching theme"
     echo "Restart VSCodium to see the new color scheme"
 }
