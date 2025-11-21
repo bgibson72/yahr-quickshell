@@ -44,13 +44,13 @@ if [[ ! -f "$STARSHIP_CONFIG" ]]; then
     exit 1
 fi
 
-# Remove existing palette section if it exists
-sed -i '/^\[palette\]/,/^$/d' "$STARSHIP_CONFIG"
+# Remove existing palettes.quickshell section if it exists
+sed -i '/^\[palettes\.quickshell\]/,/^$/d' "$STARSHIP_CONFIG"
 
-# Append new palette section at the end
+# Append new palettes section at the end
 cat >> "$STARSHIP_CONFIG" << EOF
 
-[palette]
+[palettes.quickshell]
 # Auto-synced with Quickshell Theme: $theme_name
 bg_base = "$bg_base"
 surface0 = "$surface0"

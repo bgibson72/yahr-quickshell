@@ -1,6 +1,8 @@
 # Starship Prompt Configuration
-# Colors auto-synced via sync-starship-theme.sh using palette feature
+# Colors auto-synced via sync-starship-theme.sh using palettes feature
 # Customize the format and glyphs below - they will be preserved across theme changes
+
+palette = "quickshell"
 
 format = """[](bg:bg_base fg:accent_green)[󰣇 ](bg:accent_green fg:bg_base)[](fg:accent_green bg:surface0)$time[](fg:surface0 bg:accent_blue)$directory[](fg:accent_blue bg:accent_yellow)$git_branch$git_status$git_metrics[](fg:accent_yellow bg:bg_base)$character"""
 
@@ -41,9 +43,9 @@ time_format = "%R"
 style = "bg:surface1"
 format = '[[ 󱑍 $time ](bg:surface0 fg:accent_cyan)]($style)'
 
-# Palette section - auto-updated by sync-starship-theme.sh
+# Palettes section - auto-updated by sync-starship-theme.sh
 # DO NOT manually edit these values, they are synced from ThemeManager.qml
-[palette]
+[palettes.quickshell]
 bg_base = "#2b3339"
 surface0 = "#374247"
 surface1 = "#3d484d"
