@@ -59,7 +59,7 @@ format = """\
 
 [directory]
 format = "[  \$path ](\$style)"
-style = "fg:$fg_primary bg:$accent_blue"
+style = "fg:$bg_base bg:$accent_blue"
 
 [git_branch]
 format = '[ \$symbol\$branch(:\$remote_branch) ](\$style)'
