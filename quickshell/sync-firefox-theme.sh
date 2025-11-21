@@ -88,6 +88,8 @@ toolbar {
     border-radius: 0 !important;
     margin: 0 !important;
     padding: 0 !important;
+    outline: none !important;
+    box-shadow: none !important;
 }
 
 /* Selected/active tab */
@@ -96,6 +98,7 @@ toolbar {
     background-color: var(--surface1) !important;
     border: none !important;
     box-shadow: none !important;
+    outline: none !important;
 }
 
 .tabbrowser-tab[selected="true"] .tab-label,
@@ -123,6 +126,12 @@ toolbar {
     border: none !important;
 }
 
+/* Remove tab content area border */
+.tab-content {
+    border: none !important;
+    outline: none !important;
+}
+
 /* URL bar and search bar - remove all borders */
 #urlbar,
 #urlbar-background,
@@ -136,16 +145,31 @@ toolbar {
     outline: none !important;
 }
 
-/* URL bar focused - single accent border */
+/* URL bar when it expands on focus */
+#urlbar[breakout][breakout-extend] {
+    border: none !important;
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+#urlbar[breakout][breakout-extend] > #urlbar-background {
+    border: none !important;
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+/* URL bar focused - no visible border */
 #urlbar[focused="true"],
-#urlbar[focused="true"] #urlbar-background {
-    border: 1px solid var(--accent-blue) !important;
+#urlbar[focused="true"] #urlbar-background,
+#urlbar[open],
+#urlbar[open] #urlbar-background {
+    border: none !important;
     box-shadow: none !important;
     outline: none !important;
 }
 
 #searchbar:focus-within {
-    border: 1px solid var(--accent-blue) !important;
+    border: none !important;
     box-shadow: none !important;
     outline: none !important;
 }
