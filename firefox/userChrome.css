@@ -1,0 +1,235 @@
+/* Firefox Theme - Auto-synced with Quickshell Theme: Everforest */
+
+:root {
+    --bg-base: #2b3339 !important;
+    --surface0: #374247 !important;
+    --surface1: #3d484d !important;
+    --fg-primary: #d3c6aa !important;
+    --fg-secondary: #bdc3af !important;
+    --accent-blue: #7fbbb3 !important;
+    --accent-green: #a7c080 !important;
+    --accent-red: #e67e80 !important;
+    --accent-yellow: #dbbc7f !important;
+}
+
+/* Main toolbar and tab bar background */
+#navigator-toolbox,
+#TabsToolbar,
+#nav-bar,
+#PersonalToolbar,
+toolbar {
+    background-color: var(--bg-base) !important;
+    background-image: none !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+/* Remove all borders from tab area */
+#tabbrowser-tabs,
+.tabbrowser-arrowscrollbox,
+#TabsToolbar-customization-target {
+    border: none !important;
+}
+
+/* Individual tabs */
+.tabbrowser-tab,
+.tabbrowser-tab > .tab-stack > .tab-background {
+    background-color: var(--surface0) !important;
+    color: var(--fg-secondary) !important;
+    border: none !important;
+    border-radius: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+/* Selected/active tab */
+.tabbrowser-tab[selected="true"],
+.tabbrowser-tab[selected="true"] > .tab-stack > .tab-background {
+    background-color: var(--surface1) !important;
+    border: none !important;
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+.tabbrowser-tab[selected="true"] .tab-label,
+.tabbrowser-tab[selected="true"] .tab-text {
+    color: var(--fg-primary) !important;
+}
+
+/* Tab hover */
+.tabbrowser-tab:hover:not([selected="true"]) > .tab-stack > .tab-background {
+    background-color: var(--surface1) !important;
+}
+
+/* Tab text */
+.tab-label,
+.tab-text {
+    color: var(--fg-secondary) !important;
+}
+
+/* Remove tab separators and borders */
+.tabbrowser-tab::after,
+.tabbrowser-tab::before,
+.titlebar-spacer[type="pre-tabs"],
+.titlebar-spacer[type="post-tabs"] {
+    display: none !important;
+    border: none !important;
+}
+
+/* Remove tab content area border */
+.tab-content {
+    border: none !important;
+    outline: none !important;
+}
+
+/* URL bar and search bar - remove all borders */
+#urlbar,
+#urlbar-background,
+#urlbar-input-container,
+#searchbar,
+.searchbar-textbox {
+    background-color: var(--surface1) !important;
+    color: var(--fg-primary) !important;
+    border: none !important;
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+/* URL bar when it expands on focus */
+#urlbar[breakout][breakout-extend] {
+    border: none !important;
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+#urlbar[breakout][breakout-extend] > #urlbar-background {
+    border: none !important;
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+/* URL bar focused - no visible border */
+#urlbar[focused="true"],
+#urlbar[focused="true"] #urlbar-background,
+#urlbar[open],
+#urlbar[open] #urlbar-background {
+    border: none !important;
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+#searchbar:focus-within {
+    border: none !important;
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+/* Remove default URL bar border containers */
+#urlbar-container,
+#search-container {
+    border: none !important;
+    box-shadow: none !important;
+}
+
+/* URL bar text */
+#urlbar-input,
+.searchbar-textbox {
+    color: var(--fg-primary) !important;
+}
+
+/* URL bar dropmarker and buttons */
+#urlbar toolbarbutton,
+#page-action-buttons > toolbarbutton,
+#urlbar-zoom-button {
+    fill: var(--fg-primary) !important;
+    color: var(--fg-primary) !important;
+}
+
+/* Autocomplete dropdown */
+#urlbar-results,
+.urlbarView,
+.search-panel-one-offs {
+    background-color: var(--surface0) !important;
+    color: var(--fg-primary) !important;
+    border-color: var(--surface1) !important;
+}
+
+.urlbarView-row {
+    background-color: var(--surface0) !important;
+    color: var(--fg-primary) !important;
+}
+
+.urlbarView-row[selected] {
+    background-color: var(--accent-blue) !important;
+    color: var(--bg-base) !important;
+}
+
+/* Toolbar buttons */
+toolbarbutton,
+.toolbarbutton-1 {
+    fill: var(--fg-primary) !important;
+    color: var(--fg-primary) !important;
+}
+
+toolbarbutton:hover,
+.toolbarbutton-1:hover {
+    background-color: var(--surface1) !important;
+}
+
+/* Sidebar */
+#sidebar-box,
+#sidebar-header {
+    background-color: var(--bg-base) !important;
+    color: var(--fg-primary) !important;
+    border-color: var(--surface1) !important;
+}
+
+/* Context menus and dropdowns */
+menupopup,
+menu,
+menuitem,
+.panel-arrowcontent {
+    background-color: var(--surface0) !important;
+    color: var(--fg-primary) !important;
+}
+
+menupopup menu[_moz-menuactive="true"],
+menupopup menuitem[_moz-menuactive="true"],
+menuitem:hover {
+    background-color: var(--accent-blue) !important;
+    color: var(--bg-base) !important;
+}
+
+/* Bookmarks bar */
+#PlacesToolbarItems > .bookmark-item {
+    color: var(--fg-primary) !important;
+}
+
+#PlacesToolbarItems > .bookmark-item:hover {
+    background-color: var(--surface1) !important;
+}
+
+/* Findbar */
+findbar {
+    background-color: var(--surface0) !important;
+    border-color: var(--surface1) !important;
+}
+
+.findbar-textbox {
+    background-color: var(--surface1) !important;
+    color: var(--fg-primary) !important;
+}
+
+/* Tab line indicator */
+.tab-line {
+    background-color: var(--accent-blue) !important;
+}
+
+/* Notification box */
+notification,
+.notificationbox-stack {
+    background-color: var(--surface1) !important;
+    color: var(--fg-primary) !important;
+}
