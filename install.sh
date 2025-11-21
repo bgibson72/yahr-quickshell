@@ -366,8 +366,35 @@ main() {
     print_header "YAHR Quickshell Installation"
     
     echo "This script will install the complete Hyprland + Quickshell setup."
-    echo "Your existing configurations will be backed up with timestamps."
     echo ""
+    
+    # Check what configs already exist
+    local existing_configs=()
+    
+    [ -d "$HOME/.config/quickshell" ] && existing_configs+=("quickshell")
+    [ -d "$HOME/.config/hypr" ] && existing_configs+=("hypr")
+    [ -d "$HOME/.config/kitty" ] && existing_configs+=("kitty")
+    [ -d "$HOME/.config/mako" ] && existing_configs+=("mako")
+    [ -d "$HOME/.config/fastfetch" ] && existing_configs+=("fastfetch")
+    [ -d "$HOME/.config/wofi" ] && existing_configs+=("wofi")
+    [ -d "$HOME/.config/nvim" ] && existing_configs+=("nvim")
+    [ -d "$HOME/.config/vesktop" ] && existing_configs+=("vesktop")
+    [ -f "$HOME/.config/starship.toml" ] && existing_configs+=("starship")
+    
+    if [ ${#existing_configs[@]} -gt 0 ]; then
+        print_warning "Existing configurations detected:"
+        for config in "${existing_configs[@]}"; do
+            echo "  - $config"
+        done
+        echo ""
+        print_info "All existing configs will be backed up with timestamps to:"
+        echo "  ~/.config/[name].backup.$(date +%Y%m%d_%H%M%S)"
+        echo ""
+        print_info "You can restore any backed up config by moving it back:"
+        echo "  mv ~/.config/quickshell.backup.XXXXXX ~/.config/quickshell"
+        echo ""
+    fi
+    
     print_warning "Installation will modify configs in: $HOME/.config/"
     echo ""
     read -p "Continue with installation? (y/n) " -n 1 -r
@@ -387,6 +414,13 @@ main() {
     
     echo ""
     print_success "Installation complete! Enjoy your new setup! 🚀"
+    
+    # Remind about backups if any were created
+    if [ ${#existing_configs[@]} -gt 0 ]; then
+        echo ""
+        print_info "Your original configs were backed up and can be found with:"
+        echo "  ls -lt ~/.config/*.backup.* | head -10"
+    fi
 }
 
 # Run main function
