@@ -235,6 +235,19 @@ install_starship() {
         return
     fi
     
+    # Check if user already has a starship config
+    if [ -f "$HOME/.config/starship.toml" ]; then
+        print_warning "Existing Starship config found at $HOME/.config/starship.toml"
+        print_info "The theme switcher expects a specific format with [palettes.quickshell] section."
+        read -p "Overwrite with theme-compatible config? (y/n) " -n 1 -r
+        echo
+        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+            print_info "Skipping Starship installation (keeping your existing config)"
+            print_warning "Note: Theme switching may not work properly with custom Starship configs"
+            return
+        fi
+    fi
+    
     print_info "Installing Starship config..."
     mkdir -p "$HOME/.config"
     
