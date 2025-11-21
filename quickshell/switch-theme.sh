@@ -88,6 +88,12 @@ if [ -f "$SDDM_SYNC" ]; then
     echo ""
 fi
 
+# Update fastfetch logo
+if [ -x "$HOME/.config/fastfetch/update-theme-logo.sh" ]; then
+    echo "Updating fastfetch logo..."
+    "$HOME/.config/fastfetch/update-theme-logo.sh" > /dev/null 2>&1
+fi
+
 echo ""
 
 # Check if quickshell is running
