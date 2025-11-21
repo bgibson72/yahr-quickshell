@@ -188,6 +188,25 @@ install_configs() {
         install_config "$SCRIPT_DIR/wofi" "$HOME/.config/wofi" "Wofi"
     fi
     
+    # Install Wallpapers
+    if [ -d "$SCRIPT_DIR/Pictures/Wallpapers" ]; then
+        print_info "Installing wallpapers..."
+        mkdir -p "$HOME/Pictures"
+        
+        if [ -d "$HOME/Pictures/Wallpapers" ]; then
+            print_warning "Wallpapers directory already exists at $HOME/Pictures/Wallpapers"
+            read -p "Merge wallpapers with existing collection? (y/n) " -n 1 -r
+            echo
+            if [[ $REPLY =~ ^[Yy]$ ]]; then
+                cp -rn "$SCRIPT_DIR/Pictures/Wallpapers/"* "$HOME/Pictures/Wallpapers/"
+                print_success "Wallpapers merged (existing files preserved)"
+            fi
+        else
+            cp -r "$SCRIPT_DIR/Pictures/Wallpapers" "$HOME/Pictures/"
+            print_success "Wallpapers installed to $HOME/Pictures/Wallpapers"
+        fi
+    fi
+    
     # Install Nvim configs (optional)
     if [ -d "$SCRIPT_DIR/nvim" ]; then
         read -p "Install Neovim configuration? (y/n) " -n 1 -r
