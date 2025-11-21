@@ -112,6 +112,18 @@ if [ -x "$HOME/.config/quickshell/sync-gtk-theme.sh" ]; then
     "$HOME/.config/quickshell/sync-gtk-theme.sh"
 fi
 
+# Sync VSCodium theme
+if [ -x "$HOME/.config/quickshell/sync-vscodium-theme.sh" ]; then
+    echo "Syncing VSCodium theme..."
+    "$HOME/.config/quickshell/sync-vscodium-theme.sh"
+fi
+
+# Sync VS Code theme
+if [ -x "$HOME/.config/quickshell/sync-vscode-theme.sh" ]; then
+    echo "Syncing VS Code theme..."
+    "$HOME/.config/quickshell/sync-vscode-theme.sh"
+fi
+
 echo ""
 
 # Check if quickshell is running
