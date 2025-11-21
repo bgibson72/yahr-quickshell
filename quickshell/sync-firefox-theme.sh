@@ -76,12 +76,14 @@ toolbar {
 .tabbrowser-tab > .tab-stack > .tab-background {
     background-color: var(--surface0) !important;
     color: var(--fg-secondary) !important;
+    border: none !important;
 }
 
 /* Selected/active tab */
 .tabbrowser-tab[selected="true"],
 .tabbrowser-tab[selected="true"] > .tab-stack > .tab-background {
     background-color: var(--surface1) !important;
+    border: none !important;
 }
 
 .tabbrowser-tab[selected="true"] .tab-label,
@@ -100,6 +102,12 @@ toolbar {
     color: var(--fg-secondary) !important;
 }
 
+/* Remove tab separators */
+.tabbrowser-tab::after,
+.tabbrowser-tab::before {
+    display: none !important;
+}
+
 /* URL bar and search bar */
 #urlbar,
 #urlbar-background,
@@ -107,14 +115,21 @@ toolbar {
 #searchbar {
     background-color: var(--surface1) !important;
     color: var(--fg-primary) !important;
-    border: 1px solid var(--surface1) !important;
+    border: none !important;
+    box-shadow: none !important;
 }
 
 #urlbar[focused="true"],
 #urlbar[focused="true"] #urlbar-background,
 #searchbar:focus-within {
-    border-color: var(--accent-blue) !important;
-    box-shadow: 0 0 0 1px var(--accent-blue) !important;
+    border: 1px solid var(--accent-blue) !important;
+    box-shadow: none !important;
+}
+
+/* Remove default URL bar border */
+#urlbar-container,
+#search-container {
+    border: none !important;
 }
 
 /* URL bar text */
