@@ -171,6 +171,15 @@ cp -r quickshell ~/.config/
 mkdir -p ~/.themes ~/.icons
 cp -r quickshell/gtk-themes/* ~/.themes/
 cp -r quickshell/gtk-icons/* ~/.icons/
+
+# Fix Neovim desktop entry for proper terminal launching
+mkdir -p ~/.local/share/applications
+cp nvim/nvim.desktop ~/.local/share/applications/
+chmod +x ~/.local/share/applications/nvim.desktop
+update-desktop-database ~/.local/share/applications/
+
+# Install zsh configuration (if using zsh)
+cp dotfiles/.zshrc ~/.zshrc
 ```
 
 ### 3. Configure Hyprland Autostart
