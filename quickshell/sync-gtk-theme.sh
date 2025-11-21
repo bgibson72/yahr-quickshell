@@ -5,6 +5,7 @@
 
 THEME_MANAGER="$HOME/.config/quickshell/ThemeManager.qml"
 GTK3_SETTINGS="$HOME/.config/gtk-3.0/settings.ini"
+GTK4_SETTINGS="$HOME/.config/gtk-4.0/settings.ini"
 GTK2_SETTINGS="$HOME/.gtkrc-2.0"
 
 # Check if ThemeManager exists
@@ -97,6 +98,15 @@ gtk-enable-input-feedback-sounds=1
 gtk-xft-antialias=1
 gtk-xft-hinting=1
 gtk-xft-hintstyle=hintfull
+gtk-application-prefer-dark-theme=1
+EOF
+
+# Update GTK4 settings
+mkdir -p "$(dirname "$GTK4_SETTINGS")"
+cat > "$GTK4_SETTINGS" << EOF
+[Settings]
+gtk-theme-name=$gtk_theme
+gtk-icon-theme-name=$icon_theme
 gtk-application-prefer-dark-theme=1
 EOF
 
