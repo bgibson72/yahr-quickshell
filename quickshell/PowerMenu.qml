@@ -88,7 +88,7 @@ Rectangle {
             Text {
                 anchors.centerIn: parent
                 text: "Power"
-                font.family: "MapleMono NF"
+                font.family: "Maple Mono NF"
                 font.pixelSize: 14
                 font.weight: Font.DemiBold
                 color: ThemeManager.fgPrimary
@@ -163,7 +163,7 @@ Rectangle {
                     
                     Text {
                         text: "Lock"
-                        font.family: "MapleMono NF"
+                        font.family: "Maple Mono NF"
                         font.pixelSize: 13
                         font.weight: Font.Medium
                         color: {
@@ -216,7 +216,7 @@ Rectangle {
                     
                     Text {
                         text: "Logout"
-                        font.family: "MapleMono NF"
+                        font.family: "Maple Mono NF"
                         font.pixelSize: 13
                         font.weight: Font.Medium
                         color: {
@@ -269,7 +269,7 @@ Rectangle {
                     
                     Text {
                         text: "Suspend"
-                        font.family: "MapleMono NF"
+                        font.family: "Maple Mono NF"
                         font.pixelSize: 13
                         font.weight: Font.Medium
                         color: {
@@ -322,7 +322,7 @@ Rectangle {
                     
                     Text {
                         text: "Reboot"
-                        font.family: "MapleMono NF"
+                        font.family: "Maple Mono NF"
                         font.pixelSize: 13
                         font.weight: Font.Medium
                         color: {
@@ -375,7 +375,7 @@ Rectangle {
                     
                     Text {
                         text: "Shutdown"
-                        font.family: "MapleMono NF"
+                        font.family: "Maple Mono NF"
                         font.pixelSize: 13
                         font.weight: Font.Medium
                         color: {
@@ -428,7 +428,7 @@ Rectangle {
                     
                     Text {
                         text: "Cancel"
-                        font.family: "MapleMono NF"
+                        font.family: "Maple Mono NF"
                         font.pixelSize: 13
                         font.weight: Font.Medium
                         color: {

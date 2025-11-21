@@ -129,7 +129,7 @@ Rectangle {
             Text {
                 anchors.centerIn: parent
                 text: "Applications"
-                font.family: "MapleMono NF"
+                font.family: "Maple Mono NF"
                 font.pixelSize: 14
                 font.weight: Font.Medium
                 color: ThemeManager.fgPrimary
@@ -245,7 +245,7 @@ Rectangle {
                             width: parent.width - 60
                             anchors.verticalCenter: parent.verticalCenter
                             text: model.appName
-                            font.family: "MapleMono NF"
+                            font.family: "Maple Mono NF"
                             font.pixelSize: 14
                             font.weight: {
                                 if (root.hoverIndex === index) return Font.DemiBold

@@ -174,7 +174,7 @@ PanelWindow {
                 Text {
                     anchors.centerIn: parent
                     text: "Screenshot"
-                    font.family: "MapleMono NF"
+                    font.family: "Maple Mono NF"
                     font.pixelSize: 16
                     font.weight: Font.DemiBold
                     color: ThemeManager.fgPrimary
@@ -228,7 +228,7 @@ PanelWindow {
                         Text {
                             anchors.horizontalCenter: parent.horizontalCenter
                             text: "Select Capture Mode"
-                            font.family: "MapleMono NF"
+                            font.family: "Maple Mono NF"
                             font.pixelSize: 14
                             font.weight: Font.Medium
                             color: ThemeManager.fgSecondary
@@ -270,7 +270,7 @@ PanelWindow {
                                     Text {
                                         anchors.horizontalCenter: parent.horizontalCenter
                                         text: "Workspace"
-                                        font.family: "MapleMono NF"
+                                        font.family: "Maple Mono NF"
                                         font.pixelSize: 12
                                         font.weight: Font.Medium
                                         color: workspaceMouseArea.containsMouse ? ThemeManager.bgBase : ThemeManager.fgPrimary
@@ -322,7 +322,7 @@ PanelWindow {
                                     Text {
                                         anchors.horizontalCenter: parent.horizontalCenter
                                         text: "Window"
-                                        font.family: "MapleMono NF"
+                                        font.family: "Maple Mono NF"
                                         font.pixelSize: 12
                                         font.weight: Font.Medium
                                         color: windowMouseArea.containsMouse ? ThemeManager.bgBase : ThemeManager.fgPrimary
@@ -374,7 +374,7 @@ PanelWindow {
                                     Text {
                                         anchors.horizontalCenter: parent.horizontalCenter
                                         text: "Selection"
-                                        font.family: "MapleMono NF"
+                                        font.family: "Maple Mono NF"
                                         font.pixelSize: 12
                                         font.weight: Font.Medium
                                         color: regionMouseArea.containsMouse ? ThemeManager.bgBase : ThemeManager.fgPrimary

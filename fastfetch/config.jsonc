@@ -25,6 +25,14 @@
     
     "break",
     "break",
+    
+    {
+      "type": "host",
+      "key": "󰌢",
+      "keyColor": "34",
+      "keyWidth": 4,
+      "format": "{1}"
+    }, 
     {
       "type": "os",
       "key": "󰌽 ",

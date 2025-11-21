@@ -23,7 +23,7 @@ Rectangle {
     Text {
         id: clockText
         anchors.centerIn: parent
-        font.family: "MapleMono NF"
+        font.family: "Maple Mono NF"
         font.pixelSize: 13
         color: ThemeManager.fgPrimary
     }

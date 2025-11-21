@@ -50,7 +50,7 @@ RowLayout {
                 id: workspaceText
                 anchors.centerIn: workspaceRect
                 text: staticWorkspaceButton.workspaceId
-                font.family: "MapleMono NF"
+                font.family: "Maple Mono NF"
                 font.pixelSize: 13
                 
                 color: {
@@ -142,7 +142,7 @@ RowLayout {
                 id: dynamicWorkspaceText
                 anchors.centerIn: dynamicWorkspaceRect
                 text: dynamicWorkspaceButton.modelData.id
-                font.family: "MapleMono NF"
+                font.family: "Maple Mono NF"
                 font.pixelSize: 13
                 
                 color: {

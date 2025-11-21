@@ -63,7 +63,7 @@ Rectangle {
             
             Text {
                 text: updatesArea.updateCount.toString()
-                font.family: "MapleMono NF"
+                font.family: "Maple Mono NF"
                 font.pixelSize: 13
                 color: updatesArea.updateCount > 0 ? ThemeManager.accentYellow : ThemeManager.accentBlue
                 anchors.verticalCenter: parent.verticalCenter
