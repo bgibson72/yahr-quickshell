@@ -103,6 +103,13 @@ sudo pacman -S hyprlock hypridle
 yay -S hypremoji
 ```
 
+### Optional Utilities
+```bash
+# Wofi - Used as fallback for theme switcher and wallpaper picker CLI scripts
+# Note: The QML widgets provide native UI, so wofi is only needed for command-line usage
+sudo pacman -S wofi
+```
+
 ### Application Suite (Optional)
 These are the applications pre-configured with theme support:
 ```bash
