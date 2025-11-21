@@ -60,64 +60,162 @@ cat > "$USER_CSS" << EOF
     --accent-yellow: $accent_yellow !important;
 }
 
-/* Toolbar colors */
-#navigator-toolbox {
+/* Main toolbar and tab bar background */
+#navigator-toolbox,
+#TabsToolbar,
+#nav-bar,
+#PersonalToolbar,
+toolbar {
     background-color: var(--bg-base) !important;
-    border-bottom: 1px solid var(--surface1) !important;
+    background-image: none !important;
+    border: none !important;
 }
 
-/* Tab bar */
-.tabbrowser-tab {
+/* Individual tabs */
+.tabbrowser-tab,
+.tabbrowser-tab > .tab-stack > .tab-background {
     background-color: var(--surface0) !important;
     color: var(--fg-secondary) !important;
 }
 
-.tabbrowser-tab[selected="true"] {
+/* Selected/active tab */
+.tabbrowser-tab[selected="true"],
+.tabbrowser-tab[selected="true"] > .tab-stack > .tab-background {
     background-color: var(--surface1) !important;
+}
+
+.tabbrowser-tab[selected="true"] .tab-label,
+.tabbrowser-tab[selected="true"] .tab-text {
     color: var(--fg-primary) !important;
-    border-bottom: 2px solid var(--accent-blue) !important;
 }
 
-.tabbrowser-tab:hover {
+/* Tab hover */
+.tabbrowser-tab:hover:not([selected="true"]) > .tab-stack > .tab-background {
     background-color: var(--surface1) !important;
 }
 
-/* URL bar */
-#urlbar, #searchbar {
+/* Tab text */
+.tab-label,
+.tab-text {
+    color: var(--fg-secondary) !important;
+}
+
+/* URL bar and search bar */
+#urlbar,
+#urlbar-background,
+#urlbar-input-container,
+#searchbar {
     background-color: var(--surface1) !important;
     color: var(--fg-primary) !important;
     border: 1px solid var(--surface1) !important;
 }
 
-#urlbar:focus-within, #searchbar:focus-within {
+#urlbar[focused="true"],
+#urlbar[focused="true"] #urlbar-background,
+#searchbar:focus-within {
     border-color: var(--accent-blue) !important;
+    box-shadow: 0 0 0 1px var(--accent-blue) !important;
 }
 
-/* Sidebar */
-#sidebar-box {
-    background-color: var(--bg-base) !important;
+/* URL bar text */
+#urlbar-input,
+.searchbar-textbox {
     color: var(--fg-primary) !important;
 }
 
-/* Context menus */
-menupopup, menu, menuitem {
+/* URL bar dropmarker and buttons */
+#urlbar toolbarbutton,
+#page-action-buttons > toolbarbutton,
+#urlbar-zoom-button {
+    fill: var(--fg-primary) !important;
+    color: var(--fg-primary) !important;
+}
+
+/* Autocomplete dropdown */
+#urlbar-results,
+.urlbarView,
+.search-panel-one-offs {
+    background-color: var(--surface0) !important;
+    color: var(--fg-primary) !important;
+    border-color: var(--surface1) !important;
+}
+
+.urlbarView-row {
+    background-color: var(--surface0) !important;
+    color: var(--fg-primary) !important;
+}
+
+.urlbarView-row[selected] {
+    background-color: var(--accent-blue) !important;
+    color: var(--bg-base) !important;
+}
+
+/* Toolbar buttons */
+toolbarbutton,
+.toolbarbutton-1 {
+    fill: var(--fg-primary) !important;
+    color: var(--fg-primary) !important;
+}
+
+toolbarbutton:hover,
+.toolbarbutton-1:hover {
+    background-color: var(--surface1) !important;
+}
+
+/* Sidebar */
+#sidebar-box,
+#sidebar-header {
+    background-color: var(--bg-base) !important;
+    color: var(--fg-primary) !important;
+    border-color: var(--surface1) !important;
+}
+
+/* Context menus and dropdowns */
+menupopup,
+menu,
+menuitem,
+.panel-arrowcontent {
     background-color: var(--surface0) !important;
     color: var(--fg-primary) !important;
 }
 
 menupopup menu[_moz-menuactive="true"],
-menupopup menuitem[_moz-menuactive="true"] {
+menupopup menuitem[_moz-menuactive="true"],
+menuitem:hover {
     background-color: var(--accent-blue) !important;
     color: var(--bg-base) !important;
 }
 
-/* Buttons */
-toolbarbutton {
+/* Bookmarks bar */
+#PlacesToolbarItems > .bookmark-item {
     color: var(--fg-primary) !important;
 }
 
-toolbarbutton:hover {
+#PlacesToolbarItems > .bookmark-item:hover {
     background-color: var(--surface1) !important;
+}
+
+/* Findbar */
+findbar {
+    background-color: var(--surface0) !important;
+    border-color: var(--surface1) !important;
+}
+
+.findbar-textbox {
+    background-color: var(--surface1) !important;
+    color: var(--fg-primary) !important;
+}
+
+/* Tab line indicator */
+.tab-line {
+    background-color: var(--accent-blue) !important;
+}
+
+/* Notification box */
+notification,
+.notificationbox-stack {
+    background-color: var(--surface1) !important;
+    color: var(--fg-primary) !important;
 }
 EOF
 
