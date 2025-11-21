@@ -1,0 +1,11 @@
+/* Custom font override - Maple Mono NF */
+* {
+    font-family: "Maple Mono NF", monospace !important;
+}
+
+/* Preserve emoji font for reactions and emojis */
+.emoji,
+[class*="emoji"],
+[class*="reaction"] {
+    font-family: "Noto Color Emoji", "Apple Color Emoji", "Segoe UI Emoji", sans-serif !important;
+}
