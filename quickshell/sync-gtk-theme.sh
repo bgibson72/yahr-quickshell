@@ -131,5 +131,14 @@ EOF
 echo "✓ GTK theme updated"
 echo "  GTK Theme: $gtk_theme"
 echo "  Icon Theme: $icon_theme"
+
+# Update gsettings (used by some GTK4 apps like pavucontrol)
+if command -v gsettings &> /dev/null; then
+    gsettings set org.gnome.desktop.interface gtk-theme "$gtk_theme" 2>/dev/null
+    gsettings set org.gnome.desktop.interface icon-theme "$icon_theme" 2>/dev/null
+    gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark' 2>/dev/null
+    echo "  gsettings updated"
+fi
+
 echo ""
 echo "Note: Running GTK applications will need to be restarted to see changes"
