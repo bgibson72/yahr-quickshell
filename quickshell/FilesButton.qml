@@ -2,7 +2,7 @@ import QtQuick
 import Quickshell
 
 IconButton {
-    icon: ""
+    icon: ""
     tooltip: "Files"
-    onClicked: Quickshell.execDetached(["thunar"])
+    onClicked: Quickshell.execDetached([Quickshell.env("HOME") + "/.config/quickshell/scripts/launch-thunar.sh"])
 }

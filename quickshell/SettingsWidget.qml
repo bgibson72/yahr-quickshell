@@ -936,7 +936,7 @@ SETTINGSEOF`
                                             // Open file manager in the save location
                                             var path = saveLocationField.text.replace("~", Quickshell.env("HOME"))
                                             console.log("Opening file manager at:", path)
-                                            Quickshell.execDetached(["thunar", path])
+                                            Quickshell.execDetached([Quickshell.env("HOME") + "/.config/quickshell/scripts/launch-thunar.sh", path])
                                         }
                                     }
                                 }
