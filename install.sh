@@ -43,24 +43,43 @@ print_header() {
 # Function to backup existing configs
 backup_config() {
     local config_path="$1"
+    local config_name="$2"
     
-    # Skip backup if user chose not to backup
-    if [ "$BACKUP_CONFIGS" = false ]; then
-        if [ -d "$config_path" ] || [ -f "$config_path" ]; then
+    # If config doesn't exist, no backup needed
+    if [ ! -d "$config_path" ] && [ ! -f "$config_path" ]; then
+        return 1
+    fi
+    
+    # Ask user what to do with this specific config
+    print_warning "Existing $config_name found at: $config_path"
+    echo "  [b] Backup and replace"
+    echo "  [o] Overwrite without backup"
+    echo "  [s] Skip installation of $config_name"
+    read -p "Choose action (b/o/s): " -n 1 -r
+    echo
+    
+    case $REPLY in
+        [Bb])
+            local backup_path="${config_path}.backup.$(date +%Y%m%d_%H%M%S)"
+            print_info "Backing up: $config_path -> $backup_path"
+            mv "$config_path" "$backup_path"
+            print_success "Backup created"
+            return 0
+            ;;
+        [Oo])
+            print_warning "Removing existing config without backup"
             rm -rf "$config_path"
-        fi
-        return 0
-    fi
-    
-    # Create timestamped backup if config exists
-    if [ -d "$config_path" ] || [ -f "$config_path" ]; then
-        local backup_path="${config_path}.backup.$(date +%Y%m%d_%H%M%S)"
-        print_warning "Backing up existing config: $config_path -> $backup_path"
-        mv "$config_path" "$backup_path"
-        print_success "Backup created"
-        return 0
-    fi
-    return 1
+            return 0
+            ;;
+        [Ss])
+            print_info "Skipping $config_name installation"
+            return 2  # Special return code to skip installation
+            ;;
+        *)
+            print_error "Invalid choice. Skipping $config_name installation"
+            return 2
+            ;;
+    esac
 }
 
 # Function to install a config directory
@@ -74,8 +93,14 @@ install_config() {
     # Create parent directory if it doesn't exist
     mkdir -p "$(dirname "$target_dir")"
     
-    # Backup existing config if it exists
-    backup_config "$target_dir"
+    # Backup existing config if it exists and handle user choice
+    backup_config "$target_dir" "$config_name"
+    local backup_result=$?
+    
+    # If user chose to skip (return code 2), don't install
+    if [ $backup_result -eq 2 ]; then
+        return
+    fi
     
     # Copy the config
     cp -r "$source_dir" "$target_dir"
@@ -245,27 +270,23 @@ install_starship() {
         return
     fi
     
-    # Check if user already has a starship config
+    print_info "Installing Starship config..."
+    mkdir -p "$HOME/.config"
+    
+    # Handle existing starship config
     if [ -f "$HOME/.config/starship.toml" ]; then
-        print_warning "Existing Starship config found at $HOME/.config/starship.toml"
-        print_info "The theme switcher expects a specific format with [palettes.quickshell] section."
-        read -p "Overwrite with theme-compatible config? (y/n) " -n 1 -r
-        echo
-        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-            print_info "Skipping Starship installation (keeping your existing config)"
-            print_warning "Note: Theme switching may not work properly with custom Starship configs"
+        backup_config "$HOME/.config/starship.toml" "Starship"
+        local backup_result=$?
+        
+        # If user chose to skip, return
+        if [ $backup_result -eq 2 ]; then
             return
         fi
     fi
     
-    print_info "Installing Starship config..."
-    mkdir -p "$HOME/.config"
-    
-    # Backup existing starship.toml
-    backup_config "$HOME/.config/starship.toml"
-    
     cp "$SCRIPT_DIR/dotfiles/starship.toml" "$HOME/.config/starship.toml"
     print_success "Starship config installed to $HOME/.config/starship.toml"
+    print_info "Note: The theme switcher expects a [palettes.quickshell] section for theme syncing."
 }
 
 # Install Firefox userChrome
@@ -377,52 +398,9 @@ main() {
     
     echo "This script will install the complete Hyprland + Quickshell setup."
     echo ""
-    
-    # Check what configs already exist
-    local existing_configs=()
-    
-    [ -d "$HOME/.config/quickshell" ] && existing_configs+=("quickshell")
-    [ -d "$HOME/.config/hypr" ] && existing_configs+=("hypr")
-    [ -d "$HOME/.config/kitty" ] && existing_configs+=("kitty")
-    [ -d "$HOME/.config/mako" ] && existing_configs+=("mako")
-    [ -d "$HOME/.config/fastfetch" ] && existing_configs+=("fastfetch")
-    [ -d "$HOME/.config/wofi" ] && existing_configs+=("wofi")
-    [ -d "$HOME/.config/nvim" ] && existing_configs+=("nvim")
-    [ -d "$HOME/.config/vesktop" ] && existing_configs+=("vesktop")
-    [ -f "$HOME/.config/starship.toml" ] && existing_configs+=("starship")
-    
-    if [ ${#existing_configs[@]} -gt 0 ]; then
-        print_warning "Existing configurations detected:"
-        for config in "${existing_configs[@]}"; do
-            echo "  - $config"
-        done
-        echo ""
-        read -p "Create timestamped backups of existing configs before replacing? (y/n) " -n 1 -r
-        echo
-        if [[ $REPLY =~ ^[Yy]$ ]]; then
-            BACKUP_CONFIGS=true
-            print_info "Existing configs will be backed up with timestamps to:"
-            echo "  ~/.config/[name].backup.$(date +%Y%m%d_%H%M%S)"
-            echo ""
-            print_info "You can restore any backed up config by moving it back:"
-            echo "  mv ~/.config/quickshell.backup.XXXXXX ~/.config/quickshell"
-            echo ""
-        else
-            BACKUP_CONFIGS=false
-            print_warning "Existing configs will be overwritten without backups!"
-            echo ""
-            read -p "Are you sure you want to continue without backups? (y/n) " -n 1 -r
-            echo
-            if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-                print_info "Installation cancelled."
-                exit 0
-            fi
-        fi
-    else
-        BACKUP_CONFIGS=false
-    fi
-    
     print_warning "Installation will modify configs in: $HOME/.config/"
+    echo ""
+    print_info "You will be prompted for each existing configuration found."
     echo ""
     read -p "Continue with installation? (y/n) " -n 1 -r
     echo
@@ -441,13 +419,6 @@ main() {
     
     echo ""
     print_success "Installation complete! Enjoy your new setup! 🚀"
-    
-    # Remind about backups if any were created
-    if [ "$BACKUP_CONFIGS" = true ] && [ ${#existing_configs[@]} -gt 0 ]; then
-        echo ""
-        print_info "Your original configs were backed up and can be found with:"
-        echo "  ls -lt ~/.config/*.backup.* | head -10"
-    fi
 }
 
 # Run main function
