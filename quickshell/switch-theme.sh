@@ -106,6 +106,12 @@ if [ -x "$HOME/.config/quickshell/sync-firefox-theme.sh" ]; then
     "$HOME/.config/quickshell/sync-firefox-theme.sh"
 fi
 
+# Sync GTK theme
+if [ -x "$HOME/.config/quickshell/sync-gtk-theme.sh" ]; then
+    echo "Syncing GTK theme..."
+    "$HOME/.config/quickshell/sync-gtk-theme.sh"
+fi
+
 echo ""
 
 # Check if quickshell is running
