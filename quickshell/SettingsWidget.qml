@@ -259,7 +259,7 @@ SETTINGSEOF`
             Text {
                 anchors.centerIn: parent
                 text: "YahrShell Settings"
-                font.family: "Maple Mono NF"
+                font.family: "MapleMono NF"
                 font.pixelSize: 18
                 font.weight: Font.Bold
                 color: ThemeManager.fgPrimary
@@ -317,7 +317,7 @@ SETTINGSEOF`
                         Text {
                             anchors.centerIn: parent
                             text: modelData
-                            font.family: "Maple Mono NF"
+                            font.family: "MapleMono NF"
                             font.pixelSize: 13
                             font.weight: Font.Medium
                             color: tabBar.currentIndex === index ? ThemeManager.bgBase : ThemeManager.fgPrimary
@@ -369,7 +369,7 @@ SETTINGSEOF`
                             
                             Text {
                                 text: "Weather Settings"
-                                font.family: "Maple Mono NF"
+                                font.family: "MapleMono NF"
                                 font.pixelSize: 16
                                 font.weight: Font.Bold
                                 color: ThemeManager.accentBlue
@@ -409,7 +409,7 @@ SETTINGSEOF`
                                 Text {
                                     anchors.verticalCenter: parent.verticalCenter
                                     text: "Use Fahrenheit (uncheck for Celsius)"
-                                    font.family: "Maple Mono NF"
+                                    font.family: "MapleMono NF"
                                     font.pixelSize: 12
                                     color: ThemeManager.fgPrimary
                                 }
@@ -428,7 +428,7 @@ SETTINGSEOF`
                             
                             Text {
                                 text: "Location Settings"
-                                font.family: "Maple Mono NF"
+                                font.family: "MapleMono NF"
                                 font.pixelSize: 16
                                 font.weight: Font.Bold
                                 color: ThemeManager.accentBlue
@@ -437,7 +437,7 @@ SETTINGSEOF`
                             Text {
                                 width: parent.width
                                 text: "Leave empty to auto-detect by IP, or enter coordinates for accuracy:"
-                                font.family: "Maple Mono NF"
+                                font.family: "MapleMono NF"
                                 font.pixelSize: 11
                                 color: ThemeManager.fgSecondary
                                 wrapMode: Text.NoWrap
@@ -452,7 +452,7 @@ SETTINGSEOF`
                                     
                                     Text {
                                         text: "Latitude"
-                                        font.family: "Maple Mono NF"
+                                        font.family: "MapleMono NF"
                                         font.pixelSize: 11
                                         color: ThemeManager.fgSecondary
                                     }
@@ -469,7 +469,7 @@ SETTINGSEOF`
                                             id: latitudeField
                                             anchors.fill: parent
                                             anchors.margins: 8
-                                            font.family: "Maple Mono NF"
+                                            font.family: "MapleMono NF"
                                             font.pixelSize: 12
                                             color: ThemeManager.fgPrimary
                                             verticalAlignment: TextInput.AlignVCenter
@@ -488,7 +488,7 @@ SETTINGSEOF`
                                     
                                     Text {
                                         text: "Longitude"
-                                        font.family: "Maple Mono NF"
+                                        font.family: "MapleMono NF"
                                         font.pixelSize: 11
                                         color: ThemeManager.fgSecondary
                                     }
@@ -505,7 +505,7 @@ SETTINGSEOF`
                                             id: longitudeField
                                             anchors.fill: parent
                                             anchors.margins: 8
-                                            font.family: "Maple Mono NF"
+                                            font.family: "MapleMono NF"
                                             font.pixelSize: 12
                                             color: ThemeManager.fgPrimary
                                             verticalAlignment: TextInput.AlignVCenter
@@ -528,7 +528,7 @@ SETTINGSEOF`
                             
                             Text {
                                 text: "Clock Settings"
-                                font.family: "Maple Mono NF"
+                                font.family: "MapleMono NF"
                                 font.pixelSize: 16
                                 font.weight: Font.Bold
                                 color: ThemeManager.accentBlue
@@ -569,7 +569,7 @@ SETTINGSEOF`
                                 Text {
                                     anchors.verticalCenter: parent.verticalCenter
                                     text: "Use 24-hour format"
-                                    font.family: "Maple Mono NF"
+                                    font.family: "MapleMono NF"
                                     font.pixelSize: 12
                                     color: ThemeManager.fgPrimary
                                 }
@@ -615,7 +615,7 @@ SETTINGSEOF`
                                 Text {
                                     anchors.verticalCenter: parent.verticalCenter
                                     text: "Show seconds"
-                                    font.family: "Maple Mono NF"
+                                    font.family: "MapleMono NF"
                                     font.pixelSize: 12
                                     color: ThemeManager.fgPrimary
                                 }
@@ -646,7 +646,7 @@ SETTINGSEOF`
                             
                             Text {
                                 text: "Default Delay"
-                                font.family: "Maple Mono NF"
+                                font.family: "MapleMono NF"
                                 font.pixelSize: 14
                                 font.weight: Font.DemiBold
                                 color: ThemeManager.accentBlue
@@ -670,7 +670,7 @@ SETTINGSEOF`
                                         Text {
                                             anchors.centerIn: parent
                                             text: "−"
-                                            font.family: "Maple Mono NF"
+                                            font.family: "MapleMono NF"
                                             font.pixelSize: 20
                                             font.bold: true
                                             color: decreaseMouseArea.containsMouse ? ThemeManager.bgBase : ThemeManager.accentBlue
@@ -715,7 +715,7 @@ SETTINGSEOF`
                                             id: delayText
                                             anchors.centerIn: parent
                                             text: "0"
-                                            font.family: "Maple Mono NF"
+                                            font.family: "MapleMono NF"
                                             font.pixelSize: 14
                                             font.weight: Font.Medium
                                             color: ThemeManager.fgPrimary
@@ -734,7 +734,7 @@ SETTINGSEOF`
                                         Text {
                                             anchors.centerIn: parent
                                             text: "+"
-                                            font.family: "Maple Mono NF"
+                                            font.family: "MapleMono NF"
                                             font.pixelSize: 20
                                             font.bold: true
                                             color: increaseMouseArea.containsMouse ? ThemeManager.bgBase : ThemeManager.accentBlue
@@ -758,7 +758,7 @@ SETTINGSEOF`
                                 Text {
                                     anchors.verticalCenter: parent.verticalCenter
                                     text: "seconds"
-                                    font.family: "Maple Mono NF"
+                                    font.family: "MapleMono NF"
                                     font.pixelSize: 12
                                     color: ThemeManager.fgSecondary
                                 }
@@ -772,7 +772,7 @@ SETTINGSEOF`
                             
                             Text {
                                 text: "Output Options"
-                                font.family: "Maple Mono NF"
+                                font.family: "MapleMono NF"
                                 font.pixelSize: 14
                                 font.weight: Font.DemiBold
                                 color: ThemeManager.accentBlue
@@ -812,7 +812,7 @@ SETTINGSEOF`
                                 Text {
                                     anchors.verticalCenter: parent.verticalCenter
                                     text: "Save to disk"
-                                    font.family: "Maple Mono NF"
+                                    font.family: "MapleMono NF"
                                     font.pixelSize: 12
                                     color: ThemeManager.fgPrimary
                                 }
@@ -857,7 +857,7 @@ SETTINGSEOF`
                                 Text {
                                     anchors.verticalCenter: parent.verticalCenter
                                     text: "Copy to clipboard"
-                                    font.family: "Maple Mono NF"
+                                    font.family: "MapleMono NF"
                                     font.pixelSize: 12
                                     color: ThemeManager.fgPrimary
                                 }
@@ -876,7 +876,7 @@ SETTINGSEOF`
                             
                             Text {
                                 text: "Save Location"
-                                font.family: "Maple Mono NF"
+                                font.family: "MapleMono NF"
                                 font.pixelSize: 14
                                 font.weight: Font.DemiBold
                                 color: ThemeManager.accentBlue
@@ -897,7 +897,7 @@ SETTINGSEOF`
                                         id: saveLocationField
                                         anchors.fill: parent
                                         anchors.margins: 8
-                                        font.family: "Maple Mono NF"
+                                        font.family: "MapleMono NF"
                                         font.pixelSize: 12
                                         color: ThemeManager.fgPrimary
                                         verticalAlignment: TextInput.AlignVCenter
@@ -962,7 +962,7 @@ SETTINGSEOF`
                             
                             Text {
                                 text: "Bar Appearance"
-                                font.family: "Maple Mono NF"
+                                font.family: "MapleMono NF"
                                 font.pixelSize: 16
                                 font.weight: Font.Bold
                                 color: ThemeManager.accentBlue
@@ -970,7 +970,7 @@ SETTINGSEOF`
                             
                             Text {
                                 text: "Configure bar background and system tray details"
-                                font.family: "Maple Mono NF"
+                                font.family: "MapleMono NF"
                                 font.pixelSize: 11
                                 color: ThemeManager.fgSecondary
                                 wrapMode: Text.WordWrap
@@ -1013,7 +1013,7 @@ SETTINGSEOF`
                                 Text {
                                     anchors.verticalCenter: parent.verticalCenter
                                     text: "Transparent bar background"
-                                    font.family: "Maple Mono NF"
+                                    font.family: "MapleMono NF"
                                     font.pixelSize: 12
                                     color: ThemeManager.fgPrimary
                                 }
@@ -1060,7 +1060,7 @@ SETTINGSEOF`
                                 Text {
                                     anchors.verticalCenter: parent.verticalCenter
                                     text: "Show battery percentage (e.g., \"85%\")"
-                                    font.family: "Maple Mono NF"
+                                    font.family: "MapleMono NF"
                                     font.pixelSize: 12
                                     color: ThemeManager.fgPrimary
                                 }
@@ -1107,7 +1107,7 @@ SETTINGSEOF`
                                 Text {
                                     anchors.verticalCenter: parent.verticalCenter
                                     text: "Show volume percentage (e.g., \"75%\")"
-                                    font.family: "Maple Mono NF"
+                                    font.family: "MapleMono NF"
                                     font.pixelSize: 12
                                     color: ThemeManager.fgPrimary
                                 }
@@ -1154,7 +1154,7 @@ SETTINGSEOF`
                                 Text {
                                     anchors.verticalCenter: parent.verticalCenter
                                     text: "Show network upload/download speeds (e.g., \"↑ 2.5 Mb/s ↓ 10.3 Mb/s\")"
-                                    font.family: "Maple Mono NF"
+                                    font.family: "MapleMono NF"
                                     font.pixelSize: 12
                                     color: ThemeManager.fgPrimary
                                 }
@@ -1187,7 +1187,7 @@ SETTINGSEOF`
                             Text {
                                 anchors.centerIn: parent
                                 text: "Themes apply immediately when selected"
-                                font.family: "Maple Mono NF"
+                                font.family: "MapleMono NF"
                                 font.pixelSize: 11
                                 font.italic: true
                                 color: ThemeManager.fgSecondary
@@ -1228,7 +1228,7 @@ SETTINGSEOF`
                                         
                                         Text {
                                             text: model.name
-                                            font.family: "Maple Mono NF"
+                                            font.family: "MapleMono NF"
                                             font.pixelSize: 13
                                             font.weight: Font.Medium
                                             color: themeMouseArea.containsMouse ? ThemeManager.bgBase : ThemeManager.fgPrimary
@@ -1240,7 +1240,7 @@ SETTINGSEOF`
                                         
                                         Text {
                                             text: model.name === root.settings.theme.current ? "● Current" : ""
-                                            font.family: "Maple Mono NF"
+                                            font.family: "MapleMono NF"
                                             font.pixelSize: 10
                                             color: themeMouseArea.containsMouse ? ThemeManager.bgBase : ThemeManager.accentGreen
                                             visible: model.name === root.settings.theme.current
@@ -1336,7 +1336,7 @@ SETTINGSEOF`
                 Text {
                     anchors.centerIn: parent
                     text: applyButtonSuccess ? "✓ Applied!" : "Apply"
-                    font.family: "Maple Mono NF"
+                    font.family: "MapleMono NF"
                     font.pixelSize: 14
                     font.weight: Font.Bold
                     color: applyButtonSuccess ? ThemeManager.bgBase :

@@ -44,7 +44,7 @@ Rectangle {
                 
                 Text {
                     id: timeText
-                    font.family: "Maple Mono NF"
+                    font.family: "MapleMono NF"
                     font.pixelSize: 48
                     font.weight: Font.Medium
                     color: ThemeManager.fgPrimary
@@ -53,7 +53,7 @@ Rectangle {
                 
                 Text {
                     id: periodText
-                    font.family: "Maple Mono NF"
+                    font.family: "MapleMono NF"
                     font.pixelSize: 24
                     color: ThemeManager.fgSecondary
                     text: "AM"
@@ -193,7 +193,7 @@ Rectangle {
                         Text {
                             id: temperatureText
                             text: "..."
-                            font.family: "Maple Mono NF"
+                            font.family: "MapleMono NF"
                             font.pixelSize: 52
                             font.weight: Font.Normal
                             color: ThemeManager.fgPrimary
@@ -207,7 +207,7 @@ Rectangle {
                         id: conditionText
                         anchors.horizontalCenter: parent.horizontalCenter
                         text: "Sunny"
-                        font.family: "Maple Mono NF"
+                        font.family: "MapleMono NF"
                         font.pixelSize: 18
                         color: ThemeManager.fgSecondary
                     }
@@ -220,7 +220,7 @@ Rectangle {
                         Text {
                             id: humidityText
                             text: "💧 47%"
-                            font.family: "Maple Mono NF"
+                            font.family: "MapleMono NF"
                             font.pixelSize: 16
                             color: ThemeManager.fgSecondary
                         }
@@ -228,7 +228,7 @@ Rectangle {
                         Text {
                             id: windText
                             text: "💨 4mph"
-                            font.family: "Maple Mono NF"
+                            font.family: "MapleMono NF"
                             font.pixelSize: 16
                             color: ThemeManager.fgSecondary
                         }
@@ -238,7 +238,7 @@ Rectangle {
                     Text {
                         anchors.horizontalCenter: parent.horizontalCenter
                         text: "Weather for 40°N, 89°W"
-                        font.family: "Maple Mono NF"
+                        font.family: "MapleMono NF"
                         font.pixelSize: 10
                         color: ThemeManager.border0
                     }
@@ -271,7 +271,7 @@ Rectangle {
                                               "July", "August", "September", "October", "November", "December"]
                             return monthNames[now.getMonth()] + " " + now.getFullYear()
                         }
-                        font.family: "Maple Mono NF"
+                        font.family: "MapleMono NF"
                         font.pixelSize: 16
                         font.weight: Font.Medium
                         color: ThemeManager.fgPrimary
@@ -291,7 +291,7 @@ Rectangle {
                         
                         Text {
                             text: modelData
-                            font.family: "Maple Mono NF"
+                            font.family: "MapleMono NF"
                             font.pixelSize: 10
                             font.weight: Font.Medium
                             color: ThemeManager.fgSecondary
@@ -333,7 +333,7 @@ Rectangle {
                             Text {
                                 anchors.centerIn: parent
                                 text: parent.isValidDay ? parent.dayNumber : ""
-                                font.family: "Maple Mono NF"
+                                font.family: "MapleMono NF"
                                 font.pixelSize: 13
                                 color: {
                                     if (parent.isValidDay && parent.isCurrentDay) return ThemeManager.bgBase

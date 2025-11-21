@@ -273,7 +273,7 @@ PanelWindow {
                                 
                                 Text {
                                     text: "Failed to load"
-                                    font.family: "Maple Mono NF"
+                                    font.family: "MapleMono NF"
                                     font.pixelSize: 10
                                     color: ThemeManager.fgSecondary
                                     anchors.horizontalCenter: parent.horizontalCenter

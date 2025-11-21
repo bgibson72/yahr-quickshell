@@ -7,7 +7,7 @@ Item {
     Text {
         anchors.centerIn: parent
         text: "|"
-        font.family: "Maple Mono NF"
+        font.family: "MapleMono NF"
         font.pixelSize: 13
         color: ThemeManager.border1
     }

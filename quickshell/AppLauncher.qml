@@ -164,119 +164,113 @@ Rectangle {
         }
         
         // Apps list
-        Rectangle {
+        ListView {
+            id: listView
             width: parent.width
             height: parent.height - 44
-            color: ThemeManager.surface1
-            radius: 12
+            spacing: 8
+            clip: true
             
-            ListView {
-                id: listView
-                anchors.fill: parent
-                anchors.margins: 8
-                spacing: 4
-                clip: true
-                
-                model: ListModel {
-                    id: appListModel
-                    // Apps will be loaded dynamically from the script
+            model: ListModel {
+                id: appListModel
+                // Apps will be loaded dynamically from the script
+            }
+            
+            delegate: Rectangle {
+                width: listView.width
+                height: 54
+                color: {
+                    if (root.hoverIndex === index) return ThemeManager.accentBlue
+                    if (root.hoverIndex === -1 && index === root.selectedIndex) return ThemeManager.accentBlue
+                    return ThemeManager.surface1
+                }
+                radius: 12
+                border.width: 2
+                border.color: {
+                    if (root.hoverIndex === index || (root.hoverIndex === -1 && index === root.selectedIndex)) return ThemeManager.accentBlue
+                    return "transparent"
                 }
                 
-                delegate: Rectangle {
-                    width: listView.width
-                    height: 48
-                    color: {
-                        if (root.hoverIndex === index) return ThemeManager.accentBlue
-                        if (root.hoverIndex === -1 && index === root.selectedIndex) return ThemeManager.accentBlue
-                        return "transparent"
-                    }
-                    radius: 8
+                Row {
+                    anchors.fill: parent
+                    anchors.leftMargin: 12
+                    anchors.rightMargin: 12
+                    anchors.topMargin: 8
+                    anchors.bottomMargin: 8
+                    spacing: 12
                     
-                    Row {
-                        anchors.fill: parent
-                        anchors.leftMargin: 10
-                        anchors.rightMargin: 10
-                        anchors.topMargin: 6
-                        anchors.bottomMargin: 6
-                        spacing: 12
+                    Item {
+                        width: 38
+                        height: 38
                         
-                        Item {
-                            width: 36
-                            height: 36
+                        Image {
+                            id: appIconImage
+                            anchors.fill: parent
+                            sourceSize.width: 38
+                            sourceSize.height: 38
+                            smooth: true
+                            fillMode: Image.PreserveAspectFit
                             
-                            Image {
-                                id: appIconImage
-                                anchors.fill: parent
-                                sourceSize.width: 36
-                                sourceSize.height: 36
-                                smooth: true
-                                fillMode: Image.PreserveAspectFit
-                                
-                                source: model.appIcon.startsWith('/') ? "file://" + model.appIcon : ""
-                                visible: status === Image.Ready
-                            }
-                            
-                            // Fallback icon if image fails to load
-                            Rectangle {
-                                anchors.fill: parent
-                                color: {
-                                    if (root.hoverIndex === index) return ThemeManager.bgBase
-                                    if (root.hoverIndex === -1 && index === root.selectedIndex) return ThemeManager.bgBase
-                                    return ThemeManager.surface2
-                                }
-                                radius: 8
-                                visible: !appIconImage.visible
-                                
-                                Text {
-                                    anchors.centerIn: parent
-                                    text: "󰣆"  // default app icon
-                                    font.family: "Symbols Nerd Font"
-                                    font.pixelSize: 22
-                                    color: {
-                                        if (root.hoverIndex === index) return ThemeManager.accentBlue
-                                        if (root.hoverIndex === -1 && index === root.selectedIndex) return ThemeManager.accentBlue
-                                        return ThemeManager.fgPrimary
-                                    }
-                                }
-                            }
+                            source: model.appIcon.startsWith('/') ? "file://" + model.appIcon : ""
+                            visible: status === Image.Ready
                         }
                         
-                        Text {
-                            width: parent.width - 60
-                            anchors.verticalCenter: parent.verticalCenter
-                            text: model.appName
-                            font.family: "Maple Mono NF"
-                            font.pixelSize: 14
-                            font.weight: {
-                                if (root.hoverIndex === index) return Font.DemiBold
-                                if (root.hoverIndex === -1 && index === root.selectedIndex) return Font.DemiBold
-                                return Font.Medium
-                            }
+                        // Fallback icon if image fails to load
+                        Rectangle {
+                            anchors.fill: parent
                             color: {
                                 if (root.hoverIndex === index) return ThemeManager.bgBase
                                 if (root.hoverIndex === -1 && index === root.selectedIndex) return ThemeManager.bgBase
-                                return ThemeManager.fgPrimary
+                                return ThemeManager.surface2
                             }
-                            elide: Text.ElideRight
+                            radius: 8
+                            visible: !appIconImage.visible
+                            
+                            Text {
+                                anchors.centerIn: parent
+                                text: "󰣆"  // default app icon
+                                font.family: "Symbols Nerd Font"
+                                font.pixelSize: 24
+                                color: {
+                                    if (root.hoverIndex === index) return ThemeManager.accentBlue
+                                    if (root.hoverIndex === -1 && index === root.selectedIndex) return ThemeManager.accentBlue
+                                    return ThemeManager.fgPrimary
+                                }
+                            }
                         }
                     }
                     
-                    MouseArea {
-                        id: mouseArea
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        cursorShape: Qt.PointingHandCursor
-                        
-                        onEntered: {
-                            root.hoverIndex = index
+                    Text {
+                        width: parent.width - 62
+                        anchors.verticalCenter: parent.verticalCenter
+                        text: model.appName
+                        font.family: "Maple Mono NF"
+                        font.pixelSize: 14
+                        font.weight: Font.Medium
+                        color: {
+                            if (root.hoverIndex === index) return ThemeManager.bgBase
+                            if (root.hoverIndex === -1 && index === root.selectedIndex) return ThemeManager.bgBase
+                            return ThemeManager.fgPrimary
                         }
-                        onExited: {
-                            root.hoverIndex = -1
-                        }
-                        
-                        onClicked: {
-                            launchApp(model.appCommand)
-                        }
+                        elide: Text.ElideRight
+                    }
+                }
+                
+                MouseArea {
+                    id: mouseArea
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+                    
+                    onEntered: {
+                        root.hoverIndex = index
+                    }
+                    onExited: {
+                        root.hoverIndex = -1
+                    }
+                    
+                    onClicked: {
+                        launchApp(model.appCommand)
                     }
                 }
             }

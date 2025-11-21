@@ -1,5 +1,5 @@
 # Mako Notification Daemon Configuration
-# Theme: Catppuccin
+# Theme: Everforest
 
 # General settings
 font=JetBrainsMono Nerd Font 13
@@ -11,10 +11,10 @@ margin=8
 padding=12
 border-size=2
 border-radius=12
-background-color=#1e1e2e
-text-color=#cdd6f4
-border-color=#89b4fa
-progress-color=over #89b4fa
+background-color=#2b3339
+text-color=#d3c6aa
+border-color=#7fbbb3
+progress-color=over #7fbbb3
 
 # Default timeout
 default-timeout=10000
@@ -29,15 +29,15 @@ group-by=app-name
 
 # Urgency levels
 [urgency=low]
-border-color=#a6e3a1
+border-color=#a7c080
 default-timeout=5000
 
 [urgency=normal]
-border-color=#89b4fa
+border-color=#7fbbb3
 default-timeout=10000
 
 [urgency=critical]
-border-color=#f38ba8
+border-color=#e67e80
 default-timeout=0
 
 # Icons

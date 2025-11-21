@@ -160,7 +160,7 @@ Scope {
                         Text {
                             anchors.centerIn: parent
                             text: "Select Theme"
-                            font.family: "Maple Mono NF"
+                            font.family: "MapleMono NF"
                             font.pixelSize: ThemeManager.fontSizeLarge
                             font.weight: Font.DemiBold
                             color: ThemeManager.fgPrimary
@@ -244,7 +244,7 @@ Scope {
                             Text {
                                 anchors.centerIn: parent
                                 text: modelData
-                                font.family: "Maple Mono NF"
+                                font.family: "MapleMono NF"
                                 font.pixelSize: ThemeManager.fontSizeNormal
                                 font.weight: Font.Medium
                                 color: {

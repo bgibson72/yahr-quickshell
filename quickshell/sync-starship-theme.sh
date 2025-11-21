@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Sync Starship Prompt Colors with Current Quickshell Theme
-# Uses Starship's palette feature to update only colors, preserving custom format
+# Reads colors from ThemeManager.qml and updates starship.toml
 
 THEME_MANAGER="$HOME/.config/quickshell/ThemeManager.qml"
 STARSHIP_CONFIG="$HOME/.config/starship.toml"
@@ -37,37 +37,65 @@ if [[ -f "$STARSHIP_CONFIG" ]]; then
     cp "$STARSHIP_CONFIG" "$STARSHIP_BACKUP"
 fi
 
-# Check if config exists
-if [[ ! -f "$STARSHIP_CONFIG" ]]; then
-    echo "Error: starship.toml not found at $STARSHIP_CONFIG"
-    echo "Please create your custom starship configuration first."
-    exit 1
-fi
-
-# Remove existing palettes.quickshell section if it exists
-sed -i '/^\[palettes\.quickshell\]/,/^$/d' "$STARSHIP_CONFIG"
-
-# Append new palettes section at the end
-cat >> "$STARSHIP_CONFIG" << EOF
-
-[palettes.quickshell]
+# Create new starship config with theme colors
+cat > "$STARSHIP_CONFIG" << EOF
+# Starship Prompt Configuration
 # Auto-synced with Quickshell Theme: $theme_name
-bg_base = "$bg_base"
-surface0 = "$surface0"
-surface1 = "$surface1"
-fg_primary = "$fg_primary"
-fg_secondary = "$fg_secondary"
-accent_green = "$accent_green"
-accent_blue = "$accent_blue"
-accent_cyan = "$accent_cyan"
-accent_yellow = "$accent_yellow"
+
+format = """\
+[](bg:$bg_base fg:$accent_green)\
+[󰣇 ](bg:$accent_green fg:$bg_base)\
+[](fg:$accent_green bg:$surface0)\
+\$time\
+[](fg:$surface0 bg:$accent_blue)\
+\$directory\
+[](fg:$accent_blue bg:$accent_yellow)\
+\$git_branch\
+\$git_status\
+\$git_metrics\
+[](fg:$accent_yellow bg:$bg_base)\
+\$character\
+"""
+
+[directory]
+format = "[  \$path ](\$style)"
+style = "fg:$bg_base bg:$accent_blue"
+
+[git_branch]
+format = '[ \$symbol\$branch(:\$remote_branch) ](\$style)'
+symbol = "  "
+style = "fg:$bg_base bg:$accent_yellow"
+
+[git_status]
+format = '[\$all_status](\$style)'
+style = "fg:$bg_base bg:$accent_yellow"
+
+[git_metrics]
+format = "([+\$added](\$added_style))[](\$added_style)"
+added_style = "fg:$bg_base bg:$accent_yellow"
+deleted_style = "fg:$bg_base bg:$accent_yellow"
+disabled = false
+
+[hg_branch]
+format = "[ \$symbol\$branch ](\$style)"
+symbol = " "
+
+[cmd_duration]
+format = "[ 󱎫 \$duration ](\$style)"
+style = "fg:$fg_primary bg:$surface1"
+
+[character]
+success_symbol = '[ ➜](bold $accent_green) '
+error_symbol = '[ ✗](bold red) '
+
+[time]
+disabled = false
+time_format = "%R"
+style = "bg:$surface1"
+format = '[[ 󱑍 \$time ](bg:$surface0 fg:$accent_cyan)](\$style)'
 EOF
 
-echo "✓ Starship palette updated for $theme_name theme"
-echo "  (Your custom format and glyphs are preserved)"
-echo ""
-echo "Now update your starship.toml format to use palette colors like:"
-echo '  style = "fg:bg_base bg:accent_blue"'
+echo "✓ Starship configuration updated with $theme_name colors"
 echo "  Accent Blue: $accent_blue"
 echo "  Accent Green: $accent_green"
 echo "  Accent Yellow: $accent_yellow"
