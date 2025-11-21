@@ -163,6 +163,12 @@ cp -r ~/.config/{hypr,kitty,quickshell,mako,nvim,vesktop,VSCodium} ~/config-back
 # Install configurations
 cp -r hypr kitty mako nvim vesktop VSCodium ~/.config/
 
+# Install Thunar configuration (optional but recommended)
+mkdir -p ~/.config/Thunar ~/.config/xfce4/xfconf/xfce-perchannel-xml
+cp thunar/accels.scm thunar/uca.xml ~/.config/Thunar/
+cp thunar/thunar.xml ~/.config/xfce4/xfconf/xfce-perchannel-xml/
+# Or use the installer: ./install-thunar-config.sh
+
 # Install quickshell configuration
 # Note: This copies all files including shell.qml, scripts, themes, and executables
 cp -r quickshell ~/.config/
