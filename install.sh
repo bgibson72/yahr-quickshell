@@ -4,6 +4,7 @@
 # This script installs the complete Hyprland + Quickshell setup
 
 set -e  # Exit on error
+set +e  # Temporarily disable for interactive prompts in functions
 
 # Colors for output
 RED='\033[0;31m'
@@ -51,35 +52,38 @@ backup_config() {
     fi
     
     # Ask user what to do with this specific config
+    echo ""
     print_warning "Existing $config_name found at: $config_path"
     echo "  [b] Backup and replace"
     echo "  [o] Overwrite without backup"
     echo "  [s] Skip installation of $config_name"
-    read -p "Choose action (b/o/s): " -n 1 -r
-    echo
+    echo ""
     
-    case $REPLY in
-        [Bb])
-            local backup_path="${config_path}.backup.$(date +%Y%m%d_%H%M%S)"
-            print_info "Backing up: $config_path -> $backup_path"
-            mv "$config_path" "$backup_path"
-            print_success "Backup created"
-            return 0
-            ;;
-        [Oo])
-            print_warning "Removing existing config without backup"
-            rm -rf "$config_path"
-            return 0
-            ;;
-        [Ss])
-            print_info "Skipping $config_name installation"
-            return 2  # Special return code to skip installation
-            ;;
-        *)
-            print_error "Invalid choice. Skipping $config_name installation"
-            return 2
-            ;;
-    esac
+    local choice=""
+    while true; do
+        read -p "Choose action (b/o/s): " choice < /dev/tty
+        case $choice in
+            [Bb])
+                local backup_path="${config_path}.backup.$(date +%Y%m%d_%H%M%S)"
+                print_info "Backing up: $config_path -> $backup_path"
+                mv "$config_path" "$backup_path"
+                print_success "Backup created"
+                return 0
+                ;;
+            [Oo])
+                print_warning "Removing existing config without backup"
+                rm -rf "$config_path"
+                return 0
+                ;;
+            [Ss])
+                print_info "Skipping $config_name installation"
+                return 2  # Special return code to skip installation
+                ;;
+            *)
+                print_error "Invalid choice. Please enter b, o, or s."
+                ;;
+        esac
+    done
 }
 
 # Function to install a config directory
