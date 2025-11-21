@@ -24,8 +24,6 @@
   "modules": [
     
     "break",
-    "break",
-    
     {
       "type": "host",
       "key": "󰌢",

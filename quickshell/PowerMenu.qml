@@ -122,17 +122,11 @@ Rectangle {
             }
         }
         
-        // Inner card for power options
-        Rectangle {
+        // Power options as individual cards
+        Column {
             width: parent.width
             height: parent.height - 48
-            color: ThemeManager.surface1
-            radius: 12
-            
-            Column {
-                anchors.fill: parent
-                anchors.margins: 8
-                spacing: 8
+            spacing: 8
             
             // Lock
             Rectangle {
@@ -141,9 +135,14 @@ Rectangle {
                 color: {
                     if (root.hoverIndex === 0) return ThemeManager.accentBlue
                     if (root.hoverIndex === -1 && root.selectedIndex === 0) return ThemeManager.accentBlue
-                    return "transparent"
+                    return ThemeManager.surface1
                 }
                 radius: 8
+                border.width: 2
+                border.color: {
+                    if (root.hoverIndex === 0 || (root.hoverIndex === -1 && root.selectedIndex === 0)) return ThemeManager.accentBlue
+                    return "transparent"
+                }
                 
                 Row {
                     anchors.centerIn: parent
@@ -194,9 +193,14 @@ Rectangle {
                 color: {
                     if (root.hoverIndex === 1) return ThemeManager.accentBlue
                     if (root.hoverIndex === -1 && root.selectedIndex === 1) return ThemeManager.accentBlue
-                    return "transparent"
+                    return ThemeManager.surface1
                 }
                 radius: 8
+                border.width: 2
+                border.color: {
+                    if (root.hoverIndex === 1 || (root.hoverIndex === -1 && root.selectedIndex === 1)) return ThemeManager.accentBlue
+                    return "transparent"
+                }
                 
                 Row {
                     anchors.centerIn: parent
@@ -247,9 +251,14 @@ Rectangle {
                 color: {
                     if (root.hoverIndex === 2) return ThemeManager.accentBlue
                     if (root.hoverIndex === -1 && root.selectedIndex === 2) return ThemeManager.accentBlue
-                    return "transparent"
+                    return ThemeManager.surface1
                 }
                 radius: 8
+                border.width: 2
+                border.color: {
+                    if (root.hoverIndex === 2 || (root.hoverIndex === -1 && root.selectedIndex === 2)) return ThemeManager.accentBlue
+                    return "transparent"
+                }
                 
                 Row {
                     anchors.centerIn: parent
@@ -300,9 +309,14 @@ Rectangle {
                 color: {
                     if (root.hoverIndex === 3) return ThemeManager.accentRed
                     if (root.hoverIndex === -1 && root.selectedIndex === 3) return ThemeManager.accentRed
-                    return "transparent"
+                    return ThemeManager.surface1
                 }
                 radius: 8
+                border.width: 2
+                border.color: {
+                    if (root.hoverIndex === 3 || (root.hoverIndex === -1 && root.selectedIndex === 3)) return ThemeManager.accentRed
+                    return "transparent"
+                }
                 
                 Row {
                     anchors.centerIn: parent
@@ -353,9 +367,14 @@ Rectangle {
                 color: {
                     if (root.hoverIndex === 4) return ThemeManager.accentRed
                     if (root.hoverIndex === -1 && root.selectedIndex === 4) return ThemeManager.accentRed
-                    return "transparent"
+                    return ThemeManager.surface1
                 }
                 radius: 8
+                border.width: 2
+                border.color: {
+                    if (root.hoverIndex === 4 || (root.hoverIndex === -1 && root.selectedIndex === 4)) return ThemeManager.accentRed
+                    return "transparent"
+                }
                 
                 Row {
                     anchors.centerIn: parent
@@ -406,9 +425,14 @@ Rectangle {
                 color: {
                     if (root.hoverIndex === 5) return ThemeManager.accentBlue
                     if (root.hoverIndex === -1 && root.selectedIndex === 5) return ThemeManager.accentBlue
-                    return "transparent"
+                    return ThemeManager.surface1
                 }
                 radius: 8
+                border.width: 2
+                border.color: {
+                    if (root.hoverIndex === 5 || (root.hoverIndex === -1 && root.selectedIndex === 5)) return ThemeManager.accentBlue
+                    return "transparent"
+                }
                 
                 Row {
                     anchors.centerIn: parent
@@ -454,7 +478,6 @@ Rectangle {
                     }
                 }
             }
-        }
         }
     }
     
