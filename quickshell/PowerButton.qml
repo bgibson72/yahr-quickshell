@@ -29,9 +29,9 @@ Rectangle {
             height: 32
             
             color: {
-                if (mouseArea.pressed) return Qt.darker(ThemeManager.accentMaroon, 1.3)
-                else if (mouseArea.containsMouse) return ThemeManager.accentMaroon
-                else return ThemeManager.accentRed
+                if (mouseArea.pressed) return Qt.darker(ThemeManager.accentOrange, 1.3)
+                else if (mouseArea.containsMouse) return ThemeManager.accentOrange
+                else return ThemeManager.accentOrange
             }
             radius: 6
             
