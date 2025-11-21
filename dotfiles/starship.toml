@@ -1,0 +1,55 @@
+# Starship Prompt Configuration
+# Colors auto-synced via sync-starship-theme.sh using palette feature
+# Customize the format and glyphs below - they will be preserved across theme changes
+
+format = """[](bg:bg_base fg:accent_green)[󰣇 ](bg:accent_green fg:bg_base)[](fg:accent_green bg:surface0)$time[](fg:surface0 bg:accent_blue)$directory[](fg:accent_blue bg:accent_yellow)$git_branch$git_status$git_metrics[](fg:accent_yellow bg:bg_base)$character"""
+
+[directory]
+format = "[  $path ]($style)"
+style = "fg:bg_base bg:accent_blue"
+
+[git_branch]
+format = '[ $symbol$branch(:$remote_branch) ]($style)'
+symbol = "  "
+style = "fg:bg_base bg:accent_yellow"
+
+[git_status]
+format = '[$all_status]($style)'
+style = "fg:bg_base bg:accent_yellow"
+
+[git_metrics]
+format = "([+$added]($added_style))[]($added_style)"
+added_style = "fg:bg_base bg:accent_yellow"
+deleted_style = "fg:bg_base bg:accent_yellow"
+disabled = false
+
+[hg_branch]
+format = "[ $symbol$branch ]($style)"
+symbol = " "
+
+[cmd_duration]
+format = "[ 󱎫 $duration ]($style)"
+style = "fg:fg_primary bg:surface1"
+
+[character]
+success_symbol = '[ ➜](bold accent_green) '
+error_symbol = '[ ✗](bold red) '
+
+[time]
+disabled = false
+time_format = "%R"
+style = "bg:surface1"
+format = '[[ 󱑍 $time ](bg:surface0 fg:accent_cyan)]($style)'
+
+# Palette section - auto-updated by sync-starship-theme.sh
+# DO NOT manually edit these values, they are synced from ThemeManager.qml
+[palette]
+bg_base = "#2b3339"
+surface0 = "#374247"
+surface1 = "#3d484d"
+fg_primary = "#d3c6aa"
+fg_secondary = "#a7c080"
+accent_green = "#a7c080"
+accent_blue = "#7fbbb3"
+accent_cyan = "#7fbbb3"
+accent_yellow = "#dbbc7f"

@@ -189,6 +189,9 @@ update-desktop-database ~/.local/share/applications/
 
 # Install zsh configuration (if using zsh)
 cp dotfiles/.zshrc ~/.zshrc
+
+# Install starship prompt configuration
+cp dotfiles/starship.toml ~/.config/starship.toml
 ```
 
 ### 3. Configure Hyprland Autostart
