@@ -23,27 +23,27 @@ echo "Syncing GTK theme for: $theme_name"
 case "$theme_name" in
     "Everforest")
         gtk_theme="Everforest-Dark"
-        icon_theme="Papirus-Dark"
+        icon_theme="Everforest-Dark"
         ;;
     "Catppuccin Mocha")
         gtk_theme="Catppuccin-Mocha-Standard-Blue-Dark"
-        icon_theme="Papirus-Dark"
+        icon_theme="Catppuccin-Mocha"
         ;;
     "Gruvbox")
         gtk_theme="Gruvbox-Dark"
-        icon_theme="Papirus-Dark"
+        icon_theme="Gruvbox-Dark"
         ;;
     "Nord")
         gtk_theme="Nordic"
-        icon_theme="Papirus-Dark"
+        icon_theme="Nordic"
         ;;
     "Dracula")
         gtk_theme="Dracula"
-        icon_theme="Papirus-Dark"
+        icon_theme="Dracula"
         ;;
     "Tokyo Night")
         gtk_theme="Tokyonight-Dark"
-        icon_theme="Papirus-Dark"
+        icon_theme="Tokyonight-Dark"
         ;;
     "Nightfox Duskfox")
         gtk_theme="Nightfox-Dark-Duskfox"
@@ -51,7 +51,7 @@ case "$theme_name" in
         ;;
     "Rose Pine")
         gtk_theme="Rose-Pine"
-        icon_theme="Papirus-Dark"
+        icon_theme="Rose-Pine-Moon"
         ;;
     "Solarized Dark")
         gtk_theme="Solarized-Dark"
@@ -59,7 +59,7 @@ case "$theme_name" in
         ;;
     "Material Palenight")
         gtk_theme="Material-Palenight"
-        icon_theme="Papirus-Dark"
+        icon_theme="Material - DeepOcean"
         ;;
     "One Dark")
         gtk_theme="One-Dark"
