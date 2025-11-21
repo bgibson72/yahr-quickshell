@@ -4,7 +4,20 @@
 
 palette = "quickshell"
 
-format = """[](bg:bg_base fg:accent_green)[󰣇 ](bg:accent_green fg:bg_base)[](fg:accent_green bg:surface0)$time[](fg:surface0 bg:accent_blue)$directory[](fg:accent_blue bg:accent_yellow)$git_branch$git_status$git_metrics[](fg:accent_yellow bg:bg_base)$character"""
+format = """
+[](bg:bg_base fg:accent_green)\
+[󰣇 ](bg:accent_green fg:bg_base)\
+[](fg:accent_green bg:surface0)\
+$time\
+[](fg:surface0 bg:accent_blue)\
+$directory\
+[](fg:accent_blue bg:accent_yellow)\
+$git_branch\
+$git_status\
+$git_metrics\
+[](fg:accent_yellow bg:bg_base)\
+$character\
+"""
 
 [directory]
 format = "[  $path ]($style)"
