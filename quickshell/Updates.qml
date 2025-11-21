@@ -78,9 +78,9 @@ Rectangle {
     
     Process {
         id: updateCheckProcess
-        // Use checkupdates (from pacman-contrib) which syncs databases to /tmp and checks
-        // This is safer than pacman -Sy and doesn't require root
-        command: ["sh", "-c", "checkupdates 2>/dev/null | wc -l"]
+        // Check for updates using pacman -Qu (shows only upgradeable packages)
+        // Alternative: use checkupdates from pacman-contrib if installed
+        command: ["sh", "-c", "if command -v checkupdates >/dev/null 2>&1; then checkupdates 2>/dev/null | wc -l; else pacman -Qu 2>/dev/null | wc -l; fi"]
         running: false
         
         stdout: SplitParser {
