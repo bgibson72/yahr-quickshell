@@ -502,41 +502,12 @@ update_hyprlock_theme() {
     local theme_file="$1"
     local theme_name="$2"
     
-    # Parse colors from theme file
-    local accent_blue=$(grep '\$accent-blue = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
-    local accent_red=$(grep '\$accent-red = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
-    local accent_green=$(grep '\$accent-green = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
-    local fg_primary=$(grep '\$fg-primary = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
-    local fg_secondary=$(grep '\$fg-secondary = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
-    local fg_tertiary=$(grep '\$fg-tertiary = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
-    local bg_base=$(grep '\$bg-base = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
-    
-    # Convert RGB to RGBA with alpha channel (E6 = 90% opacity)
-    local bg_base_alpha="${bg_base}E6"
-    local accent_blue_alpha="${accent_blue}FF"
-    local accent_green_alpha="${accent_green}FF"
-    local accent_red_alpha="${accent_red}FF"
-    local fg_primary_alpha="${fg_primary}FF"
-    local fg_secondary_alpha="${fg_secondary}E6"
-    local fg_tertiary_alpha="${fg_tertiary}CC"
-    
-    # Update hyprlock config
-    local hyprlock_config="$HOME/.config/hypr/hyprlock.conf"
-    
-    # Replace RGBA placeholders
-    sed -i "s/BG_BASE_ALPHA_PLACEHOLDER/$bg_base_alpha/g" "$hyprlock_config"
-    sed -i "s/ACCENT_BLUE_ALPHA_PLACEHOLDER/$accent_blue_alpha/g" "$hyprlock_config"
-    sed -i "s/ACCENT_GREEN_ALPHA_PLACEHOLDER/$accent_green_alpha/g" "$hyprlock_config"
-    sed -i "s/ACCENT_RED_ALPHA_PLACEHOLDER/$accent_red_alpha/g" "$hyprlock_config"
-    sed -i "s/FG_PRIMARY_ALPHA_PLACEHOLDER/$fg_primary_alpha/g" "$hyprlock_config"
-    sed -i "s/FG_SECONDARY_ALPHA_PLACEHOLDER/$fg_secondary_alpha/g" "$hyprlock_config"
-    sed -i "s/FG_TERTIARY_ALPHA_PLACEHOLDER/$fg_tertiary_alpha/g" "$hyprlock_config"
-    
-    # Replace HEX placeholders (for pango markup)
-    sed -i "s/FG_SECONDARY_HEX_PLACEHOLDER/$fg_secondary/g" "$hyprlock_config"
-    sed -i "s/ACCENT_RED_HEX_PLACEHOLDER/$accent_red/g" "$hyprlock_config"
-    
-    echo "Hyprlock theme updated successfully"
+    # Call the sync script which properly reads from Hyprland config
+    if [ -x "$QUICKSHELL_DIR/sync-hyprlock-theme.sh" ]; then
+        "$QUICKSHELL_DIR/sync-hyprlock-theme.sh"
+    else
+        echo "Warning: sync-hyprlock-theme.sh not found"
+    fi
 }
 
 # Function to update kitty theme
@@ -544,68 +515,11 @@ update_kitty_theme() {
     local theme_file="$1"
     local theme_name="$2"
     
-    # Parse colors from theme file  
-    local accent_blue=$(grep '\$accent-blue = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
-    local accent_red=$(grep '\$accent-red = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
-    local accent_green=$(grep '\$accent-green = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
-    local accent_yellow=$(grep '\$accent-yellow = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
-    local accent_purple=$(grep '\$accent-purple = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
-    local accent_cyan=$(grep '\$accent-cyan = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
-    local fg_primary=$(grep '\$fg-primary = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
-    local fg_secondary=$(grep '\$fg-secondary = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
-    local bg_base=$(grep '\$bg-base = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
-    local surface_0=$(grep '\$surface-0 = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
-    
-    # Update kitty theme
-    if [[ -f "$HOME/.config/kitty/current-theme.conf" ]] || mkdir -p "$HOME/.config/kitty"; then
-        cat > "$HOME/.config/kitty/current-theme.conf" << EOF
-# $theme_name theme for kitty
-foreground #$fg_primary
-background #$bg_base
-selection_foreground #$bg_base
-selection_background #$accent_blue
-cursor #$fg_primary
-cursor_text_color #$bg_base
-
-# Black
-color0 #$bg_base
-color8 #$surface_0
-
-# Red  
-color1 #$accent_red
-color9 #$accent_red
-
-# Green
-color2 #$accent_green
-color10 #$accent_green
-
-# Yellow
-color3 #$accent_yellow
-color11 #$accent_yellow
-
-# Blue
-color4 #$accent_blue
-color12 #$accent_blue
-
-# Magenta
-color5 #$accent_purple
-color13 #$accent_purple
-
-# Cyan
-color6 #$accent_cyan
-color14 #$accent_cyan
-
-# White
-color7 #$fg_secondary
-color15 #$fg_primary
-EOF
-
-        # Include the theme in kitty.conf if not already included
-        if [[ -f "$HOME/.config/kitty/kitty.conf" ]]; then
-            if ! grep -q "include current-theme.conf" "$HOME/.config/kitty/kitty.conf"; then
-                echo "include current-theme.conf" >> "$HOME/.config/kitty/kitty.conf"
-            fi
-        fi
+    # Call the sync script which properly reads from Hyprland config
+    if [ -x "$QUICKSHELL_DIR/sync-kitty-theme.sh" ]; then
+        "$QUICKSHELL_DIR/sync-kitty-theme.sh"
+    else
+        echo "Warning: sync-kitty-theme.sh not found"
     fi
 }
 
