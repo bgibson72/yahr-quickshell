@@ -621,29 +621,169 @@ apply_theme() {
     
     echo "Applying theme: $theme_name"
     
-    # Use the centralized switch-theme.sh script which handles all syncing
-    # Convert Hyprland theme name to quickshell theme name format
-    local quickshell_theme=""
-    case "$theme_name" in
-        "Catppuccin") quickshell_theme="catppuccin-mocha" ;;
-        "Gruvbox") quickshell_theme="gruvbox-dark" ;;
-        "TokyoNight") quickshell_theme="tokyonight-night" ;;
-        "Dracula") quickshell_theme="dracula" ;;
-        "Everforest") quickshell_theme="everforest" ;;
-        "Nord") quickshell_theme="nord" ;;
-        "RosePine") quickshell_theme="rosepine" ;;
-        "Kanagawa") quickshell_theme="kanagawa" ;;
-        "NightFox") quickshell_theme="nightfox" ;;
-        "Eldritch") quickshell_theme="eldritch" ;;
-        "Material") quickshell_theme="material" ;;
-        *) 
-            echo "Unknown theme: $theme_name"
-            return 1
-            ;;
-    esac
+    # Create backup of current ThemeManager
+    cp "$QUICKSHELL_DIR/ThemeManager.qml" "$QUICKSHELL_DIR/ThemeManager.qml.backup" 2>/dev/null || true
     
-    # Call the main theme switcher script
-    "$QUICKSHELL_DIR/switch-theme.sh" "$quickshell_theme"
+    # Create new ThemeManager.qml with colors from the theme file
+    cat > "$QUICKSHELL_DIR/ThemeManager.qml.tmp" << 'EOF'
+pragma Singleton
+
+import QtQuick
+
+QtObject {
+    // Theme name
+    property string themeName: "THEME_NAME_PLACEHOLDER"
+    
+    // Accent colors
+    property color accentRose: "ACCENT_ROSE_PLACEHOLDER"
+    property color accentCoral: "ACCENT_CORAL_PLACEHOLDER" 
+    property color accentPink: "ACCENT_PINK_PLACEHOLDER"
+    property color accentPurple: "ACCENT_PURPLE_PLACEHOLDER"
+    property color accentRed: "ACCENT_RED_PLACEHOLDER"
+    property color accentMaroon: "ACCENT_MAROON_PLACEHOLDER"
+    property color accentOrange: "ACCENT_ORANGE_PLACEHOLDER"
+    property color accentYellow: "ACCENT_YELLOW_PLACEHOLDER"
+    property color accentGreen: "ACCENT_GREEN_PLACEHOLDER"
+    property color accentTeal: "ACCENT_TEAL_PLACEHOLDER"
+    property color accentCyan: "ACCENT_CYAN_PLACEHOLDER"
+    property color accentSapphire: "ACCENT_SAPPHIRE_PLACEHOLDER"
+    property color accentBlue: "ACCENT_BLUE_PLACEHOLDER"
+    property color accentLavender: "ACCENT_LAVENDER_PLACEHOLDER"
+    
+    // Text colors  
+    property color fgPrimary: "FG_PRIMARY_PLACEHOLDER"
+    property color fgSecondary: "FG_SECONDARY_PLACEHOLDER"
+    property color fgTertiary: "FG_TERTIARY_PLACEHOLDER"
+    
+    // Border colors
+    property color border2: "BORDER_2_PLACEHOLDER"
+    property color border1: "BORDER_1_PLACEHOLDER"
+    property color border0: "BORDER_0_PLACEHOLDER"
+    
+    // Surface colors
+    property color surface2: "SURFACE_2_PLACEHOLDER"
+    property color surface1: "SURFACE_1_PLACEHOLDER"
+    property color surface0: "SURFACE_0_PLACEHOLDER"
+    
+    // Background colors
+    property color bgBase: "BG_BASE_PLACEHOLDER"
+    property color bgBaseAlpha: "BG_BASE_ALPHA_PLACEHOLDER"
+    property color bgMantle: "BG_MANTLE_PLACEHOLDER"
+    property color bgCrust: "BG_CRUST_PLACEHOLDER"
+    
+    // Font sizes
+    property int fontSizeSmall: 11
+    property int fontSizeNormal: 13
+    property int fontSizeLarge: 15
+    property int fontSizeIcon: 14
+}
+EOF
+
+    # Parse the theme file and extract colors
+    local accent_rose=$(grep '\$accent-rose = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
+    local accent_coral=$(grep '\$accent-coral = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
+    local accent_pink=$(grep '\$accent-pink = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
+    local accent_purple=$(grep '\$accent-purple = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
+    local accent_red=$(grep '\$accent-red = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
+    local accent_maroon=$(grep '\$accent-maroon = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
+    local accent_orange=$(grep '\$accent-orange = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
+    local accent_yellow=$(grep '\$accent-yellow = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
+    local accent_green=$(grep '\$accent-green = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
+    local accent_teal=$(grep '\$accent-teal = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
+    local accent_cyan=$(grep '\$accent-cyan = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
+    local accent_sapphire=$(grep '\$accent-sapphire = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
+    local accent_blue=$(grep '\$accent-blue = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
+    local accent_lavender=$(grep '\$accent-lavender = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
+    
+    local fg_primary=$(grep '\$fg-primary = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
+    local fg_secondary=$(grep '\$fg-secondary = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
+    local fg_tertiary=$(grep '\$fg-tertiary = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
+    
+    local border_2=$(grep '\$border-2 = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
+    local border_1=$(grep '\$border-1 = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
+    local border_0=$(grep '\$border-0 = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
+    
+    local surface_2=$(grep '\$surface-2 = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
+    local surface_1=$(grep '\$surface-1 = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
+    local surface_0=$(grep '\$surface-0 = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
+    
+    local bg_base=$(grep '\$bg-base = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
+    local bg_base_alpha=$(grep '\$bg-baseAlpha =' "$theme_file" | sed 's/.*= \([a-f0-9]*\).*/\1/')
+    local bg_mantle=$(grep '\$bg-mantle = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
+    local bg_crust=$(grep '\$bg-crust = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
+    
+    # Replace placeholders with actual colors
+    sed -i "s/THEME_NAME_PLACEHOLDER/$theme_name/g" "$QUICKSHELL_DIR/ThemeManager.qml.tmp"
+    sed -i "s/ACCENT_ROSE_PLACEHOLDER/#$accent_rose/g" "$QUICKSHELL_DIR/ThemeManager.qml.tmp"
+    sed -i "s/ACCENT_CORAL_PLACEHOLDER/#$accent_coral/g" "$QUICKSHELL_DIR/ThemeManager.qml.tmp"
+    sed -i "s/ACCENT_PINK_PLACEHOLDER/#$accent_pink/g" "$QUICKSHELL_DIR/ThemeManager.qml.tmp"
+    sed -i "s/ACCENT_PURPLE_PLACEHOLDER/#$accent_purple/g" "$QUICKSHELL_DIR/ThemeManager.qml.tmp"
+    sed -i "s/ACCENT_RED_PLACEHOLDER/#$accent_red/g" "$QUICKSHELL_DIR/ThemeManager.qml.tmp"
+    sed -i "s/ACCENT_MAROON_PLACEHOLDER/#$accent_maroon/g" "$QUICKSHELL_DIR/ThemeManager.qml.tmp"
+    sed -i "s/ACCENT_ORANGE_PLACEHOLDER/#$accent_orange/g" "$QUICKSHELL_DIR/ThemeManager.qml.tmp"
+    sed -i "s/ACCENT_YELLOW_PLACEHOLDER/#$accent_yellow/g" "$QUICKSHELL_DIR/ThemeManager.qml.tmp"
+    sed -i "s/ACCENT_GREEN_PLACEHOLDER/#$accent_green/g" "$QUICKSHELL_DIR/ThemeManager.qml.tmp"
+    sed -i "s/ACCENT_TEAL_PLACEHOLDER/#$accent_teal/g" "$QUICKSHELL_DIR/ThemeManager.qml.tmp"
+    sed -i "s/ACCENT_CYAN_PLACEHOLDER/#$accent_cyan/g" "$QUICKSHELL_DIR/ThemeManager.qml.tmp"
+    sed -i "s/ACCENT_SAPPHIRE_PLACEHOLDER/#$accent_sapphire/g" "$QUICKSHELL_DIR/ThemeManager.qml.tmp"
+    sed -i "s/ACCENT_BLUE_PLACEHOLDER/#$accent_blue/g" "$QUICKSHELL_DIR/ThemeManager.qml.tmp"
+    sed -i "s/ACCENT_LAVENDER_PLACEHOLDER/#$accent_lavender/g" "$QUICKSHELL_DIR/ThemeManager.qml.tmp"
+    
+    sed -i "s/FG_PRIMARY_PLACEHOLDER/#$fg_primary/g" "$QUICKSHELL_DIR/ThemeManager.qml.tmp"
+    sed -i "s/FG_SECONDARY_PLACEHOLDER/#$fg_secondary/g" "$QUICKSHELL_DIR/ThemeManager.qml.tmp"
+    sed -i "s/FG_TERTIARY_PLACEHOLDER/#$fg_tertiary/g" "$QUICKSHELL_DIR/ThemeManager.qml.tmp"
+    
+    sed -i "s/BORDER_2_PLACEHOLDER/#$border_2/g" "$QUICKSHELL_DIR/ThemeManager.qml.tmp"
+    sed -i "s/BORDER_1_PLACEHOLDER/#$border_1/g" "$QUICKSHELL_DIR/ThemeManager.qml.tmp"
+    sed -i "s/BORDER_0_PLACEHOLDER/#$border_0/g" "$QUICKSHELL_DIR/ThemeManager.qml.tmp"
+    
+    sed -i "s/SURFACE_2_PLACEHOLDER/#$surface_2/g" "$QUICKSHELL_DIR/ThemeManager.qml.tmp"
+    sed -i "s/SURFACE_1_PLACEHOLDER/#$surface_1/g" "$QUICKSHELL_DIR/ThemeManager.qml.tmp"
+    sed -i "s/SURFACE_0_PLACEHOLDER/#$surface_0/g" "$QUICKSHELL_DIR/ThemeManager.qml.tmp"
+    
+    sed -i "s/BG_BASE_PLACEHOLDER/#$bg_base/g" "$QUICKSHELL_DIR/ThemeManager.qml.tmp"
+    sed -i "s/BG_BASE_ALPHA_PLACEHOLDER/#FF$bg_base_alpha/g" "$QUICKSHELL_DIR/ThemeManager.qml.tmp"  # Add alpha (FF = 100% opacity)
+    sed -i "s/BG_MANTLE_PLACEHOLDER/#$bg_mantle/g" "$QUICKSHELL_DIR/ThemeManager.qml.tmp"
+    sed -i "s/BG_CRUST_PLACEHOLDER/#$bg_crust/g" "$QUICKSHELL_DIR/ThemeManager.qml.tmp"
+    
+    # Move temp file to final location atomically
+    mv "$QUICKSHELL_DIR/ThemeManager.qml.tmp" "$QUICKSHELL_DIR/ThemeManager.qml"
+    
+    # Restart Quickshell to reload the singleton ThemeManager
+    echo "Restarting Quickshell..."
+    pkill quickshell
+    sleep 0.5
+    quickshell &>/dev/null & disown
+    
+    # Update other applications
+    echo "Updating application themes..."
+    update_hyprland_theme "$theme_file" "$theme_name"
+    update_wofi_theme "$theme_file" "$theme_name" 
+    update_kitty_theme "$theme_file" "$theme_name"
+    update_mako_theme "$theme_file" "$theme_name"
+    update_hyprlock_theme "$theme_file" "$theme_name"
+    update_gtk_theme "$theme_name"
+    set_theme_wallpaper "$theme_name"
+    
+    # Update fastfetch logo
+    if [[ -x "$HOME/.config/fastfetch/update-theme-logo.sh" ]]; then
+        echo "Updating fastfetch logo..."
+        "$HOME/.config/fastfetch/update-theme-logo.sh" > /dev/null 2>&1
+    fi
+
+    # Sync VSCodium theme colors
+    if [[ -x "$QUICKSHELL_DIR/sync-vscodium-theme.sh" ]]; then
+        echo "Syncing VSCodium theme..."
+        "$QUICKSHELL_DIR/sync-vscodium-theme.sh"
+    fi
+    
+    # Save current theme
+    echo "$theme_name" > "$CURRENT_THEME_FILE"
+    
+    echo "Theme applied successfully: $theme_name"
+    echo "Updated: Quickshell, Hyprland, wofi, kitty, mako, hyprlock, GTK theme, wallpaper, VSCodium"
+    echo "GTK applications (Thunar, gnome-text-editor, waypaper) will now use matching theme"
+    echo "Restart VSCodium to see the new color scheme"
 }
 
 # Show wofi theme selector

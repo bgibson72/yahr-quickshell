@@ -108,6 +108,14 @@ if [ -f "$HOME/.config/quickshell/sync-vencord-theme.sh" ]; then
     echo ""
 fi
 
+# Sync SDDM theme
+SDDM_SYNC="$HOME/Dev/yahr-quickshell/sddm/sync-sddm-theme.sh"
+if [ -f "$SDDM_SYNC" ]; then
+    echo "Syncing SDDM theme..."
+    "$SDDM_SYNC"
+    echo ""
+fi
+
 # Update fastfetch logo
 if [ -x "$HOME/.config/quickshell/update-theme-logo.sh" ]; then
     echo "Updating fastfetch logo..."
@@ -159,11 +167,14 @@ else
     echo -e "${YELLOW}⚠ Quickshell is not running${NC}"
     echo "Start it with: quickshell &"
 fi
+    
+    # Send desktop notification if notify-send is available
+echo ""
 
-# Sync SDDM theme (requires sudo, so do it last to avoid blocking)
-SDDM_SYNC="$HOME/.config/sddm/sync-sddm-theme.sh"
-if [ -f "$SDDM_SYNC" ]; then
-    echo ""
-    echo "Syncing SDDM theme (requires sudo)..."
-    "$SDDM_SYNC"
+# Check if quickshell is running
+if pgrep -x quickshell > /dev/null; then
+    echo -e "${GREEN}✓ Quickshell is running - theme will apply automatically${NC}"
+else
+    echo -e "${YELLOW}⚠ Quickshell is not running${NC}"
+    echo "Start it with: quickshell &"
 fi
