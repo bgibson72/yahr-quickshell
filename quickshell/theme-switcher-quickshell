@@ -182,8 +182,8 @@ update_gtk_theme() {
             icon_theme="Nordic"
             ;;
         "Eldritch")
-            gtk_theme="Eldritch"
-            icon_theme="Eldritch"
+            gtk_theme="Osaka-Dark"
+            icon_theme="Adwaita"
             ;;
         *)
             # Default fallback
