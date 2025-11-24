@@ -55,11 +55,9 @@ sed -i "/# Date Display/,/position = 0, 120/ s/color = rgba([0-9a-fA-F]\+)/color
 sed -i "/# User label/,/position = 0, -200/ s/color = rgba([0-9a-fA-F]\+)/color = $user_color/" "$HYPRLOCK_CONF"
 sed -i "/font_color = rgba/s/font_color = rgba([0-9a-fA-F]\+)/font_color = $font_color/" "$HYPRLOCK_CONF"
 
-# Update placeholder and fail text colors in spans
-fg_secondary_nohash="${fg_secondary#\#}"
-accent_red_nohash="${accent_red#\#}"
-sed -i "s/##[0-9a-fA-F]\{6\}/$accent_red_nohash/g" "$HYPRLOCK_CONF"
-sed -i "s/foreground=\"##/foreground=\"#/g" "$HYPRLOCK_CONF"
+# Update placeholder and fail text colors in spans (preserve the # in hex colors)
+sed -i "s/foreground=\"#[0-9a-fA-F]\{6\}\"/foreground=\"$fg_secondary\"/g" "$HYPRLOCK_CONF"
+sed -i "s/<span foreground=\"$fg_secondary\"><b>\$FAIL/<span foreground=\"$accent_red\"><b>\$FAIL/g" "$HYPRLOCK_CONF"
 
 echo "✓ Hyprlock colors updated for $theme_name theme"
 echo "  Inner: $inner_color"
