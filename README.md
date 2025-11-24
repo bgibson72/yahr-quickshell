@@ -413,6 +413,54 @@ The Hyprland configuration is modularized for easier maintenance and customizati
 
 The main `hyprland.conf` file sources all these modules, keeping it clean and organized. Edit individual files in `hypr/` to customize specific aspects of your setup without navigating through a large config file.
 
+## Development & Customization
+
+### Bidirectional Sync Scripts
+
+For developers and power users who want to modify configs:
+
+**Working with Live Configs:**
+```bash
+# Make changes directly in ~/.config/
+# When ready to commit, sync changes back to repo:
+./sync-from-live.sh
+
+# Then commit and push:
+git add -A
+git commit -m "Your changes"
+git push
+```
+
+**Testing Repo Changes:**
+```bash
+# Made changes in the repo? Test them in live config:
+./sync-to-live.sh
+
+# Restart affected applications (e.g., quickshell --replace &)
+```
+
+### Key Improvements
+
+**Update Counter (v1.1)**
+- Checks both official repos AND AUR packages
+- Handles pacman lock files properly
+- Uses paru/yay for AUR updates
+- Updates every hour with wake-from-sleep detection
+
+**Theme Synchronization**
+- Hyprlock now syncs with theme changes
+- Starship prompt preserves custom glyphs while updating colors
+- VS Code and VSCodium have separate theme sync
+- All sync scripts use consistent property names
+
+**Application Theming:**
+- Firefox: userChrome.css auto-generation
+- VS Code/VSCodium: workbench color customizations
+- Kitty: dynamic theme switching
+- GTK apps: gsettings + settings.ini sync
+- Starship: color-only updates (preserves formatting)
+- Hyprlock: lock screen colors match theme
+
 ## Contributing
 
 Contributions, issues, and feature requests are welcome!
