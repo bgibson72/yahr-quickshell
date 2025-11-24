@@ -53,11 +53,39 @@ cp "$THEME_FILE" "$TARGET"
 echo -e "${GREEN}✓ Theme switched to: $THEME${NC}"
 echo ""
 
+# Update Hyprland theme source
+# Map Quickshell theme names to Hyprland theme files
+declare -A HYPR_THEME_MAP=(
+    ["catppuccin-mocha"]="Catppuccin"
+    ["gruvbox-dark"]="Gruvbox"
+    ["tokyonight-night"]="TokyoNight"
+    ["dracula"]="Dracula"
+    ["everforest"]="Everforest"
+    ["nord"]="Nord"
+    ["rosepine"]="RosePine"
+    ["kanagawa"]="Kanagawa"
+    ["nightfox"]="NightFox"
+    ["eldritch"]="Eldritch"
+    ["material"]="Material"
+)
+
+HYPR_THEME="${HYPR_THEME_MAP[$THEME]}"
+if [ -n "$HYPR_THEME" ]; then
+    HYPR_THEME_FILE="$HOME/.config/hypr/themes/${HYPR_THEME}.conf"
+    if [ -f "$HYPR_THEME_FILE" ]; then
+        sed -i "s|^source = .*/themes/.*\.conf|source = $HYPR_THEME_FILE|" "$HOME/.config/hypr/hyprland.conf"
+        echo -e "${GREEN}✓ Hyprland theme updated to: $HYPR_THEME${NC}"
+        # Reload Hyprland config
+        hyprctl reload 2>/dev/null
+    fi
+fi
+
+# Export theme file path for sync scripts to use
+export QUICKSHELL_THEME_FILE="$THEME_FILE"
+
 # Sync Vencord/Vesktop theme
 if [ -f "$HOME/.config/quickshell/sync-vencord-theme.sh" ]; then
     echo "Syncing Vencord theme..."
-    # Wait a moment for Quickshell to update settings.json
-    sleep 1
     "$HOME/.config/quickshell/sync-vencord-theme.sh" --theme-file
     echo -e "${GREEN}✓ Vencord theme synced${NC}"
     

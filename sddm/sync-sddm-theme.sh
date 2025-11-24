@@ -4,29 +4,39 @@
 SDDM_THEME_DIR="/usr/share/sddm/themes/yahr-theme"
 QS_DIR="$HOME/.config/quickshell"
 THEME_CONF="$SDDM_THEME_DIR/theme.conf"
-THEME_MANAGER="$QS_DIR/ThemeManager.qml"
+HYPRLAND_CONF="$HOME/.config/hypr/hyprland.conf"
+HYPR_THEMES_DIR="$HOME/.config/hypr/themes"
 
-# Check if ThemeManager.qml exists
-if [[ ! -f "$THEME_MANAGER" ]]; then
-    echo "Error: ThemeManager.qml not found: $THEME_MANAGER"
+# Get current theme from Hyprland config (most reliable source during theme switches)
+THEME_FILE=$(grep "^source.*themes.*\.conf" "$HYPRLAND_CONF" | sed 's/.*= *//')
+
+if [ -z "$THEME_FILE" ] || [ ! -f "$THEME_FILE" ]; then
+    echo "Error: Could not determine theme file from Hyprland config"
     exit 1
 fi
 
-# Extract theme name and colors directly from ThemeManager.qml
-current_theme=$(grep 'property string themeName:' "$THEME_MANAGER" | sed -E 's/.*"([^"]+)".*/\1/')
+current_theme=$(basename "$THEME_FILE" .conf)
 
-# Parse colors from ThemeManager.qml (using the first accent as themeColor)
-accent_blue=$(grep 'property color accentBlue:' "$THEME_MANAGER" | sed -E 's/.*"([^"]+)".*/\1/' | head -1)
-accent_purple=$(grep 'property color accentPurple:' "$THEME_MANAGER" | sed -E 's/.*"([^"]+)".*/\1/' | head -1)
-fg_primary=$(grep 'property color fgPrimary:' "$THEME_MANAGER" | sed -E 's/.*"([^"]+)".*/\1/' | head -1)
-fg_secondary=$(grep 'property color fgSecondary:' "$THEME_MANAGER" | sed -E 's/.*"([^"]+)".*/\1/' | head -1)
-bg_base=$(grep 'property color bgBase:' "$THEME_MANAGER" | sed -E 's/.*"([^"]+)".*/\1/' | head -1)
-surface0=$(grep 'property color surface0:' "$THEME_MANAGER" | sed -E 's/.*"([^"]+)".*/\1/' | head -1)
+# Extract colors from Hyprland theme file
+get_color() {
+    local color_var="$1"
+    grep "^$color_var" "$THEME_FILE" | sed -E 's/.*= *rgb\(([^)]+)\).*/\1/' | head -1
+}
 
-# Use accentTeal or accentCyan as themeColor if accentBlue doesn't exist
-if [[ -z "$accent_blue" ]]; then
-    accent_blue=$(grep 'property color accent' "$THEME_MANAGER" | grep -E 'Teal|Cyan|Blue' | head -1 | sed -E 's/.*"([^"]+)".*/\1/')
-fi
+accent_blue=$(get_color '\$accent-blue')
+accent_purple=$(get_color '\$accent-purple')
+fg_primary=$(get_color '\$fg-primary')
+fg_secondary=$(get_color '\$fg-secondary')
+bg_base=$(get_color '\$bg-base')
+surface0=$(get_color '\$surface-0')
+
+# Convert RGB hex to #RRGGBB format
+accent_blue="#$accent_blue"
+accent_purple="#$accent_purple"
+fg_primary="#$fg_primary"
+fg_secondary="#$fg_secondary"
+bg_base="#$bg_base"
+surface0="#$surface0"
 
 # Get current wallpaper from swww
 current_wallpaper=""

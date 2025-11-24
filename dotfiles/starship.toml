@@ -1,25 +1,25 @@
 # Starship Prompt Configuration
-# Auto-synced with Quickshell Theme: 
+# Auto-synced with Quickshell Theme: catppuccin-mocha
 
-format = """[](bg:#b8bb26 fg:#282828)[󰣇 ](bg:#282828 fg:#b8bb26)[](fg:#282828 bg:#3c3836)$time[](fg:#3c3836 bg:#282828)$directory[](fg:#282828 bg:#282828)$git_branch$git_status$git_metrics[](fg:#282828 bg:#b8bb26)$character"""
+format = """[](bg:#a6e3a1 fg:#1e1e2e)[󰣇 ](bg:#1e1e2e fg:#a6e3a1)[](fg:#1e1e2e bg:#313244)$time[](fg:#313244 bg:#1e1e2e)$directory[](fg:#1e1e2e bg:#1e1e2e)$git_branch$git_status$git_metrics[](fg:#1e1e2e bg:#a6e3a1)$character"""
 
 [directory]
 format = "[  $path ]($style)"
-style = "fg:#b8bb26 bg:#282828"
+style = "fg:#a6e3a1 bg:#1e1e2e"
 
 [git_branch]
 format = '[ $symbol$branch(:$remote_branch) ]($style)'
 symbol = "  "
-style = "fg:#b8bb26 bg:#282828"
+style = "fg:#a6e3a1 bg:#1e1e2e"
 
 [git_status]
 format = '[$all_status]($style)'
-style = "fg:#b8bb26 bg:#282828"
+style = "fg:#a6e3a1 bg:#1e1e2e"
 
 [git_metrics]
 format = "([+$added]($added_style))[]($added_style)"
-added_style = "fg:#b8bb26 bg:#282828"
-deleted_style = "fg:#b8bb26 bg:#282828"
+added_style = "fg:#a6e3a1 bg:#1e1e2e"
+deleted_style = "fg:#a6e3a1 bg:#1e1e2e"
 disabled = false
 
 [hg_branch]
@@ -28,14 +28,14 @@ symbol = " "
 
 [cmd_duration]
 format = "[ 󱎫 $duration ]($style)"
-style = "fg:#83a598 bg:#3c3836"
+style = "fg:#89b4fa bg:#313244"
 
 [character]
-success_symbol = '[ ➜](bold #282828) '
+success_symbol = '[ ➜](bold #1e1e2e) '
 error_symbol = '[ ✗](bold red) '
 
 [time]
 disabled = false
 time_format = "%R"
-style = "bg:#3c3836"
-format = '[[ 󱑍 $time ](bg:#3c3836 fg:#83a598)]($style)'
+style = "bg:#313244"
+format = '[[ 󱑍 $time ](bg:#313244 fg:#89b4fa)]($style)'

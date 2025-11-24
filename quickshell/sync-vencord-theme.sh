@@ -8,21 +8,17 @@
 QUICKSHELL_SETTINGS="$HOME/.config/quickshell/settings.json"
 HYPR_THEMES_DIR="$HOME/.config/hypr/themes"
 VENCORD_CSS="$HOME/.config/vesktop/settings/settings.json"
+HYPRLAND_CONF="$HOME/.config/hypr/hyprland.conf"
 
-# Get the current theme from quickshell settings
-CURRENT_THEME=$(jq -r '.theme.current' "$QUICKSHELL_SETTINGS" 2>/dev/null)
+# Get current theme from Hyprland config (most reliable source during theme switches)
+THEME_FILE=$(grep "^source.*themes.*\.conf" "$HYPRLAND_CONF" | sed 's/.*= *//')
 
-if [ -z "$CURRENT_THEME" ] || [ "$CURRENT_THEME" = "null" ]; then
-    echo "Error: Could not read current theme from $QUICKSHELL_SETTINGS"
+if [ -z "$THEME_FILE" ] || [ ! -f "$THEME_FILE" ]; then
+    echo "Error: Could not determine theme file from Hyprland config"
     exit 1
 fi
 
-THEME_FILE="$HYPR_THEMES_DIR/${CURRENT_THEME}.conf"
-
-if [ ! -f "$THEME_FILE" ]; then
-    echo "Error: Theme file not found: $THEME_FILE"
-    exit 1
-fi
+CURRENT_THEME=$(basename "$THEME_FILE" .conf)
 
 echo "Syncing theme: $CURRENT_THEME"
 echo "Reading colors from: $THEME_FILE"

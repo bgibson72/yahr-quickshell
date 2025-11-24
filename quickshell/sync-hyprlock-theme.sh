@@ -2,32 +2,39 @@
 
 # Sync Hyprlock Colors with Current Quickshell Theme
 
-THEME_MANAGER="$HOME/.config/quickshell/ThemeManager.qml"
 HYPRLOCK_CONF="$HOME/.config/hypr/hyprlock.conf"
+HYPRLAND_CONF="$HOME/.config/hypr/hyprland.conf"
 
-# Check if ThemeManager exists
-if [[ ! -f "$THEME_MANAGER" ]]; then
-    echo "Error: ThemeManager.qml not found"
+# Get current theme from Hyprland config (most reliable source during theme switches)
+THEME_FILE=$(grep "^source.*themes.*\.conf" "$HYPRLAND_CONF" | sed 's/.*= *//')
+
+if [ -z "$THEME_FILE" ] || [ ! -f "$THEME_FILE" ]; then
+    echo "Error: Could not determine theme file from Hyprland config"
     exit 1
 fi
 
-# Extract theme colors
-theme_name=$(grep 'property string themeName:' "$THEME_MANAGER" | sed -E 's/.*"([^"]+)".*/\1/')
-accent_blue=$(grep 'property color accentBlue:' "$THEME_MANAGER" | sed -E 's/.*"([^"]+)".*/\1/')
-accent_green=$(grep 'property color accentGreen:' "$THEME_MANAGER" | sed -E 's/.*"([^"]+)".*/\1/')
-accent_red=$(grep 'property color accentRed:' "$THEME_MANAGER" | sed -E 's/.*"([^"]+)".*/\1/')
-fg_primary=$(grep 'property color fgPrimary:' "$THEME_MANAGER" | sed -E 's/.*"([^"]+)".*/\1/')
-fg_secondary=$(grep 'property color fgSecondary:' "$THEME_MANAGER" | sed -E 's/.*"([^"]+)".*/\1/')
-fg_tertiary=$(grep 'property color fgTertiary:' "$THEME_MANAGER" | sed -E 's/.*"([^"]+)".*/\1/')
-bg_base=$(grep 'property color bgBase:' "$THEME_MANAGER" | sed -E 's/.*"([^"]+)".*/\1/')
+theme_name=$(basename "$THEME_FILE" .conf)
+
+# Extract colors from Hyprland theme file
+get_color() {
+    local color_var="$1"
+    grep "^$color_var" "$THEME_FILE" | sed -E 's/.*= *rgb\(([^)]+)\).*/\1/' | head -1
+}
+
+accent_blue=$(get_color '\$accent-blue')
+accent_green=$(get_color '\$accent-green')
+accent_red=$(get_color '\$accent-red')
+fg_primary=$(get_color '\$fg-primary')
+fg_secondary=$(get_color '\$fg-secondary')
+fg_tertiary=$(get_color '\$fg-tertiary')
+bg_base=$(get_color '\$bg-base')
 
 echo "Syncing Hyprlock colors for theme: $theme_name"
 
-# Convert #RRGGBB to rgba format for hyprlock
+# Convert RGB hex to rgba format for hyprlock
 hex_to_rgba() {
     local hex=$1
     local alpha=${2:-FF}  # Default to opaque
-    hex=${hex#\#}  # Remove # if present
     echo "rgba(${hex}${alpha})"
 }
 
