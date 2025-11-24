@@ -494,7 +494,7 @@ Rectangle {
         onTriggered: {
             let command = []
             if (pendingAction === "lock") command = ["hyprlock"]
-            else if (pendingAction === "logout") command = ["bash", "-c", "loginctl terminate-user $USER"]
+            else if (pendingAction === "logout") command = ["hyprctl", "dispatch", "exit"]
             else if (pendingAction === "suspend") command = ["systemctl", "suspend"]
             else if (pendingAction === "reboot") command = ["systemctl", "reboot"]
             else if (pendingAction === "shutdown") command = ["systemctl", "poweroff"]

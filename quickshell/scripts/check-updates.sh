@@ -50,7 +50,7 @@ if _checkCommandExists "pacman"; then
     # Get AUR updates if helper is available
     updates_aur=0
     if [ -n "$aur_helper" ]; then
-        updates_aur=$($aur_helper -Qum 2>/dev/null | wc -l)
+        updates_aur=$($aur_helper -Qua 2>/dev/null | wc -l)
     fi
     
     # Total updates
