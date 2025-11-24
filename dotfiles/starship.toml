@@ -1,41 +1,25 @@
 # Starship Prompt Configuration
-# Colors auto-synced via sync-starship-theme.sh using palettes feature
-# Customize the format and glyphs below - they will be preserved across theme changes
+# Auto-synced with Quickshell Theme: 
 
-palette = "quickshell"
-
-format = """
-[](bg:bg_base fg:accent_green)\
-[󰣇 ](bold bg:accent_green fg:bg_base)\
-[](fg:accent_green bg:surface0)\
-$time\
-[](fg:surface0 bg:accent_blue)\
-$directory\
-[](fg:accent_blue bg:accent_yellow)\
-$git_branch\
-$git_status\
-$git_metrics\
-[](fg:accent_yellow bg:bg_base)\
-$character\
-"""
+format = """[](bg:#b8bb26 fg:#282828)[󰣇 ](bg:#282828 fg:#b8bb26)[](fg:#282828 bg:#3c3836)$time[](fg:#3c3836 bg:#282828)$directory[](fg:#282828 bg:#282828)$git_branch$git_status$git_metrics[](fg:#282828 bg:#b8bb26)$character"""
 
 [directory]
-format = "[   $path ]($style)"
-style = "bold fg:bg_base bg:accent_blue"
+format = "[  $path ]($style)"
+style = "fg:#b8bb26 bg:#282828"
 
 [git_branch]
 format = '[ $symbol$branch(:$remote_branch) ]($style)'
 symbol = "  "
-style = "bold fg:bg_base bg:accent_yellow"
+style = "fg:#b8bb26 bg:#282828"
 
 [git_status]
 format = '[$all_status]($style)'
-style = "bold fg:bg_base bg:accent_yellow"
+style = "fg:#b8bb26 bg:#282828"
 
 [git_metrics]
 format = "([+$added]($added_style))[]($added_style)"
-added_style = "bold fg:bg_base bg:accent_yellow"
-deleted_style = "bold fg:bg_base bg:accent_yellow"
+added_style = "fg:#b8bb26 bg:#282828"
+deleted_style = "fg:#b8bb26 bg:#282828"
 disabled = false
 
 [hg_branch]
@@ -44,27 +28,14 @@ symbol = " "
 
 [cmd_duration]
 format = "[ 󱎫 $duration ]($style)"
-style = "bold fg:fg_primary bg:surface1"
+style = "fg:#83a598 bg:#3c3836"
 
 [character]
-success_symbol = '[ ➜](bold accent_green) '
+success_symbol = '[ ➜](bold #282828) '
 error_symbol = '[ ✗](bold red) '
 
 [time]
 disabled = false
 time_format = "%R"
-style = "bg:surface1"
-format = '[[ 󱑍 $time ](bold bg:surface0 fg:accent_cyan)]($style)'
-
-# Palettes section - auto-updated by sync-starship-theme.sh
-# DO NOT manually edit these values, they are synced from ThemeManager.qml
-[palettes.quickshell]
-bg_base = "#2b3339"
-surface0 = "#374247"
-surface1 = "#3d484d"
-fg_primary = "#d3c6aa"
-fg_secondary = "#a7c080"
-accent_green = "#a7c080"
-accent_blue = "#7fbbb3"
-accent_cyan = "#7fbbb3"
-accent_yellow = "#dbbc7f"
+style = "bg:#3c3836"
+format = '[[ 󱑍 $time ](bg:#3c3836 fg:#83a598)]($style)'

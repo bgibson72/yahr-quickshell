@@ -1,20 +1,20 @@
 # Mako Notification Daemon Configuration
-# Theme: Everforest
+# Theme: Gruvbox
 
 # General settings
-font=Maple Mono NF 13
+font=JetBrainsMono Nerd Font 13
 max-visible=5
 sort=-time
 layer=overlay
 anchor=top-right
 margin=8
 padding=12
-border-size=3
+border-size=2
 border-radius=12
-background-color=#2b3339
-text-color=#d3c6aa
-border-color=#7fbbb3
-progress-color=over #7fbbb3
+background-color=#282828
+text-color=#ebdbb2
+border-color=#83a598
+progress-color=over #83a598
 
 # Default timeout
 default-timeout=10000
@@ -29,15 +29,15 @@ group-by=app-name
 
 # Urgency levels
 [urgency=low]
-border-color=#a7c080
+border-color=#b8bb26
 default-timeout=5000
 
 [urgency=normal]
-border-color=#7fbbb3
+border-color=#83a598
 default-timeout=10000
 
 [urgency=critical]
-border-color=#e67e80
+border-color=#fb4934
 default-timeout=0
 
 # Icons

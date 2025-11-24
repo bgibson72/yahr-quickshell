@@ -112,6 +112,12 @@ if [ -x "$HOME/.config/quickshell/sync-gtk-theme.sh" ]; then
     "$HOME/.config/quickshell/sync-gtk-theme.sh"
 fi
 
+# Sync Hyprlock theme
+if [ -x "$HOME/.config/quickshell/sync-hyprlock-theme.sh" ]; then
+    echo "Syncing Hyprlock theme..."
+    "$HOME/.config/quickshell/sync-hyprlock-theme.sh"
+fi
+
 # Sync VSCodium theme
 if [ -x "$HOME/.config/quickshell/sync-vscodium-theme.sh" ]; then
     echo "Syncing VSCodium theme..."

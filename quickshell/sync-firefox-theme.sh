@@ -25,7 +25,7 @@ fi
 mkdir -p "$CHROME_DIR"
 
 # Extract theme colors
-theme_name=$(grep 'property string themeName:' "$THEME_MANAGER" | sed -E 's/.*"([^"]+)".*/\1/')
+theme_name=$(grep 'property string currentTheme:' "$THEME_MANAGER" | sed -E 's/.*"([^"]+)".*/\1/')
 accent_blue=$(grep 'property color accentBlue:' "$THEME_MANAGER" | sed -E 's/.*"([^"]+)".*/\1/')
 accent_cyan=$(grep 'property color accentCyan:' "$THEME_MANAGER" | sed -E 's/.*"([^"]+)".*/\1/')
 accent_green=$(grep 'property color accentGreen:' "$THEME_MANAGER" | sed -E 's/.*"([^"]+)".*/\1/')

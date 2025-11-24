@@ -5,8 +5,8 @@
 
 window {
     margin: 0px;
-    border: 3px solid #89b4fa;
-    background-color: #1e1e2e;
+    border: 3px solid #83a598;
+    background-color: #282828;
     border-radius: 8px;
     outline: none;
 }
@@ -20,20 +20,19 @@ window {
     background-color: transparent;
     border-radius: 0px;
     min-height: 0px;
-    font-size: 1px;
-    opacity: 0;
+    font-size: 0px;
 }
 
 #inner-box {
     margin: 5px;
     border: none;
-    background-color: #1e1e2e;
+    background-color: #282828;
 }
 
 #outer-box {
     margin: 5px;
     border: none;
-    background-color: #1e1e2e;
+    background-color: #282828;
 }
 
 #scroll {
@@ -45,7 +44,7 @@ window {
     margin: 0px;
     padding: 10px 12px;
     border: none;
-    color: #cdd6f4;
+    color: #ebdbb2;
     background-color: transparent;
 } 
 
@@ -58,21 +57,21 @@ window {
 }
 
 #entry:hover {
-    background-color: #89b4fa;
+    background-color: #83a598;
 }
 
 #entry:hover #text {
-    color: #1e1e2e;
+    color: #282828;
     font-weight: 600;
 }
 
 #entry:selected {
-    background-color: #89b4fa;
+    background-color: #83a598;
     border: none;
     outline: none;
 }
 
 #entry:selected #text {
-    color: #1e1e2e;
+    color: #282828;
     font-weight: 600;
 }

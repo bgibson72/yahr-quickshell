@@ -1,104 +1,69 @@
 #!/bin/bash
 
-# Sync Starship Prompt Colors with Current Quickshell Theme
-# Reads colors from ThemeManager.qml and updates starship.toml
+# Sync Starship Prompt Colors with Current Quickshell Theme  
+# Only replaces hex color values - preserves ALL glyphs and formatting
 
 THEME_MANAGER="$HOME/.config/quickshell/ThemeManager.qml"
 STARSHIP_CONFIG="$HOME/.config/starship.toml"
-STARSHIP_BACKUP="$HOME/.config/starship.toml.backup"
 
-# Check if ThemeManager exists
-if [[ ! -f "$THEME_MANAGER" ]]; then
-    echo "Error: ThemeManager.qml not found at $THEME_MANAGER"
-    exit 1
-fi
-
-# Extract theme colors
-theme_name=$(grep 'property string themeName:' "$THEME_MANAGER" | sed -E 's/.*"([^"]+)".*/\1/')
+# Extract theme name and colors
+theme_name=$(grep 'property string currentTheme:' "$THEME_MANAGER" | sed -E 's/.*"([^"]+)".*/\1/')
 accent_blue=$(grep 'property color accentBlue:' "$THEME_MANAGER" | sed -E 's/.*"([^"]+)".*/\1/')
 accent_cyan=$(grep 'property color accentCyan:' "$THEME_MANAGER" | sed -E 's/.*"([^"]+)".*/\1/')
 accent_green=$(grep 'property color accentGreen:' "$THEME_MANAGER" | sed -E 's/.*"([^"]+)".*/\1/')
 accent_yellow=$(grep 'property color accentYellow:' "$THEME_MANAGER" | sed -E 's/.*"([^"]+)".*/\1/')
 fg_primary=$(grep 'property color fgPrimary:' "$THEME_MANAGER" | sed -E 's/.*"([^"]+)".*/\1/')
-fg_secondary=$(grep 'property color fgSecondary:' "$THEME_MANAGER" | sed -E 's/.*"([^"]+)".*/\1/')
 bg_base=$(grep 'property color bgBase:' "$THEME_MANAGER" | sed -E 's/.*"([^"]+)".*/\1/')
 surface0=$(grep 'property color surface0:' "$THEME_MANAGER" | sed -E 's/.*"([^"]+)".*/\1/')
-surface1=$(grep 'property color surface1:' "$THEME_MANAGER" | sed -E 's/.*"([^"]+)".*/\1/')
-
-# Fallback to cyan if blue doesn't exist
-if [[ -z "$accent_blue" ]]; then
-    accent_blue="$accent_cyan"
-fi
 
 echo "Syncing Starship colors for theme: $theme_name"
 
-# Backup existing config
-if [[ -f "$STARSHIP_CONFIG" ]]; then
-    cp "$STARSHIP_CONFIG" "$STARSHIP_BACKUP"
-fi
+# Backup with timestamp
+cp "$STARSHIP_CONFIG" "$STARSHIP_CONFIG.backup-$(date +%Y%m%d-%H%M%S)"
 
-# Create new starship config with theme colors
-cat > "$STARSHIP_CONFIG" << EOF
-# Starship Prompt Configuration
-# Auto-synced with Quickshell Theme: $theme_name
+# Use Python to intelligently replace colors by frequency
+python3 << PYTHON_EOF
+import re
+from collections import Counter
 
-format = """\
-[](bg:$bg_base fg:$accent_green)\
-[󰣇 ](bg:$accent_green fg:$bg_base)\
-[](fg:$accent_green bg:$surface0)\
-\$time\
-[](fg:$surface0 bg:$accent_blue)\
-\$directory\
-[](fg:$accent_blue bg:$accent_yellow)\
-\$git_branch\
-\$git_status\
-\$git_metrics\
-[](fg:$accent_yellow bg:$bg_base)\
-\$character\
-"""
+with open("$STARSHIP_CONFIG", 'r') as f:
+    content = f.read()
 
-[directory]
-format = "[  \$path ](\$style)"
-style = "fg:$bg_base bg:$accent_blue"
+# Find all hex colors and count frequency
+hex_colors = re.findall(r'#[0-9a-fA-F]{6}', content)
+color_freq = Counter(hex_colors)
 
-[git_branch]
-format = '[ \$symbol\$branch(:\$remote_branch) ](\$style)'
-symbol = "  "
-style = "fg:$bg_base bg:$accent_yellow"
+# Sort by frequency (most common first)
+sorted_colors = [c for c, _ in color_freq.most_common()]
 
-[git_status]
-format = '[\$all_status](\$style)'
-style = "fg:$bg_base bg:$accent_yellow"
+# Map old colors to new colors based on typical usage
+# Most frequent = background, then accents in order of usage
+color_map = {}
+new_colors = ["$bg_base", "$accent_green", "$surface0", "$accent_blue", "$accent_yellow", "$accent_cyan", "$fg_primary"]
 
-[git_metrics]
-format = "([+\$added](\$added_style))[](\$added_style)"
-added_style = "fg:$bg_base bg:$accent_yellow"
-deleted_style = "fg:$bg_base bg:$accent_yellow"
-disabled = false
+for i, old_color in enumerate(sorted_colors):
+    if i < len(new_colors):
+        color_map[old_color] = new_colors[i]
 
-[hg_branch]
-format = "[ \$symbol\$branch ](\$style)"
-symbol = " "
+# Replace all occurrences
+for old, new in color_map.items():
+    content = content.replace(old, new)
 
-[cmd_duration]
-format = "[ 󱎫 \$duration ](\$style)"
-style = "fg:$fg_primary bg:$surface1"
+# Update theme name in comment
+content = re.sub(r'# Auto-synced with Quickshell Theme: .*', 
+                 f'# Auto-synced with Quickshell Theme: $theme_name', 
+                 content)
 
-[character]
-success_symbol = '[ ➜](bold $accent_green) '
-error_symbol = '[ ✗](bold red) '
+# Write back
+with open("$STARSHIP_CONFIG", 'w') as f:
+    f.write(content)
 
-[time]
-disabled = false
-time_format = "%R"
-style = "bg:$surface1"
-format = '[[ 󱑍 \$time ](bg:$surface0 fg:$accent_cyan)](\$style)'
-EOF
+print("✓ Colors updated (all glyphs preserved)")
+PYTHON_EOF
 
-echo "✓ Starship configuration updated with $theme_name colors"
 echo "  Accent Blue: $accent_blue"
-echo "  Accent Green: $accent_green"
+echo "  Accent Green: $accent_green"  
 echo "  Accent Yellow: $accent_yellow"
 echo "  Accent Cyan: $accent_cyan"
 echo ""
-echo "Restart your terminal or run: source ~/.zshrc"
+echo "Restart terminal to see changes: exec zsh"

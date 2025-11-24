@@ -15,7 +15,7 @@ if [[ ! -f "$THEME_MANAGER" ]]; then
 fi
 
 # Extract current theme name
-theme_name=$(grep 'property string themeName:' "$THEME_MANAGER" | sed -E 's/.*"([^"]+)".*/\1/')
+theme_name=$(grep 'property string currentTheme:' "$THEME_MANAGER" | sed -E 's/.*"([^"]+)".*/\1/')
 
 echo "Syncing GTK theme for: $theme_name"
 

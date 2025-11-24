@@ -78,9 +78,8 @@ Rectangle {
     
     Process {
         id: updateCheckProcess
-        // Check for updates using pacman -Qu (shows only upgradeable packages)
-        // Alternative: use checkupdates from pacman-contrib if installed
-        command: ["sh", "-c", "if command -v checkupdates >/dev/null 2>&1; then checkupdates 2>/dev/null | wc -l; else pacman -Qu 2>/dev/null | wc -l; fi"]
+        // Use dedicated script that checks both official repos and AUR
+        command: [Quickshell.env("HOME") + "/.config/quickshell/scripts/check-updates.sh"]
         running: false
         
         stdout: SplitParser {
