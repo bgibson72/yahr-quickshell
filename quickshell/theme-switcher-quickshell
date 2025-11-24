@@ -679,6 +679,12 @@ EOF
     update_gtk_theme "$theme_name"
     set_theme_wallpaper "$theme_name"
     
+    # Update SDDM theme
+    if [[ -x "$HOME/.config/sddm/sync-sddm-theme.sh" ]]; then
+        echo "Syncing SDDM theme..."
+        "$HOME/.config/sddm/sync-sddm-theme.sh"
+    fi
+    
     # Update fastfetch logo
     if [[ -x "$HOME/.config/fastfetch/update-theme-logo.sh" ]]; then
         echo "Updating fastfetch logo..."
