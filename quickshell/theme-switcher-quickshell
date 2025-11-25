@@ -691,19 +691,43 @@ EOF
         "$HOME/.config/fastfetch/update-theme-logo.sh" > /dev/null 2>&1
     fi
 
+    # Sync Starship prompt colors
+    if [[ -x "$QUICKSHELL_DIR/sync-starship-theme.sh" ]]; then
+        echo "Syncing Starship prompt..."
+        "$QUICKSHELL_DIR/sync-starship-theme.sh" > /dev/null 2>&1
+    fi
+
+    # Sync Firefox theme colors
+    if [[ -x "$QUICKSHELL_DIR/sync-firefox-theme.sh" ]]; then
+        echo "Syncing Firefox theme..."
+        "$QUICKSHELL_DIR/sync-firefox-theme.sh" > /dev/null 2>&1
+    fi
+
+    # Sync VS Code theme colors
+    if [[ -x "$QUICKSHELL_DIR/sync-vscode-theme.sh" ]]; then
+        echo "Syncing VS Code theme..."
+        "$QUICKSHELL_DIR/sync-vscode-theme.sh" > /dev/null 2>&1
+    fi
+
     # Sync VSCodium theme colors
     if [[ -x "$QUICKSHELL_DIR/sync-vscodium-theme.sh" ]]; then
         echo "Syncing VSCodium theme..."
-        "$QUICKSHELL_DIR/sync-vscodium-theme.sh"
+        "$QUICKSHELL_DIR/sync-vscodium-theme.sh" > /dev/null 2>&1
+    fi
+
+    # Sync Bento browser start page
+    if [[ -x "$QUICKSHELL_DIR/sync-bento-theme.sh" ]]; then
+        echo "Syncing Bento start page..."
+        "$QUICKSHELL_DIR/sync-bento-theme.sh" > /dev/null 2>&1
     fi
     
     # Save current theme
     echo "$theme_name" > "$CURRENT_THEME_FILE"
     
     echo "Theme applied successfully: $theme_name"
-    echo "Updated: Quickshell, Hyprland, wofi, kitty, mako, hyprlock, GTK theme, wallpaper, VSCodium"
+    echo "Updated: Quickshell, Hyprland, wofi, kitty, mako, hyprlock, GTK theme, wallpaper, Starship, Firefox, VS Code, VSCodium, Bento"
     echo "GTK applications (Thunar, gnome-text-editor, waypaper) will now use matching theme"
-    echo "Restart VSCodium to see the new color scheme"
+    echo "Restart terminal (exec zsh) and Firefox/VS Code/VSCodium to see the new color scheme"
 }
 
 # Show wofi theme selector

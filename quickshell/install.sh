@@ -86,6 +86,55 @@ fi
 
 echo ""
 echo "========================================="
+echo "  Optional Components                   "
+echo "========================================="
+echo ""
+
+# Ask about Bento browser start page
+read -p "Do you want to install the Bento browser start page? (y/n) " -n 1 -r
+echo
+if [[ $REPLY =~ ^[Yy]$ ]]; then
+    BENTO_DIR="$HOME/bento"
+    
+    if [ -d "$BENTO_DIR" ]; then
+        echo "⚠️  Bento directory already exists at $BENTO_DIR"
+        read -p "Do you want to overwrite it? (y/n) " -n 1 -r
+        echo
+        if [[ $REPLY =~ ^[Yy]$ ]]; then
+            echo "Backing up existing Bento..."
+            mv "$BENTO_DIR" "${BENTO_DIR}.backup-$(date +%Y%m%d-%H%M%S)"
+        else
+            echo "Skipping Bento installation"
+            SKIP_BENTO=true
+        fi
+    fi
+    
+    if [ "$SKIP_BENTO" != "true" ]; then
+        echo "Installing Bento browser start page..."
+        
+        # Clone or copy Bento (assuming it's in the repo)
+        SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+        REPO_BENTO="$(dirname "$SCRIPT_DIR")/bento"
+        
+        if [ -d "$REPO_BENTO" ]; then
+            cp -r "$REPO_BENTO" "$BENTO_DIR"
+            echo "✓ Bento installed to $BENTO_DIR"
+            echo ""
+            echo "  To use it, set your browser's homepage to:"
+            echo "  file://$BENTO_DIR/index.html"
+            echo ""
+            echo "  The start page colors will automatically sync with your theme!"
+        else
+            echo "⚠️  Bento directory not found in repository"
+            echo "  Skipping Bento installation"
+        fi
+    fi
+else
+    echo "Skipping Bento browser start page"
+fi
+
+echo ""
+echo "========================================="
 echo "  Testing Quickshell                    "
 echo "========================================="
 echo ""
@@ -120,5 +169,14 @@ echo ""
 echo "4. Restart Hyprland or run manually:"
 echo "   killall waybar && quickshell &"
 echo ""
+
+if [ -d "$HOME/bento" ] && [ "$SKIP_BENTO" != "true" ]; then
+    echo "5. Set your browser homepage to the Bento start page:"
+    echo "   file://$HOME/bento/index.html"
+    echo ""
+    echo "   The start page will automatically update colors when you switch themes!"
+    echo ""
+fi
+
 echo "📖 See ~/.config/quickshell/README.md for more information"
 echo ""
