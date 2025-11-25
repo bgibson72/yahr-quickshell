@@ -160,8 +160,24 @@ check_dependencies() {
             echo "  - $dep"
         done
         echo ""
-        print_info "Please install the missing dependencies and run this script again."
-        exit 1
+        print_warning "Would you like to install missing dependencies now?"
+        read -p "Install with paru/yay? (y/n) " -n 1 -r
+        echo
+        if [[ $REPLY =~ ^[Yy]$ ]]; then
+            # Try paru first, then yay
+            if command_exists "paru"; then
+                paru -S --needed ${missing_deps[@]}
+            elif command_exists "yay"; then
+                yay -S --needed ${missing_deps[@]}
+            else
+                print_error "No AUR helper found (paru or yay required)"
+                print_info "Please install dependencies manually and run this script again."
+                exit 1
+            fi
+        else
+            print_info "Please install the missing dependencies and run this script again."
+            exit 1
+        fi
     fi
     
     print_success "All required dependencies found"

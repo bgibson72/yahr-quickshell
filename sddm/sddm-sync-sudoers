@@ -1,0 +1,15 @@
+# Sudoers rule to allow SDDM theme sync without password
+# Copy this file to /etc/sudoers.d/sddm-sync-yahr
+#
+# Usage:
+#   sudo cp sddm-sync-sudoers /etc/sudoers.d/sddm-sync-yahr
+#   sudo chmod 440 /etc/sudoers.d/sddm-sync-yahr
+#
+# This allows the sync-sddm-theme.sh script to update SDDM theme
+# without prompting for password
+
+# Allow copying wallpaper to SDDM theme directory
+%wheel ALL=(ALL) NOPASSWD: /usr/bin/cp * /usr/share/sddm/themes/yahr-theme/*
+
+# Allow updating theme.conf
+%wheel ALL=(ALL) NOPASSWD: /usr/bin/tee /usr/share/sddm/themes/yahr-theme/theme.conf
