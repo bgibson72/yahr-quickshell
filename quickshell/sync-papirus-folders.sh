@@ -36,16 +36,16 @@ case "$theme_name" in
         folder_color="orange"  # Gruvbox orange (#fe8019)
         ;;
     "material"|"Material")
-        folder_color="cyan"  # Material palenight cyan
+        folder_color="red"  # Material red
         ;;
     "everforest"|"Everforest")
         folder_color="brown"  # Everforest earthy brown
         ;;
     "kanagawa"|"Kanagawa")
-        folder_color="teal"  # Kanagawa teal/cyan
+        folder_color="palebrown"  # Kanagawa pale brown
         ;;
     "nightfox"|"NightFox")
-        folder_color="blue"  # Nightfox blue
+        folder_color="cyan"  # Nightfox cyan
         ;;
     "rosepine"|"RosePine")
         folder_color="pink"  # Rose Pine signature pink
