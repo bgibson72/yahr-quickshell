@@ -38,10 +38,15 @@ PanelWindow {
     }
     
     function loadCurrentTheme() {
+        // Always reload theme from file when showing picker
+        console.log("Loading current theme...")
+        wallpaperModel.clear()  // Clear old wallpapers immediately
         // Read current theme from file
         const themeFile = Quickshell.env("HOME") + "/.config/hypr/.current-theme"
         currentTheme = "TokyoNight" // fallback
         
+        // Force the process to restart
+        themeProcess.running = false
         themeProcess.running = true
     }
     

@@ -32,6 +32,7 @@ Singleton {
             ', Singleton, "wallpaperPickerInstance")
         }
         
+        // Always reload theme when showing, to catch theme changes
         pickerWindow.show()
     }
 }
