@@ -42,7 +42,7 @@ case "$theme_name" in
         folder_color="brown"  # Everforest earthy brown
         ;;
     "kanagawa"|"Kanagawa")
-        folder_color="palebrown"  # Kanagawa pale brown
+        folder_color="paleorange"  # Kanagawa pale orange
         ;;
     "nightfox"|"NightFox")
         folder_color="cyan"  # Nightfox cyan
