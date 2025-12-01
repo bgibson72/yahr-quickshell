@@ -39,7 +39,7 @@ case "$theme_name" in
         folder_color="cyan"  # Material palenight cyan
         ;;
     "everforest"|"Everforest")
-        folder_color="green"  # Everforest green theme
+        folder_color="brown"  # Everforest earthy brown
         ;;
     "kanagawa"|"Kanagawa")
         folder_color="teal"  # Kanagawa teal/cyan
