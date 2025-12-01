@@ -13,7 +13,7 @@
     "width": 15,
     "preserveAspectRatio": true,
     "padding": {
-      "top": 1,
+      "top": 0,
       "right": 3
     }
   },
