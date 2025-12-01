@@ -143,52 +143,52 @@ update_gtk_theme() {
     case "$theme_name" in
         "TokyoNight")
             gtk_theme="Tokyonight-Dark"
-            icon_theme="Tokyonight-Dark"
+            icon_theme="Papirus-Dark"
             ;;
         "Catppuccin")
             gtk_theme="Catppuccin-Dark"
-            icon_theme="Catppuccin-Mocha"
+            icon_theme="Papirus-Dark"
             ;;
         "Gruvbox")
             gtk_theme="Gruvbox-Dark"
-            icon_theme="Gruvbox-Dark"
+            icon_theme="Papirus-Dark"
             ;;
         "Material")
             gtk_theme="Material-Dark-Palenight"
-            icon_theme="Material - DeepOcean"
+            icon_theme="Papirus-Dark"
             ;;
         "Everforest")
             gtk_theme="Everforest-Dark"
-            icon_theme="Everforest-Dark"
+            icon_theme="Papirus-Dark"
             ;;
         "Kanagawa")
             gtk_theme="Kanagawa-Dark-Dragon"
-            icon_theme="Kanagawa"
+            icon_theme="Papirus-Dark"
             ;;
         "NightFox")
             gtk_theme="Nightfox-Dark-Duskfox"
-            icon_theme="Nightfox - Duskfox"
+            icon_theme="Papirus-Dark"
             ;;
         "RosePine")
             gtk_theme="Rosepine-Dark"
-            icon_theme="Rose-Pine-Moon"
+            icon_theme="Papirus-Dark"
             ;;
         "Dracula")
             gtk_theme="Dracula"
-            icon_theme="Dracula"
+            icon_theme="Papirus-Dark"
             ;;
         "Nord")
             gtk_theme="Nordic"
-            icon_theme="Nordic"
+            icon_theme="Papirus-Dark"
             ;;
         "Eldritch")
             gtk_theme="Osaka-Dark"
-            icon_theme="Adwaita"
+            icon_theme="Papirus-Dark"
             ;;
         *)
             # Default fallback
             gtk_theme="Adwaita-dark"
-            icon_theme="Adwaita"
+            icon_theme="Papirus-Dark"
             ;;
     esac
     
@@ -678,6 +678,12 @@ EOF
     update_hyprlock_theme "$theme_file" "$theme_name"
     update_gtk_theme "$theme_name"
     set_theme_wallpaper "$theme_name"
+    
+    # Sync Papirus folder colors
+    if [[ -x "$QUICKSHELL_DIR/sync-papirus-folders.sh" ]]; then
+        echo "Syncing Papirus folder colors..."
+        "$QUICKSHELL_DIR/sync-papirus-folders.sh" > /dev/null 2>&1
+    fi
     
     # Update SDDM theme
     if [[ -x "$HOME/.config/sddm/sync-sddm-theme.sh" ]]; then
