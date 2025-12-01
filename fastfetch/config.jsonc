@@ -22,8 +22,6 @@
     "pipe": false
   },
   "modules": [
-    
-    "break",
     {
       "type": "host",
       "key": "󰌢",
