@@ -26,7 +26,17 @@ Rectangle {
         
         onClicked: {
             console.log("Updates clicked! Launching updater...")
-            let proc = Quickshell.execDetached(["kitty", "-e", "sh", "-c", "sudo pacman -Syu; echo 'Done - Press enter to exit'; read"])
+            // Use paru or yay if available (handles both official and AUR), otherwise fall back to pacman
+            let updateCmd = ""
+            if (Quickshell.execOutput(["sh", "-c", "command -v paru"]).trim() !== "") {
+                updateCmd = "paru -Syu"
+            } else if (Quickshell.execOutput(["sh", "-c", "command -v yay"]).trim() !== "") {
+                updateCmd = "yay -Syu"
+            } else {
+                updateCmd = "sudo pacman -Syu"
+            }
+            
+            let proc = Quickshell.execDetached(["kitty", "-e", "sh", "-c", updateCmd + "; echo 'Done - Press enter to exit'; read"])
             // Trigger a recheck after a short delay (user might close terminal)
             recheckTimer.start()
         }
