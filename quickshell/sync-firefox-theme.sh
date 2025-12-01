@@ -1,23 +1,19 @@
 #!/bin/bash
 
-# Sync Firefox Theme with Current Hyprland Theme
+# Sync Firefox Theme with Current Quickshell Theme
 # Uses Firefox CSS to apply theme colors
 
-HYPRLAND_CONF="$HOME/.config/hypr/hyprland.conf"
+THEME_MANAGER="$HOME/.config/quickshell/ThemeManager.qml"
 FIREFOX_PROFILE="$HOME/.mozilla/firefox/g9e0jl2u.default-release"
 CHROME_DIR="$FIREFOX_PROFILE/chrome"
 USER_CSS="$CHROME_DIR/userChrome.css"
 USER_CONTENT_CSS="$CHROME_DIR/userContent.css"
 
-# Get current theme from Hyprland config
-THEME_FILE=$(grep "^source.*themes.*\.conf" "$HYPRLAND_CONF" | sed 's/.*= *//')
-
-if [ -z "$THEME_FILE" ] || [ ! -f "$THEME_FILE" ]; then
-    echo "Error: Could not determine theme file from Hyprland config"
+# Check if ThemeManager exists
+if [[ ! -f "$THEME_MANAGER" ]]; then
+    echo "Error: ThemeManager.qml not found at $THEME_MANAGER"
     exit 1
 fi
-
-theme_name=$(basename "$THEME_FILE" .conf)
 
 # Check if Firefox profile exists
 if [[ ! -d "$FIREFOX_PROFILE" ]]; then
@@ -28,22 +24,18 @@ fi
 # Create chrome directory if it doesn't exist
 mkdir -p "$CHROME_DIR"
 
-# Extract colors from Hyprland theme file
-get_color() {
-    local color_var="$1"
-    grep "^$color_var" "$THEME_FILE" | sed -E 's/.*= *rgb\(([^)]+)\).*/\1/' | head -1
-}
-
-accent_blue=$(get_color '\$accent-blue')
-accent_cyan=$(get_color '\$accent-cyan')
-accent_green=$(get_color '\$accent-green')
-accent_red=$(get_color '\$accent-red')
-accent_yellow=$(get_color '\$accent-yellow')
-fg_primary=$(get_color '\$fg-primary')
-fg_secondary=$(get_color '\$fg-secondary')
-bg_base=$(get_color '\$bg-base')
-surface0=$(get_color '\$surface-0')
-surface1=$(get_color '\$surface-1')
+# Extract theme colors
+theme_name=$(grep 'property string currentTheme:' "$THEME_MANAGER" | sed -E 's/.*"([^"]+)".*/\1/')
+accent_blue=$(grep 'property color accentBlue:' "$THEME_MANAGER" | sed -E 's/.*"([^"]+)".*/\1/')
+accent_cyan=$(grep 'property color accentCyan:' "$THEME_MANAGER" | sed -E 's/.*"([^"]+)".*/\1/')
+accent_green=$(grep 'property color accentGreen:' "$THEME_MANAGER" | sed -E 's/.*"([^"]+)".*/\1/')
+accent_red=$(grep 'property color accentRed:' "$THEME_MANAGER" | sed -E 's/.*"([^"]+)".*/\1/')
+accent_yellow=$(grep 'property color accentYellow:' "$THEME_MANAGER" | sed -E 's/.*"([^"]+)".*/\1/')
+fg_primary=$(grep 'property color fgPrimary:' "$THEME_MANAGER" | sed -E 's/.*"([^"]+)".*/\1/')
+fg_secondary=$(grep 'property color fgSecondary:' "$THEME_MANAGER" | sed -E 's/.*"([^"]+)".*/\1/')
+bg_base=$(grep 'property color bgBase:' "$THEME_MANAGER" | sed -E 's/.*"([^"]+)".*/\1/')
+surface0=$(grep 'property color surface0:' "$THEME_MANAGER" | sed -E 's/.*"([^"]+)".*/\1/')
+surface1=$(grep 'property color surface1:' "$THEME_MANAGER" | sed -E 's/.*"([^"]+)".*/\1/')
 
 # Fallback to cyan if blue doesn't exist
 if [[ -z "$accent_blue" ]]; then
@@ -54,18 +46,18 @@ echo "Syncing Firefox theme for: $theme_name"
 
 # Create userChrome.css
 cat > "$USER_CSS" << EOF
-/* Firefox Theme - Auto-synced with Hyprland Theme: $theme_name */
+/* Firefox Theme - Auto-synced with Quickshell Theme: $theme_name */
 
 :root {
-    --bg-base: #$bg_base !important;
-    --surface0: #$surface0 !important;
-    --surface1: #$surface1 !important;
-    --fg-primary: #$fg_primary !important;
-    --fg-secondary: #$fg_secondary !important;
-    --accent-blue: #$accent_blue !important;
-    --accent-green: #$accent_green !important;
-    --accent-red: #$accent_red !important;
-    --accent-yellow: #$accent_yellow !important;
+    --bg-base: $bg_base !important;
+    --surface0: $surface0 !important;
+    --surface1: $surface1 !important;
+    --fg-primary: $fg_primary !important;
+    --fg-secondary: $fg_secondary !important;
+    --accent-blue: $accent_blue !important;
+    --accent-green: $accent_green !important;
+    --accent-red: $accent_red !important;
+    --accent-yellow: $accent_yellow !important;
 }
 
 /* Main toolbar and tab bar background */
@@ -293,17 +285,17 @@ EOF
 
 # Create userContent.css for web page styling (optional - dark pages)
 cat > "$USER_CONTENT_CSS" << EOF
-/* Firefox Content Theme - Auto-synced with Hyprland Theme: $theme_name */
+/* Firefox Content Theme - Auto-synced with Quickshell Theme: $theme_name */
 /* This styles Firefox's internal pages (about:, preferences, etc.) */
 
 @-moz-document url-prefix(about:), url-prefix(chrome://) {
     :root {
-        --bg-base: #$bg_base !important;
-        --surface0: #$surface0 !important;
-        --surface1: #$surface1 !important;
-        --fg-primary: #$fg_primary !important;
-        --fg-secondary: #$fg_secondary !important;
-        --accent-blue: #$accent_blue !important;
+        --bg-base: $bg_base !important;
+        --surface0: $surface0 !important;
+        --surface1: $surface1 !important;
+        --fg-primary: $fg_primary !important;
+        --fg-secondary: $fg_secondary !important;
+        --accent-blue: $accent_blue !important;
     }
     
     body, html {
