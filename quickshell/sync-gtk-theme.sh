@@ -14,60 +14,69 @@ if [[ ! -f "$THEME_MANAGER" ]]; then
     exit 1
 fi
 
-# Extract current theme name
-theme_name=$(grep 'property string currentTheme:' "$THEME_MANAGER" | sed -E 's/.*"([^"]+)".*/\1/')
+# Extract current theme name (check for both themeName and currentTheme properties)
+theme_name=$(grep -E 'property string (themeName|currentTheme):' "$THEME_MANAGER" | sed -E 's/.*"([^"]+)".*/\1/')
 
 echo "Syncing GTK theme for: $theme_name"
 
 # Map Quickshell themes to GTK themes
+# Supports both kebab-case (catppuccin-mocha) and Title Case (Catppuccin Mocha)
 case "$theme_name" in
-    "Everforest")
+    "everforest"|"Everforest")
         gtk_theme="Everforest-Dark"
-        icon_theme="Everforest-Dark"
+        icon_theme="Papirus-Dark"
         ;;
-    "Catppuccin Mocha")
+    "catppuccin-mocha"|"Catppuccin Mocha")
         gtk_theme="Catppuccin-Mocha-Standard-Blue-Dark"
-        icon_theme="Catppuccin-Mocha"
+        icon_theme="Papirus-Dark"
         ;;
-    "Gruvbox")
+    "gruvbox-dark"|"Gruvbox")
         gtk_theme="Gruvbox-Dark"
-        icon_theme="Gruvbox-Dark"
+        icon_theme="Papirus-Dark"
         ;;
-    "Nord")
+    "nord"|"Nord")
         gtk_theme="Nordic"
-        icon_theme="Nordic"
+        icon_theme="Papirus-Dark"
         ;;
-    "Dracula")
+    "dracula"|"Dracula")
         gtk_theme="Dracula"
-        icon_theme="Dracula"
+        icon_theme="Papirus-Dark"
         ;;
-    "Tokyo Night")
+    "tokyonight-night"|"Tokyo Night")
         gtk_theme="Tokyonight-Dark"
-        icon_theme="Tokyonight-Dark"
+        icon_theme="Papirus-Dark"
         ;;
-    "Nightfox Duskfox")
+    "nightfox"|"Nightfox Duskfox")
         gtk_theme="Nightfox-Dark-Duskfox"
-        icon_theme="Nightfox - Duskfox"
+        icon_theme="Papirus-Dark"
         ;;
-    "Rose Pine")
+    "rosepine"|"Rose Pine")
         gtk_theme="Rose-Pine"
-        icon_theme="Rose-Pine-Moon"
+        icon_theme="Papirus-Dark"
         ;;
-    "Solarized Dark")
+    "solarized-dark"|"Solarized Dark")
         gtk_theme="Solarized-Dark"
         icon_theme="Papirus-Dark"
         ;;
-    "Material Palenight")
-        gtk_theme="Material-Palenight"
-        icon_theme="Material - DeepOcean"
+    "material"|"Material"|"Material Palenight")
+        gtk_theme="Material-Dark-Palenight"
+        icon_theme="Papirus-Dark"
         ;;
-    "One Dark")
+    "onedark"|"One Dark")
         gtk_theme="One-Dark"
+        icon_theme="Papirus-Dark"
+        ;;
+    "kanagawa"|"Kanagawa")
+        gtk_theme="Kanagawa"
+        icon_theme="Papirus-Dark"
+        ;;
+    "eldritch"|"Eldritch")
+        gtk_theme="Eldritch"
         icon_theme="Papirus-Dark"
         ;;
     *)
         echo "⚠ No GTK theme mapping for: $theme_name"
-        echo "  Using default: Adwaita-dark"
+        echo "  Using default with Papirus-Dark icons"
         gtk_theme="Adwaita-dark"
         icon_theme="Papirus-Dark"
         ;;

@@ -140,6 +140,12 @@ if [ -x "$HOME/.config/quickshell/sync-gtk-theme.sh" ]; then
     "$HOME/.config/quickshell/sync-gtk-theme.sh"
 fi
 
+# Sync Papirus folder colors
+if [ -x "$HOME/.config/quickshell/sync-papirus-folders.sh" ]; then
+    echo "Syncing Papirus folder colors..."
+    "$HOME/.config/quickshell/sync-papirus-folders.sh" &
+fi
+
 # Sync Hyprlock theme
 if [ -x "$HOME/.config/quickshell/sync-hyprlock-theme.sh" ]; then
     echo "Syncing Hyprlock theme..."
