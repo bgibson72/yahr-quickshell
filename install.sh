@@ -4,17 +4,25 @@
 # This script installs the complete Hyprland + Quickshell setup
 
 set -e  # Exit on error
-set +e  # Temporarily disable for interactive prompts in functions
 
 # Colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
+MAGENTA='\033[0;35m'
+CYAN='\033[0;36m'
 NC='\033[0m' # No Color
 
 # Get the directory where the script is located
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Installation mode (full or minimal)
+INSTALL_MODE="full"
+
+# Track what gets installed for summary
+declare -a INSTALLED_COMPONENTS=()
+declare -a SKIPPED_COMPONENTS=()
 
 # Function to print colored messages
 print_info() {
@@ -41,74 +49,12 @@ print_header() {
     echo ""
 }
 
-# Function to backup existing configs
-backup_config() {
-    local config_path="$1"
-    local config_name="$2"
-    
-    # If config doesn't exist, no backup needed
-    if [ ! -d "$config_path" ] && [ ! -f "$config_path" ]; then
-        return 1
-    fi
-    
-    # Ask user what to do with this specific config
-    echo ""
-    print_warning "Existing $config_name found at: $config_path"
-    echo "  [b] Backup and replace"
-    echo "  [o] Overwrite without backup"
-    echo "  [s] Skip installation of $config_name"
-    echo ""
-    
-    local choice=""
-    while true; do
-        read -p "Choose action (b/o/s): " choice < /dev/tty
-        case $choice in
-            [Bb])
-                local backup_path="${config_path}.backup.$(date +%Y%m%d_%H%M%S)"
-                print_info "Backing up: $config_path -> $backup_path"
-                mv "$config_path" "$backup_path"
-                print_success "Backup created"
-                return 0
-                ;;
-            [Oo])
-                print_warning "Removing existing config without backup"
-                rm -rf "$config_path"
-                return 0
-                ;;
-            [Ss])
-                print_info "Skipping $config_name installation"
-                return 2  # Special return code to skip installation
-                ;;
-            *)
-                print_error "Invalid choice. Please enter b, o, or s."
-                ;;
-        esac
-    done
+print_step() {
+    echo -e "${CYAN}→${NC} $1"
 }
 
-# Function to install a config directory
-install_config() {
-    local source_dir="$1"
-    local target_dir="$2"
-    local config_name="$3"
-    
-    print_info "Installing $config_name..."
-    
-    # Create parent directory if it doesn't exist
-    mkdir -p "$(dirname "$target_dir")"
-    
-    # Backup existing config if it exists and handle user choice
-    backup_config "$target_dir" "$config_name"
-    local backup_result=$?
-    
-    # If user chose to skip (return code 2), don't install
-    if [ $backup_result -eq 2 ]; then
-        return
-    fi
-    
-    # Copy the config
-    cp -r "$source_dir" "$target_dir"
-    print_success "$config_name installed to $target_dir"
+print_step() {
+    echo -e "${CYAN}→${NC} $1"
 }
 
 # Function to check if a command exists
@@ -116,85 +62,267 @@ command_exists() {
     command -v "$1" >/dev/null 2>&1
 }
 
+# Function to install a config directory (no prompts, just overwrite)
+install_config() {
+    local source_dir="$1"
+    local target_dir="$2"
+    local config_name="$3"
+    
+    print_step "Installing $config_name..."
+    
+    # Create parent directory if it doesn't exist
+    mkdir -p "$(dirname "$target_dir")"
+    
+    # Remove existing config and copy new one
+    rm -rf "$target_dir"
+    cp -r "$source_dir" "$target_dir"
+    print_success "$config_name installed"
+    INSTALLED_COMPONENTS+=("$config_name")
+}
+
+# Check if running as root (we shouldn't be)
+check_not_root() {
+    if [ "$EUID" -eq 0 ]; then
+        print_error "Do not run this script as root or with sudo"
+        print_info "The script will request sudo access when needed"
+        exit 1
+    fi
+}
+
+# Pre-flight check - show what will be installed
+preflight_check() {
+    print_header "Pre-Flight Check"
+    
+    print_info "Installation mode: $INSTALL_MODE"
+    echo ""
+    
+    print_info "The following will be installed/configured:"
+    echo ""
+    
+    # Core components (always installed)
+    echo "📦 Core Components:"
+    [ -d "$SCRIPT_DIR/quickshell" ] && echo "  ✓ Quickshell configuration"
+    [ -d "$SCRIPT_DIR/hypr" ] && echo "  ✓ Hyprland configuration"
+    [ -d "$SCRIPT_DIR/kitty" ] && echo "  ✓ Kitty terminal"
+    [ -d "$SCRIPT_DIR/mako" ] && echo "  ✓ Mako notifications"
+    [ -d "$SCRIPT_DIR/Pictures/Wallpapers" ] && echo "  ✓ Wallpapers collection"
+    [ -f "$SCRIPT_DIR/dotfiles/starship.toml" ] && echo "  ✓ Starship prompt"
+    echo ""
+    
+    if [ "$INSTALL_MODE" = "full" ]; then
+        echo "🎨 Additional Components (Full Install):"
+        [ -d "$SCRIPT_DIR/fastfetch" ] && echo "  ✓ Fastfetch system info"
+        [ -d "$SCRIPT_DIR/wofi" ] && echo "  ✓ Wofi launcher (fallback)"
+        [ -d "$SCRIPT_DIR/hypremoji" ] && echo "  ✓ Hypremoji picker"
+        [ -d "$SCRIPT_DIR/firefox" ] && echo "  • Firefox userChrome (optional)"
+        [ -d "$SCRIPT_DIR/nvim" ] && echo "  • Neovim config (optional)"
+        [ -d "$SCRIPT_DIR/vesktop" ] && echo "  • Vesktop/Discord (optional)"
+        [ -d "$SCRIPT_DIR/VSCodium" ] && echo "  • VSCodium (optional)"
+        [ -d "$SCRIPT_DIR/thunar" ] && echo "  • Thunar file manager (optional)"
+        echo ""
+    fi
+    
+    echo "⚙️  System Configuration:"
+    echo "  ✓ Create default settings.json"
+    echo "  ✓ Setup Papirus icon folders"
+    echo "  ✓ Configure sudo for theme switching"
+    echo "  ✓ Initialize wallpaper system"
+    echo "  ✓ Apply default theme (Catppuccin)"
+    echo "  ✓ Make all scripts executable"
+    echo ""
+    
+    print_info "Installation location: ~/.config/"
+    echo ""
+}
+
+# Show installation summary at the end
+show_summary() {
+    print_header "Installation Summary"
+    
+    if [ ${#INSTALLED_COMPONENTS[@]} -gt 0 ]; then
+        print_success "Successfully installed (${#INSTALLED_COMPONENTS[@]} components):"
+        for component in "${INSTALLED_COMPONENTS[@]}"; do
+            echo "  ✓ $component"
+        done
+        echo ""
+    fi
+    
+    if [ ${#SKIPPED_COMPONENTS[@]} -gt 0 ]; then
+        print_info "Skipped components (${#SKIPPED_COMPONENTS[@]}):"
+        for component in "${SKIPPED_COMPONENTS[@]}"; do
+            echo "  ⊝ $component"
+        done
+        echo ""
+    fi
+}
+
 # Check dependencies
 check_dependencies() {
     print_header "Checking Dependencies"
     
-    local missing_deps=()
-    local optional_deps=()
+    local missing_critical=()
+    local missing_recommended=()
+    local aur_helper=""
     
-    # Required dependencies
+    # Detect AUR helper
+    if command_exists "paru"; then
+        aur_helper="paru"
+    elif command_exists "yay"; then
+        aur_helper="yay"
+    else
+        print_error "No AUR helper found (paru or yay required)"
+        print_info "Install yay with:"
+        echo "  sudo pacman -S --needed git base-devel"
+        echo "  git clone https://aur.archlinux.org/yay.git && cd yay && makepkg -si"
+        exit 1
+    fi
+    
+    print_success "Found AUR helper: $aur_helper"
+    
+    # Critical dependencies - must have these
+    print_info "Checking critical dependencies..."
+    
     if ! command_exists "quickshell"; then
-        missing_deps+=("quickshell")
+        missing_critical+=("quickshell-git")
     fi
     
     if ! command_exists "hyprctl"; then
-        missing_deps+=("hyprland")
+        missing_critical+=("hyprland")
     fi
     
-    # Optional but recommended dependencies
     if ! command_exists "kitty"; then
-        optional_deps+=("kitty - terminal emulator")
+        missing_critical+=("kitty")
+    fi
+    
+    if ! command_exists "swww"; then
+        missing_critical+=("swww")
     fi
     
     if ! command_exists "mako"; then
-        optional_deps+=("mako - notification daemon")
+        missing_critical+=("mako")
+    fi
+    
+    if ! command_exists "notify-send"; then
+        missing_critical+=("libnotify")
+    fi
+    
+    if ! command_exists "hyprshot"; then
+        missing_critical+=("hyprshot")
+    fi
+    
+    if ! command_exists "grim"; then
+        missing_critical+=("grim")
+    fi
+    
+    if ! command_exists "slurp"; then
+        missing_critical+=("slurp")
+    fi
+    
+    if ! command_exists "nwg-look"; then
+        missing_critical+=("nwg-look")
+    fi
+    
+    if ! command_exists "papirus-folders"; then
+        missing_critical+=("papirus-folders-git")
+    fi
+    
+    # Check for Papirus icon theme
+    if [ ! -d "/usr/share/icons/Papirus" ] && [ ! -d "/usr/share/icons/Papirus-Dark" ]; then
+        missing_critical+=("papirus-icon-theme")
+    fi
+    
+    # Check for required fonts
+    if ! fc-list | grep -qi "nerd.*font.*symbols"; then
+        missing_critical+=("ttf-nerd-fonts-symbols")
+    fi
+    
+    if ! fc-list | grep -qi "maple"; then
+        missing_critical+=("ttf-maple")
+    fi
+    
+    # Recommended dependencies
+    print_info "Checking recommended dependencies..."
+    
+    if ! command_exists "wireplumber"; then
+        missing_recommended+=("wireplumber pipewire-pulse")
+    fi
+    
+    if ! command_exists "pavucontrol"; then
+        missing_recommended+=("pavucontrol")
+    fi
+    
+    if ! command_exists "blueman-manager"; then
+        missing_recommended+=("blueman")
+    fi
+    
+    if ! command_exists "nmtui"; then
+        missing_recommended+=("networkmanager")
+    fi
+    
+    if ! command_exists "thunar"; then
+        missing_recommended+=("thunar")
+    fi
+    
+    if ! command_exists "firefox"; then
+        missing_recommended+=("firefox")
+    fi
+    
+    if ! command_exists "brightnessctl"; then
+        missing_recommended+=("brightnessctl")
+    fi
+    
+    if ! command_exists "hyprlock"; then
+        missing_recommended+=("hyprlock")
+    fi
+    
+    if ! command_exists "hypridle"; then
+        missing_recommended+=("hypridle")
     fi
     
     if ! command_exists "fastfetch"; then
-        optional_deps+=("fastfetch - system info")
+        missing_recommended+=("fastfetch")
     fi
     
     if ! command_exists "starship"; then
-        optional_deps+=("starship - shell prompt")
+        missing_recommended+=("starship")
     fi
     
-    if ! command_exists "wofi"; then
-        optional_deps+=("wofi - application launcher")
-    fi
-    
-    # Report missing required dependencies
-    if [ ${#missing_deps[@]} -gt 0 ]; then
-        print_error "Missing required dependencies:"
-        for dep in "${missing_deps[@]}"; do
+    # Install critical dependencies
+    if [ ${#missing_critical[@]} -gt 0 ]; then
+        print_error "Missing critical dependencies:"
+        for dep in "${missing_critical[@]}"; do
             echo "  - $dep"
         done
         echo ""
-        print_warning "Would you like to install missing dependencies now?"
-        read -p "Install with paru/yay? (y/n) " -n 1 -r
+        print_info "Installing critical dependencies..."
+        $aur_helper -S --needed ${missing_critical[@]}
+        
+        if [ $? -ne 0 ]; then
+            print_error "Failed to install critical dependencies"
+            exit 1
+        fi
+        print_success "Critical dependencies installed"
+    else
+        print_success "All critical dependencies found"
+    fi
+    
+    # Offer to install recommended dependencies
+    if [ ${#missing_recommended[@]} -gt 0 ]; then
+        print_warning "Missing recommended dependencies:"
+        for dep in "${missing_recommended[@]}"; do
+            echo "  - $dep"
+        done
+        echo ""
+        read -p "Install recommended dependencies? (y/n) " -n 1 -r
         echo
         if [[ $REPLY =~ ^[Yy]$ ]]; then
-            # Try paru first, then yay
-            if command_exists "paru"; then
-                paru -S --needed ${missing_deps[@]}
-            elif command_exists "yay"; then
-                yay -S --needed ${missing_deps[@]}
-            else
-                print_error "No AUR helper found (paru or yay required)"
-                print_info "Please install dependencies manually and run this script again."
-                exit 1
-            fi
+            $aur_helper -S --needed ${missing_recommended[@]}
+            print_success "Recommended dependencies installed"
         else
-            print_info "Please install the missing dependencies and run this script again."
-            exit 1
+            print_info "Skipping recommended dependencies (some features may not work)"
         fi
-    fi
-    
-    print_success "All required dependencies found"
-    
-    # Report missing optional dependencies
-    if [ ${#optional_deps[@]} -gt 0 ]; then
-        print_warning "Missing optional dependencies:"
-        for dep in "${optional_deps[@]}"; do
-            echo "  - $dep"
-        done
-        echo ""
-        print_info "The setup will work without these, but some features may be missing."
-        read -p "Continue anyway? (y/n) " -n 1 -r
-        echo
-        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-            exit 1
-        fi
+    else
+        print_success "All recommended dependencies found"
     fi
 }
 
@@ -205,15 +333,6 @@ install_configs() {
     # Install Quickshell configs
     if [ -d "$SCRIPT_DIR/quickshell" ]; then
         install_config "$SCRIPT_DIR/quickshell" "$HOME/.config/quickshell" "Quickshell"
-        
-        # Make scripts executable
-        if [ -d "$HOME/.config/quickshell/scripts" ]; then
-            chmod +x "$HOME/.config/quickshell/scripts/"*.sh 2>/dev/null || true
-        fi
-        chmod +x "$HOME/.config/quickshell/"*.sh 2>/dev/null || true
-        chmod +x "$HOME/.config/quickshell/theme-switcher-quickshell" 2>/dev/null || true
-        chmod +x "$HOME/.config/quickshell/wallpaper-picker" 2>/dev/null || true
-        chmod +x "$HOME/.config/quickshell/toggle-"* 2>/dev/null || true
     fi
     
     # Install Hyprland configs
@@ -229,54 +348,81 @@ install_configs() {
     # Install Mako configs
     if [ -d "$SCRIPT_DIR/mako" ]; then
         install_config "$SCRIPT_DIR/mako" "$HOME/.config/mako" "Mako"
-        chmod +x "$HOME/.config/mako/"*.sh 2>/dev/null || true
     fi
     
-    # Install Fastfetch configs
-    if [ -d "$SCRIPT_DIR/fastfetch" ]; then
+    # Install Fastfetch configs (full mode only)
+    if [ "$INSTALL_MODE" = "full" ] && [ -d "$SCRIPT_DIR/fastfetch" ]; then
         install_config "$SCRIPT_DIR/fastfetch" "$HOME/.config/fastfetch" "Fastfetch"
-        chmod +x "$HOME/.config/fastfetch/"*.sh 2>/dev/null || true
     fi
     
-    # Install Wofi configs
-    if [ -d "$SCRIPT_DIR/wofi" ]; then
+    # Install Wofi configs (full mode only)
+    if [ "$INSTALL_MODE" = "full" ] && [ -d "$SCRIPT_DIR/wofi" ]; then
         install_config "$SCRIPT_DIR/wofi" "$HOME/.config/wofi" "Wofi"
+    fi
+    
+    # Install Hypremoji configs (full mode only)
+    if [ "$INSTALL_MODE" = "full" ] && [ -d "$SCRIPT_DIR/hypremoji" ]; then
+        install_config "$SCRIPT_DIR/hypremoji" "$HOME/.config/hypremoji" "Hypremoji"
     fi
     
     # Install Wallpapers
     if [ -d "$SCRIPT_DIR/Pictures/Wallpapers" ]; then
-        print_info "Installing wallpapers..."
+        print_step "Installing wallpapers..."
         mkdir -p "$HOME/Pictures"
-        
-        if [ -d "$HOME/Pictures/Wallpapers" ]; then
-            print_warning "Wallpapers directory already exists at $HOME/Pictures/Wallpapers"
-            read -p "Merge wallpapers with existing collection? (y/n) " -n 1 -r
+        cp -r "$SCRIPT_DIR/Pictures/Wallpapers" "$HOME/Pictures/"
+        print_success "Wallpapers installed"
+        INSTALLED_COMPONENTS+=("Wallpapers")
+    fi
+    
+    # Optional components (only in full mode and if user confirms)
+    if [ "$INSTALL_MODE" = "full" ]; then
+        # Install Nvim configs (optional)
+        if [ -d "$SCRIPT_DIR/nvim" ]; then
+            read -p "Install Neovim configuration? (y/n) " -n 1 -r
             echo
             if [[ $REPLY =~ ^[Yy]$ ]]; then
-                cp -rn "$SCRIPT_DIR/Pictures/Wallpapers/"* "$HOME/Pictures/Wallpapers/"
-                print_success "Wallpapers merged (existing files preserved)"
+                install_config "$SCRIPT_DIR/nvim" "$HOME/.config/nvim" "Neovim"
+            else
+                SKIPPED_COMPONENTS+=("Neovim")
             fi
-        else
-            cp -r "$SCRIPT_DIR/Pictures/Wallpapers" "$HOME/Pictures/"
-            print_success "Wallpapers installed to $HOME/Pictures/Wallpapers"
         fi
-    fi
-    
-    # Install Nvim configs (optional)
-    if [ -d "$SCRIPT_DIR/nvim" ]; then
-        read -p "Install Neovim configuration? (y/n) " -n 1 -r
-        echo
-        if [[ $REPLY =~ ^[Yy]$ ]]; then
-            install_config "$SCRIPT_DIR/nvim" "$HOME/.config/nvim" "Neovim"
+        
+        # Install Vesktop configs (optional)
+        if [ -d "$SCRIPT_DIR/vesktop" ]; then
+            read -p "Install Vesktop (Discord) configuration? (y/n) " -n 1 -r
+            echo
+            if [[ $REPLY =~ ^[Yy]$ ]]; then
+                install_config "$SCRIPT_DIR/vesktop" "$HOME/.config/vesktop" "Vesktop"
+            else
+                SKIPPED_COMPONENTS+=("Vesktop")
+            fi
         fi
-    fi
-    
-    # Install Vesktop configs (optional)
-    if [ -d "$SCRIPT_DIR/vesktop" ]; then
-        read -p "Install Vesktop (Discord) configuration? (y/n) " -n 1 -r
-        echo
-        if [[ $REPLY =~ ^[Yy]$ ]]; then
-            install_config "$SCRIPT_DIR/vesktop" "$HOME/.config/vesktop" "Vesktop"
+        
+        # Install VSCodium configs (optional)
+        if [ -d "$SCRIPT_DIR/VSCodium" ]; then
+            read -p "Install VSCodium configuration? (y/n) " -n 1 -r
+            echo
+            if [[ $REPLY =~ ^[Yy]$ ]]; then
+                install_config "$SCRIPT_DIR/VSCodium" "$HOME/.config/VSCodium" "VSCodium"
+            else
+                SKIPPED_COMPONENTS+=("VSCodium")
+            fi
+        fi
+        
+        # Install Thunar configs (optional)
+        if [ -d "$SCRIPT_DIR/thunar" ]; then
+            read -p "Install Thunar configuration? (y/n) " -n 1 -r
+            echo
+            if [[ $REPLY =~ ^[Yy]$ ]]; then
+                install_config "$SCRIPT_DIR/thunar" "$HOME/.config/Thunar" "Thunar"
+                # Also install xfce4 thunar.xml
+                if [ -f "$SCRIPT_DIR/thunar/thunar.xml" ]; then
+                    mkdir -p "$HOME/.config/xfce4/xfconf/xfce-perchannel-xml"
+                    cp "$SCRIPT_DIR/thunar/thunar.xml" "$HOME/.config/xfce4/xfconf/xfce-perchannel-xml/"
+                fi
+            else
+                SKIPPED_COMPONENTS+=("Thunar")
+            fi
         fi
     fi
 }
@@ -292,21 +438,102 @@ install_starship() {
     
     print_info "Installing Starship config..."
     mkdir -p "$HOME/.config"
-    
-    # Handle existing starship config
-    if [ -f "$HOME/.config/starship.toml" ]; then
-        backup_config "$HOME/.config/starship.toml" "Starship"
-        local backup_result=$?
-        
-        # If user chose to skip, return
-        if [ $backup_result -eq 2 ]; then
-            return
-        fi
-    fi
-    
     cp "$SCRIPT_DIR/dotfiles/starship.toml" "$HOME/.config/starship.toml"
     print_success "Starship config installed to $HOME/.config/starship.toml"
-    print_info "Note: The theme switcher expects a [palettes.quickshell] section for theme syncing."
+}
+
+# Setup Papirus folders with sudo permissions
+setup_papirus() {
+    print_header "Setting Up Papirus Folders"
+    
+    if ! command_exists "papirus-folders"; then
+        print_error "papirus-folders not installed - was it skipped during dependency check?"
+        return
+    fi
+    
+    # Create sudoers.d file for passwordless papirus-folders
+    print_info "Configuring passwordless sudo for papirus-folders..."
+    
+    local sudoers_content="$USER ALL=(ALL) NOPASSWD: /usr/bin/papirus-folders"
+    local sudoers_file="/etc/sudoers.d/papirus-folders"
+    
+    # Create temp file with content
+    echo "$sudoers_content" | sudo tee "$sudoers_file" > /dev/null
+    
+    # Set proper permissions (must be 0440)
+    sudo chmod 0440 "$sudoers_file"
+    
+    # Validate sudoers file
+    if sudo visudo -c -f "$sudoers_file" &> /dev/null; then
+        print_success "Sudoers configured for papirus-folders"
+    else
+        print_error "Failed to validate sudoers file"
+        sudo rm -f "$sudoers_file"
+        return 1
+    fi
+    
+    # Set initial Papirus folder color to match default theme
+    print_info "Setting default Papirus folder color..."
+    "$HOME/.config/quickshell/sync-papirus-folders.sh" 2>/dev/null || true
+}
+
+# Create default settings.json
+create_settings() {
+    print_header "Creating Default Settings"
+    
+    local settings_file="$HOME/.config/quickshell/settings.json"
+    
+    if [ -f "$settings_file" ]; then
+        print_info "Settings file already exists, skipping..."
+        return
+    fi
+    
+    print_info "Creating default settings.json..."
+    
+    cat > "$settings_file" << 'EOF'
+{
+  "general": {
+    "clockFormat24hr": false,
+    "showSeconds": false
+  },
+  "systemTray": {
+    "showBatteryDetails": true,
+    "showVolumeDetails": true,
+    "showNetworkDetails": true
+  },
+  "currentTheme": "Catppuccin"
+}
+EOF
+    
+    print_success "Default settings created at $settings_file"
+}
+
+# Make all scripts executable
+fix_permissions() {
+    print_header "Setting Script Permissions"
+    
+    print_info "Making scripts executable..."
+    
+    # Quickshell scripts
+    if [ -d "$HOME/.config/quickshell/scripts" ]; then
+        chmod +x "$HOME/.config/quickshell/scripts/"*.sh 2>/dev/null || true
+    fi
+    chmod +x "$HOME/.config/quickshell/"*.sh 2>/dev/null || true
+    chmod +x "$HOME/.config/quickshell/theme-switcher-quickshell" 2>/dev/null || true
+    chmod +x "$HOME/.config/quickshell/wallpaper-picker" 2>/dev/null || true
+    chmod +x "$HOME/.config/quickshell/toggle-"* 2>/dev/null || true
+    
+    # Mako scripts
+    if [ -d "$HOME/.config/mako" ]; then
+        chmod +x "$HOME/.config/mako/"*.sh 2>/dev/null || true
+    fi
+    
+    # Fastfetch scripts
+    if [ -d "$HOME/.config/fastfetch" ]; then
+        chmod +x "$HOME/.config/fastfetch/"*.sh 2>/dev/null || true
+    fi
+    
+    print_success "Script permissions configured"
 }
 
 # Install Firefox userChrome
@@ -349,9 +576,6 @@ install_firefox() {
     
     print_info "Found Firefox profile: $profile_dir"
     mkdir -p "$profile_dir/chrome"
-    
-    backup_config "$profile_dir/chrome/userChrome.css"
-    
     cp "$SCRIPT_DIR/firefox/userChrome.css" "$profile_dir/chrome/userChrome.css"
     print_success "Firefox userChrome.css installed"
     print_info "Remember to:"
@@ -379,29 +603,245 @@ install_gtk_themes() {
     print_info "The theme switcher will automatically update GTK apps to match your Quickshell theme."
 }
 
-# Post-installation setup
-post_install() {
-    print_header "Post-Installation Setup"
+# Initialize wallpaper system
+initialize_wallpaper() {
+    print_header "Initializing Wallpaper System"
     
-    print_info "Setting up executable permissions..."
-    find "$HOME/.config/quickshell" -type f -name "*.sh" -exec chmod +x {} \;
-    find "$HOME/.config/mako" -type f -name "*.sh" -exec chmod +x {} \;
-    find "$HOME/.config/fastfetch" -type f -name "*.sh" -exec chmod +x {} \;
+    # Check if swww is running
+    if ! pgrep -x swww-daemon > /dev/null; then
+        print_info "Starting swww daemon..."
+        swww-daemon &
+        sleep 2
+    else
+        print_info "swww daemon already running"
+    fi
     
-    print_success "Setup complete!"
+    # Set default wallpaper if available
+    local default_wallpaper="$HOME/Pictures/Wallpapers/catppuccin-macchiato.png"
+    
+    if [ -f "$default_wallpaper" ]; then
+        print_info "Setting default wallpaper..."
+        swww img "$default_wallpaper" --transition-type fade --transition-duration 2
+        print_success "Default wallpaper applied"
+    else
+        # Try to find any wallpaper
+        local any_wallpaper=$(find "$HOME/Pictures/Wallpapers" -type f \( -name "*.png" -o -name "*.jpg" \) | head -n 1)
+        if [ -n "$any_wallpaper" ]; then
+            print_info "Setting wallpaper..."
+            swww img "$any_wallpaper" --transition-type fade --transition-duration 2
+            print_success "Wallpaper applied"
+        else
+            print_warning "No wallpapers found in ~/Pictures/Wallpapers"
+        fi
+    fi
+}
+
+# Apply default theme
+apply_default_theme() {
+    print_header "Applying Default Theme"
+    
+    local switch_theme_script="$HOME/.config/quickshell/switch-theme.sh"
+    
+    if [ ! -f "$switch_theme_script" ]; then
+        print_warning "Theme switcher script not found, skipping theme application"
+        return
+    fi
+    
+    if [ ! -x "$switch_theme_script" ]; then
+        chmod +x "$switch_theme_script"
+    fi
+    
+    print_info "Applying Catppuccin theme..."
+    "$switch_theme_script" Catppuccin
+    
+    if [ $? -eq 0 ]; then
+        print_success "Default theme applied successfully"
+    else
+        print_warning "Theme application may have encountered issues (check manually)"
+    fi
+}
+
+# Test theme switching functionality
+test_theme_switching() {
+    print_header "Testing Theme System"
+    
+    local switch_theme_script="$HOME/.config/quickshell/switch-theme.sh"
+    
+    if [ ! -f "$switch_theme_script" ]; then
+        print_error "Theme switcher script not found"
+        return 1
+    fi
+    
+    print_step "Testing theme switcher..."
+    
+    # Test by checking if ThemeManager.qml exists and has themes
+    local theme_manager="$HOME/.config/quickshell/ThemeManager.qml"
+    if [ ! -f "$theme_manager" ]; then
+        print_error "ThemeManager.qml not found"
+        return 1
+    fi
+    
+    # Count available themes
+    local theme_count=$(grep -c "name:" "$theme_manager" || echo "0")
+    if [ "$theme_count" -gt 0 ]; then
+        print_success "Found $theme_count themes available"
+        print_info "Themes can be switched with Super+T"
+    else
+        print_warning "Could not detect themes in ThemeManager.qml"
+    fi
+    
+    return 0
+}
+
+# Verify Quickshell configuration
+verify_installation() {
+    print_header "Verifying Installation"
+    
+    local errors=0
+    
+    # Check if Quickshell is installed
+    print_step "Checking Quickshell installation..."
+    if command_exists "quickshell"; then
+        print_success "Quickshell is installed"
+    else
+        print_error "Quickshell not found in PATH"
+        ((errors++))
+    fi
+    
+    # Check if shell.qml exists
+    print_step "Checking configuration files..."
+    if [ -f "$HOME/.config/quickshell/shell.qml" ]; then
+        print_success "Main configuration found"
+    else
+        print_error "shell.qml not found"
+        ((errors++))
+    fi
+    
+    # Check if settings.json exists
+    if [ -f "$HOME/.config/quickshell/settings.json" ]; then
+        print_success "Settings file found"
+    else
+        print_warning "settings.json not found (will be created on first run)"
+    fi
+    
+    # Test Quickshell syntax
+    print_step "Testing Quickshell configuration syntax..."
+    if command_exists "quickshell"; then
+        # Run quickshell with --check flag if available, otherwise try brief launch
+        local config_check=$(quickshell -c "$HOME/.config/quickshell/shell.qml" --help 2>&1 | grep -i "check\|test" || echo "")
+        
+        if [ -n "$config_check" ]; then
+            print_info "Running syntax check..."
+            if quickshell --check -c "$HOME/.config/quickshell/shell.qml" 2>/dev/null; then
+                print_success "Configuration syntax is valid"
+            else
+                print_warning "Could not verify syntax (will test on first launch)"
+            fi
+        else
+            print_info "Running brief launch test (will close in 3 seconds)..."
+            timeout 3 quickshell -c "$HOME/.config/quickshell/shell.qml" >/dev/null 2>&1 &
+            local qs_pid=$!
+            sleep 2
+            
+            if ps -p $qs_pid > /dev/null 2>&1; then
+                print_success "Quickshell launched successfully"
+                kill $qs_pid 2>/dev/null || true
+            else
+                print_warning "Quickshell exited (may need Hyprland session)"
+            fi
+        fi
+    fi
+    
+    # Check script permissions
+    print_step "Checking script permissions..."
+    local scripts_executable=0
+    if [ -x "$HOME/.config/quickshell/switch-theme.sh" ]; then
+        ((scripts_executable++))
+    fi
+    if [ -x "$HOME/.config/quickshell/scripts/list-apps.sh" ]; then
+        ((scripts_executable++))
+    fi
+    
+    if [ $scripts_executable -eq 2 ]; then
+        print_success "Scripts are executable"
+    else
+        print_warning "Some scripts may not be executable"
+    fi
     
     echo ""
+    if [ $errors -eq 0 ]; then
+        print_success "Verification complete - no critical errors"
+        return 0
+    else
+        print_warning "Verification found $errors issue(s) - please review"
+        return 1
+    fi
+}
+
+# Configure Hyprland autostart
+configure_hyprland() {
+    print_header "Configuring Hyprland Integration"
+    
+    local hypr_config="$HOME/.config/hypr/hyprland.conf"
+    
+    if [ ! -f "$hypr_config" ]; then
+        print_warning "Hyprland config not found at $hypr_config"
+        return
+    fi
+    
+    # Check if quickshell is already in autostart
+    if grep -q "exec-once.*quickshell" "$hypr_config"; then
+        print_info "Quickshell already configured in Hyprland autostart"
+        return
+    fi
+    
+    print_info "Quickshell autostart is configured in hypr/autostart.conf"
+    print_info "This file is included by hyprland.conf"
+    
+    # Check if autostart.conf is sourced
+    if ! grep -q "source.*autostart.conf" "$hypr_config"; then
+        print_warning "autostart.conf is not sourced in hyprland.conf"
+        read -p "Add source line to hyprland.conf? (y/n) " -n 1 -r
+        echo
+        if [[ $REPLY =~ ^[Yy]$ ]]; then
+            echo "" >> "$hypr_config"
+            echo "# Autostart applications" >> "$hypr_config"
+            echo "source = ~/.config/hypr/autostart.conf" >> "$hypr_config"
+            print_success "Added autostart.conf source to hyprland.conf"
+        fi
+    else
+        print_success "Hyprland is configured to use autostart.conf"
+    fi
+}
+
+# Post-installation setup
+post_install() {
+    print_header "Post-Installation Summary"
+    
+    print_success "Installation completed successfully!"
+    
+    echo ""
+    print_info "What was installed:"
+    echo "  ✓ Quickshell configuration"
+    echo "  ✓ Hyprland configuration"
+    echo "  ✓ Kitty terminal configuration"
+    echo "  ✓ Mako notification daemon configuration"
+    echo "  ✓ Wallpapers collection"
+    echo "  ✓ Default settings and theme"
+    echo "  ✓ All required scripts and permissions"
+    echo ""
+    
     print_info "Next steps:"
     echo "  1. Log out and log back into Hyprland"
     echo "  2. Quickshell should start automatically"
-    echo "  3. Use Super+T to open the theme switcher"
-    echo "  4. Use Super+A to open the app launcher"
-    echo "  5. Use Super+Shift+E to open the power menu"
+    echo "  3. Try switching themes with Super+T"
+    echo "  4. Open app launcher with Super+A"
     echo ""
     print_info "Key bindings:"
     echo "  Super+Q          - Close window"
     echo "  Super+Return     - Terminal (Kitty)"
-    echo "  Super+E          - File manager"
+    echo "  Super+E          - File manager (Thunar)"
+    echo "  Super+B          - Browser (Firefox)"
     echo "  Super+A          - App launcher"
     echo "  Super+T          - Theme switcher"
     echo "  Super+Shift+E    - Power menu"
@@ -412,15 +852,80 @@ post_install() {
     echo ""
 }
 
+# Rollback function in case of failure
+rollback_installation() {
+    print_header "Installation Failed - Rollback"
+    
+    print_error "An error occurred during installation"
+    print_warning "Note: This installer overwrites configs without backup"
+    print_info "You may need to restore from your own backups"
+    
+    echo ""
+    print_info "To try again:"
+    echo "  1. Fix any dependency issues"
+    echo "  2. Re-run: ./install.sh"
+    echo ""
+    
+    exit 1
+}
+
 # Main installation flow
 main() {
+    # Set up error handling
+    trap rollback_installation ERR
+    
     print_header "YAHR Quickshell Installation"
     
-    echo "This script will install the complete Hyprland + Quickshell setup."
+    # Check we're not running as root
+    check_not_root
+    
+    # Show banner
+    echo "Complete Hyprland + Quickshell desktop environment"
+    echo "with unified theme system and modern aesthetics"
     echo ""
-    print_warning "Installation will modify configs in: $HOME/.config/"
+    
+    # Select installation mode
+    print_info "Select installation mode:"
+    echo "  [1] Full - All configs and optional components (recommended)"
+    echo "  [2] Minimal - Core components only (Quickshell, Hyprland, Kitty, Mako)"
     echo ""
-    print_info "You will be prompted for each existing configuration found."
+    read -p "Choose mode (1/2) [1]: " mode_choice
+    
+    case $mode_choice in
+        2)
+            INSTALL_MODE="minimal"
+            print_info "Minimal installation selected"
+            ;;
+        1|"")
+            INSTALL_MODE="full"
+            print_info "Full installation selected"
+            ;;
+        *)
+            print_error "Invalid choice. Using full installation."
+            INSTALL_MODE="full"
+            ;;
+    esac
+    
+    echo ""
+    
+    # Run pre-flight check
+    preflight_check
+    
+    # Warning about overwriting configs
+    print_warning "⚠️  IMPORTANT: Backup your existing configs!"
+    echo ""
+    print_info "This installer will OVERWRITE existing configurations in:"
+    echo "  • ~/.config/quickshell/"
+    echo "  • ~/.config/hypr/"
+    echo "  • ~/.config/kitty/"
+    echo "  • ~/.config/mako/"
+    if [ "$INSTALL_MODE" = "full" ]; then
+        echo "  • ~/.config/fastfetch/"
+        echo "  • ~/.config/wofi/"
+    fi
+    echo "  • ~/.config/starship.toml"
+    echo ""
+    print_warning "If you have custom configs, back them up NOW!"
     echo ""
     read -p "Continue with installation? (y/n) " -n 1 -r
     echo
@@ -429,16 +934,45 @@ main() {
         exit 0
     fi
     
-    # Run installation steps
+    echo ""
+    print_info "Starting installation..."
+    echo ""
+    
+    # Run installation steps in order
     check_dependencies
     install_configs
     install_starship
-    install_firefox
+    create_settings
+    fix_permissions
+    setup_papirus
+    configure_hyprland
+    initialize_wallpaper
+    apply_default_theme
+    test_theme_switching
+    
+    # Optional components (full mode only)
+    if [ "$INSTALL_MODE" = "full" ]; then
+        install_firefox
+    fi
+    
     install_gtk_themes
+    
+    # Verify installation
+    verify_installation
+    
+    # Show summary
+    show_summary
+    
     post_install
     
+    # Disable error trap on successful completion
+    trap - ERR
+    
     echo ""
-    print_success "Installation complete! Enjoy your new setup! 🚀"
+    print_success "✨ Installation complete! Enjoy your new setup! 🚀"
+    echo ""
+    print_info "Please log out and log back in for all changes to take effect."
+    echo ""
 }
 
 # Run main function
