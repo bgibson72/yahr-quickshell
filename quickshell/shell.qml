@@ -174,17 +174,15 @@ ShellRoot {
             anchors {
                 top: true
                 left: true
-                right: true
             }
             
             margins {
-                top: 42  // Position at bottom edge of 42px bar
-                left: (screen.width - 750) / 2  // Center horizontally
-                right: (screen.width - 750) / 2  // Center horizontally
+                top: 42
+                left: modelData.width / 2 - 270
             }
             
-            implicitWidth: 750
-            implicitHeight: shellRoot.calendarVisible ? 420 : 0
+            implicitWidth: 540
+            implicitHeight: 432
             
             color: "transparent"
             exclusiveZone: 0
@@ -222,11 +220,11 @@ ShellRoot {
             }
             
             margins {
-                top: 42  // Position at bottom edge of 42px bar
-                left: 8  // Align with left edge near Arch button
+                top: modelData.height / 2 - 300
+                left: modelData.width / 2 - 500
             }
             
-            implicitWidth: 400
+            implicitWidth: 1000
             implicitHeight: shellRoot.appLauncherVisible ? 600 : 0
             
             color: "transparent"
@@ -262,16 +260,16 @@ ShellRoot {
             
             anchors {
                 top: true
-                right: true
+                left: true
             }
             
             margins {
-                top: 42  // Position at bottom edge of 42px bar
-                right: 8  // Align with right edge near power button
+                top: (modelData.height - 120) / 2
+                left: (modelData.width - 586) / 2
             }
             
-            implicitWidth: 200
-            implicitHeight: shellRoot.powerMenuVisible ? 420 : 0
+            implicitWidth: 586
+            implicitHeight: 120
             
             color: "transparent"
             exclusiveZone: 0

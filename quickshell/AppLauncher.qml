@@ -6,7 +6,7 @@ import Quickshell.Io
 Rectangle {
     id: root
     
-    width: 400
+    width: 1000
     height: 600
     color: ThemeManager.bgBase
     radius: 16
@@ -15,63 +15,82 @@ Rectangle {
     antialiasing: true
     
     property bool isVisible: false
-    property int selectedIndex: -1  // Start with nothing selected
-    property int hoverIndex: -1  // Track mouse hover separately
+    property int selectedIndex: -1
+    property int hoverIndex: -1
+    property string searchText: ""
     
     signal requestClose()
     
     focus: true
     
+    // Filtered model for search
+    ListModel {
+        id: filteredModel
+    }
+    
+    function updateFilteredModel() {
+        filteredModel.clear()
+        const search = searchText.toLowerCase()
+        
+        // Create array for sorting
+        let apps = []
+        for (let i = 0; i < appListModel.count; i++) {
+            const app = appListModel.get(i)
+            if (search === "" || 
+                app.appName.toLowerCase().includes(search) ||
+                app.appDescription.toLowerCase().includes(search)) {
+                apps.push({
+                    appName: app.appName,
+                    appDescription: app.appDescription,
+                    appIcon: app.appIcon,
+                    appCommand: app.appCommand
+                })
+            }
+        }
+        
+        // Sort alphabetically
+        apps.sort((a, b) => a.appName.toLowerCase().localeCompare(b.appName.toLowerCase()))
+        
+        // Add to filtered model
+        for (let app of apps) {
+            filteredModel.append(app)
+        }
+    }
+    
     // Keyboard navigation
-    Keys.onEscapePressed: requestClose()
-    
-    Keys.onUpPressed: {
-        hoverIndex = -1  // Clear hover when using keyboard
-        if (selectedIndex === -1) {
-            selectedIndex = appListModel.count - 1  // Go to last item if nothing selected
-        } else if (selectedIndex > 0) {
-            selectedIndex--
-        }
-        listView.positionViewAtIndex(selectedIndex, ListView.Contain)
-    }
-    
-    Keys.onDownPressed: {
-        hoverIndex = -1  // Clear hover when using keyboard
-        if (selectedIndex === -1) {
-            selectedIndex = 0  // Go to first item if nothing selected
-        } else if (selectedIndex < appListModel.count - 1) {
-            selectedIndex++
-        }
-        listView.positionViewAtIndex(selectedIndex, ListView.Contain)
-    }
-    
-    Keys.onReturnPressed: {
-        if (selectedIndex >= 0 && selectedIndex < appListModel.count) {
-            launchApp(appListModel.get(selectedIndex).appCommand)
+    Keys.onEscapePressed: {
+        if (searchText !== "") {
+            searchText = ""
+            searchField.text = ""
+        } else {
+            requestClose()
         }
     }
     
-    Keys.onEnterPressed: {
-        if (selectedIndex >= 0 && selectedIndex < appListModel.count) {
-            launchApp(appListModel.get(selectedIndex).appCommand)
+    Keys.onPressed: (event) => {
+        // Focus search field on typing
+        if (event.key >= Qt.Key_A && event.key <= Qt.Key_Z && !event.modifiers) {
+            searchField.forceActiveFocus()
         }
     }
     
     // Reset selection when widget becomes visible
     onIsVisibleChanged: {
         if (isVisible) {
-            selectedIndex = -1  // Start with nothing selected
-            hoverIndex = -1  // Reset hover on open
-            root.forceActiveFocus()
-            // Reload apps every time the launcher opens
+            selectedIndex = -1
+            hoverIndex = -1
+            searchText = ""
+            searchField.text = ""
             loadApps()
         }
     }
     
+    onSearchTextChanged: updateFilteredModel()
+    
     // Process to load apps
     Process {
         id: appLoader
-        running: false  // Don't auto-start, we'll trigger it manually
+        running: false
         command: [Quickshell.env("HOME") + "/.config/quickshell/scripts/list-apps.sh"]
         
         stdout: SplitParser {
@@ -91,11 +110,11 @@ Rectangle {
                     }
                 }
                 console.log("Loaded", appListModel.count, "applications")
+                updateFilteredModel()
             }
         }
         
         onRunningChanged: {
-            // When process finishes, reset it for next run
             if (!running) {
                 appLoader.running = false
             }
@@ -104,9 +123,7 @@ Rectangle {
     
     // Function to load/reload applications
     function loadApps() {
-        // Clear existing apps
         appListModel.clear()
-        // Start the process to reload
         appLoader.running = true
     }
     
@@ -117,160 +134,234 @@ Rectangle {
     
     Column {
         anchors.fill: parent
-        anchors.margins: 12
-        spacing: 8
+        anchors.margins: 16
+        spacing: 12
         
-        // Header
+        // Search field
         Rectangle {
-            width: parent.width
-            height: 36
-            color: "transparent"
+            width: parent.width - 48
+            anchors.horizontalCenter: parent.horizontalCenter
+            height: 42
+            color: ThemeManager.surface0
+            radius: 10
+            border.width: 2
+            border.color: searchField.activeFocus ? ThemeManager.accentBlue : "transparent"
             
-            Text {
-                anchors.centerIn: parent
-                text: "Applications"
-                font.family: "Maple Mono NF"
-                font.pixelSize: 14
-                font.weight: Font.Medium
-                color: ThemeManager.fgPrimary
-            }
-            
-            // Close button
-            Rectangle {
-                width: 28
-                height: 28
-                anchors.right: parent.right
-                anchors.verticalCenter: parent.verticalCenter
-                radius: 6
-                color: closeMouseArea.containsMouse ? ThemeManager.accentRed : "transparent"
+            Row {
+                anchors.fill: parent
+                anchors.leftMargin: 12
+                anchors.rightMargin: 12
+                spacing: 10
                 
                 Text {
-                    anchors.centerIn: parent
-                    text: "✕"
-                    font.family: "Maple Mono NF"
-                    font.pixelSize: 16
-                    font.weight: Font.Bold
-                    color: closeMouseArea.containsMouse ? ThemeManager.bgBase : ThemeManager.fgSecondary
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: ""
+                    font.family: "Symbols Nerd Font"
+                    font.pixelSize: 18
+                    color: ThemeManager.fgSecondary
                 }
                 
-                MouseArea {
-                    id: closeMouseArea
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: root.requestClose()
+                TextInput {
+                    id: searchField
+                    width: parent.width - 40
+                    anchors.verticalCenter: parent.verticalCenter
+                    font.family: "Maple Mono NF"
+                    font.pixelSize: 13
+                    color: ThemeManager.fgPrimary
+                    selectionColor: ThemeManager.accentBlue
+                    selectedTextColor: ThemeManager.bgBase
+                    
+                    Text {
+                        anchors.fill: parent
+                        text: "Search applications..."
+                        font: searchField.font
+                        color: ThemeManager.fgTertiary
+                        visible: !searchField.text && !searchField.activeFocus
+                    }
+                    
+                    onTextChanged: root.searchText = text
+                    
+                    Keys.onReturnPressed: {
+                        if (filteredModel.count > 0) {
+                            launchApp(filteredModel.get(0).appCommand)
+                        }
+                    }
+                    Keys.onEnterPressed: {
+                        if (filteredModel.count > 0) {
+                            launchApp(filteredModel.get(0).appCommand)
+                        }
+                    }
                 }
             }
         }
         
-        // Apps list
-        ListView {
-            id: listView
+        // Apps grid with overlay for filtering
+        Item {
             width: parent.width
-            height: parent.height - 44
-            spacing: 8
-            clip: true
+            height: parent.height - 90
             
-            model: ListModel {
-                id: appListModel
-                // Apps will be loaded dynamically from the script
-            }
-            
-            delegate: Rectangle {
-                width: listView.width
-                height: 54
-                color: {
-                    if (root.hoverIndex === index) return ThemeManager.accentBlue
-                    if (root.hoverIndex === -1 && index === root.selectedIndex) return ThemeManager.accentBlue
-                    return ThemeManager.surface1
-                }
-                radius: 12
-                border.width: 2
-                border.color: {
-                    if (root.hoverIndex === index || (root.hoverIndex === -1 && index === root.selectedIndex)) return ThemeManager.accentBlue
-                    return "transparent"
+            // Base grid (all apps)
+            GridView {
+                id: gridView
+                anchors.fill: parent
+                cellWidth: width / 6
+                cellHeight: 120
+                clip: true
+                visible: root.searchText === ""
+                
+                model: ListModel {
+                    id: appListModel
                 }
                 
-                Row {
-                    anchors.fill: parent
-                    anchors.leftMargin: 12
-                    anchors.rightMargin: 12
-                    anchors.topMargin: 8
-                    anchors.bottomMargin: 8
-                    spacing: 12
+                delegate: Item {
+                    width: gridView.cellWidth
+                    height: gridView.cellHeight
                     
-                    Item {
-                        width: 38
-                        height: 38
+                    Column {
+                        anchors.centerIn: parent
+                        spacing: 8
+                        width: parent.width - 12
                         
-                        Image {
-                            id: appIconImage
-                            anchors.fill: parent
-                            sourceSize.width: 38
-                            sourceSize.height: 38
-                            smooth: true
-                            fillMode: Image.PreserveAspectFit
-                            
-                            source: model.appIcon.startsWith('/') ? "file://" + model.appIcon : ""
-                            visible: status === Image.Ready
-                        }
-                        
-                        // Fallback icon if image fails to load
                         Rectangle {
-                            anchors.fill: parent
-                            color: {
-                                if (root.hoverIndex === index) return ThemeManager.bgBase
-                                if (root.hoverIndex === -1 && index === root.selectedIndex) return ThemeManager.bgBase
-                                return ThemeManager.surface2
-                            }
-                            radius: 8
-                            visible: !appIconImage.visible
+                            width: 64
+                            height: 64
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            color: appMouseArea.containsMouse ? ThemeManager.accentBlue : "transparent"
+                            radius: 12
                             
-                            Text {
+                            Behavior on color {
+                                ColorAnimation { duration: 150 }
+                            }
+                            
+                            Item {
                                 anchors.centerIn: parent
-                                text: "󰣆"  // default app icon
-                                font.family: "Symbols Nerd Font"
-                                font.pixelSize: 24
-                                color: {
-                                    if (root.hoverIndex === index) return ThemeManager.accentBlue
-                                    if (root.hoverIndex === -1 && index === root.selectedIndex) return ThemeManager.accentBlue
-                                    return ThemeManager.fgPrimary
+                                width: 48
+                                height: 48
+                                
+                                Image {
+                                    id: appIconImage
+                                    anchors.fill: parent
+                                    sourceSize.width: 48
+                                    sourceSize.height: 48
+                                    smooth: true
+                                    fillMode: Image.PreserveAspectFit
+                                    source: model.appIcon.startsWith('/') ? "file://" + model.appIcon : ""
+                                    visible: status === Image.Ready
+                                }
+                                
+                                Text {
+                                    anchors.centerIn: parent
+                                    text: "󰣆"
+                                    font.family: "Symbols Nerd Font"
+                                    font.pixelSize: 32
+                                    color: appMouseArea.containsMouse ? ThemeManager.bgBase : ThemeManager.fgPrimary
+                                    visible: !appIconImage.visible
                                 }
                             }
                         }
+                        
+                        Text {
+                            width: parent.width
+                            horizontalAlignment: Text.AlignHCenter
+                            text: model.appName
+                            font.family: "Maple Mono NF"
+                            font.pixelSize: 11
+                            font.weight: Font.Medium
+                            color: ThemeManager.fgPrimary
+                            elide: Text.ElideRight
+                            maximumLineCount: 2
+                            wrapMode: Text.WordWrap
+                        }
                     }
                     
-                    Text {
-                        width: parent.width - 62
-                        anchors.verticalCenter: parent.verticalCenter
-                        text: model.appName
-                        font.family: "Maple Mono NF"
-                        font.pixelSize: 14
-                        font.weight: Font.Medium
-                        color: {
-                            if (root.hoverIndex === index) return ThemeManager.bgBase
-                            if (root.hoverIndex === -1 && index === root.selectedIndex) return ThemeManager.bgBase
-                            return ThemeManager.fgPrimary
-                        }
-                        elide: Text.ElideRight
+                    MouseArea {
+                        id: appMouseArea
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: launchApp(model.appCommand)
                     }
                 }
+            }
+            
+            // Filtered grid (search results)
+            GridView {
+                id: filteredGridView
+                anchors.fill: parent
+                cellWidth: width / 6
+                cellHeight: 120
+                clip: true
+                visible: root.searchText !== ""
                 
-                MouseArea {
-                    id: mouseArea
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
+                model: filteredModel
+                
+                delegate: Item {
+                    width: filteredGridView.cellWidth
+                    height: filteredGridView.cellHeight
                     
-                    onEntered: {
-                        root.hoverIndex = index
-                    }
-                    onExited: {
-                        root.hoverIndex = -1
+                    Column {
+                        anchors.centerIn: parent
+                        spacing: 8
+                        width: parent.width - 12
+                        
+                        Rectangle {
+                            width: 64
+                            height: 64
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            color: filteredMouseArea.containsMouse ? ThemeManager.accentBlue : "transparent"
+                            radius: 12
+                            
+                            Behavior on color {
+                                ColorAnimation { duration: 150 }
+                            }
+                            
+                            Item {
+                                anchors.centerIn: parent
+                                width: 48
+                                height: 48
+                                
+                                Image {
+                                    id: filteredIconImage
+                                    anchors.fill: parent
+                                    sourceSize.width: 48
+                                    sourceSize.height: 48
+                                    smooth: true
+                                    fillMode: Image.PreserveAspectFit
+                                    source: model.appIcon.startsWith('/') ? "file://" + model.appIcon : ""
+                                    visible: status === Image.Ready
+                                }
+                                
+                                Text {
+                                    anchors.centerIn: parent
+                                    text: "󰣆"
+                                    font.family: "Symbols Nerd Font"
+                                    font.pixelSize: 32
+                                    color: filteredMouseArea.containsMouse ? ThemeManager.bgBase : ThemeManager.fgPrimary
+                                    visible: !filteredIconImage.visible
+                                }
+                            }
+                        }
+                        
+                        Text {
+                            width: parent.width
+                            horizontalAlignment: Text.AlignHCenter
+                            text: model.appName
+                            font.family: "Maple Mono NF"
+                            font.pixelSize: 11
+                            font.weight: Font.Medium
+                            color: ThemeManager.fgPrimary
+                            elide: Text.ElideRight
+                            maximumLineCount: 2
+                            wrapMode: Text.WordWrap
+                        }
                     }
                     
-                    onClicked: {
-                        launchApp(model.appCommand)
+                    MouseArea {
+                        id: filteredMouseArea
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: launchApp(model.appCommand)
                     }
                 }
             }
@@ -279,10 +370,7 @@ Rectangle {
     
     function launchApp(command) {
         console.log("Launching app:", command)
-        // Close the launcher first
         root.requestClose()
-        
-        // Use a small delay before launching to ensure the window closes properly
         Qt.callLater(() => {
             Quickshell.execDetached(["sh", "-c", command + " &"])
         })
