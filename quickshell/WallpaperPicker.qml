@@ -9,7 +9,7 @@ PanelWindow {
     id: wallpaperWindow
     
     implicitWidth: 1080
-    implicitHeight: 500
+    implicitHeight: 700
     
     visible: false
     color: "transparent"
@@ -120,7 +120,7 @@ PanelWindow {
         id: bgRect
         anchors.centerIn: parent
         width: 1080
-        height: 500
+        height: 700
         color: ThemeManager.surface0
         radius: 24
         border.width: 2
