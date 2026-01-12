@@ -1174,31 +1174,18 @@ initialize_wallpaper() {
 apply_default_theme() {
     print_header "Applying Default Theme"
     
-    local switch_theme_script="$HOME/.config/quickshell/switch-theme.sh"
-    
-    if [ ! -f "$switch_theme_script" ]; then
-        print_warning "Theme switcher script not found, skipping theme application"
-        return
-    fi
-    
-    if [ ! -x "$switch_theme_script" ]; then
-        chmod +x "$switch_theme_script"
-    fi
-    
-    print_info "Applying catppuccin-mocha theme..."
-    "$switch_theme_script" catppuccin-mocha
-    
-    if [ $? -eq 0 ]; then
-        print_success "Default theme applied successfully"
-    else
-        print_warning "Theme application may have encountered issues (check manually)"
-    fi
+    # Skip theme application during installation to avoid Papirus async issues
+    # Theme will be applied automatically on first Quickshell launch
+    print_info "Theme will be applied on first Quickshell launch"
+    print_info "Default theme: catppuccin-mocha"
 }
 
 # Test theme switching functionality
 test_theme_switching() {
     print_header "Testing Theme System"
     
+    # Skip active theme testing during installation to avoid Papirus async issues
+    # Just verify files exist
     local switch_theme_script="$HOME/.config/quickshell/switch-theme.sh"
     
     if [ ! -f "$switch_theme_script" ]; then
@@ -1206,7 +1193,7 @@ test_theme_switching() {
         return 1
     fi
     
-    print_step "Testing theme switcher..."
+    print_step "Verifying theme system files..."
     
     # Test by checking if ThemeManager.qml exists and has themes
     local theme_manager="$HOME/.config/quickshell/ThemeManager.qml"
