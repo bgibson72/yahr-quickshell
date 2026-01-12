@@ -782,6 +782,13 @@ install_gtk_themes() {
 initialize_wallpaper() {
     print_header "Initializing Wallpaper System"
     
+    # Check if we're in a Wayland session
+    if [ -z "$WAYLAND_DISPLAY" ] && [ -z "$HYPRLAND_INSTANCE_SIGNATURE" ]; then
+        print_info "Not in a Wayland session - wallpaper will be initialized on first launch"
+        print_info "The wallpaper system is configured and ready to use"
+        return
+    fi
+    
     # Check if swww is running
     if ! pgrep -x swww-daemon > /dev/null; then
         print_info "Starting swww daemon..."
