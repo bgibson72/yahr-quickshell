@@ -268,6 +268,7 @@ Rectangle {
                         Text {
                             id: weatherIcon
                             text: "⛅"
+                            font.family: "Noto Color Emoji"
                             font.pixelSize: 52
                             anchors.verticalCenter: parent.verticalCenter
                         }

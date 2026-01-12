@@ -13,6 +13,11 @@ Scope {
     property string currentTheme: ""
     property bool isVisible: false
     property string themeBuffer: ""
+    
+    // Loading overlay instance
+    ThemeLoadingOverlay {
+        id: loadingOverlay
+    }
 
     // Process to load theme list
     Process {
@@ -52,10 +57,43 @@ Scope {
 
     function applyTheme(themeName) {
         console.log("Applying theme:", themeName);
+        
+        // Show loading overlay
+        loadingOverlay.show(themeName);
+        
+        // Remove completion marker file before starting
+        Quickshell.execDetached(["rm", "-f", Quickshell.env("HOME") + "/.config/quickshell/.theme-switch-complete"]);
+        
+        // Start theme switch
         Quickshell.execDetached([
             "bash", "-c",
             `. ~/.config/quickshell/theme-switcher-quickshell 2>/dev/null; apply_theme "$HOME/.config/hypr/themes/${themeName}.conf" "${themeName}"`
         ]);
+        
+        // Start completion watcher
+        completionWatcher.running = true;
+    }
+    
+    // File watcher to detect completion
+    Process {
+        id: completionWatcher
+        running: false
+        command: ["bash", "-c", "while [ ! -f ~/.config/quickshell/.theme-switch-complete ]; do sleep 0.2; done; echo 'complete'"]
+        
+        stdout: SplitParser {
+            onRead: data => {
+                if (data.trim() === "complete") {
+                    console.log("Theme switch completed");
+                    loadingOverlay.hide();
+                    completionWatcher.running = false;
+                }
+            }
+        }
+        
+        onExited: {
+            // Ensure overlay is hidden even if process fails
+            loadingOverlay.hide();
+        }
     }
 
     Variants {

@@ -241,8 +241,8 @@ SETTINGSEOF`
             `. ~/.config/quickshell/theme-switcher-quickshell 2>/dev/null; apply_theme "$HOME/.config/hypr/themes/${themeName}.conf" "${themeName}"`
         ])
         
-        // Reload Quickshell to apply theme changes
-        reloadQuickshell()
+        // Theme switch happens in background, no need to reload Quickshell
+        // The theme-switcher-quickshell script handles all necessary updates
     }
     
     ColumnLayout {

@@ -703,6 +703,16 @@ check_dependencies() {
         missing_critical+=("maplemono-cn-unhinted")
     fi
     
+    # Check for emoji font (needed for colored weather icons)
+    if ! fc-list | grep -qi "noto.*color.*emoji"; then
+        missing_critical+=("noto-fonts-emoji")
+    fi
+    
+    # Check for pacseek
+    if ! command_exists "pacseek"; then
+        missing_critical+=("pacseek")
+    fi
+    
     # Recommended dependencies
     print_info "Checking recommended dependencies..."
     
@@ -1203,14 +1213,50 @@ install_gtk_themes() {
     mkdir -p "$HOME/.themes"
     mkdir -p "$HOME/.icons"
     
-    print_info "Common GTK themes that work well with this setup:"
-    echo "  - Everforest-Dark (GTK theme)"
-    echo "  - Gruvbox-Dark (GTK theme)"
-    echo "  - Catppuccin-Mocha (GTK theme)"
-    echo "  - Papirus-Dark (Icon theme)"
-    echo ""
-    print_info "Install these themes from your distribution's package manager or AUR."
-    print_info "The theme switcher will automatically update GTK apps to match your Quickshell theme."
+    # Copy GTK themes from repo
+    if [ -d "$SCRIPT_DIR/quickshell/gtk-themes" ]; then
+        print_step "Installing GTK themes from repository..."
+        cp -r "$SCRIPT_DIR/quickshell/gtk-themes/"* "$HOME/.themes/" 2>/dev/null || true
+        print_success "GTK themes installed to ~/.themes"
+    fi
+    
+    # Configure fontconfig for colored emoji support
+    print_step "Configuring emoji font support..."
+    mkdir -p "$HOME/.config/fontconfig"
+    cat > "$HOME/.config/fontconfig/fonts.conf" << 'EOF'
+<?xml version="1.0"?>
+<!DOCTYPE fontconfig SYSTEM "fonts.dtd">
+<fontconfig>
+  <!-- Use Noto Color Emoji for emoji characters -->
+  <match>
+    <test name="family"><string>sans-serif</string></test>
+    <edit name="family" mode="prepend" binding="strong">
+      <string>Noto Color Emoji</string>
+    </edit>
+  </match>
+  <match>
+    <test name="family"><string>serif</string></test>
+    <edit name="family" mode="prepend" binding="strong">
+      <string>Noto Color Emoji</string>
+    </edit>
+  </match>
+  <match>
+    <test name="family"><string>monospace</string></test>
+    <edit name="family" mode="prepend" binding="strong">
+      <string>Noto Color Emoji</string>
+    </edit>
+  </match>
+</fontconfig>
+EOF
+    print_success "Emoji font configuration created"
+    
+    # Rebuild font cache
+    print_step "Rebuilding font cache..."
+    fc-cache -fv > /dev/null 2>&1
+    print_success "Font cache rebuilt"
+    
+    print_info "Installed GTK themes will automatically sync with your Quickshell theme."
+    print_success "GTK theme system configured"
 }
 
 # Initialize wallpaper system
@@ -1235,6 +1281,21 @@ initialize_wallpaper() {
                 sed -i "s|\"currentWallpaper\": \".*\"|\"currentWallpaper\": \"$random_wallpaper\"|" "$settings_file"
                 print_success "Default wallpaper configured: $(basename "$random_wallpaper")"
             fi
+        fi
+        
+        # Initialize Catppuccin theme as default
+        print_info "Initializing Catppuccin as default theme..."
+        if [ -f "$HOME/.config/hypr/themes/Catppuccin.conf" ]; then
+            # Set in hyprland.conf
+            local hypr_conf="$HOME/.config/hypr/hyprland.conf"
+            if [ -f "$hypr_conf" ]; then
+                sed -i 's|^source.*themes.*\.conf|source = '"$HOME"'/.config/hypr/themes/Catppuccin.conf|' "$hypr_conf" 2>/dev/null || \
+                    echo "source = $HOME/.config/hypr/themes/Catppuccin.conf" >> "$hypr_conf"
+                print_success "Catppuccin theme set in Hyprland config"
+            fi
+            
+            # Mark current theme
+            echo "Catppuccin" > "$HOME/.config/hypr/.current-theme" 2>/dev/null || true
         fi
         
         print_info "The wallpaper system is configured and ready to use"
@@ -1387,6 +1448,121 @@ verify_installation() {
     
     # Always return 0 to not trigger error trap
     return 0
+}
+
+# Install optional extras
+install_extras() {
+    print_header "Optional Extras Installation"
+    
+    print_info "This setup includes configurations for optional applications."
+    print_info "Would you like to install any of these?"
+    echo ""
+    
+    # Neovim
+    if ! command_exists "nvim"; then
+        local neovim_choice="n"
+        if [ "$YOLO_MODE" = true ]; then
+            neovim_choice="y"
+        else
+            read -p "$(echo -e ${CYAN}?${NC}) Install Neovim (AstroVim config included)? (y/n): " neovim_choice
+        fi
+        
+        if [[ "$neovim_choice" =~ ^[Yy]$ ]]; then
+            print_step "Installing Neovim..."
+            if command_exists "paru"; then
+                paru -S --needed neovim
+            elif command_exists "yay"; then
+                yay -S --needed neovim
+            else
+                sudo pacman -S --needed neovim
+            fi
+            print_success "Neovim installed"
+            INSTALLED_COMPONENTS+=("Neovim")
+        else
+            SKIPPED_COMPONENTS+=("Neovim")
+        fi
+    else
+        print_info "Neovim already installed"
+    fi
+    
+    # Vesktop (Discord)
+    if ! command_exists "vesktop"; then
+        local vesktop_choice="n"
+        if [ "$YOLO_MODE" = true ]; then
+            vesktop_choice="y"
+        else
+            read -p "$(echo -e ${CYAN}?${NC}) Install Vesktop (Discord client with Vencord)? (y/n): " vesktop_choice
+        fi
+        
+        if [[ "$vesktop_choice" =~ ^[Yy]$ ]]; then
+            print_step "Installing Vesktop..."
+            if command_exists "paru"; then
+                paru -S --needed vesktop-bin
+            elif command_exists "yay"; then
+                yay -S --needed vesktop-bin
+            fi
+            print_success "Vesktop installed"
+            INSTALLED_COMPONENTS+=("Vesktop")
+        else
+            SKIPPED_COMPONENTS+=("Vesktop")
+        fi
+    else
+        print_info "Vesktop already installed"
+    fi
+    
+    # VS Code variants
+    if ! command_exists "code" && ! command_exists "codium"; then
+        local vscode_choice="4"
+        if [ "$YOLO_MODE" = true ]; then
+            vscode_choice="2"  # Default to VSCodium in YOLO mode
+        else
+            echo ""
+            print_info "Which VS Code variant would you like to install?"
+            echo "  1) Code OSS (Open source, from official repos)"
+            echo "  2) VSCodium (Binary release, no telemetry)"
+            echo "  3) Visual Studio Code (Microsoft build, with telemetry)"
+            echo "  4) None - Skip installation"
+            read -p "$(echo -e ${CYAN}?${NC}) Enter choice (1-4): " vscode_choice
+        fi
+        
+        case "$vscode_choice" in
+            1)
+                print_step "Installing Code OSS..."
+                sudo pacman -S --needed code
+                print_success "Code OSS installed"
+                INSTALLED_COMPONENTS+=("Code OSS")
+                ;;
+            2)
+                print_step "Installing VSCodium..."
+                if command_exists "paru"; then
+                    paru -S --needed vscodium-bin
+                elif command_exists "yay"; then
+                    yay -S --needed vscodium-bin
+                fi
+                print_success "VSCodium installed"
+                INSTALLED_COMPONENTS+=("VSCodium")
+                ;;
+            3)
+                print_step "Installing Visual Studio Code..."
+                if command_exists "paru"; then
+                    paru -S --needed visual-studio-code-bin
+                elif command_exists "yay"; then
+                    yay -S --needed visual-studio-code-bin
+                fi
+                print_success "Visual Studio Code installed"
+                INSTALLED_COMPONENTS+=("VS Code")
+                ;;
+            *)
+                print_info "Skipping VS Code installation"
+                SKIPPED_COMPONENTS+=("VS Code")
+                ;;
+        esac
+    else
+        print_info "VS Code variant already installed"
+    fi
+    
+    echo ""
+    print_success "Optional extras configuration complete"
 }
 
 # Configure Hyprland autostart
@@ -1605,6 +1781,7 @@ main() {
     fi
     
     install_gtk_themes
+    install_extras
     
     # Verify installation
     verify_installation

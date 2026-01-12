@@ -43,7 +43,8 @@ Rectangle {
                     appName: app.appName,
                     appDescription: app.appDescription,
                     appIcon: app.appIcon,
-                    appCommand: app.appCommand
+                    appCommand: app.appCommand,
+                    needsTerminal: app.needsTerminal
                 })
             }
         }
@@ -105,7 +106,8 @@ Rectangle {
                             appName: parts[0],
                             appDescription: parts[1],
                             appIcon: parts[2],
-                            appCommand: parts[3]
+                            appCommand: parts[3],
+                            needsTerminal: parts.length >= 5 ? (parts[4].toLowerCase() === 'true') : false
                         })
                     }
                 }
@@ -183,12 +185,12 @@ Rectangle {
                     
                     Keys.onReturnPressed: {
                         if (filteredModel.count > 0) {
-                            launchApp(filteredModel.get(0).appCommand)
+                            launchApp(filteredModel.get(0).appCommand, filteredModel.get(0).needsTerminal)
                         }
                     }
                     Keys.onEnterPressed: {
                         if (filteredModel.count > 0) {
-                            launchApp(filteredModel.get(0).appCommand)
+                            launchApp(filteredModel.get(0).appCommand, filteredModel.get(0).needsTerminal)
                         }
                     }
                 }
@@ -279,7 +281,7 @@ Rectangle {
                         anchors.fill: parent
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
-                        onClicked: launchApp(model.appCommand)
+                        onClicked: launchApp(model.appCommand, model.needsTerminal)
                     }
                 }
             }
@@ -361,18 +363,23 @@ Rectangle {
                         anchors.fill: parent
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
-                        onClicked: launchApp(model.appCommand)
+                        onClicked: launchApp(model.appCommand, model.needsTerminal)
                     }
                 }
             }
         }
     }
     
-    function launchApp(command) {
-        console.log("Launching app:", command)
+    function launchApp(command, needsTerminal) {
+        console.log("Launching app:", command, "(Terminal:", needsTerminal, ")")
         root.requestClose()
         Qt.callLater(() => {
-            Quickshell.execDetached(["sh", "-c", command + " &"])
+            if (needsTerminal) {
+                // Launch in Kitty terminal
+                Quickshell.execDetached(["kitty", "-e", "sh", "-c", command])
+            } else {
+                Quickshell.execDetached(["sh", "-c", command + " &"])
+            }
         })
     }
 }

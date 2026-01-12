@@ -102,6 +102,7 @@ for dir in "${SEARCH_PATHS[@]}"; do
         comment=$(grep "^Comment=" "$desktop_file" | head -1 | cut -d= -f2-)
         icon=$(grep "^Icon=" "$desktop_file" | head -1 | cut -d= -f2-)
         exec=$(grep "^Exec=" "$desktop_file" | head -1 | cut -d= -f2- | sed 's/%[uUfF]//g' | sed 's/%[cdnNvmki]//g')
+        terminal=$(grep "^Terminal=" "$desktop_file" | head -1 | cut -d= -f2-)
         
         # Skip if no name or exec
         [ -z "$name" ] && continue
@@ -113,8 +114,11 @@ for dir in "${SEARCH_PATHS[@]}"; do
         # Find icon path
         icon_path=$(find_icon "$icon")
         
-        # Output in format: name|comment|icon_path|exec
-        echo "$name|$comment|$icon_path|$exec"
+        # Default terminal to false if not set
+        [ -z "$terminal" ] && terminal="false"
+        
+        # Output in format: name|comment|icon_path|exec|terminal
+        echo "$name|$comment|$icon_path|$exec|$terminal"
         
     done < <(find -L "$dir" -name "*.desktop" -type f 2>/dev/null)
 done | sort -u
