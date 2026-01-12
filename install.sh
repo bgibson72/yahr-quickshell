@@ -150,7 +150,7 @@ preflight_check() {
     echo "  + Setup Papirus icon folders"
     echo "  + Configure sudo for theme switching"
     echo "  + Initialize wallpaper system"
-    echo "  + Apply default theme (Catppuccin)"
+    echo "  + Apply default theme (catppuccin-mocha)"
     echo "  + Make all scripts executable"
     echo ""
     
@@ -1176,8 +1176,8 @@ apply_default_theme() {
         chmod +x "$switch_theme_script"
     fi
     
-    print_info "Applying Catppuccin theme..."
-    "$switch_theme_script" Catppuccin
+    print_info "Applying catppuccin-mocha theme..."
+    "$switch_theme_script" catppuccin-mocha
     
     if [ $? -eq 0 ]; then
         print_success "Default theme applied successfully"
