@@ -200,7 +200,7 @@ PanelWindow {
             Rectangle {
                 width: parent.width
                 height: 680  // Fixed height to ensure 3 rows: 3 * 210 + margins + scrollbar
-                color: ThemeManager.surface1
+                color: "transparent"
                 radius: 16
                 
                 GridView {
