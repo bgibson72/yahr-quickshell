@@ -1251,7 +1251,12 @@ verify_installation() {
     
     # Test Quickshell syntax
     print_step "Testing Quickshell configuration syntax..."
-    if command_exists "quickshell"; then
+    
+    # Skip launch test if not in a Wayland/Hyprland session
+    if [ -z "$WAYLAND_DISPLAY" ] && [ -z "$HYPRLAND_INSTANCE_SIGNATURE" ]; then
+        print_info "Not in Wayland session - skipping Quickshell launch test"
+        print_info "Quickshell will be tested on first launch after entering Hyprland"
+    elif command_exists "quickshell"; then
         # Run quickshell with --check flag if available, otherwise try brief launch
         local config_check=$(quickshell -c "$HOME/.config/quickshell/shell.qml" --help 2>&1 | grep -i "check\|test" || echo "")
         
