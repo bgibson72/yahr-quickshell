@@ -7,6 +7,7 @@ Item {
     id: root
     
     property bool transparentBackground: false
+    property string position: "top"  // "top" or "bottom"
     
     // Load bar settings
     Process {
@@ -26,8 +27,13 @@ Item {
             if (!running && buffer !== "") {
                 try {
                     const settings = JSON.parse(buffer)
-                    if (settings.bar && settings.bar.transparentBackground !== undefined) {
-                        root.transparentBackground = settings.bar.transparentBackground
+                    if (settings.bar) {
+                        if (settings.bar.transparentBackground !== undefined) {
+                            root.transparentBackground = settings.bar.transparentBackground
+                        }
+                        if (settings.bar.position !== undefined) {
+                            root.position = settings.bar.position
+                        }
                     }
                 } catch (e) {
                     console.log("🎨 Error parsing bar settings:", e)

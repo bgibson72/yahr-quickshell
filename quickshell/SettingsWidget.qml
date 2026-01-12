@@ -203,6 +203,7 @@ SETTINGSEOF`
         
         if (root.settings.bar) {
             transparentBackgroundCheck.checked = root.settings.bar.transparentBackground === true
+            barPositionBottomCheck.checked = root.settings.bar.position === "bottom"
         }
     }
     
@@ -1020,6 +1021,53 @@ SETTINGSEOF`
                                 
                                 QtObject {
                                     id: transparentBackgroundCheck
+                                    property bool checked: false
+                                }
+                            }
+                            
+                            // Bar Position Toggle
+                            Row {
+                                spacing: 12
+                                
+                                Rectangle {
+                                    width: 24
+                                    height: 24
+                                    radius: 4
+                                    color: barPositionBottomCheck.checked ? ThemeManager.accentBlue : ThemeManager.surface1
+                                    border.width: 2
+                                    border.color: ThemeManager.accentBlue
+                                    
+                                    Text {
+                                        anchors.centerIn: parent
+                                        text: "✓"
+                                        font.family: "Symbols Nerd Font"
+                                        font.pixelSize: 16
+                                        color: ThemeManager.bgBase
+                                        visible: barPositionBottomCheck.checked
+                                    }
+                                    
+                                    MouseArea {
+                                        anchors.fill: parent
+                                        cursorShape: Qt.PointingHandCursor
+                                        onClicked: {
+                                            barPositionBottomCheck.checked = !barPositionBottomCheck.checked
+                                            if (!root.settings.bar) root.settings.bar = {}
+                                            root.settings.bar.position = barPositionBottomCheck.checked ? "bottom" : "top"
+                                            saveSettings()
+                                        }
+                                    }
+                                }
+                                
+                                Text {
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    text: "Position bar at bottom"
+                                    font.family: "MapleMono NF"
+                                    font.pixelSize: 12
+                                    color: ThemeManager.fgPrimary
+                                }
+                                
+                                QtObject {
+                                    id: barPositionBottomCheck
                                     property bool checked: false
                                 }
                             }

@@ -92,14 +92,17 @@ cd yahr-quickshell
 - **Utilities**: Thunar, Firefox, brightnessctl
 - **Screenshots**: hyprshot, grim, slurp
 - **Tools**: nwg-look (GTK theme manager)
+- **System Info**: fastfetch with themed logos
+- **Fonts**: Noto Color Emoji for colored icons
 
 ### Optional Components (Full Install - User Choice)
-- **Neovim** - Editor with AstroNvim configuration
+- **Neovim** - Editor with AstroVim configuration and 10 synced colorschemes
 - **Vesktop** - Discord client with Vencord theme support
 - **VSCodium** - VS Code alternative with theme integration
-- **Thunar** - File manager with custom configuration
+- **Thunar** - File manager with thumbnail support and custom plugins
 - **Firefox** - Browser with userChrome.css theming
 - **SDDM** - Display manager (login screen) with theme
+- **Pacseek** - Modern TUI package manager with CLI launcher support
 
 ## 🎨 Included Themes
 Switch themes instantly with Super + T. All themes include matching wallpapers and synchronized colors across all applications.
@@ -200,6 +203,8 @@ Switch themes instantly with Super + T. All themes include matching wallpapers a
 <details>
 <summary><b>Settings</b> - Super + Shift + S - Quickshell configuration panel</summary>
 
+Configure weather, clock format, screenshots, system tray visibility, theme selection, bar transparency, and bar position (top/bottom).
+
 ![settings.png](previews/settings.png)
 </details>
 
@@ -221,7 +226,11 @@ Switch themes instantly with Super + T. All themes include matching wallpapers a
 - System tray with audio, network, and updates
 - Notification system with urgency-based styling
 - GTK theme synchronization
+- **Configurable bar position** - Toggle between top and bottom placement
 - **Firefox theme synchronization** - Automatic Firefox UI theming via userChrome.css
+- **Neovim theme synchronization** - AstroVim colorschemes sync with system theme
+- **Fastfetch themed display** - System info with matching logo and colors
+- **CLI app launcher support** - Terminal apps launch correctly from app launcher
 - **Included GTK themes and icons** - Multiple theme-matched GTK themes and icon packs included in quickshell/gtk-themes/ and quickshell/gtk-icons/
 
 ## Hyprland Configuration
@@ -265,7 +274,16 @@ git push
 # Restart affected applications (e.g., quickshell --replace &)
 ```
 
-### Key Improvements
+### Key Features & Recent Improvements
+
+**Latest Updates (v1.2)**
+- **Bar Position Toggle** - Choose top or bottom bar placement in Settings
+- **Neovim Theme Sync** - AstroVim colorschemes now sync with system theme
+- **Enhanced Installer** - Improved package detection, theme initialization, and optional component prompts
+- **Thunar Thumbnails** - Full thumbnail support with tumbler and media plugins
+- **Colored Weather Icons** - Emoji support via fontconfig configuration
+- **CLI App Launcher Support** - Terminal-based apps (like Pacseek) now launch correctly
+- **Fastfetch Integration** - Themed logo display with kitty graphics protocol
 
 **Update Counter (v1.1)**
 - Checks both official repos AND AUR packages
@@ -274,18 +292,14 @@ git push
 - Updates every hour with wake-from-sleep detection
 
 **Theme Synchronization**
-- Hyprlock now syncs with theme changes
-- Starship prompt preserves custom glyphs while updating colors
-- VS Code and VSCodium have separate theme sync
-- All sync scripts use consistent property names
-
-**Application Theming:**
-- Firefox: userChrome.css auto-generation
-- VS Code/VSCodium: workbench color customizations
-- Kitty: dynamic theme switching
-- GTK apps: gsettings + settings.ini sync
-- Starship: color-only updates (preserves formatting)
-- Hyprlock: lock screen colors match theme
+- **Neovim** - 10 colorscheme mappings (Catppuccin, Everforest, Kanagawa, Dracula, Eldritch, Gruvbox, Nightfox, Nord, RosePine, TokyoNight)
+- **Firefox** - Auto-detect profile and generate userChrome.css from theme colors
+- **VS Code/VSCodium** - Separate theme sync with workbench color customizations
+- **Kitty** - Dynamic terminal theme switching
+- **GTK** - Synchronized via gsettings and settings.ini
+- **Starship** - Color-only updates preserving custom glyphs
+- **Hyprlock** - Lock screen colors match active theme
+- **Fastfetch** - Logo updates to match theme
 
 ## Contributing
 

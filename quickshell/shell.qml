@@ -377,8 +377,47 @@ ShellRoot {
             property var modelData
             screen: modelData
             
+            property bool barAtBottom: false
+            
+            // Load bar position setting
+            Process {
+                id: barPositionLoader
+                running: true
+                command: ["sh", "-c", "cat ~/.config/quickshell/settings.json 2>/dev/null || echo '{}'"]
+                
+                property string buffer: ""
+                
+                stdout: SplitParser {
+                    onRead: data => {
+                        barPositionLoader.buffer += data
+                    }
+                }
+                
+                onRunningChanged: {
+                    if (!running && buffer !== "") {
+                        try {
+                            const settings = JSON.parse(buffer)
+                            if (settings.bar && settings.bar.position) {
+                                barAtBottom = settings.bar.position === "bottom"
+                            }
+                        } catch (e) {}
+                        buffer = ""
+                    } else if (running) {
+                        buffer = ""
+                    }
+                }
+            }
+            
+            Timer {
+                interval: 1000
+                running: true
+                repeat: true
+                onTriggered: barPositionLoader.running = true
+            }
+            
             anchors {
-                top: true
+                top: !barAtBottom
+                bottom: barAtBottom
                 left: true
                 right: true
             }
