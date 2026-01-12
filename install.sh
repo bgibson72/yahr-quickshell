@@ -1414,10 +1414,11 @@ post_install() {
     echo ""
     
     print_info "Next steps:"
-    echo "  1. Log out and log back into Hyprland"
-    echo "  2. Quickshell should start automatically"
-    echo "  3. Try switching themes with Super+T"
-    echo "  4. Open app launcher with Super+A"
+    echo "  1. Reboot your system"
+    echo "  2. Log into Hyprland"
+    echo "  3. YahrShell will start automatically"
+    echo "  4. Try switching themes with Super+T"
+    echo "  5. Open app launcher with Super+A"
     echo ""
     print_info "Key bindings:"
     echo "  Super+Q          - Close window"
@@ -1592,30 +1593,27 @@ main() {
     
     print_info "To complete the setup:"
     if [ "$needs_reboot" = true ]; then
-        echo "  1. Reboot your system (required for NVIDIA drivers)"
-        echo "  2. Log into Hyprland"
-        echo "  3. YahrShell will start automatically"
+        echo "  1. Reboot your system (required for GPU drivers to load)"
     else
-        echo "  1. Log out and log into Hyprland"
-        echo "  2. YahrShell will start automatically"
+        echo "  1. Reboot your system (recommended)"
     fi
+    echo "  2. Log into Hyprland"
+    echo "  3. YahrShell will start automatically"
     echo ""
     
     # Prompt for reboot
-    if [ "$needs_reboot" = true ] || [ "$YOLO_MODE" = false ]; then
-        if [ "$YOLO_MODE" = false ]; then
-            read -p "Would you like to reboot now? (y/N) " -n 1 -r
-            echo
-            if [[ $REPLY =~ ^[Yy]$ ]]; then
-                print_info "Rebooting system..."
-                sudo reboot
-            else
-                print_info "Remember to reboot before using Hyprland"
-            fi
+    if [ "$YOLO_MODE" = false ]; then
+        read -p "Would you like to reboot now? (y/N) " -n 1 -r
+        echo
+        if [[ $REPLY =~ ^[Yy]$ ]]; then
+            print_info "Rebooting system..."
+            sudo reboot
         else
-            print_info "YOLO mode: Skipping reboot prompt"
-            print_warning "Please reboot manually before using Hyprland"
+            print_info "Remember to reboot to complete setup"
         fi
+    else
+        print_info "YOLO mode: Skipping reboot prompt"
+        print_warning "Please reboot to complete setup"
     fi
     
     echo ""
