@@ -20,6 +20,9 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # Installation mode (full or minimal)
 INSTALL_MODE="full"
 
+# YOLO mode - unattended installation (auto-answer all prompts)
+YOLO_MODE=false
+
 # Track what gets installed for summary
 declare -a INSTALLED_COMPONENTS=()
 declare -a SKIPPED_COMPONENTS=()
@@ -162,25 +165,31 @@ install_aur_helper() {
     
     print_info "An AUR helper is required to install packages from the Arch User Repository"
     echo ""
-    echo "Available options:"
-    echo "  [1] yay - Popular, feature-rich AUR helper"
-    echo "  [2] paru - Modern, rust-based AUR helper"
-    echo ""
-    read -p "Choose AUR helper (1/2) [1]: " helper_choice
     
     local helper_name=""
-    case $helper_choice in
-        2)
-            helper_name="paru"
-            ;;
-        1|"")
-            helper_name="yay"
-            ;;
-        *)
-            print_error "Invalid choice. Installing yay by default."
-            helper_name="yay"
-            ;;
-    esac
+    if [ "$YOLO_MODE" = true ]; then
+        print_info "YOLO mode: Auto-selecting yay as AUR helper"
+        helper_name="yay"
+    else
+        echo "Available options:"
+        echo "  [1] yay - Popular, feature-rich AUR helper"
+        echo "  [2] paru - Modern, rust-based AUR helper"
+        echo ""
+        read -p "Choose AUR helper (1/2) [1]: " helper_choice
+        
+        case $helper_choice in
+            2)
+                helper_name="paru"
+                ;;
+            1|"")
+                helper_name="yay"
+                ;;
+            *)
+                print_error "Invalid choice. Installing yay by default."
+                helper_name="yay"
+                ;;
+        esac
+    fi
     
     print_info "Installing $helper_name..."
     
@@ -228,25 +237,47 @@ check_dependencies() {
         aur_helper="yay"
     else
         print_warning "No AUR helper found (paru or yay required)"
-        read -p "Install an AUR helper now? (y/n) " -n 1 -r
-        echo
-        if [[ $REPLY =~ ^[Yy]$ ]]; then
-            install_aur_helper
-            # Detect which one was installed
-            if command_exists "paru"; then
-                aur_helper="paru"
-            elif command_exists "yay"; then
+        
+        if [ "$YOLO_MODE" = true ]; then
+            print_info "YOLO mode: Auto-installing yay"
+            # Auto-install yay in YOLO mode
+            print_step "Ensuring base-devel and git are installed..."
+            sudo pacman -S --needed --noconfirm base-devel git
+            local temp_dir=$(mktemp -d)
+            cd "$temp_dir"
+            git clone "https://aur.archlinux.org/yay.git"
+            cd yay
+            makepkg -si --noconfirm
+            cd "$HOME"
+            rm -rf "$temp_dir"
+            
+            if command_exists "yay"; then
                 aur_helper="yay"
             else
-                print_error "AUR helper installation failed"
+                print_error "Failed to install yay"
                 exit 1
             fi
         else
-            print_error "AUR helper is required for installation"
-            print_info "Install manually with:"
-            echo "  sudo pacman -S --needed git base-devel"
-            echo "  git clone https://aur.archlinux.org/yay.git && cd yay && makepkg -si"
-            exit 1
+            read -p "Install an AUR helper now? (y/n) " -n 1 -r
+            echo
+            if [[ $REPLY =~ ^[Yy]$ ]]; then
+                install_aur_helper
+                # Detect which one was installed
+                if command_exists "paru"; then
+                    aur_helper="paru"
+                elif command_exists "yay"; then
+                    aur_helper="yay"
+                else
+                    print_error "AUR helper installation failed"
+                    exit 1
+                fi
+            else
+                print_error "AUR helper is required for installation"
+                print_info "Install manually with:"
+                echo "  sudo pacman -S --needed git base-devel"
+                echo "  git clone https://aur.archlinux.org/yay.git && cd yay && makepkg -si"
+                exit 1
+            fi
         fi
     fi
     
@@ -368,7 +399,21 @@ check_dependencies() {
         done
         echo ""
         print_info "Installing critical dependencies..."
-        $aur_helper -S --needed ${missing_critical[@]}
+        
+        # Add appropriate flags for YOLO mode
+        if [ "$aur_helper" = "yay" ]; then
+            if [ "$YOLO_MODE" = true ]; then
+                $aur_helper -S --needed --noconfirm --answerclean All --answerdiff None ${missing_critical[@]}
+            else
+                $aur_helper -S --needed ${missing_critical[@]}
+            fi
+        elif [ "$aur_helper" = "paru" ]; then
+            if [ "$YOLO_MODE" = true ]; then
+                $aur_helper -S --needed --noconfirm ${missing_critical[@]}
+            else
+                $aur_helper -S --needed ${missing_critical[@]}
+            fi
+        fi
         
         if [ $? -ne 0 ]; then
             print_error "Failed to install critical dependencies"
@@ -386,10 +431,31 @@ check_dependencies() {
             echo "  - $dep"
         done
         echo ""
-        read -p "Install recommended dependencies? (y/n) " -n 1 -r
-        echo
-        if [[ $REPLY =~ ^[Yy]$ ]]; then
-            $aur_helper -S --needed ${missing_recommended[@]}
+        
+        local install_recommended=false
+        if [ "$YOLO_MODE" = true ]; then
+            print_info "YOLO mode: Auto-installing recommended dependencies"
+            install_recommended=true
+        else
+            read -p "Install recommended dependencies? (y/n) " -n 1 -r
+            echo
+            [[ $REPLY =~ ^[Yy]$ ]] && install_recommended=true
+        fi
+        
+        if [ "$install_recommended" = true ]; then
+            if [ "$aur_helper" = "yay" ]; then
+                if [ "$YOLO_MODE" = true ]; then
+                    $aur_helper -S --needed --noconfirm --answerclean All --answerdiff None ${missing_recommended[@]}
+                else
+                    $aur_helper -S --needed ${missing_recommended[@]}
+                fi
+            elif [ "$aur_helper" = "paru" ]; then
+                if [ "$YOLO_MODE" = true ]; then
+                    $aur_helper -S --needed --noconfirm ${missing_recommended[@]}
+                else
+                    $aur_helper -S --needed ${missing_recommended[@]}
+                fi
+            fi
             print_success "Recommended dependencies installed"
         else
             print_info "Skipping recommended dependencies (some features may not work)"
@@ -451,9 +517,16 @@ install_configs() {
     if [ "$INSTALL_MODE" = "full" ]; then
         # Install Nvim configs (optional)
         if [ -d "$SCRIPT_DIR/nvim" ]; then
-            read -p "Install Neovim configuration? (y/n) " -n 1 -r
-            echo
-            if [[ $REPLY =~ ^[Yy]$ ]]; then
+            local install_nvim=false
+            if [ "$YOLO_MODE" = true ]; then
+                print_info "YOLO mode: Skipping optional Neovim config"
+            else
+                read -p "Install Neovim configuration? (y/n) " -n 1 -r
+                echo
+                [[ $REPLY =~ ^[Yy]$ ]] && install_nvim=true
+            fi
+            
+            if [ "$install_nvim" = true ]; then
                 install_config "$SCRIPT_DIR/nvim" "$HOME/.config/nvim" "Neovim"
             else
                 SKIPPED_COMPONENTS+=("Neovim")
@@ -462,9 +535,16 @@ install_configs() {
         
         # Install Vesktop configs (optional)
         if [ -d "$SCRIPT_DIR/vesktop" ]; then
-            read -p "Install Vesktop (Discord) configuration? (y/n) " -n 1 -r
-            echo
-            if [[ $REPLY =~ ^[Yy]$ ]]; then
+            local install_vesktop=false
+            if [ "$YOLO_MODE" = true ]; then
+                print_info "YOLO mode: Skipping optional Vesktop config"
+            else
+                read -p "Install Vesktop (Discord) configuration? (y/n) " -n 1 -r
+                echo
+                [[ $REPLY =~ ^[Yy]$ ]] && install_vesktop=true
+            fi
+            
+            if [ "$install_vesktop" = true ]; then
                 install_config "$SCRIPT_DIR/vesktop" "$HOME/.config/vesktop" "Vesktop"
             else
                 SKIPPED_COMPONENTS+=("Vesktop")
@@ -473,9 +553,16 @@ install_configs() {
         
         # Install VSCodium configs (optional)
         if [ -d "$SCRIPT_DIR/VSCodium" ]; then
-            read -p "Install VSCodium configuration? (y/n) " -n 1 -r
-            echo
-            if [[ $REPLY =~ ^[Yy]$ ]]; then
+            local install_vscodium=false
+            if [ "$YOLO_MODE" = true ]; then
+                print_info "YOLO mode: Skipping optional VSCodium config"
+            else
+                read -p "Install VSCodium configuration? (y/n) " -n 1 -r
+                echo
+                [[ $REPLY =~ ^[Yy]$ ]] && install_vscodium=true
+            fi
+            
+            if [ "$install_vscodium" = true ]; then
                 install_config "$SCRIPT_DIR/VSCodium" "$HOME/.config/VSCodium" "VSCodium"
             else
                 SKIPPED_COMPONENTS+=("VSCodium")
@@ -484,9 +571,16 @@ install_configs() {
         
         # Install Thunar configs (optional)
         if [ -d "$SCRIPT_DIR/thunar" ]; then
-            read -p "Install Thunar configuration? (y/n) " -n 1 -r
-            echo
-            if [[ $REPLY =~ ^[Yy]$ ]]; then
+            local install_thunar=false
+            if [ "$YOLO_MODE" = true ]; then
+                print_info "YOLO mode: Skipping optional Thunar config"
+            else
+                read -p "Install Thunar configuration? (y/n) " -n 1 -r
+                echo
+                [[ $REPLY =~ ^[Yy]$ ]] && install_thunar=true
+            fi
+            
+            if [ "$install_thunar" = true ]; then
                 install_config "$SCRIPT_DIR/thunar" "$HOME/.config/Thunar" "Thunar"
                 # Also install xfce4 thunar.xml
                 if [ -f "$SCRIPT_DIR/thunar/thunar.xml" ]; then
@@ -618,9 +712,17 @@ install_firefox() {
         return
     fi
     
-    read -p "Install Firefox userChrome.css theme? (y/n) " -n 1 -r
-    echo
-    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+    local install_firefox=false
+    if [ "$YOLO_MODE" = true ]; then
+        print_info "YOLO mode: Skipping optional Firefox userChrome"
+        return
+    else
+        read -p "Install Firefox userChrome.css theme? (y/n) " -n 1 -r
+        echo
+        [[ $REPLY =~ ^[Yy]$ ]] && install_firefox=true
+    fi
+    
+    if [ "$install_firefox" = false ]; then
         return
     fi
     
@@ -874,9 +976,18 @@ configure_hyprland() {
     # Check if autostart.conf is sourced
     if ! grep -q "source.*autostart.conf" "$hypr_config"; then
         print_warning "autostart.conf is not sourced in hyprland.conf"
-        read -p "Add source line to hyprland.conf? (y/n) " -n 1 -r
-        echo
-        if [[ $REPLY =~ ^[Yy]$ ]]; then
+        
+        local add_source=false
+        if [ "$YOLO_MODE" = true ]; then
+            print_info "YOLO mode: Auto-adding autostart.conf source"
+            add_source=true
+        else
+            read -p "Add source line to hyprland.conf? (y/n) " -n 1 -r
+            echo
+            [[ $REPLY =~ ^[Yy]$ ]] && add_source=true
+        fi
+        
+        if [ "$add_source" = true ]; then
             echo "" >> "$hypr_config"
             echo "# Autostart applications" >> "$hypr_config"
             echo "source = ~/.config/hypr/autostart.conf" >> "$hypr_config"
@@ -957,6 +1068,26 @@ main() {
     echo "with unified theme system and modern aesthetics"
     echo ""
     
+    # YOLO mode prompt
+    print_info "Installation mode:"
+    echo "  [Y] YOLO mode - Fully unattended installation (auto-skips optional prompts)"
+    echo "  [N] Normal mode - Interactive prompts for optional components"
+    echo ""
+    read -p "Enable YOLO mode? (y/N) [N]: " yolo_choice
+    
+    case $yolo_choice in
+        [Yy]*)
+            YOLO_MODE=true
+            print_success "YOLO mode enabled - buckle up!"
+            ;;
+        *)
+            YOLO_MODE=false
+            print_info "Normal mode selected"
+            ;;
+    esac
+    
+    echo ""
+    
     # Select installation mode
     print_info "Select installation mode:"
     echo "  [1] Full - All configs and optional components (recommended)"
@@ -1000,11 +1131,16 @@ main() {
     echo ""
     print_warning "If you have custom configs, back them up NOW!"
     echo ""
-    read -p "Continue with installation? (y/n) " -n 1 -r
-    echo
-    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-        print_info "Installation cancelled."
-        exit 0
+    
+    if [ "$YOLO_MODE" = false ]; then
+        read -p "Continue with installation? (y/n) " -n 1 -r
+        echo
+        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+            print_info "Installation cancelled."
+            exit 0
+        fi
+    else
+        print_info "YOLO mode: Proceeding without confirmation"
     fi
     
     echo ""
