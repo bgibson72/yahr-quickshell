@@ -9,12 +9,11 @@ PanelWindow {
     id: wallpaperWindow
     
     width: 1080
-    height: 900
+    height: 760
     
     visible: false
     color: "transparent"
     
-    mask: Region { item: bgRect }
     exclusiveZone: 0
     
     property string currentTheme: ""
@@ -98,26 +97,14 @@ PanelWindow {
         id: wallpaperModel
     }
     
-    // Background overlay
-    Rectangle {
-        anchors.fill: parent
-        color: "#80000000"  // Semi-transparent black
-        
-        MouseArea {
-            anchors.fill: parent
-            onClicked: wallpaperWindow.hide()
-        }
-    }
-    
     Rectangle {
         id: bgRect
-        anchors.centerIn: parent
-        width: 1080
-        height: 900
+        anchors.fill: parent
         color: ThemeManager.surface0
         radius: 24
         border.width: 2
         border.color: ThemeManager.accentBlue
+        clip: true
         focus: true
         
         // Add keyboard handling
@@ -199,7 +186,7 @@ PanelWindow {
             // Wallpaper Grid
             Rectangle {
                 width: parent.width
-                height: 680  // Fixed height to ensure 3 rows: 3 * 210 + margins + scrollbar
+                height: 650  // Height for exactly 3 rows: 3 * 210 + 20px margins
                 color: "transparent"
                 radius: 16
                 
@@ -231,6 +218,8 @@ PanelWindow {
                             smooth: true
                             cache: true
                             asynchronous: true
+                            sourceSize.width: 240
+                            sourceSize.height: 200
                             
                             layer.enabled: true
                             layer.effect: OpacityMask {
@@ -319,7 +308,7 @@ PanelWindow {
                     }
                     
                     ScrollBar.vertical: ScrollBar {
-                        policy: ScrollBar.AsNeeded
+                        policy: wallpaperModel.count > 12 ? ScrollBar.AsNeeded : ScrollBar.AlwaysOff
                         
                         contentItem: Rectangle {
                             implicitWidth: 8

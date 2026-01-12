@@ -849,6 +849,16 @@ install_configs() {
     # Install Fastfetch configs (full mode only)
     if [ "$INSTALL_MODE" = "full" ] && [ -d "$SCRIPT_DIR/fastfetch" ]; then
         install_config "$SCRIPT_DIR/fastfetch" "$HOME/.config/fastfetch" "Fastfetch"
+        
+        # Add fastfetch to .bashrc if not already present
+        if [ -f "$HOME/.bashrc" ]; then
+            if ! grep -q "fastfetch" "$HOME/.bashrc"; then
+                echo "" >> "$HOME/.bashrc"
+                echo "# Display system info with fastfetch" >> "$HOME/.bashrc"
+                echo "fastfetch" >> "$HOME/.bashrc"
+                log_message "Added fastfetch to .bashrc"
+            fi
+        fi
     fi
     
     # Install Wofi configs (full mode only)
