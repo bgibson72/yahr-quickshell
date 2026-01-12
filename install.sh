@@ -327,7 +327,6 @@ install_gpu_drivers() {
         "polkit"
         "qt5-wayland"
         "qt5-graphicaleffects"
-        "qt5compat"
         "qt6-wayland"
         "qt6-5compat"
         "glfw-wayland"
