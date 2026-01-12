@@ -100,35 +100,35 @@ preflight_check() {
     echo ""
     
     # Core components (always installed)
-    echo "📦 Core Components:"
-    [ -d "$SCRIPT_DIR/quickshell" ] && echo "  ✓ Quickshell configuration"
-    [ -d "$SCRIPT_DIR/hypr" ] && echo "  ✓ Hyprland configuration"
-    [ -d "$SCRIPT_DIR/kitty" ] && echo "  ✓ Kitty terminal"
-    [ -d "$SCRIPT_DIR/mako" ] && echo "  ✓ Mako notifications"
-    [ -d "$SCRIPT_DIR/Pictures/Wallpapers" ] && echo "  ✓ Wallpapers collection"
-    [ -f "$SCRIPT_DIR/dotfiles/starship.toml" ] && echo "  ✓ Starship prompt"
+    echo "[*] Core Components:"
+    [ -d "$SCRIPT_DIR/quickshell" ] && echo "  + Quickshell configuration"
+    [ -d "$SCRIPT_DIR/hypr" ] && echo "  + Hyprland configuration"
+    [ -d "$SCRIPT_DIR/kitty" ] && echo "  + Kitty terminal"
+    [ -d "$SCRIPT_DIR/mako" ] && echo "  + Mako notifications"
+    [ -d "$SCRIPT_DIR/Pictures/Wallpapers" ] && echo "  + Wallpapers collection"
+    [ -f "$SCRIPT_DIR/dotfiles/starship.toml" ] && echo "  + Starship prompt"
     echo ""
     
     if [ "$INSTALL_MODE" = "full" ]; then
-        echo "🎨 Additional Components (Full Install):"
-        [ -d "$SCRIPT_DIR/fastfetch" ] && echo "  ✓ Fastfetch system info"
-        [ -d "$SCRIPT_DIR/wofi" ] && echo "  ✓ Wofi launcher (fallback)"
-        [ -d "$SCRIPT_DIR/hypremoji" ] && echo "  ✓ Hypremoji picker"
-        [ -d "$SCRIPT_DIR/firefox" ] && echo "  • Firefox userChrome (optional)"
-        [ -d "$SCRIPT_DIR/nvim" ] && echo "  • Neovim config (optional)"
-        [ -d "$SCRIPT_DIR/vesktop" ] && echo "  • Vesktop/Discord (optional)"
-        [ -d "$SCRIPT_DIR/VSCodium" ] && echo "  • VSCodium (optional)"
-        [ -d "$SCRIPT_DIR/thunar" ] && echo "  • Thunar file manager (optional)"
+        echo "[*] Additional Components (Full Install):"
+        [ -d "$SCRIPT_DIR/fastfetch" ] && echo "  + Fastfetch system info"
+        [ -d "$SCRIPT_DIR/wofi" ] && echo "  + Wofi launcher (fallback)"
+        [ -d "$SCRIPT_DIR/hypremoji" ] && echo "  + Hypremoji picker"
+        [ -d "$SCRIPT_DIR/firefox" ] && echo "  - Firefox userChrome (optional)"
+        [ -d "$SCRIPT_DIR/nvim" ] && echo "  - Neovim config (optional)"
+        [ -d "$SCRIPT_DIR/vesktop" ] && echo "  - Vesktop/Discord (optional)"
+        [ -d "$SCRIPT_DIR/VSCodium" ] && echo "  - VSCodium (optional)"
+        [ -d "$SCRIPT_DIR/thunar" ] && echo "  - Thunar file manager (optional)"
         echo ""
     fi
     
-    echo "⚙️  System Configuration:"
-    echo "  ✓ Create default settings.json"
-    echo "  ✓ Setup Papirus icon folders"
-    echo "  ✓ Configure sudo for theme switching"
-    echo "  ✓ Initialize wallpaper system"
-    echo "  ✓ Apply default theme (Catppuccin)"
-    echo "  ✓ Make all scripts executable"
+    echo "[*] System Configuration:"
+    echo "  + Create default settings.json"
+    echo "  + Setup Papirus icon folders"
+    echo "  + Configure sudo for theme switching"
+    echo "  + Initialize wallpaper system"
+    echo "  + Apply default theme (Catppuccin)"
+    echo "  + Make all scripts executable"
     echo ""
     
     print_info "Installation location: ~/.config/"
@@ -142,7 +142,7 @@ show_summary() {
     if [ ${#INSTALLED_COMPONENTS[@]} -gt 0 ]; then
         print_success "Successfully installed (${#INSTALLED_COMPONENTS[@]} components):"
         for component in "${INSTALLED_COMPONENTS[@]}"; do
-            echo "  ✓ $component"
+            echo "  + $component"
         done
         echo ""
     fi
@@ -150,7 +150,7 @@ show_summary() {
     if [ ${#SKIPPED_COMPONENTS[@]} -gt 0 ]; then
         print_info "Skipped components (${#SKIPPED_COMPONENTS[@]}):"
         for component in "${SKIPPED_COMPONENTS[@]}"; do
-            echo "  ⊝ $component"
+            echo "  - $component"
         done
         echo ""
     fi
