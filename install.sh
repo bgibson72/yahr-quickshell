@@ -683,8 +683,18 @@ check_dependencies() {
         missing_critical+=("ttf-nerd-fonts-symbols")
     fi
     
-    if ! fc-list | grep -qi "maple"; then
-        missing_critical+=("ttf-maple")
+    # Check for Maple Mono font family (need multiple packages for complete coverage)
+    local maple_found=false
+    if fc-list | grep -qi "maple"; then
+        maple_found=true
+    fi
+    
+    if [ "$maple_found" = false ]; then
+        # Install all Maple Mono variants for proper font coverage
+        missing_critical+=("maplemono-nf-unhinted")
+        missing_critical+=("maplemono-ttf")
+        missing_critical+=("maplemononl-ttf")
+        missing_critical+=("maplemono-cn-unhinted")
     fi
     
     # Recommended dependencies
