@@ -984,7 +984,10 @@ setup_papirus() {
     
     # Set initial Papirus folder color to match default theme
     print_info "Setting default Papirus folder color..."
-    "$HOME/.config/quickshell/sync-papirus-folders.sh" 2>/dev/null || true
+    if [ -f "$HOME/.config/quickshell/sync-papirus-folders.sh" ]; then
+        "$HOME/.config/quickshell/sync-papirus-folders.sh" 2>&1 | grep -v "^$" || true
+        print_success "Papirus folder colors configured"
+    fi
 }
 
 # Create default settings.json
@@ -1534,9 +1537,45 @@ main() {
     trap - ERR
     
     echo ""
-    print_success "✨ Installation complete! Enjoy your new setup! 🚀"
+    print_header "Installation Complete!"
+    print_success "✨ YahrShell has been successfully installed! 🚀"
     echo ""
-    print_info "Please log out and log back in for all changes to take effect."
+    
+    # Check if NVIDIA drivers were installed
+    local needs_reboot=false
+    if lspci | grep -iq "nvidia" && command_exists "nvidia-smi"; then
+        needs_reboot=true
+        print_warning "NVIDIA drivers installed - reboot required for proper functionality"
+    fi
+    
+    print_info "To complete the setup:"
+    if [ "$needs_reboot" = true ]; then
+        echo "  1. Reboot your system (required for NVIDIA drivers)"
+        echo "  2. Log into Hyprland"
+        echo "  3. YahrShell will start automatically"
+    else
+        echo "  1. Log out and log into Hyprland"
+        echo "  2. YahrShell will start automatically"
+    fi
+    echo ""
+    
+    # Prompt for reboot
+    if [ "$needs_reboot" = true ] || [ "$YOLO_MODE" = false ]; then
+        if [ "$YOLO_MODE" = false ]; then
+            read -p "Would you like to reboot now? (y/N) " -n 1 -r
+            echo
+            if [[ $REPLY =~ ^[Yy]$ ]]; then
+                print_info "Rebooting system..."
+                sudo reboot
+            else
+                print_info "Remember to reboot before using Hyprland"
+            fi
+        else
+            print_info "YOLO mode: Skipping reboot prompt"
+            print_warning "Please reboot manually before using Hyprland"
+        fi
+    fi
+    
     echo ""
 }
 
