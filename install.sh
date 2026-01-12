@@ -99,7 +99,27 @@ preflight_check() {
     print_info "Installation mode: $INSTALL_MODE"
     echo ""
     
+    # Detect and show GPU info
+    print_info "Detecting GPU hardware..."
+    local gpu_info=$(lspci | grep -E "VGA|3D|Display")
+    if [ -n "$gpu_info" ]; then
+        echo "$gpu_info" | while read -r line; do
+            echo "  + $line"
+        done
+    else
+        echo "  - No GPU detected"
+    fi
+    echo ""
+    
     print_info "The following will be installed/configured:"
+    echo ""
+    
+    # GPU and graphics stack
+    echo "[*] Graphics Stack:"
+    echo "  + GPU drivers (auto-detected)"
+    echo "  + Mesa & Vulkan libraries"
+    echo "  + Wayland & XWayland"
+    echo "  + Qt5/Qt6 Wayland support"
     echo ""
     
     # Core components (always installed)
@@ -219,6 +239,329 @@ install_aur_helper() {
     else
         print_error "Failed to install $helper_name"
         return 1
+    fi
+}
+
+# Detect GPU vendor
+detect_gpu() {
+    print_header "Detecting GPU Hardware"
+    
+    local gpu_info=$(lspci | grep -E "VGA|3D|Display")
+    local nvidia_detected=false
+    local amd_detected=false
+    local intel_detected=false
+    
+    if echo "$gpu_info" | grep -iq "nvidia"; then
+        nvidia_detected=true
+        print_info "NVIDIA GPU detected:"
+        echo "$gpu_info" | grep -i nvidia
+    fi
+    
+    if echo "$gpu_info" | grep -iq "amd\|radeon"; then
+        amd_detected=true
+        print_info "AMD GPU detected:"
+        echo "$gpu_info" | grep -iE "amd|radeon"
+    fi
+    
+    if echo "$gpu_info" | grep -iq "intel"; then
+        intel_detected=true
+        print_info "Intel GPU detected:"
+        echo "$gpu_info" | grep -i intel
+    fi
+    
+    # Determine GPU type
+    local gpu_type=""
+    local gpu_count=0
+    $nvidia_detected && ((gpu_count++))
+    $amd_detected && ((gpu_count++))
+    $intel_detected && ((gpu_count++))
+    
+    if [ $gpu_count -eq 0 ]; then
+        print_warning "No GPU detected - this is unusual"
+        gpu_type="none"
+    elif [ $gpu_count -gt 1 ]; then
+        print_info "Hybrid GPU configuration detected"
+        gpu_type="hybrid"
+    else
+        if $nvidia_detected; then
+            gpu_type="nvidia"
+        elif $amd_detected; then
+            gpu_type="amd"
+        elif $intel_detected; then
+            gpu_type="intel"
+        fi
+    fi
+    
+    echo "$gpu_type"
+}
+
+# Install GPU drivers and graphics stack
+install_gpu_drivers() {
+    print_header "Installing GPU Drivers & Graphics Stack"
+    
+    local gpu_type=$(detect_gpu)
+    local aur_helper=""
+    
+    # Detect AUR helper
+    if command_exists "paru"; then
+        aur_helper="paru"
+    elif command_exists "yay"; then
+        aur_helper="yay"
+    else
+        print_error "AUR helper required for GPU driver installation"
+        exit 1
+    fi
+    
+    print_success "GPU type: $gpu_type"
+    echo ""
+    
+    # Common graphics packages for all GPU types
+    local common_packages=(
+        "mesa"
+        "lib32-mesa"
+        "wayland"
+        "xorg-xwayland"
+        "libinput"
+        "xf86-input-libinput"
+        "seatd"
+        "polkit"
+        "qt5-wayland"
+        "qt6-wayland"
+        "glfw-wayland"
+    )
+    
+    print_info "Installing common graphics libraries..."
+    if [ "$YOLO_MODE" = true ]; then
+        sudo pacman -S --needed --noconfirm "${common_packages[@]}"
+    else
+        sudo pacman -S --needed "${common_packages[@]}"
+    fi
+    print_success "Common graphics libraries installed"
+    
+    case "$gpu_type" in
+        nvidia)
+            install_nvidia_drivers "$aur_helper"
+            ;;
+        amd)
+            install_amd_drivers
+            ;;
+        intel)
+            install_intel_drivers
+            ;;
+        hybrid)
+            install_hybrid_drivers "$aur_helper"
+            ;;
+        none)
+            print_warning "No GPU detected - skipping GPU-specific drivers"
+            ;;
+    esac
+    
+    echo ""
+    print_success "GPU drivers and graphics stack installed"
+}
+
+# Install NVIDIA drivers
+install_nvidia_drivers() {
+    local aur_helper="$1"
+    
+    print_warning "NVIDIA GPU detected"
+    echo ""
+    print_info "NVIDIA driver options:"
+    echo "  [1] Proprietary (nvidia-dkms) - Recommended for best Wayland support"
+    echo "  [2] Open source (nouveau) - Limited Wayland support, not recommended"
+    echo ""
+    
+    local driver_choice=""
+    if [ "$YOLO_MODE" = true ]; then
+        print_info "YOLO mode: Auto-selecting proprietary NVIDIA drivers"
+        driver_choice="1"
+    else
+        read -p "Choose NVIDIA driver (1/2) [1]: " driver_choice
+    fi
+    
+    case $driver_choice in
+        2)
+            print_info "Installing nouveau (open source)..."
+            print_warning "Note: nouveau has poor Wayland/Hyprland performance"
+            if [ "$YOLO_MODE" = true ]; then
+                sudo pacman -S --needed --noconfirm mesa xf86-video-nouveau
+            else
+                sudo pacman -S --needed mesa xf86-video-nouveau
+            fi
+            ;;
+        1|"")
+            print_info "Installing NVIDIA proprietary drivers..."
+            
+            local nvidia_packages=(
+                "nvidia-dkms"
+                "nvidia-utils"
+                "lib32-nvidia-utils"
+                "nvidia-settings"
+                "linux-headers"
+            )
+            
+            if [ "$YOLO_MODE" = true ]; then
+                sudo pacman -S --needed --noconfirm "${nvidia_packages[@]}"
+            else
+                sudo pacman -S --needed "${nvidia_packages[@]}"
+            fi
+            
+            print_success "NVIDIA drivers installed"
+            configure_nvidia
+            ;;
+    esac
+}
+
+# Configure NVIDIA for Hyprland
+configure_nvidia() {
+    print_info "Configuring NVIDIA for Hyprland..."
+    
+    # Enable nvidia-drm modeset
+    local modprobe_conf="/etc/modprobe.d/nvidia.conf"
+    if [ ! -f "$modprobe_conf" ] || ! grep -q "nvidia-drm.modeset=1" "$modprobe_conf"; then
+        print_info "Enabling nvidia-drm modeset..."
+        echo "options nvidia-drm modeset=1" | sudo tee -a "$modprobe_conf" > /dev/null
+    fi
+    
+    # Add NVIDIA environment variables to Hyprland config
+    local hypr_nvidia_conf="$HOME/.config/hypr/nvidia.conf"
+    print_info "Creating NVIDIA environment configuration..."
+    
+    cat > "$hypr_nvidia_conf" << 'EOF'
+# NVIDIA-specific environment variables for Hyprland
+env = LIBVA_DRIVER_NAME,nvidia
+env = XDG_SESSION_TYPE,wayland
+env = GBM_BACKEND,nvidia-drm
+env = __GLX_VENDOR_LIBRARY_NAME,nvidia
+env = WLR_NO_HARDWARE_CURSORS,1
+
+# NVIDIA-specific cursor fix
+cursor {
+    no_hardware_cursors = true
+}
+EOF
+    
+    # Source it from main hyprland.conf if not already there
+    local hypr_config="$HOME/.config/hypr/hyprland.conf"
+    if [ -f "$hypr_config" ] && ! grep -q "source.*nvidia.conf" "$hypr_config"; then
+        print_info "Adding NVIDIA config to hyprland.conf..."
+        echo "" >> "$hypr_config"
+        echo "# NVIDIA configuration" >> "$hypr_config"
+        echo "source = ~/.config/hypr/nvidia.conf" >> "$hypr_config"
+    fi
+    
+    print_success "NVIDIA configuration complete"
+    print_warning "IMPORTANT: Reboot required for NVIDIA drivers to take effect"
+}
+
+# Install AMD drivers
+install_amd_drivers() {
+    print_info "Installing AMD drivers (open source)..."
+    
+    local amd_packages=(
+        "vulkan-radeon"
+        "lib32-vulkan-radeon"
+        "libva-mesa-driver"
+        "lib32-libva-mesa-driver"
+        "mesa-vdpau"
+        "lib32-mesa-vdpau"
+        "xf86-video-amdgpu"
+    )
+    
+    if [ "$YOLO_MODE" = true ]; then
+        sudo pacman -S --needed --noconfirm "${amd_packages[@]}"
+    else
+        sudo pacman -S --needed "${amd_packages[@]}"
+    fi
+    
+    print_success "AMD drivers installed"
+}
+
+# Install Intel drivers
+install_intel_drivers() {
+    print_info "Installing Intel drivers (open source)..."
+    
+    local intel_packages=(
+        "vulkan-intel"
+        "lib32-vulkan-intel"
+        "libva-intel-driver"
+        "libva-utils"
+        "intel-media-driver"
+    )
+    
+    if [ "$YOLO_MODE" = true ]; then
+        sudo pacman -S --needed --noconfirm "${intel_packages[@]}"
+    else
+        sudo pacman -S --needed "${intel_packages[@]}"
+    fi
+    
+    print_success "Intel drivers installed"
+}
+
+# Install drivers for hybrid GPU systems
+install_hybrid_drivers() {
+    local aur_helper="$1"
+    
+    print_warning "Hybrid GPU system detected"
+    echo ""
+    
+    local gpu_info=$(lspci | grep -E "VGA|3D|Display")
+    local has_nvidia=false
+    local has_amd=false
+    local has_intel=false
+    
+    echo "$gpu_info" | grep -iq "nvidia" && has_nvidia=true
+    echo "$gpu_info" | grep -iq "amd\|radeon" && has_amd=true
+    echo "$gpu_info" | grep -iq "intel" && has_intel=true
+    
+    # Install drivers for each detected GPU
+    if $has_intel; then
+        install_intel_drivers
+    fi
+    
+    if $has_amd; then
+        install_amd_drivers
+    fi
+    
+    if $has_nvidia; then
+        print_info "NVIDIA detected in hybrid configuration"
+        echo ""
+        print_info "For hybrid NVIDIA systems, we recommend envycontrol for GPU switching"
+        echo ""
+        
+        local install_envycontrol=false
+        if [ "$YOLO_MODE" = true ]; then
+            print_info "YOLO mode: Installing envycontrol and NVIDIA drivers"
+            install_envycontrol=true
+        else
+            read -p "Install NVIDIA drivers and envycontrol for GPU switching? (y/n) " -n 1 -r
+            echo
+            [[ $REPLY =~ ^[Yy]$ ]] && install_envycontrol=true
+        fi
+        
+        if [ "$install_envycontrol" = true ]; then
+            install_nvidia_drivers "$aur_helper"
+            
+            print_info "Installing envycontrol..."
+            if [ "$aur_helper" = "yay" ]; then
+                if [ "$YOLO_MODE" = true ]; then
+                    $aur_helper -S --needed --noconfirm --answerclean All --answerdiff None envycontrol
+                else
+                    $aur_helper -S --needed envycontrol
+                fi
+            elif [ "$aur_helper" = "paru" ]; then
+                if [ "$YOLO_MODE" = true ]; then
+                    $aur_helper -S --needed --noconfirm envycontrol
+                else
+                    $aur_helper -S --needed envycontrol
+                fi
+            fi
+            
+            print_success "envycontrol installed"
+            print_info "Use 'sudo envycontrol -s hybrid' for hybrid mode"
+            print_info "Use 'sudo envycontrol -s integrated' for integrated GPU only"
+            print_info "Use 'sudo envycontrol -s nvidia' for NVIDIA only"
+        fi
     fi
 }
 
@@ -1155,6 +1498,7 @@ main() {
     echo ""
     
     # Run installation steps in order
+    install_gpu_drivers
     check_dependencies
     install_configs
     install_starship
