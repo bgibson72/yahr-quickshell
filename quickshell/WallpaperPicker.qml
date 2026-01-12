@@ -8,18 +8,11 @@ import Quickshell.Io
 PanelWindow {
     id: wallpaperWindow
     
-    implicitWidth: 1080
-    implicitHeight: 900
+    width: 1080
+    height: 900
     
     visible: false
     color: "transparent"
-    
-    anchors {
-        top: true
-        bottom: true
-        left: true
-        right: true
-    }
     
     mask: Region { item: bgRect }
     exclusiveZone: 0
@@ -206,7 +199,7 @@ PanelWindow {
             // Wallpaper Grid
             Rectangle {
                 width: parent.width
-                height: parent.height - 65
+                height: 680  // Fixed height to ensure 3 rows: 3 * 210 + margins + scrollbar
                 color: ThemeManager.surface1
                 radius: 16
                 
