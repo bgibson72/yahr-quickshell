@@ -1,165 +1,40 @@
-# YAHR - Yet Another Hyprland Rice 🍚
+# YahrShell - Yet Another Hyprland Rice 🍚
 
-Complete Arch Linux + Hyprland desktop configuration with unified theme system.
+Complete Arch Linux desktop environment featuring Hyprland + Quickshell with unified theme system and comprehensive automated installation.
 
 ![quickshell_preview.png](previews/quickshell_preview.png)
 
-## Features
-- 🎨 11 beautiful themes with instant switching
-- 🖥️ Quickshell desktop environment
-- ⚡ Synced themes across all apps
-- 📦 Ready to use configurations
-- 🎭 Includes GTK themes and icon packs
+## ✨ Features
+- 🎨 **11 Beautiful Themes** - Instant switching across all applications
+- 🖥️ **Quickshell Desktop** - Modern QML-based desktop environment
+- ⚡ **Unified Theme System** - Synced themes for Hyprland, GTK, Kitty, Firefox, VSCodium, Discord, and more
+- 🎯 **GPU-Aware Installation** - Auto-detects and installs appropriate drivers (NVIDIA/AMD/Intel/Hybrid)
+- 🚀 **Fully Automated Installer** - One command from minimal Arch to complete desktop
+- 🎭 **Icon Theme Integration** - Papirus icons with dynamic folder colors matching your theme
+- 📦 **Complete Graphics Stack** - Wayland, Mesa, Vulkan, Qt5/Qt6 support
+- 🔧 **Two Installation Modes** - Full (all features) or Minimal (core only)
+- ⚙️ **YOLO Mode** - Completely unattended installation option
 
-## Prerequisites
+## 📋 Prerequisites
 
-### System Requirements
-- Linux distribution with Hyprland support (Arch Linux recommended)
-- Preinstalled Hyprland window manager
-- git (for cloning this repository)
-- base-devel (for building packages)
+**All you need is a minimal Arch Linux installation!**
 
-### AUR Helper (Arch Linux)
-Many packages are installed from the AUR. You'll need an AUR helper like `yay`:
-```bash
-# Install yay if you don't have it
-sudo pacman -S --needed git base-devel
-git clone https://aur.archlinux.org/yay.git
-cd yay
-makepkg -si
-```
-If you prefer `paru` or another AUR helper, substitute `yay` with your preferred tool in the installation commands below.
+The installer handles everything else:
+- ✅ GPU driver detection and installation (NVIDIA/AMD/Intel/Hybrid)
+- ✅ AUR helper installation (yay/paru)
+- ✅ Complete graphics stack (Wayland, Mesa, Vulkan, Qt)
+- ✅ All dependencies and recommended packages
+- ✅ Quickshell, Hyprland, and all desktop components
+- ✅ Theme system and configurations
 
-## Requirements
+### Minimum Requirements
+- Fresh or existing Arch Linux installation
+- Internet connection
+- `git` installed (`sudo pacman -S git`)
 
-### Absolute Minimum Requirements
-These packages are **required** for basic functionality:
-```bash
-# Core system (must be pre-installed)
-# - hyprland - Wayland compositor
-# - git - For cloning this repository
-# - base-devel - For building AUR packages
+That's it! The installer does the rest.
 
-# Desktop environment and shell
-yay -S quickshell-git              # Main desktop environment framework
-sudo pacman -S kitty               # Terminal emulator (used throughout)
-
-# Wallpaper and notifications
-sudo pacman -S swww                # Wallpaper daemon
-sudo pacman -S mako                # Notification daemon
-sudo pacman -S libnotify           # Provides notify-send command
-
-# Authentication and security
-sudo pacman -S hyprpolkitagent     # Polkit authentication agent
-
-# Screenshots
-sudo pacman -S hyprshot            # Screenshot utility
-sudo pacman -S grim slurp          # Screenshot dependencies
-
-# Audio system (PipeWire/PulseAudio)
-sudo pacman -S wireplumber pipewire-pulse  # Or: pulseaudio pulseaudio-alsa
-sudo pacman -S pavucontrol         # Volume control GUI (system tray)
-
-# GTK theme system
-yay -S nwg-look                    # GTK theme/icon manager (REQUIRED)
-
-# Network management
-sudo pacman -S networkmanager      # Network backend
-# nmtui is included with networkmanager
-```
-
-### Required Fonts
-The bar and widgets **will not display correctly** without these fonts:
-```bash
-# Nerd Fonts Symbols - Required for all icons in the bar and widgets
-sudo pacman -S ttf-nerd-fonts-symbols ttf-nerd-fonts-symbols-common
-
-# Maple Mono Nerd Font - Required for text in bar, workspaces, and widgets
-yay -S ttf-maple                   # Or: maplemono-nf-unhinted
-```
-
-### Strongly Recommended
-These packages enable core features and widgets:
-```bash
-# Bluetooth (for system tray icon)
-sudo pacman -S bluez bluez-utils blueman
-
-# File manager (launched by Files button in bar)
-sudo pacman -S thunar
-
-# Browser (Super + B keybind)
-sudo pacman -S firefox
-
-# Brightness control (for brightness keys on laptops)
-sudo pacman -S brightnessctl
-
-# Power management (for battery system tray icon)
-sudo pacman -S xfce4-power-manager  # Or: gnome-power-manager
-
-# Screen locking and idle management
-sudo pacman -S hyprlock hypridle
-
-# Emoji picker (Hypremoji - if you want emoji selector)
-yay -S hypremoji
-```
-
-### Optional Utilities
-```bash
-# Wofi - Used as fallback for theme switcher and wallpaper picker CLI scripts
-# Note: The QML widgets provide native UI, so wofi is only needed for command-line usage
-sudo pacman -S wofi
-```
-
-### Application Suite (Optional)
-These are the applications pre-configured with theme support:
-```bash
-# Code editors
-yay -S vscodium-bin                # VS Code fork (theme support included)
-sudo pacman -S neovim              # Terminal editor (AstroNvim config)
-
-# Communication
-yay -S vesktop-bin                 # Discord client (Vencord theme support)
-
-# System tools
-sudo pacman -S htop                # System monitor
-```
-
-### SDDM Login Manager (Optional but Recommended)
-For a complete themed experience from boot to desktop:
-```bash
-# Install SDDM and dependencies
-sudo pacman -S sddm qt6-declarative qt6-svg qt6-5compat
-
-# Enable SDDM at boot
-sudo systemctl enable sddm.service
-```
-
-After installing configurations (see Installation section), the SDDM theme will be available at `sddm/yahr-theme/`. See [sddm/yahr-theme/README.md](sddm/yahr-theme/README.md) for setup instructions.
-
-### Thunar File Manager Enhancements
-To enable image/video thumbnails and additional file support:
-```bash
-# Core thumbnail service for Thunar
-sudo pacman -S tumbler ffmpegthumbnailer
-
-# Additional format support (optional)
-sudo pacman -S poppler-glib libgsf  # PDF and ODF thumbnails
-
-# Archive support
-sudo pacman -S thunar-archive-plugin file-roller
-
-# Mount support for USB drives, etc.
-sudo pacman -S gvfs thunar-volman
-```
-Restart Thunar after installation for thumbnails and features to appear.
-
-## Installation
-
-You have two installation options:
-
-### Option 1: Automated Installation (Recommended)
-
-The automated installer will handle everything for you, including backups:
+## 🚀 Quick Installation
 
 ```bash
 # Clone the repository
@@ -170,113 +45,64 @@ cd yahr-quickshell
 ./install.sh
 ```
 
-The installer will:
-- Check for required dependencies
-- Backup your existing configurations with timestamps
-- Install all configurations to `~/.config/`
-- Set up Firefox userChrome.css theming
-- Configure executable permissions
-- Provide post-installation instructions
+### Installation Modes
 
-### Option 2: Manual Installation
+**Normal Mode (Recommended for first-time users)**
+- Interactive prompts for optional components
+- Choose AUR helper (yay/paru)
+- Select NVIDIA driver type (proprietary/nouveau)
+- Optional: Neovim, Vesktop, VSCodium, Thunar, Firefox, SDDM
 
-If you prefer manual control or want to install selectively:
+**YOLO Mode (Unattended)**
+- Fully automated, zero prompts
+- Auto-installs yay as AUR helper
+- Auto-selects proprietary NVIDIA drivers
+- Skips all optional components
+- Perfect for scripted/VM installations
 
-#### 1. Install All Required Packages
-Follow the package installation instructions in the **Requirements** section above. At minimum, you must install the packages listed under "Absolute Minimum Requirements" and "Required Fonts".
+**Installation Types**
+- **Full Install**: All core components + optional applications (recommended)
+- **Minimal Install**: Core desktop only (Quickshell, Hyprland, Kitty, Mako)
 
-#### 2. Clone and Install Configurations
-```bash
-git clone https://github.com/bgibson72/yahr-quickshell.git
-cd yahr-quickshell
+## 🎯 What Gets Installed
 
-# Backup existing configs (recommended)
-mkdir -p ~/config-backup
-cp -r ~/.config/{hypr,kitty,quickshell,mako,nvim,vesktop,VSCodium} ~/config-backup/ 2>/dev/null || true
+### Core Components (Always Installed)
+- **Quickshell** - Desktop environment framework
+- **Hyprland** - Wayland compositor with complete configuration
+- **GPU Drivers** - Auto-detected for your hardware
+  - NVIDIA: nvidia-dkms, nvidia-utils (with proper env vars)
+  - AMD: vulkan-radeon, mesa-vdpau, amdgpu
+  - Intel: vulkan-intel, libva-intel-driver, intel-media-driver
+  - Hybrid: All detected GPUs + envycontrol for switching
+- **Graphics Stack**
+  - Mesa, Wayland, XWayland
+  - Qt5/Qt6 Wayland support
+  - Vulkan, libinput, seatd, polkit
+- **Kitty** - Terminal emulator with theme sync
+- **Mako** - Notification daemon
+- **Wallpapers** - Collection organized by theme
+- **Papirus Icons** - With dynamic folder colors
+- **Fonts** - Maple Mono Nerd Font family, Nerd Fonts Symbols
+- **Starship** - Shell prompt with configuration
 
-# Install configurations
-cp -r hypr kitty mako nvim vesktop VSCodium ~/.config/
+### Recommended Packages (Auto-Installed)
+- **Audio**: PipeWire, WirePlumber, pavucontrol
+- **Bluetooth**: Blueman
+- **Network**: NetworkManager
+- **Utilities**: Thunar, Firefox, brightnessctl
+- **Screenshots**: hyprshot, grim, slurp
+- **Tools**: nwg-look (GTK theme manager)
 
-# Install Thunar configuration (optional but recommended)
-mkdir -p ~/.config/Thunar ~/.config/xfce4/xfconf/xfce-perchannel-xml
-cp thunar/accels.scm thunar/uca.xml ~/.config/Thunar/
-cp thunar/thunar.xml ~/.config/xfce4/xfconf/xfce-perchannel-xml/
-# Or use the installer: ./install-thunar-config.sh
+### Optional Components (Full Install - User Choice)
+- **Neovim** - Editor with AstroNvim configuration
+- **Vesktop** - Discord client with Vencord theme support
+- **VSCodium** - VS Code alternative with theme integration
+- **Thunar** - File manager with custom configuration
+- **Firefox** - Browser with userChrome.css theming
+- **SDDM** - Display manager (login screen) with theme
 
-# Install quickshell configuration
-# Note: This copies all files including shell.qml, scripts, themes, and executables
-cp -r quickshell ~/.config/
-
-# Install fastfetch configuration (optional but recommended)
-cp -r fastfetch ~/.config/
-
-# Install GTK themes and icons
-mkdir -p ~/.themes ~/.icons
-cp -r quickshell/gtk-themes/* ~/.themes/
-cp -r quickshell/gtk-icons/* ~/.icons/
-
-# Fix Neovim desktop entry for proper terminal launching
-mkdir -p ~/.local/share/applications
-cp nvim/nvim.desktop ~/.local/share/applications/
-chmod +x ~/.local/share/applications/nvim.desktop
-update-desktop-database ~/.local/share/applications/
-
-# Install zsh configuration (if using zsh)
-cp dotfiles/.zshrc ~/.zshrc
-
-# Install starship prompt configuration
-cp dotfiles/starship.toml ~/.config/starship.toml
-
-# Enable Firefox theme sync (one-time setup)
-# This enables userChrome.css support in Firefox
-./quickshell/sync-firefox-theme.sh
-# Then follow the on-screen instructions to enable userChrome in Firefox
-# For best results: In Firefox Settings > Extensions & Themes, use the default "Light" or "Dark" theme
-```
-
-### 3. Configure Hyprland Autostart
-
-**Note:** If you used the automated installer (`./install.sh`), quickshell is already configured to autostart. Skip this section.
-
-For manual installations, add quickshell to your Hyprland configuration:
-```bash
-# Add quickshell to autostart
-echo 'exec-once = quickshell' >> ~/.config/hypr/hyprland.conf
-
-# If you're migrating from Waybar, remove it from autostart
-sed -i '/exec-once.*waybar/d' ~/.config/hypr/hyprland.conf
-```
-
-### 4. Start Quickshell
-```bash
-# Test quickshell (should launch without errors)
-quickshell
-
-# Or restart Hyprland to start everything fresh
-# Log out and log back in, or press Super + Shift + E (if configured)
-```
-
-### Troubleshooting
-  - If `quickshell` can't find the config, ensure `~/.config/quickshell/shell.qml` exists
-  - For widget issues, check that all scripts in `~/.config/quickshell/` are executable: `chmod +x ~/.config/quickshell/*.sh ~/.config/quickshell/toggle-*`
-  - Check logs: `cat /run/user/$(id -u)/quickshell/by-id/*/log.qslog`
-
-## Included Applications
-
-- **hypr** - Hyprland window manager with 11 theme definitions
-- **quickshell** - Custom desktop environment (bar, widgets, controls)
-- **kitty** - Terminal emulator with theme synchronization
-- **firefox** - Browser with UI theme synchronization via userChrome.css
-- **mako** - Notification daemon with themed styling
-- **nvim** - Neovim with AstroNvim configuration
-- **VSCodium** - VS Code fork with theme integration
-  - **Note**: If you prefer Microsoft's VS Code, you can adapt the theme sync by changing the path in `sync-vscodium-theme.sh` from `~/.config/VSCodium/User/settings.json` to `~/.config/Code/User/settings.json`
-- **vesktop** - Discord client with theme support
-
-## Key Features
-
-### Unified Theme System
-Switch themes instantly across all applications with Super + T. Available themes:
+## 🎨 Included Themes
+Switch themes instantly with Super + T. All themes include matching wallpapers and synchronized colors across all applications.
 
 <details>
 <summary><b>Material (Palenight)</b></summary>
@@ -285,7 +111,7 @@ Switch themes instantly across all applications with Super + T. Available themes
 </details>
 
 <details>
-<summary><b>Catppuccin (Mocha)</b></summary>
+<summary><b>Catppuccin (Mocha) - Default Theme</b></summary>
 
 ![catppuccin_preview.png](previews/catppuccin_preview.png)
 </details>
