@@ -138,6 +138,7 @@ preflight_check() {
         [ -d "$SCRIPT_DIR/wofi" ] && echo "  + Wofi launcher (fallback)"
         [ -d "$SCRIPT_DIR/hypremoji" ] && echo "  + Hypremoji picker"
         [ -d "$SCRIPT_DIR/firefox" ] && echo "  - Firefox userChrome (optional)"
+        [ -d "$SCRIPT_DIR/sddm" ] && echo "  - SDDM display manager (optional)"
         [ -d "$SCRIPT_DIR/nvim" ] && echo "  - Neovim config (optional)"
         [ -d "$SCRIPT_DIR/vesktop" ] && echo "  - Vesktop/Discord (optional)"
         [ -d "$SCRIPT_DIR/VSCodium" ] && echo "  - VSCodium (optional)"
@@ -1114,6 +1115,73 @@ install_firefox() {
     echo "  4. Restart Firefox"
 }
 
+# Install and configure SDDM
+install_sddm() {
+    print_header "SDDM Display Manager Setup"
+    
+    if [ ! -d "$SCRIPT_DIR/sddm" ]; then
+        print_warning "SDDM config not found in repo, skipping..."
+        return
+    fi
+    
+    local install_sddm=false
+    if [ "$YOLO_MODE" = true ]; then
+        print_info "YOLO mode: Skipping optional SDDM installation"
+        return
+    else
+        print_info "SDDM is a display manager (login screen) for Wayland/X11"
+        echo ""
+        read -p "Install and configure SDDM? (y/n) " -n 1 -r
+        echo
+        [[ $REPLY =~ ^[Yy]$ ]] && install_sddm=true
+    fi
+    
+    if [ "$install_sddm" = false ]; then
+        return
+    fi
+    
+    # Install SDDM package
+    print_info "Installing SDDM..."
+    if [ "$YOLO_MODE" = true ]; then
+        sudo pacman -S --needed --noconfirm sddm
+    else
+        sudo pacman -S --needed sddm
+    fi
+    
+    if [ $? -ne 0 ]; then
+        print_error "Failed to install SDDM"
+        return 1
+    fi
+    
+    # Install SDDM config
+    print_info "Installing SDDM configuration..."
+    sudo mkdir -p /etc/sddm.conf.d
+    
+    # Copy all config files from sddm directory
+    for config_file in "$SCRIPT_DIR/sddm"/*; do
+        if [ -f "$config_file" ]; then
+            local filename=$(basename "$config_file")
+            print_step "Installing $filename..."
+            sudo cp "$config_file" "/etc/sddm.conf.d/$filename"
+        fi
+    done
+    
+    print_success "SDDM configuration installed"
+    
+    # Enable SDDM service
+    print_info "Enabling SDDM service..."
+    sudo systemctl enable sddm
+    
+    if [ $? -eq 0 ]; then
+        print_success "SDDM enabled - will start on next boot"
+        print_info "To start SDDM now: sudo systemctl start sddm"
+        INSTALLED_COMPONENTS+=("SDDM")
+    else
+        print_error "Failed to enable SDDM service"
+        return 1
+    fi
+}
+
 # Install GTK themes
 install_gtk_themes() {
     print_header "GTK Theme Setup"
@@ -1491,6 +1559,7 @@ main() {
     # Optional components (full mode only)
     if [ "$INSTALL_MODE" = "full" ]; then
         install_firefox
+        install_sddm
     fi
     
     install_gtk_themes
