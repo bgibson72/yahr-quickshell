@@ -995,7 +995,9 @@ setup_papirus() {
     # Set initial Papirus folder color to match default theme
     print_info "Setting default Papirus folder color..."
     if [ -f "$HOME/.config/quickshell/sync-papirus-folders.sh" ]; then
-        "$HOME/.config/quickshell/sync-papirus-folders.sh" 2>&1 | grep -v "^$" || true
+        # Run synchronously and fully suppress output to prevent async messages
+        "$HOME/.config/quickshell/sync-papirus-folders.sh" > /dev/null 2>&1
+        wait $! 2>/dev/null || true
         print_success "Papirus folder colors configured"
     fi
 }
