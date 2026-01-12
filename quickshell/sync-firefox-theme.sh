@@ -71,6 +71,12 @@ cat > "$USER_CSS" << EOF
     --accent-yellow: #$accent_yellow !important;
 }
 
+/* Normalize font rendering and spacing */
+* {
+    letter-spacing: normal !important;
+    word-spacing: normal !important;
+}
+
 /* Main toolbar and tab bar background */
 #navigator-toolbox,
 #TabsToolbar,
