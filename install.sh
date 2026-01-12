@@ -1207,7 +1207,24 @@ initialize_wallpaper() {
     
     # Check if we're in a Wayland session
     if [ -z "$WAYLAND_DISPLAY" ] && [ -z "$HYPRLAND_INSTANCE_SIGNATURE" ]; then
-        print_info "Not in a Wayland session - wallpaper will be initialized on first launch"
+        print_info "Not in a Wayland session - wallpaper will be set on first launch"
+        
+        # Still set default theme wallpaper in settings.json for wallpaper picker
+        print_info "Setting default catppuccin-mocha wallpaper for first launch..."
+        local catppuccin_wallpapers=("$HOME/Pictures/Wallpapers/"*catppuccin-mocha*)
+        if [ -f "${catppuccin_wallpapers[0]}" ]; then
+            # Pick a random catppuccin-mocha wallpaper
+            local random_wallpaper="${catppuccin_wallpapers[$RANDOM % ${#catppuccin_wallpapers[@]}]}"
+            
+            # Update settings.json with the wallpaper
+            local settings_file="$HOME/.config/quickshell/settings.json"
+            if [ -f "$settings_file" ]; then
+                # Use sed to update the currentWallpaper field
+                sed -i "s|\"currentWallpaper\": \".*\"|\"currentWallpaper\": \"$random_wallpaper\"|" "$settings_file"
+                print_success "Default wallpaper configured: $(basename "$random_wallpaper")"
+            fi
+        fi
+        
         print_info "The wallpaper system is configured and ready to use"
         return
     fi
@@ -1221,15 +1238,24 @@ initialize_wallpaper() {
         print_info "swww daemon already running"
     fi
     
-    # Set default wallpaper if available
-    local default_wallpaper="$HOME/Pictures/Wallpapers/catppuccin-macchiato.png"
+    # Set a random catppuccin-mocha wallpaper
+    local catppuccin_wallpapers=("$HOME/Pictures/Wallpapers/"*catppuccin-mocha*)
     
-    if [ -f "$default_wallpaper" ]; then
-        print_info "Setting default wallpaper..."
-        swww img "$default_wallpaper" --transition-type fade --transition-duration 2
-        print_success "Default wallpaper applied"
+    if [ -f "${catppuccin_wallpapers[0]}" ]; then
+        # Pick a random catppuccin-mocha wallpaper
+        local random_wallpaper="${catppuccin_wallpapers[$RANDOM % ${#catppuccin_wallpapers[@]}]}"
+        print_info "Setting random catppuccin-mocha wallpaper..."
+        swww img "$random_wallpaper" --transition-type fade --transition-duration 2
+        
+        # Update settings.json with the wallpaper
+        local settings_file="$HOME/.config/quickshell/settings.json"
+        if [ -f "$settings_file" ]; then
+            sed -i "s|\"currentWallpaper\": \".*\"|\"currentWallpaper\": \"$random_wallpaper\"|" "$settings_file"
+        fi
+        
+        print_success "Wallpaper applied: $(basename "$random_wallpaper")"
     else
-        # Try to find any wallpaper
+        # Fallback to any wallpaper
         local any_wallpaper=$(find "$HOME/Pictures/Wallpapers" -type f \( -name "*.png" -o -name "*.jpg" \) | head -n 1)
         if [ -n "$any_wallpaper" ]; then
             print_info "Setting wallpaper..."
