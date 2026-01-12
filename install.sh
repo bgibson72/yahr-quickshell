@@ -156,6 +156,63 @@ show_summary() {
     fi
 }
 
+# Install AUR helper
+install_aur_helper() {
+    print_header "Installing AUR Helper"
+    
+    print_info "An AUR helper is required to install packages from the Arch User Repository"
+    echo ""
+    echo "Available options:"
+    echo "  [1] yay - Popular, feature-rich AUR helper"
+    echo "  [2] paru - Modern, rust-based AUR helper"
+    echo ""
+    read -p "Choose AUR helper (1/2) [1]: " helper_choice
+    
+    local helper_name=""
+    case $helper_choice in
+        2)
+            helper_name="paru"
+            ;;
+        1|"")
+            helper_name="yay"
+            ;;
+        *)
+            print_error "Invalid choice. Installing yay by default."
+            helper_name="yay"
+            ;;
+    esac
+    
+    print_info "Installing $helper_name..."
+    
+    # Install base-devel and git if not present
+    print_step "Ensuring base-devel and git are installed..."
+    sudo pacman -S --needed --noconfirm base-devel git
+    
+    # Create temporary directory
+    local temp_dir=$(mktemp -d)
+    cd "$temp_dir"
+    
+    # Clone and install
+    print_step "Cloning $helper_name from AUR..."
+    git clone "https://aur.archlinux.org/${helper_name}.git"
+    cd "$helper_name"
+    
+    print_step "Building and installing $helper_name..."
+    makepkg -si --noconfirm
+    
+    # Clean up
+    cd "$HOME"
+    rm -rf "$temp_dir"
+    
+    if command_exists "$helper_name"; then
+        print_success "$helper_name installed successfully"
+        return 0
+    else
+        print_error "Failed to install $helper_name"
+        return 1
+    fi
+}
+
 # Check dependencies
 check_dependencies() {
     print_header "Checking Dependencies"
@@ -170,11 +227,27 @@ check_dependencies() {
     elif command_exists "yay"; then
         aur_helper="yay"
     else
-        print_error "No AUR helper found (paru or yay required)"
-        print_info "Install yay with:"
-        echo "  sudo pacman -S --needed git base-devel"
-        echo "  git clone https://aur.archlinux.org/yay.git && cd yay && makepkg -si"
-        exit 1
+        print_warning "No AUR helper found (paru or yay required)"
+        read -p "Install an AUR helper now? (y/n) " -n 1 -r
+        echo
+        if [[ $REPLY =~ ^[Yy]$ ]]; then
+            install_aur_helper
+            # Detect which one was installed
+            if command_exists "paru"; then
+                aur_helper="paru"
+            elif command_exists "yay"; then
+                aur_helper="yay"
+            else
+                print_error "AUR helper installation failed"
+                exit 1
+            fi
+        else
+            print_error "AUR helper is required for installation"
+            print_info "Install manually with:"
+            echo "  sudo pacman -S --needed git base-devel"
+            echo "  git clone https://aur.archlinux.org/yay.git && cd yay && makepkg -si"
+            exit 1
+        fi
     fi
     
     print_success "Found AUR helper: $aur_helper"
