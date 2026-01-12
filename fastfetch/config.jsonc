@@ -1,73 +1,62 @@
-//    ______           __  ______      __
-//   / ____/___ ______/ /_/ ____/___ _/ /_
-//  / /_  / __ `/ ___/ __/ /   / __ `/ __/
-// / __/ / /_/ (__  ) /_/ /___/ /_/ / /_
-///_/    \__,_/____/\__/\____/\__,_/\__/
-//  https://github.com/m3tozz/FastCat
-
 {
   "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
   "logo": {
     "type": "kitty-direct",
     "source": "~/.config/fastfetch/current-theme-logo.png",
     "width": 15,
+    "height": 6,
     "preserveAspectRatio": true,
-    "padding": {
-      "top": 0,
-      "right": 3
+    "padding":{
+      "top":2,
+      "bottom": 2
     }
   },
   "display": {
-    "separator": " ",
-    "pipe": false
+    "separator": " "
   },
   "modules": [
+    "break",
     {
       "type": "host",
-      "key": "󰌢",
+      "key": "󰌢 ",
       "keyColor": "34",
-      "keyWidth": 4,
       "format": "{1}"
     }, 
     {
+      "type": "separator",
+      "string": "───────────────────────────────"
+    },
+    {
       "type": "os",
       "key": "󰌽 ",
-      "keyColor": "34",
-      "keyWidth": 4
+      "keyColor": "34"
     },
     {
       "type": "cpu",
       "key": " ",
-      "keyColor": "34",
-      "keyWidth": 4
+      "keyColor": "34"
     },
     {
       "type": "memory",
       "key": " ",
-      "keyColor": "34",
-      "keyWidth": 4
+      "keyColor": "34"
     },
     {
       "type": "wm",
       "key": "󱇛 ",
-      "keyColor": "34",
-      "keyWidth": 4
+      "keyColor": "34"
     },
     {
       "type": "shell",
       "key": " ",
-      "keyColor": "34",
-      "keyWidth": 4
+      "keyColor": "34"
     },
     {
       "type": "command",
-      "key": " ",
+      "key": " ",
       "keyColor": "34",
-      "keyWidth": 4,
       "text": "grep 'themeName:' ~/.config/quickshell/ThemeManager.qml 2>/dev/null | sed -E 's/.*\"(.+)\".*/\\1/' || echo 'Unknown'"
     },
     "break",
-    "break",
-    "break"
   ]
 }
