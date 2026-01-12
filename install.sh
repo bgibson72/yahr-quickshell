@@ -1250,35 +1250,10 @@ verify_installation() {
     # Test Quickshell syntax
     print_step "Testing Quickshell configuration syntax..."
     
-    # Skip launch test if not in a Wayland/Hyprland session
-    if [ -z "$WAYLAND_DISPLAY" ] && [ -z "$HYPRLAND_INSTANCE_SIGNATURE" ]; then
-        print_info "Not in Wayland session - skipping Quickshell launch test"
-        print_info "Quickshell will be tested on first launch after entering Hyprland"
-    elif command_exists "quickshell"; then
-        # Run quickshell with --check flag if available, otherwise try brief launch
-        local config_check=$(quickshell -c "$HOME/.config/quickshell/shell.qml" --help 2>&1 | grep -i "check\|test" || echo "")
-        
-        if [ -n "$config_check" ]; then
-            print_info "Running syntax check..."
-            if quickshell --check -c "$HOME/.config/quickshell/shell.qml" 2>/dev/null; then
-                print_success "Configuration syntax is valid"
-            else
-                print_warning "Could not verify syntax (will test on first launch)"
-            fi
-        else
-            print_info "Running brief launch test (will close in 3 seconds)..."
-            timeout 3 quickshell -c "$HOME/.config/quickshell/shell.qml" >/dev/null 2>&1 &
-            local qs_pid=$!
-            sleep 2
-            
-            if ps -p $qs_pid > /dev/null 2>&1; then
-                print_success "Quickshell launched successfully"
-                kill $qs_pid 2>/dev/null || true
-            else
-                print_warning "Quickshell exited (may need Hyprland session)"
-            fi
-        fi
-    fi
+    # Skip launch test during installation to avoid process conflicts
+    print_info "Skipping Quickshell launch test during installation"
+    print_info "Quickshell will start automatically via Hyprland autostart"
+    print_info "You can test manually with: quickshell"
     
     # Check script permissions
     print_step "Checking script permissions..."
