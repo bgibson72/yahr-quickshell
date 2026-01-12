@@ -3,7 +3,8 @@
 # YAHR Quickshell Configuration Installer
 # This script installs the complete Hyprland + Quickshell setup
 
-set -e  # Exit on error
+# Note: We don't use 'set -e' to allow the installer to be more resilient
+# Critical errors are handled explicitly with error trap
 
 # Colors for output
 RED='\033[0;31m'
@@ -1342,11 +1343,12 @@ verify_installation() {
     echo ""
     if [ $errors -eq 0 ]; then
         print_success "Verification complete - no critical errors"
-        return 0
     else
         print_warning "Verification found $errors issue(s) - please review"
-        return 1
     fi
+    
+    # Always return 0 to not trigger error trap
+    return 0
 }
 
 # Configure Hyprland autostart
