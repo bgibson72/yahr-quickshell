@@ -1546,8 +1546,9 @@ main() {
     echo ""
     
     # Run installation steps in order
-    install_gpu_drivers
+    # Note: check_dependencies must come before install_gpu_drivers (needs AUR helper)
     check_dependencies
+    install_gpu_drivers
     install_configs
     install_starship
     create_settings
