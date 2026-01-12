@@ -108,69 +108,69 @@ cd yahr-quickshell
 Switch themes instantly with Super + T. All themes include matching wallpapers and synchronized colors across all applications.
 
 <details>
-<summary><b>Material (Palenight)</b></summary>
+<summary><b>Catppuccin (Mocha) - Default Theme</b></summary>
 
-![material_preview.png](previews/material_preview.png)
+![catppuccin.png](previews/catppuccin.png)
 </details>
 
 <details>
-<summary><b>Catppuccin (Mocha) - Default Theme</b></summary>
+<summary><b>Material (Palenight)</b></summary>
 
-![catppuccin_preview.png](previews/catppuccin_preview.png)
+![material.png](previews/material.png)
 </details>
 
 <details>
 <summary><b>Dracula</b></summary>
 
-![dracula_preview.png](previews/dracula_preview.png)
+![dracula.png](previews/dracula.png)
 </details>
 
 <details>
 <summary><b>Eldritch</b></summary>
 
-![eldritch_preview.png](previews/eldritch_preview.png)
+![eldritch.png](previews/eldritch.png)
 </details>
 
 <details>
 <summary><b>Everforest</b></summary>
 
-![everforest_preview.png](previews/everforest_preview.png)
+![everforest.png](previews/everforest.png)
 </details>
 
 <details>
 <summary><b>Gruvbox</b></summary>
 
-![gruvbox_preview.png](previews/gruvbox_preview.png)
+![gruv_box.png](previews/gruv_box.png)
 </details>
 
 <details>
 <summary><b>Kanagawa</b></summary>
 
-![kanagawa_preview.png](previews/kanagawa_preview.png)
+![kanagawa.png](previews/kanagawa.png)
 </details>
 
 <details>
 <summary><b>NightFox</b></summary>
 
-![nightfox_preview.png](previews/nightfox_preview.png)
+![night_fox.png](previews/night_fox.png)
 </details>
 
 <details>
 <summary><b>Nord</b></summary>
 
-![nord_preview.png](previews/nord_preview.png)
+![nord.png](previews/nord.png)
 </details>
 
 <details>
 <summary><b>Rosé Pine</b></summary>
 
-![rosepine_preview.png](previews/rosepine_preview.png)
+![rose_pine.png](previews/rose_pine.png)
 </details>
 
 <details>
 <summary><b>TokyoNight</b></summary>
 
-![tokyonight_preview.png](previews/tokyonight_preview.png)
+![tokyo_night.png](previews/tokyo_night.png)
 </details>
 
 
