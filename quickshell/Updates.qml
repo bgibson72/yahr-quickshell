@@ -168,14 +168,31 @@ Rectangle {
     // Recheck after manual update installation
     Timer {
         id: recheckTimer
-        interval: 5000  // 5 seconds after launching updater
+        interval: 10000  // 10 seconds after launching updater (gives time to close)
         running: false
-        repeat: false
+        repeat: true  // Keep checking periodically
+        
+        property int checkCount: 0
+        property int maxChecks: 30  // Check for up to 5 minutes (30 * 10 seconds)
         
         onTriggered: {
-            console.log("Rechecking updates after manual installation...")
+            checkCount++
+            console.log("Rechecking updates after manual installation (attempt", checkCount, "of", maxChecks, ")...")
             lastCheckTime = new Date()
             updateCheckProcess.running = true
+            
+            // Stop checking after maxChecks attempts or if no updates remain
+            if (checkCount >= maxChecks || updatesArea.updateCount === 0) {
+                console.log("Stopping recheck timer")
+                running = false
+                checkCount = 0
+            }
+        }
+        
+        onRunningChanged: {
+            if (running) {
+                checkCount = 0
+            }
         }
     }
 }
