@@ -109,7 +109,7 @@ if [ -f "$HOME/.config/quickshell/sync-vencord-theme.sh" ]; then
 fi
 
 # Sync SDDM theme
-SDDM_SYNC="$HOME/Dev/yahr-quickshell/sddm/sync-sddm-theme.sh"
+SDDM_SYNC="$HOME/.config/quickshell/sync-sddm-theme.sh"
 if [ -f "$SDDM_SYNC" ]; then
     echo "Syncing SDDM theme..."
     "$SDDM_SYNC"
