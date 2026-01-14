@@ -25,25 +25,6 @@ RowLayout {
                 return null
             }
             
-            // Check if any window in this workspace needs attention
-            property bool hasAttention: {
-                let ws = hyprWorkspace
-                if (!ws) return false
-                
-                // Check workspace urgent flag
-                if (ws.urgent) return true
-                
-                // Check if any window is demanding attention
-                if (ws.toplevels && ws.toplevels.length > 0) {
-                    for (let i = 0; i < ws.toplevels.length; i++) {
-                        if (ws.toplevels[i].demanding) {
-                            return true
-                        }
-                    }
-                }
-                return false
-            }
-            
             width: 40
             height: 32
             
@@ -84,9 +65,8 @@ RowLayout {
                 
                 Behavior on color {
                     ColorAnimation { duration: 200 }
-                }
-            }
-            
+                }let ws = staticWorkspaceButton.hyprWorkspace
+                    if (ws && ws
             Rectangle {
                 anchors.top: workspaceText.bottom
                 anchors.topMargin: 4
@@ -98,6 +78,7 @@ RowLayout {
                 visible: {
                     let ws = staticWorkspaceButton.hyprWorkspace
                     if (ws && (ws.focused || ws.active || staticWorkspaceButton.hasAttention)) {
+                        return true)) {
                         return true
                     }
                     // Fallback: check if this workspace ID matches the focused workspace
@@ -107,8 +88,7 @@ RowLayout {
                     return false
                 }
                 
-                color: staticWorkspaceButton.hasAttention ? ThemeManager.accentRed : ThemeManager.fgPrimary
-                Behavior on color {
+                color
                     ColorAnimation { duration: 200 }
                 }
             }
@@ -129,22 +109,6 @@ RowLayout {
             
             required property var modelData
             
-            // Check if any window in this workspace needs attention
-            property bool hasAttention: {
-                // Check workspace urgent flag
-                if (modelData.urgent) return true
-                
-                // Check if any window is demanding attention
-                if (modelData.toplevels && modelData.toplevels.length > 0) {
-                    for (let i = 0; i < modelData.toplevels.length; i++) {
-                        if (modelData.toplevels[i].demanding) {
-                            return true
-                        }
-                    }
-                }
-                return false
-            }
-            
             visible: modelData.id >= 5 && (modelData.toplevels.length > 0 || modelData.active || modelData.focused)
             
             width: visible ? 40 : 0
@@ -160,31 +124,32 @@ RowLayout {
                 anchors.centerIn: parent
                 width: 35
                 height: parent.height - 10
-                color: dynamicWorkspaceButton.containsMouse ? 
-                    Qt.rgba(ThemeManager.fgPrimary.r, ThemeManager.fgPrimary.g, ThemeManager.fgPrimary.b, 0.1) : 
-                    "transparent"
+                
+                color: {
+                    if (dynamicWorkspaceButton.hasAttention) {
+                        // Bright red background when urgent
+                        return Qt.rgba(ThemeManager.accentRed.r, ThemeManager.accentRed.g, ThemeManager.accentRed.b, 0.3)
+                    } else if (dynamicWorkspaceButton.containsMouse) {
+                        return Qt.rgba(ThemeManager.fgPrimary.r, ThemeManager.fgPrimary.g, ThemeManager.fgPrimary.b, 0.1)
+                    } else {
+                        return "transparent"
+                    }
+                }
                 
                 radius: 6
+                
+                Behavior on color {
+                    ColorAnimation { duration: 200 }
+                }
             }
             
             Text {
                 id: dynamicWorkspaceText
-                anchors.centerIn: dynamicWorkspaceRect
-                text: dynamicWorkspaceButton.modelData.id
-                font.family: "MapleMono NF"
-                font.pixelSize: 13
+                anchorsdynamicWorkspaceButton.containsMouse ? 
+                    Qt.rgba(ThemeManager.fgPrimary.r, ThemeManager.fgPrimary.g, ThemeManager.fgPrimary.b, 0.1) : 
+                    "transparent"
                 
-                color: {
-                    if (dynamicWorkspaceButton.modelData.urgent) {
-                        return ThemeManager.accentRed
-                    } else if (dynamicWorkspaceButton.modelData.toplevels.length > 0) {
-                        return ThemeManager.fgPrimary
-                    } else {
-                        return ThemeManager.fgTertiary
-                    }
-                }
-                
-                Behavior on color {
+                radius: 6ehavior on color {
                     ColorAnimation { duration: 200 }
                 }
             }
@@ -206,10 +171,8 @@ RowLayout {
                 }
             }
             
-            onClicked: {
-                console.log("Workspace", dynamicWorkspaceButton.modelData.id, "clicked")
-                Quickshell.execDetached(["hyprctl", "dispatch", "workspace", dynamicWorkspaceButton.modelData.name])
+                    if (dynamicWorkspaceButton.modelData.toplevels.length > 0) {kspaceButton.modelData.name])
             }
         }
-    }
-}
+                
+                color
