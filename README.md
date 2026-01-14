@@ -220,6 +220,14 @@ Configure weather, clock format, screenshots, system tray visibility, theme sele
 ![wallpaper_picker.png](previews/wallpaper_picker.png)
 </details>
 
+<details>
+<summary><b>SDDM Login Screen</b> - Themed display manager with automatic theme sync</summary>
+
+Custom SDDM theme that automatically syncs colors and wallpaper with your selected theme. Test without logging out using: `sddm-greeter-qt6 --test-mode --theme /usr/share/sddm/themes/yahr-theme`
+
+![sddm_preview.png](previews/sddm_preview.png)
+</details>
+
 
 ### System Integration
 - Workspace management with visual indicators
@@ -227,6 +235,7 @@ Configure weather, clock format, screenshots, system tray visibility, theme sele
 - Notification system with urgency-based styling
 - GTK theme synchronization
 - **Configurable bar position** - Toggle between top and bottom placement
+- **SDDM theme synchronization** - Login screen automatically syncs with system theme
 - **Firefox theme synchronization** - Automatic Firefox UI theming via userChrome.css
 - **Neovim theme synchronization** - AstroVim colorschemes sync with system theme
 - **Fastfetch themed display** - System info with matching logo and colors

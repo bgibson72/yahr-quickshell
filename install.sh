@@ -1176,20 +1176,40 @@ install_sddm() {
         return 1
     fi
     
+    # Install SDDM theme
+    print_info "Installing SDDM theme..."
+    sudo mkdir -p /usr/share/sddm/themes
+    
+    if [ -d "$SCRIPT_DIR/sddm/yahr-theme" ]; then
+        print_step "Installing yahr-theme..."
+        sudo cp -r "$SCRIPT_DIR/sddm/yahr-theme" /usr/share/sddm/themes/
+        print_success "SDDM theme installed to /usr/share/sddm/themes/yahr-theme"
+    fi
+    
     # Install SDDM config
     print_info "Installing SDDM configuration..."
     sudo mkdir -p /etc/sddm.conf.d
     
-    # Copy all config files from sddm directory
-    for config_file in "$SCRIPT_DIR/sddm"/*; do
-        if [ -f "$config_file" ]; then
-            local filename=$(basename "$config_file")
-            print_step "Installing $filename..."
-            sudo cp "$config_file" "/etc/sddm.conf.d/$filename"
-        fi
-    done
+    # Create theme configuration
+    print_step "Configuring SDDM to use yahr-theme..."
+    sudo tee /etc/sddm.conf.d/theme.conf > /dev/null << 'EOF'
+[Theme]
+Current=yahr-theme
+CursorTheme=Adwaita
+
+[General]
+Numlock=on
+EOF
     
     print_success "SDDM configuration installed"
+    
+    # Copy sync script to quickshell directory
+    if [ -f "$SCRIPT_DIR/sddm/sync-sddm-theme.sh" ]; then
+        print_step "Installing SDDM theme sync script..."
+        cp "$SCRIPT_DIR/sddm/sync-sddm-theme.sh" "$HOME/.config/quickshell/sync-sddm-theme.sh"
+        chmod +x "$HOME/.config/quickshell/sync-sddm-theme.sh"
+        print_success "SDDM sync script installed"
+    fi
     
     # Enable SDDM service
     print_info "Enabling SDDM service..."
