@@ -97,8 +97,7 @@ RowLayout {
                 
                 visible: {
                     let ws = staticWorkspaceButton.hyprWorkspace
-                    if (ws && (ws.focused || ws.active || ws.urgent)) {
-                        return truestaticWorkspaceButton.hasAttention)) {
+                    if (ws && (ws.focused || ws.active || staticWorkspaceButton.hasAttention)) {
                         return true
                     }
                     // Fallback: check if this workspace ID matches the focused workspace
@@ -130,9 +129,6 @@ RowLayout {
             
             required property var modelData
             
-            visible: modelData.id >= 5 && (modelData.toplevels.length > 0 || modelData.active || modelData.focused)
-            
-            width: visible ? 40 : 0
             // Check if any window in this workspace needs attention
             property bool hasAttention: {
                 // Check workspace urgent flag
@@ -149,6 +145,9 @@ RowLayout {
                 return false
             }
             
+            visible: modelData.id >= 5 && (modelData.toplevels.length > 0 || modelData.active || modelData.focused)
+            
+            width: visible ? 40 : 0
             height: 32
             
             hoverEnabled: true
@@ -161,7 +160,6 @@ RowLayout {
                 anchors.centerIn: parent
                 width: 35
                 height: parent.height - 10
-                hasAttention
                 color: dynamicWorkspaceButton.containsMouse ? 
                     Qt.rgba(ThemeManager.fgPrimary.r, ThemeManager.fgPrimary.g, ThemeManager.fgPrimary.b, 0.1) : 
                     "transparent"
