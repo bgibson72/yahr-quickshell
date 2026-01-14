@@ -26,28 +26,29 @@ Rectangle {
         
         onClicked: {
             console.log("Updates clicked! Launching updater...")
-            // Use paru or yay if available (handles both official and AUR), otherwise fall back to pacman
-            let updateCmd = ""
-            if (Quickshell.execOutput(["sh", "-c", "command -v paru"]).trim() !== "") {
-                updateCmd = "paru -Syu"
-            } else if (Quickshell.execOutput(["sh", "-c", "command -v yay"]).trim() !== "") {
-                updateCmd = "yay -Syu"
-            } else {
-                updateCmd = "sudo pacman -Syu"
-            }
             
-            console.log("Update command:", updateCmd)
+            // Use a shell script to determine the best update command and launch it in kitty
+            let updateScript = 'if command -v paru >/dev/null 2>&1; then ' +
+                              'paru -Syu; ' +
+                              'elif command -v yay >/dev/null 2>&1; then ' +
+                              'yay -Syu; ' +
+                              'else ' +
+                              'sudo pacman -Syu; ' +
+                              'fi; ' +
+                              'echo ""; echo "Done - Press enter to exit"; read'
+            
+            console.log("Launching kitty with update command")
             
             // Launch kitty terminal with update command
             try {
-                let proc = Quickshell.execDetached([
+                Quickshell.execDetached([
                     "kitty", 
                     "-e", 
                     "sh", 
                     "-c", 
-                    updateCmd + "; echo ''; echo 'Done - Press enter to exit'; read"
+                    updateScript
                 ])
-                console.log("Launched updater terminal, process:", proc)
+                console.log("Launched updater terminal successfully")
             } catch (error) {
                 console.error("Failed to launch updater:", error)
             }
