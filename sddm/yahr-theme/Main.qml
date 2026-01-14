@@ -214,6 +214,7 @@ Rectangle {
                         leftPadding: 16
                         rightPadding: 16
                         placeholderText: translateUsername
+                        placeholderTextColor: Qt.rgba(fgSecondary.r, fgSecondary.g, fgSecondary.b, 0.6)
                         text: userModel.lastUser
                         font.family: fontFamily
                         font.pixelSize: fontSize + 1
@@ -251,6 +252,7 @@ Rectangle {
                         leftPadding: 16
                         rightPadding: 16
                         placeholderText: translatePassword
+                        placeholderTextColor: Qt.rgba(fgSecondary.r, fgSecondary.g, fgSecondary.b, 0.6)
                         font.family: fontFamily
                         font.pixelSize: fontSize + 1
                         color: fgPrimary
