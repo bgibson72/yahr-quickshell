@@ -36,7 +36,22 @@ Rectangle {
                 updateCmd = "sudo pacman -Syu"
             }
             
-            let proc = Quickshell.execDetached(["kitty", "-e", "sh", "-c", updateCmd + "; echo 'Done - Press enter to exit'; read"])
+            console.log("Update command:", updateCmd)
+            
+            // Launch kitty terminal with update command
+            try {
+                let proc = Quickshell.execDetached([
+                    "kitty", 
+                    "-e", 
+                    "sh", 
+                    "-c", 
+                    updateCmd + "; echo ''; echo 'Done - Press enter to exit'; read"
+                ])
+                console.log("Launched updater terminal, process:", proc)
+            } catch (error) {
+                console.error("Failed to launch updater:", error)
+            }
+            
             // Trigger a recheck after a short delay (user might close terminal)
             recheckTimer.start()
         }
