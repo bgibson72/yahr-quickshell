@@ -760,6 +760,10 @@ check_dependencies() {
         missing_recommended+=("starship")
     fi
     
+    if ! command_exists "checkupdates"; then
+        missing_recommended+=("pacman-contrib")
+    fi
+    
     # Install critical dependencies
     if [ ${#missing_critical[@]} -gt 0 ]; then
         print_error "Missing critical dependencies:"

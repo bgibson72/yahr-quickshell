@@ -306,6 +306,7 @@ git push
 - **VS Code/VSCodium** - Separate theme sync with workbench color customizations
 - **Kitty** - Dynamic terminal theme switching
 - **GTK** - Synchronized via gsettings and settings.ini
+- **Papirus Icons** - Folder colors automatically match active theme
 - **Starship** - Color-only updates preserving custom glyphs
 - **Hyprlock** - Lock screen colors match active theme
 - **Fastfetch** - Logo updates to match theme
