@@ -25,6 +25,25 @@ RowLayout {
                 return null
             }
             
+            // Check if any window in this workspace needs attention
+            property bool hasAttention: {
+                let ws = hyprWorkspace
+                if (!ws) return false
+                
+                // Check workspace urgent flag
+                if (ws.urgent) return true
+                
+                // Check if any window is demanding attention
+                if (ws.toplevels && ws.toplevels.length > 0) {
+                    for (let i = 0; i < ws.toplevels.length; i++) {
+                        if (ws.toplevels[i].demanding) {
+                            return true
+                        }
+                    }
+                }
+                return false
+            }
+            
             width: 40
             height: 32
             
@@ -54,10 +73,9 @@ RowLayout {
                 font.pixelSize: 13
                 
                 color: {
-                    let ws = staticWorkspaceButton.hyprWorkspace
-                    if (ws && ws.urgent) {
+                    if (staticWorkspaceButton.hasAttention) {
                         return ThemeManager.accentRed
-                    } else if (ws && ws.toplevels.length > 0) {
+                    } else if (staticWorkspaceButton.hyprWorkspace && staticWorkspaceButton.hyprWorkspace.toplevels.length > 0) {
                         return ThemeManager.fgPrimary
                     } else {
                         return ThemeManager.fgTertiary
@@ -80,6 +98,7 @@ RowLayout {
                 visible: {
                     let ws = staticWorkspaceButton.hyprWorkspace
                     if (ws && (ws.focused || ws.active || ws.urgent)) {
+                        return truestaticWorkspaceButton.hasAttention)) {
                         return true
                     }
                     // Fallback: check if this workspace ID matches the focused workspace
@@ -89,11 +108,7 @@ RowLayout {
                     return false
                 }
                 
-                color: {
-                    let ws = staticWorkspaceButton.hyprWorkspace
-                    return (ws && ws.urgent) ? ThemeManager.accentRed : ThemeManager.fgPrimary
-                }
-                
+                color: staticWorkspaceButton.hasAttention ? ThemeManager.accentRed : ThemeManager.fgPrimary
                 Behavior on color {
                     ColorAnimation { duration: 200 }
                 }
@@ -118,6 +133,22 @@ RowLayout {
             visible: modelData.id >= 5 && (modelData.toplevels.length > 0 || modelData.active || modelData.focused)
             
             width: visible ? 40 : 0
+            // Check if any window in this workspace needs attention
+            property bool hasAttention: {
+                // Check workspace urgent flag
+                if (modelData.urgent) return true
+                
+                // Check if any window is demanding attention
+                if (modelData.toplevels && modelData.toplevels.length > 0) {
+                    for (let i = 0; i < modelData.toplevels.length; i++) {
+                        if (modelData.toplevels[i].demanding) {
+                            return true
+                        }
+                    }
+                }
+                return false
+            }
+            
             height: 32
             
             hoverEnabled: true
@@ -130,7 +161,7 @@ RowLayout {
                 anchors.centerIn: parent
                 width: 35
                 height: parent.height - 10
-                
+                hasAttention
                 color: dynamicWorkspaceButton.containsMouse ? 
                     Qt.rgba(ThemeManager.fgPrimary.r, ThemeManager.fgPrimary.g, ThemeManager.fgPrimary.b, 0.1) : 
                     "transparent"
@@ -168,9 +199,9 @@ RowLayout {
                 height: 2
                 radius: 1
                 
-                visible: dynamicWorkspaceButton.modelData.focused || dynamicWorkspaceButton.modelData.active || dynamicWorkspaceButton.modelData.urgent
+                visible: dynamicWorkspaceButton.modelData.focused || dynamicWorkspaceButton.modelData.active || dynamicWorkspaceButton.hasAttention
                 
-                color: dynamicWorkspaceButton.modelData.urgent ? ThemeManager.accentRed : ThemeManager.fgPrimary
+                color: dynamicWorkspaceButton.hasAttention ? ThemeManager.accentRed : ThemeManager.fgPrimary
                 
                 Behavior on color {
                     ColorAnimation { duration: 200 }
