@@ -9,9 +9,31 @@ window {
     margin: 0px;
     padding: 0px;
     border: 2px solid #89b4fa;
-    background-color: #1e1e2e;
+    background-color: rgba(0, 0, 0, 0);
     border-radius: 12px;
     outline: none;
+}
+
+#inner-box {
+    margin: 0px;
+    padding: 0px;
+    border: none;
+    background-color: #1e1e2e;
+    border-radius: 10px;
+}
+
+#outer-box {
+    margin: 0px;
+    padding: 0px;
+    border: none;
+    background-color: transparent;
+}
+
+#scroll {
+    margin: 0px;
+    padding: 0px;
+    border: none;
+    background-color: transparent;
 }
 
 #input {
@@ -28,26 +50,6 @@ window {
 #input:focus {
     border: 2px solid #89b4fa;
     background-color: #45475a;
-}
-
-#inner-box {
-    margin: 0px 8px 8px 8px;
-    padding: 4px;
-    border: none;
-    background-color: transparent;
-}
-
-#outer-box {
-    margin: 0px;
-    padding: 0px;
-    border: none;
-    background-color: transparent;
-}
-
-#scroll {
-    margin: 0px;
-    padding: 0px;
-    border: none;
 }
 
 #text {
