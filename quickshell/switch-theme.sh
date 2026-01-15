@@ -158,6 +158,12 @@ if [ -x "$HOME/.config/quickshell/sync-kitty-theme.sh" ]; then
     "$HOME/.config/quickshell/sync-kitty-theme.sh"
 fi
 
+# Sync Wofi theme
+if [ -x "$HOME/.config/quickshell/sync-wofi-theme.sh" ]; then
+    echo "Syncing Wofi theme..."
+    "$HOME/.config/quickshell/sync-wofi-theme.sh"
+fi
+
 # Sync Neovim theme
 if [ -x "$HOME/.config/quickshell/sync-nvim-theme.sh" ]; then
     echo "Syncing Neovim theme..."
