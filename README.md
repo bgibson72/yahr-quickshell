@@ -80,6 +80,7 @@ cd yahr-quickshell
   - Vulkan, libinput, seatd, polkit
 - **Kitty** - Terminal emulator with theme sync
 - **Mako** - Notification daemon
+- **Wofi** - Application launcher with clipboard history integration
 - **Wallpapers** - Collection organized by theme
 - **Papirus Icons** - With dynamic folder colors
 - **Fonts** - Maple Mono Nerd Font family, Nerd Fonts Symbols
@@ -91,6 +92,7 @@ cd yahr-quickshell
 - **Network**: NetworkManager
 - **Utilities**: Thunar, Firefox, brightnessctl
 - **Screenshots**: hyprshot, grim, slurp
+- **Clipboard**: cliphist for clipboard history management
 - **Tools**: nwg-look (GTK theme manager)
 - **System Info**: fastfetch with themed logos
 - **Fonts**: Noto Color Emoji for colored icons

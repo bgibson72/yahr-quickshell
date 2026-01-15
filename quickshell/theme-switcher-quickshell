@@ -444,7 +444,8 @@ update_mako_theme() {
 # Theme: $theme_name
 
 # General settings
-font=JetBrainsMono Nerd Font 13
+font=JetBrainsMono 13
+markup=1
 max-visible=5
 sort=-time
 layer=overlay

@@ -671,6 +671,10 @@ check_dependencies() {
         missing_critical+=("slurp")
     fi
     
+    if ! command_exists "cliphist"; then
+        missing_critical+=("cliphist")
+    fi
+    
     if ! command_exists "nwg-look"; then
         missing_critical+=("nwg-look")
     fi

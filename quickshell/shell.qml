@@ -326,12 +326,12 @@ ShellRoot {
             }
             
             margins {
-                top: (screen.height - 600) / 2
-                left: (screen.width - 700) / 2
+                top: (screen.height - 768) / 2
+                left: (screen.width - 1024) / 2
             }
             
-            implicitWidth: 700
-            implicitHeight: 600
+            implicitWidth: 1024
+            implicitHeight: 768
             
             color: "transparent"
             exclusiveZone: 0
@@ -340,7 +340,7 @@ ShellRoot {
             WlrLayershell.keyboardFocus: WlrKeyboardFocus.OnDemand
             
             SettingsWidget {
-                anchors.fill: parent
+                anchors.centerIn: parent
                 isVisible: shellRoot.settingsVisible
                 
                 onCloseRequested: {

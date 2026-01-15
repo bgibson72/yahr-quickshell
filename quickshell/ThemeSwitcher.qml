@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
+import QtQuick.Effects
 import Quickshell
 import Quickshell.Io
 import Quickshell.Wayland
@@ -13,6 +14,7 @@ Scope {
     property string currentTheme: ""
     property bool isVisible: false
     property string themeBuffer: ""
+    property bool enableBlur: false
     
     // Loading overlay instance
     ThemeLoadingOverlay {
@@ -93,6 +95,35 @@ Scope {
         onExited: {
             // Ensure overlay is hidden even if process fails
             loadingOverlay.hide();
+        }
+    }
+    
+    // Load blur setting
+    Process {
+        id: blurSettingsLoader
+        running: true
+        command: ["cat", Quickshell.env("HOME") + "/.config/quickshell/settings.json"]
+        
+        property string buffer: ""
+        
+        stdout: SplitParser {
+            onRead: data => {
+                blurSettingsLoader.buffer += data
+            }
+        }
+        
+        onRunningChanged: {
+            if (!running && buffer !== "") {
+                try {
+                    const settings = JSON.parse(buffer)
+                    if (settings.general && settings.general.enableBlur !== undefined) {
+                        themeSwitcher.enableBlur = settings.general.enableBlur
+                    }
+                } catch (e) {}
+                buffer = ""
+            } else if (running) {
+                buffer = ""
+            }
         }
     }
 

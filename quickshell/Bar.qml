@@ -2,11 +2,14 @@ import QtQuick
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Io
+import Quickshell.Services.Mpris
+import QtQuick.Effects
 
 Item {
     id: root
     
     property bool transparentBackground: false
+    property bool enableBlur: false
     property string position: "top"  // "top" or "bottom"
     
     // Load bar settings
@@ -35,6 +38,9 @@ Item {
                             root.position = settings.bar.position
                         }
                     }
+                    if (settings.general && settings.general.enableBlur !== undefined) {
+                        root.enableBlur = settings.general.enableBlur
+                    }
                 } catch (e) {
                     console.log("🎨 Error parsing bar settings:", e)
                 }
@@ -57,6 +63,7 @@ Item {
     
     // Background rectangle
     Rectangle {
+        id: background
         anchors.fill: parent
         color: root.transparentBackground ? "transparent" : ThemeManager.bgBaseAlpha
         z: -1
@@ -91,7 +98,12 @@ Item {
         anchors.verticalCenter: parent.verticalCenter
     }
 
-    
+    // CENTER-RIGHT SECTION - Media Player
+    MediaPlayer {
+        anchors.left: clockComponent.right
+        anchors.leftMargin: 16
+        anchors.verticalCenter: parent.verticalCenter
+    }
 
     
     // RIGHT SECTION
@@ -108,6 +120,7 @@ Item {
             anchors.verticalCenter: parent.verticalCenter
             spacing: 8
             
+            ClipboardManager {}
             Updates {}
             SystemTray {}
             PowerButton {

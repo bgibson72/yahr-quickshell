@@ -1,14 +1,15 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import QtQuick.Effects
 import Quickshell
 import Quickshell.Io
 
 Rectangle {
     id: root
     
-    width: 700
-    height: 600
+    width: 1024
+    height: 768
     color: ThemeManager.bgBase
     radius: 16
     border.width: 3
@@ -17,8 +18,10 @@ Rectangle {
     
     property bool isVisible: false
     property var settings: ({})
+    property string currentTheme: ""  // Separate property for reactive binding
     property var themes: []
     property bool applyButtonSuccess: false
+    property bool enableBlur: false
     
     signal closeRequested()
     signal settingsUpdated()  // Signal to notify when settings change
@@ -64,7 +67,8 @@ Rectangle {
                             weatherLongitude: "",
                             useFahrenheit: true,
                             clockFormat24hr: true,
-                            showSeconds: false
+                            showSeconds: false,
+                            enableBlur: false
                         }
                     }
                     if (!root.settings.screenshot) {
@@ -93,6 +97,9 @@ Rectangle {
                         }
                     }
                     
+                    // Update the reactive currentTheme property
+                    root.currentTheme = root.settings.theme.current || "TokyoNight"
+                    
                     console.log("Settings loaded:", JSON.stringify(root.settings))
                     updateUI()
                 } catch (e) {
@@ -104,7 +111,8 @@ Rectangle {
                             weatherLongitude: "",
                             useFahrenheit: true,
                             clockFormat24hr: true,
-                            showSeconds: false
+                            showSeconds: false,
+                            enableBlur: false
                         },
                         screenshot: {
                             defaultDelay: 0,
@@ -234,7 +242,19 @@ SETTINGSEOF`
     
     function applyTheme(themeName) {
         console.log("Applying theme:", themeName)
+        
+        // Update the theme in settings
+        if (!root.settings.theme) {
+            root.settings.theme = {}
+        }
         root.settings.theme.current = themeName
+        
+        // Update the reactive property
+        root.currentTheme = themeName
+        
+        // Force the settings object to update by creating a new object
+        root.settings = JSON.parse(JSON.stringify(root.settings))
+        
         saveSettings()
         
         Quickshell.execDetached([
@@ -307,10 +327,10 @@ SETTINGSEOF`
                 spacing: 8
                 
                 Repeater {
-                    model: ["General", "Screenshots", "Bar", "Theme"]
+                    model: ["General", "Widgets", "Screenshots", "Bar", "Theme"]
                     
                     Rectangle {
-                        width: (parent.width - 24) / 4
+                        width: (parent.width - 32) / 5
                         height: parent.height
                         radius: 8
                         color: tabBar.currentIndex === index ? ThemeManager.accentBlue : "transparent"
@@ -354,6 +374,29 @@ SETTINGSEOF`
                 currentIndex: tabBar.currentIndex
                 
                 // General Tab
+                ScrollView {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    clip: true
+                    
+                    ColumnLayout {
+                        width: parent.width
+                        spacing: 24
+                        
+                        // Placeholder for future general settings
+                        Text {
+                            Layout.fillWidth: true
+                            text: "General settings will appear here"
+                            font.family: "MapleMono NF"
+                            font.pixelSize: 13
+                            color: ThemeManager.fgSecondary
+                            horizontalAlignment: Text.AlignHCenter
+                            Layout.topMargin: 40
+                        }
+                    }
+                }
+                
+                // Widgets Tab
                 ScrollView {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
@@ -1234,7 +1277,7 @@ SETTINGSEOF`
                             
                             Text {
                                 anchors.centerIn: parent
-                                text: "Themes apply immediately when selected"
+                                text: "Please allow 30-45 seconds for the theme to propagate to all UI elements once selected"
                                 font.family: "MapleMono NF"
                                 font.pixelSize: 11
                                 font.italic: true
@@ -1247,7 +1290,7 @@ SETTINGSEOF`
                             
                             Rectangle {
                                 width: parent.width
-                                height: 60
+                                height: 180
                                 radius: 8
                                 color: themeMouseArea.containsMouse ? ThemeManager.accentBlue : ThemeManager.surface1
                                 border.width: themeMouseArea.containsMouse ? 2 : 0
@@ -1265,19 +1308,19 @@ SETTINGSEOF`
                                 
                                 Row {
                                     anchors.fill: parent
-                                    anchors.margins: 12
-                                    spacing: 12
+                                    anchors.margins: 16
+                                    spacing: 20
                                     
                                     // Theme name and current indicator
                                     Column {
                                         anchors.verticalCenter: parent.verticalCenter
-                                        spacing: 2
+                                        spacing: 4
                                         width: 150
                                         
                                         Text {
                                             text: model.name
                                             font.family: "MapleMono NF"
-                                            font.pixelSize: 13
+                                            font.pixelSize: 15
                                             font.weight: Font.Medium
                                             color: themeMouseArea.containsMouse ? ThemeManager.bgBase : ThemeManager.fgPrimary
                                             
@@ -1287,11 +1330,11 @@ SETTINGSEOF`
                                         }
                                         
                                         Text {
-                                            text: model.name === root.settings.theme.current ? "● Current" : ""
+                                            text: model.name === root.currentTheme ? "● Current" : ""
                                             font.family: "MapleMono NF"
                                             font.pixelSize: 10
                                             color: themeMouseArea.containsMouse ? ThemeManager.bgBase : ThemeManager.accentGreen
-                                            visible: model.name === root.settings.theme.current
+                                            visible: model.name === root.currentTheme
                                             
                                             Behavior on color {
                                                 ColorAnimation { duration: 150 }
@@ -1299,48 +1342,32 @@ SETTINGSEOF`
                                         }
                                     }
                                     
-                                    // Color chips - show palette preview with distinctive colors
-                                    Row {
-                                        spacing: 4
+                                    // Theme mockup thumbnail
+                                    Rectangle {
+                                        width: 420
+                                        height: 150
+                                        radius: 6
+                                        color: ThemeManager.bgMantle
+                                        border.width: 1
+                                        border.color: ThemeManager.border0
+                                        clip: true
                                         anchors.verticalCenter: parent.verticalCenter
                                         
-                                        Repeater {
-                                            model: {
-                                                // Distinctive color palettes for each theme
-                                                const name = parent.parent.parent.themeName.toLowerCase()
-                                                // TokyoNight - vibrant purples and blues
-                                                if (name.includes("tokyo")) return ["#f7768e", "#bb9af7", "#7dcfff", "#9ece6a", "#7aa2f7", "#1a1b26"]
-                                                // Catppuccin - soft pastels
-                                                if (name.includes("catppuccin")) return ["#f38ba8", "#cba6f7", "#f9e2af", "#a6e3a1", "#89b4fa", "#1e1e2e"]
-                                                // Nord - cool blues and teals
-                                                if (name.includes("nord")) return ["#bf616a", "#d08770", "#ebcb8b", "#a3be8c", "#88c0d0", "#2e3440"]
-                                                // Gruvbox - warm earth tones
-                                                if (name.includes("gruvbox")) return ["#fb4934", "#fabd2f", "#b8bb26", "#83a598", "#d3869b", "#282828"]
-                                                // Everforest - natural greens
-                                                if (name.includes("everforest")) return ["#e67e80", "#e69875", "#dbbc7f", "#a7c080", "#83c092", "#2b3339"]
-                                                // Dracula - vivid neon
-                                                if (name.includes("dracula")) return ["#ff79c6", "#bd93f9", "#ffb86c", "#50fa7b", "#8be9fd", "#282a36"]
-                                                // RosePine - muted rose tones
-                                                if (name.includes("rose")) return ["#eb6f92", "#c4a7e7", "#f6c177", "#ebbcba", "#9ccfd8", "#191724"]
-                                                // Kanagawa - Japanese ink wash (deep reds and golds)
-                                                if (name.includes("kanagawa")) return ["#ff5d62", "#ffa066", "#dca561", "#98bb6c", "#7e9cd8", "#1f1f28"]
-                                                // Material - Google Material Design (bold primaries)
-                                                if (name.includes("material")) return ["#f07178", "#c792ea", "#ffcb6b", "#c3e88d", "#82aaff", "#263238"]
-                                                // NightFox - deep forest blues and oranges
-                                                if (name.includes("nightfox") || name.includes("night")) return ["#c94f6d", "#f4a261", "#dbc074", "#81b29a", "#719cd6", "#192330"]
-                                                // Eldritch - mystical purples and cyans
-                                                if (name.includes("eldritch")) return ["#f16c75", "#a48cf4", "#f1fc79", "#37f499", "#04d1f9", "#212337"]
-                                                // Default fallback
-                                                return [ThemeManager.accentRed, ThemeManager.accentPurple, ThemeManager.accentYellow, ThemeManager.accentGreen, ThemeManager.accentBlue, ThemeManager.bgBase]
-                                            }
+                                        Image {
+                                            anchors.fill: parent
+                                            anchors.margins: 2
+                                            source: "file://" + Quickshell.env("HOME") + "/.config/quickshell/theme-mockups/" + model.name.toLowerCase() + "_mockup.png"
+                                            fillMode: Image.PreserveAspectFit
+                                            smooth: true
+                                            antialiasing: true
                                             
-                                            Rectangle {
-                                                width: 28
-                                                height: 28
-                                                radius: 4
-                                                color: modelData
-                                                border.width: 1
-                                                border.color: Qt.rgba(0.5, 0.5, 0.5, 0.3)
+                                            Text {
+                                                anchors.centerIn: parent
+                                                text: "No preview"
+                                                font.family: "MapleMono NF"
+                                                font.pixelSize: 10
+                                                color: ThemeManager.fgTertiary
+                                                visible: parent.status === Image.Error
                                             }
                                         }
                                     }
@@ -1412,4 +1439,3 @@ SETTINGSEOF`
         }
     }
 }
-

@@ -40,18 +40,47 @@ RowLayout {
                 height: parent.height - 10
                 
                 color: staticWorkspaceButton.containsMouse ? 
-                    Qt.rgba(ThemeManager.fgPrimary.r, ThemeManager.fgPrimary.g, ThemeManager.fgPrimary.b, 0.1) : 
+                    Qt.rgba(ThemeManager.fgPrimary.r, ThemeManager.fgPrimary.g, ThemeManager.fgPrimary.b, 0.2) : 
                     "transparent"
                 
                 radius: 6
+                
+                // Add a subtle glow effect on hover
+                border.width: staticWorkspaceButton.containsMouse ? 1 : 0
+                border.color: Qt.rgba(ThemeManager.fgPrimary.r, ThemeManager.fgPrimary.g, ThemeManager.fgPrimary.b, 0.3)
+                
+                Behavior on color {
+                    ColorAnimation { duration: 150 }
+                }
+                
+                Behavior on border.width {
+                    NumberAnimation { duration: 150 }
+                }
             }
             
             Text {
                 id: workspaceText
                 anchors.centerIn: workspaceRect
-                text: staticWorkspaceButton.workspaceId
+                text: staticWorkspaceButton.workspaceId.toString()
                 font.family: "MapleMono NF"
                 font.pixelSize: 13
+                textFormat: Text.PlainText
+                
+                property bool isCurrentWorkspace: {
+                    let ws = staticWorkspaceButton.hyprWorkspace
+                    if (ws && (ws.focused || ws.active)) {
+                        console.log("Workspace", staticWorkspaceButton.workspaceId, "is active")
+                        return true
+                    }
+                    // Fallback check
+                    if (Hyprland.focusedMonitor && Hyprland.focusedMonitor.activeWorkspace) {
+                        return Hyprland.focusedMonitor.activeWorkspace.id === staticWorkspaceButton.workspaceId
+                    }
+                    return false
+                }
+                
+                scale: isCurrentWorkspace ? 1.5 : 1.0
+                font.bold: isCurrentWorkspace
                 
                 color: {
                     let ws = staticWorkspaceButton.hyprWorkspace
@@ -64,12 +93,20 @@ RowLayout {
                     }
                 }
                 
+                Behavior on scale {
+                    NumberAnimation {
+                        duration: 600
+                        easing.type: Easing.OutBounce
+                    }
+                }
+                
                 Behavior on color {
                     ColorAnimation { duration: 200 }
                 }
             }
             
             Rectangle {
+                id: staticIndicator
                 anchors.top: workspaceText.bottom
                 anchors.topMargin: 4
                 anchors.horizontalCenter: workspaceText.horizontalCenter
@@ -77,7 +114,7 @@ RowLayout {
                 height: 2
                 radius: 1
                 
-                visible: {
+                property bool isActive: {
                     let ws = staticWorkspaceButton.hyprWorkspace
                     if (ws && (ws.focused || ws.active || ws.urgent)) {
                         return true
@@ -89,9 +126,31 @@ RowLayout {
                     return false
                 }
                 
+                opacity: isActive ? 1.0 : 0.0
+                scale: isActive ? 1.0 : 0.5
+                
+                transform: Translate {
+                    y: staticIndicator.isActive ? 0 : -5
+                }
+                
                 color: {
                     let ws = staticWorkspaceButton.hyprWorkspace
                     return (ws && ws.urgent) ? ThemeManager.accentRed : ThemeManager.fgPrimary
+                }
+                
+                Behavior on opacity {
+                    NumberAnimation {
+                        duration: 250
+                        easing.type: Easing.OutCubic
+                    }
+                }
+                
+                Behavior on scale {
+                    NumberAnimation {
+                        duration: 250
+                        easing.type: Easing.OutBack
+                        easing.overshoot: 1.3
+                    }
                 }
                 
                 Behavior on color {
@@ -119,6 +178,21 @@ RowLayout {
             
             width: visible ? 40 : 0
             height: 32
+            opacity: visible ? 1.0 : 0.0
+            
+            Behavior on width {
+                NumberAnimation {
+                    duration: 200
+                    easing.type: Easing.OutCubic
+                }
+            }
+            
+            Behavior on opacity {
+                NumberAnimation {
+                    duration: 200
+                    easing.type: Easing.OutCubic
+                }
+            }
             
             hoverEnabled: true
             cursorShape: Qt.PointingHandCursor
@@ -132,18 +206,35 @@ RowLayout {
                 height: parent.height - 10
                 
                 color: dynamicWorkspaceButton.containsMouse ? 
-                    Qt.rgba(ThemeManager.fgPrimary.r, ThemeManager.fgPrimary.g, ThemeManager.fgPrimary.b, 0.1) : 
+                    Qt.rgba(ThemeManager.fgPrimary.r, ThemeManager.fgPrimary.g, ThemeManager.fgPrimary.b, 0.2) : 
                     "transparent"
                 
                 radius: 6
+                
+                border.width: dynamicWorkspaceButton.containsMouse ? 1 : 0
+                border.color: Qt.rgba(ThemeManager.fgPrimary.r, ThemeManager.fgPrimary.g, ThemeManager.fgPrimary.b, 0.3)
+                
+                Behavior on color {
+                    ColorAnimation { duration: 150 }
+                }
+                
+                Behavior on border.width {
+                    NumberAnimation { duration: 150 }
+                }
             }
             
             Text {
                 id: dynamicWorkspaceText
                 anchors.centerIn: dynamicWorkspaceRect
-                text: dynamicWorkspaceButton.modelData.id
+                text: dynamicWorkspaceButton.modelData.id.toString()
                 font.family: "MapleMono NF"
                 font.pixelSize: 13
+                textFormat: Text.PlainText
+                
+                property bool isCurrentWorkspace: dynamicWorkspaceButton.modelData.focused || dynamicWorkspaceButton.modelData.active
+                
+                scale: isCurrentWorkspace ? 1.5 : 1.0
+                font.bold: isCurrentWorkspace
                 
                 color: {
                     if (dynamicWorkspaceButton.modelData.urgent) {
@@ -155,12 +246,20 @@ RowLayout {
                     }
                 }
                 
+                Behavior on scale {
+                    NumberAnimation {
+                        duration: 600
+                        easing.type: Easing.OutBounce
+                    }
+                }
+                
                 Behavior on color {
                     ColorAnimation { duration: 200 }
                 }
             }
             
             Rectangle {
+                id: dynamicIndicator
                 anchors.top: dynamicWorkspaceText.bottom
                 anchors.topMargin: 4
                 anchors.horizontalCenter: dynamicWorkspaceText.horizontalCenter
@@ -168,9 +267,31 @@ RowLayout {
                 height: 2
                 radius: 1
                 
-                visible: dynamicWorkspaceButton.modelData.focused || dynamicWorkspaceButton.modelData.active || dynamicWorkspaceButton.modelData.urgent
+                property bool isActive: dynamicWorkspaceButton.modelData.focused || dynamicWorkspaceButton.modelData.active || dynamicWorkspaceButton.modelData.urgent
+                
+                opacity: isActive ? 1.0 : 0.0
+                scale: isActive ? 1.0 : 0.5
+                
+                transform: Translate {
+                    y: dynamicIndicator.isActive ? 0 : -5
+                }
                 
                 color: dynamicWorkspaceButton.modelData.urgent ? ThemeManager.accentRed : ThemeManager.fgPrimary
+                
+                Behavior on opacity {
+                    NumberAnimation {
+                        duration: 250
+                        easing.type: Easing.OutCubic
+                    }
+                }
+                
+                Behavior on scale {
+                    NumberAnimation {
+                        duration: 250
+                        easing.type: Easing.OutBack
+                        easing.overshoot: 1.3
+                    }
+                }
                 
                 Behavior on color {
                     ColorAnimation { duration: 200 }

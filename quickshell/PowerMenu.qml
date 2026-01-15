@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Effects
 import Quickshell
 import Quickshell.Io
 
@@ -15,6 +16,7 @@ Rectangle {
     
     property bool isVisible: false
     property int hoverIndex: -1
+    property bool enableBlur: false
     
     signal requestClose()
     
@@ -31,6 +33,36 @@ Rectangle {
             if (executeTimer.running) {
                 executeTimer.stop()
                 executeTimer.pendingAction = ""
+            }
+            blurSettingsLoader.running = true
+        }
+    }
+    
+    // Load blur setting
+    Process {
+        id: blurSettingsLoader
+        running: false
+        command: ["cat", Quickshell.env("HOME") + "/.config/quickshell/settings.json"]
+        
+        property string buffer: ""
+        
+        stdout: SplitParser {
+            onRead: data => {
+                blurSettingsLoader.buffer += data
+            }
+        }
+        
+        onRunningChanged: {
+            if (!running && buffer !== "") {
+                try {
+                    const settings = JSON.parse(buffer)
+                    if (settings.general && settings.general.enableBlur !== undefined) {
+                        root.enableBlur = settings.general.enableBlur
+                    }
+                } catch (e) {}
+                buffer = ""
+            } else if (running) {
+                buffer = ""
             }
         }
     }

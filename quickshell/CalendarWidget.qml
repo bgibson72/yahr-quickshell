@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Effects
 import Quickshell
 import Quickshell.Io
 
@@ -14,6 +15,7 @@ Rectangle {
     antialiasing: true
     
     property bool isVisible: false
+    property bool enableBlur: false
     
     signal requestClose()
     
@@ -21,6 +23,41 @@ Rectangle {
     
     Keys.onEscapePressed: {
         root.requestClose()
+    }
+    
+    // Load blur setting
+    onIsVisibleChanged: {
+        if (isVisible) {
+            blurSettingsLoader.running = true
+        }
+    }
+    
+    Process {
+        id: blurSettingsLoader
+        running: false
+        command: ["cat", Quickshell.env("HOME") + "/.config/quickshell/settings.json"]
+        
+        property string buffer: ""
+        
+        stdout: SplitParser {
+            onRead: data => {
+                blurSettingsLoader.buffer += data
+            }
+        }
+        
+        onRunningChanged: {
+            if (!running && buffer !== "") {
+                try {
+                    const settings = JSON.parse(buffer)
+                    if (settings.general && settings.general.enableBlur !== undefined) {
+                        root.enableBlur = settings.general.enableBlur
+                    }
+                } catch (e) {}
+                buffer = ""
+            } else if (running) {
+                buffer = ""
+            }
+        }
     }
     
     Column {

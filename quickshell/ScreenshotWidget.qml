@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import QtQuick.Effects
 import Quickshell
 import Quickshell.Io
 import Quickshell.Wayland
@@ -12,6 +13,8 @@ PanelWindow {
     screen: screen_
     
     visible: false
+    
+    property bool enableBlur: false
     
     anchors {
         top: true
@@ -72,6 +75,9 @@ PanelWindow {
                         copyToClipboard = settings.screenshot.copyToClipboard === true
                         saveLocation = settings.screenshot.saveLocation || "~/Pictures/Screenshots"
                         console.log("Screenshot settings loaded - delay:", delaySeconds, "saveToDisk:", saveToDisk, "copyToClipboard:", copyToClipboard, "location:", saveLocation)
+                    }
+                    if (settings.general && settings.general.enableBlur !== undefined) {
+                        screenshotWindow.enableBlur = settings.general.enableBlur
                     }
                 } catch (e) {
                     console.error("Failed to load screenshot settings:", e)

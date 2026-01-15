@@ -2,7 +2,8 @@
 # Theme: Gruvbox
 
 # General settings
-font=JetBrainsMono Nerd Font 13
+font=JetBrainsMono 13
+markup=1
 max-visible=5
 sort=-time
 layer=overlay
@@ -46,3 +47,4 @@ icon-path=/usr/share/icons/Papirus-Dark
 
 # Format
 format=<b>%s</b>\n%b
+text-alignment=left
