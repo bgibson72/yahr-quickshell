@@ -8,8 +8,8 @@ import Quickshell.Io
 Rectangle {
     id: root
     
-    width: 1024
-    height: 768
+    width: 800
+    height: 600
     color: ThemeManager.bgBase
     radius: 16
     border.width: 3
@@ -1356,7 +1356,7 @@ SETTINGSEOF`
                                         Image {
                                             anchors.fill: parent
                                             anchors.margins: 2
-                                            source: "file://" + Quickshell.env("HOME") + "/.config/quickshell/theme-mockups/" + model.name.toLowerCase() + "_mockup.png"
+                                            source: "file://" + Quickshell.env("HOME") + "/.config/quickshell/theme-mockups/" + model.name.toLowerCase() + ".png"
                                             fillMode: Image.PreserveAspectFit
                                             smooth: true
                                             antialiasing: true

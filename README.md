@@ -80,7 +80,8 @@ cd yahr-quickshell
   - Vulkan, libinput, seatd, polkit
 - **Kitty** - Terminal emulator with theme sync
 - **Mako** - Notification daemon
-- **Wofi** - Application launcher with clipboard history integration
+- **Wofi** - Application launcher and clipboard history GUI
+- **Cliphist** - Clipboard history manager (requires wofi for GUI)
 - **Wallpapers** - Collection organized by theme
 - **Papirus Icons** - With dynamic folder colors
 - **Fonts** - Maple Mono Nerd Font family, Nerd Fonts Symbols

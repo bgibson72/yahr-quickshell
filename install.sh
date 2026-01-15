@@ -675,6 +675,10 @@ check_dependencies() {
         missing_critical+=("cliphist")
     fi
     
+    if ! command_exists "wofi"; then
+        missing_critical+=("wofi")
+    fi
+    
     if ! command_exists "nwg-look"; then
         missing_critical+=("nwg-look")
     fi
