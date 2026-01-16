@@ -464,6 +464,9 @@ Item {
         
         onRunningChanged: {
             if (running) {
+                // Clear buffer before new load
+                buffer = ""
+                
                 // Build command to load calendar file(s)
                 let expandedPaths = root.calendarPaths.replace(/~/g, Quickshell.env("HOME"))
                 
@@ -479,9 +482,14 @@ Item {
                 command = ["sh", "-c", catCommands + " || echo ''"]
                 console.log("Loading calendars from:", paths.join(", "))
             } else if (!running && buffer !== "") {
-                console.log("Calendar data loaded, size:", buffer.length)
+                console.log("Calendar data loaded, size:", buffer.length, "bytes")
                 parseICalData(buffer)
-                // Don't clear buffer - we need it for hasEventsOnDay checks
+                // Keep buffer for hasEventsOnDay checks
+            } else if (!running) {
+                console.log("Calendar load complete but buffer is empty")
+                // Initialize empty cache
+                calendarModel.eventDatesCache = {}
+                calendarModel.eventsModel = []
             }
         }
         
@@ -490,15 +498,20 @@ Item {
             let events = []
             let eventDates = {}
             
+            console.log("Parsing iCal data, length:", icalContent.length)
+            
             if (!icalContent || icalContent.trim() === "") {
+                console.log("No calendar data to parse")
                 calendarModel.eventsModel = events
                 calendarModel.eventDatesCache = eventDates
                 return
             }
             
             let lines = icalContent.split('\n')
+            console.log("Processing", lines.length, "lines")
             let currentEvent = null
             let selectedDate = new Date(calendarModel.currentYear, calendarModel.currentMonth, calendarModel.selectedDay)
+            let totalEvents = 0
             
             for (let i = 0; i < lines.length; i++) {
                 let line = lines[i].trim()
@@ -514,6 +527,7 @@ Item {
                 } else if (line === "END:VEVENT" && currentEvent) {
                     // Check if event is on selected date
                     if (currentEvent.date) {
+                        totalEvents++
                         let eventDate = new Date(currentEvent.date)
                         
                         // Add to cache for fast lookup
@@ -554,6 +568,9 @@ Item {
                     }
                 }
             }
+            
+            console.log("Parsed", totalEvents, "total events,", events.length, "events for selected day")
+            console.log("Event dates cache has", Object.keys(eventDates).length, "dates")
             
             calendarModel.eventsModel = events
             calendarModel.eventDatesCache = eventDates
