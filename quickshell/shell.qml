@@ -178,11 +178,11 @@ ShellRoot {
             
             margins {
                 top: 42
-                left: modelData.width / 2 - 270
+                left: modelData.width / 2 - 400
             }
             
-            implicitWidth: 540
-            implicitHeight: 432
+            implicitWidth: 800
+            implicitHeight: 600
             
             color: "transparent"
             exclusiveZone: 0
@@ -193,7 +193,7 @@ ShellRoot {
                 NumberAnimation { duration: 200; easing.type: Easing.OutCubic }
             }
             
-            CalendarWidget {
+            SystemInfoWidget {
                 anchors.fill: parent
                 isVisible: shellRoot.calendarVisible
                 
