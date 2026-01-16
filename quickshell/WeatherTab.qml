@@ -64,11 +64,23 @@ Item {
                     spacing: 20
                     
                     Text {
+                        id: cityName
+                        text: ""
+                        font.family: "MapleMono NF"
+                        font.pixelSize: 16
+                        font.weight: Font.Bold
+                        color: ThemeManager.accentBlue
+                        width: parent.width
+                        elide: Text.ElideRight
+                        visible: text !== ""
+                    }
+                    
+                    Text {
                         id: locationText
                         text: "📍 Loading location..."
                         font.family: "MapleMono NF"
-                        font.pixelSize: 16
-                        color: ThemeManager.fgPrimary
+                        font.pixelSize: 14
+                        color: ThemeManager.fgSecondary
                         width: parent.width
                         elide: Text.ElideRight
                     }
@@ -203,7 +215,7 @@ Item {
                     spacing: 12
                     
                     Repeater {
-                        model: 5
+                        model: forecastModel.updateCount >= 0 ? Math.min(5, forecastModel.forecast.length) : 0
                         
                         Rectangle {
                             width: (parent.width - 48) / 5
@@ -275,6 +287,46 @@ Item {
         }
     }
     
+    // Reverse geocoding to get city name from coordinates
+    Process {
+        id: reverseGeocodeProcess
+        command: ["sh", "-c", "echo"]
+        running: false
+        property string buffer: ""
+        
+        stdout: SplitParser {
+            onRead: data => { reverseGeocodeProcess.buffer += data }
+        }
+        
+        onRunningChanged: {
+            if (!running && buffer !== "") {
+                try {
+                    const data = JSON.parse(buffer)
+                    if (data.address) {
+                        let parts = []
+                        if (data.address.city || data.address.town || data.address.village) {
+                            parts.push(data.address.city || data.address.town || data.address.village)
+                        }
+                        if (data.address.state) {
+                            parts.push(data.address.state)
+                        }
+                        if (data.address.country) {
+                            parts.push(data.address.country)
+                        }
+                        if (parts.length > 0) {
+                            cityName.text = "🏙️ " + parts.join(", ")
+                        }
+                    }
+                } catch (e) {
+                    console.error("Failed to parse geocoding data:", e)
+                }
+                buffer = ""
+            } else if (running) {
+                buffer = ""
+            }
+        }
+    }
+    
     // Weather update timer
     Timer {
         interval: 300000 // 5 minutes
@@ -321,11 +373,12 @@ Item {
                         locationName = city
                         if (state) locationName += ", " + state
                         if (country) locationName += " " + country
+                        cityName.text = "🏙️ " + locationName
                     } else if (latitude && longitude) {
-                        locationName = latitude + ", " + longitude
-                    }
-                    if (locationName) {
-                        locationText.text = "📍 " + locationName
+                        // Try to get city name from coordinates using reverse geocoding
+                        cityName.text = ""
+                        reverseGeocodeProcess.command = ["sh", "-c", `curl -s "https://geocode.maps.co/reverse?lat=${latitude}&lon=${longitude}"`]
+                        reverseGeocodeProcess.running = true
                     }
                     
                     const tempUnit = useFahrenheit ? "u" : "m"
@@ -369,7 +422,10 @@ Item {
                     currentCondition.text = (parts[2] || "Unknown").trim()
                     humidity.text = (parts[3] || "--").trim()
                     windSpeed.text = (parts[4] || "--").trim()
-                    locationText.text = "📍 " + (parts[5] || "Unknown").trim()
+                    // Only set location from API if we don't have city name
+                    if (cityName.text === "") {
+                        locationText.text = "📍 " + (parts[5] || "Unknown").trim()
+                    }
                     feelsLike.text = (parts[6] || "--").trim().replace(/^\+/, "")
                     pressure.text = (parts[7] || "--").trim()
                 }
@@ -390,13 +446,19 @@ Item {
         
         onRunningChanged: {
             if (!running && buffer !== "") {
+                console.log("Forecast buffer length:", buffer.length)
                 try {
                     const data = JSON.parse(buffer)
+                    console.log("Forecast data parsed, weather array length:", data.weather ? data.weather.length : 0)
                     if (data.weather && Array.isArray(data.weather)) {
                         forecastModel.parseForecast(data.weather)
+                        console.log("Forecast parsed, items:", forecastModel.forecast.length)
+                    } else {
+                        console.error("No weather data in forecast response")
                     }
                 } catch (e) {
                     console.error("Failed to parse forecast:", e)
+                    console.error("Buffer content:", buffer.substring(0, 500))
                 }
                 buffer = ""
             } else if (running) {
@@ -410,15 +472,20 @@ Item {
         id: forecastModel
         
         property var forecast: []
+        property int updateCount: 0
+        signal forecastChanged()
         
         property bool useFahrenheit: true
         
         function parseForecast(weatherData) {
             forecast = []
+            console.log("Parsing forecast with useFahrenheit:", useFahrenheit)
             for (let i = 0; i < Math.min(5, weatherData.length); i++) {
                 let day = weatherData[i]
+                console.log("Day", i, "data:", JSON.stringify(day).substring(0, 200))
                 let high = useFahrenheit ? (day.maxtempF + "°F") : (day.maxtempC + "°C")
                 let low = useFahrenheit ? (day.mintempF + "°F") : (day.mintempC + "°C")
+                console.log("Day", i, "temps:", high, low)
                 forecast.push({
                     date: day.date || "",
                     highTemp: high || "--",
@@ -427,6 +494,9 @@ Item {
                     icon: getWeatherIcon(day.hourly && day.hourly[0] ? day.hourly[0].weatherCode : "")
                 })
             }
+            console.log("Forecast array populated with", forecast.length, "items")
+            updateCount++
+            forecastChanged()
         }
         
         function getWeatherIcon(code) {
