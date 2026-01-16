@@ -376,6 +376,7 @@ Item {
         property var eventsModel: []
         property string monthYearText: getMonthYearText()
         property string selectedDateText: getSelectedDateText()
+        property var eventDatesCache: ({})  // Cache of dates with events for fast lookup
         
         function getMonthYearText() {
             const months = ["January", "February", "March", "April", "May", "June",
@@ -430,43 +431,9 @@ Item {
         }
         
         function hasEventsOnDay(day) {
-            // Check if there are events for this day from the loaded calendar
-            let checkDate = new Date(currentYear, currentMonth, day)
-            
-            // Parse iCal data synchronously to check for events
-            if (icalLoader.buffer) {
-                let lines = icalLoader.buffer.split('\n')
-                let inEvent = false
-                let eventDate = null
-                
-                for (let i = 0; i < lines.length; i++) {
-                    let line = lines[i].trim()
-                    
-                    if (line === "BEGIN:VEVENT") {
-                        inEvent = true
-                        eventDate = null
-                    } else if (line === "END:VEVENT") {
-                        if (eventDate) {
-                            if (eventDate.getDate() === checkDate.getDate() &&
-                                eventDate.getMonth() === checkDate.getMonth() &&
-                                eventDate.getFullYear() === checkDate.getFullYear()) {
-                                return true
-                            }
-                        }
-                        inEvent = false
-                    } else if (inEvent && line.startsWith("DTSTART")) {
-                        let dateMatch = line.match(/(\d{8})/)
-                        if (dateMatch) {
-                            let dateStr = dateMatch[1]
-                            let year = parseInt(dateStr.substring(0, 4))
-                            let month = parseInt(dateStr.substring(4, 6)) - 1
-                            let day = parseInt(dateStr.substring(6, 8))
-                            eventDate = new Date(year, month, day)
-                        }
-                    }
-                }
-            }
-            return false
+            // Fast lookup using cached event dates
+            let dateKey = `${currentYear}-${(currentMonth + 1).toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`
+            return eventDatesCache[dateKey] === true
         }
         
         function selectDay(day) {
@@ -521,9 +488,11 @@ Item {
         function parseICalData(icalContent) {
             // Simple iCal parser for VEVENT entries
             let events = []
+            let eventDates = {}
             
             if (!icalContent || icalContent.trim() === "") {
                 calendarModel.eventsModel = events
+                calendarModel.eventDatesCache = eventDates
                 return
             }
             
@@ -546,6 +515,11 @@ Item {
                     // Check if event is on selected date
                     if (currentEvent.date) {
                         let eventDate = new Date(currentEvent.date)
+                        
+                        // Add to cache for fast lookup
+                        let dateKey = `${eventDate.getFullYear()}-${(eventDate.getMonth() + 1).toString().padStart(2, '0')}-${eventDate.getDate().toString().padStart(2, '0')}`
+                        eventDates[dateKey] = true
+                        
                         if (eventDate.getDate() === selectedDate.getDate() &&
                             eventDate.getMonth() === selectedDate.getMonth() &&
                             eventDate.getFullYear() === selectedDate.getFullYear()) {
@@ -582,6 +556,7 @@ Item {
             }
             
             calendarModel.eventsModel = events
+            calendarModel.eventDatesCache = eventDates
         }
     }
         // Settings loader for clock format and calendar paths
