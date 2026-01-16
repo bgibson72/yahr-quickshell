@@ -133,7 +133,7 @@ Item {
                             property bool isCurrentDay: calendarModel.isToday(index)
                             property bool isSelectedDay: calendarModel.isSelected(index)
                             property bool isValidDay: dayNumber > 0
-                            property bool hasEvents: isValidDay && calendarModel.hasEventsOnDay(dayNumber)
+                            property bool hasEvents: isValidDay ? (calendarModel.hasEventsOnDay(dayNumber) || false) : false
                             
                             color: {
                                 if (isValidDay && isCurrentDay) return ThemeManager.accentBlue
@@ -432,6 +432,9 @@ Item {
         
         function hasEventsOnDay(day) {
             // Fast lookup using cached event dates
+            if (!eventDatesCache || typeof eventDatesCache !== 'object') {
+                return false
+            }
             let dateKey = `${currentYear}-${(currentMonth + 1).toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`
             return eventDatesCache[dateKey] === true
         }
