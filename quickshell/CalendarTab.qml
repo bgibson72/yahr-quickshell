@@ -478,8 +478,8 @@ Item {
                 }
                 
                 // Build command to cat all files that exist
-                let catCommands = paths.map(p => `test -f "${p}" && cat "${p}"`).join(" ; ")
-                command = ["sh", "-c", catCommands + " || echo ''"]
+                let catCommands = paths.map(p => `(test -f "${p}" && cat "${p}" && echo "")`).join(" ; ")
+                command = ["sh", "-c", catCommands]
                 console.log("Loading calendars from:", paths.join(", "))
             } else if (!running && buffer !== "") {
                 console.log("Calendar data loaded, size:", buffer.length, "bytes")
