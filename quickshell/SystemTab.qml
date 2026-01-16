@@ -234,15 +234,15 @@ Item {
                         // Disk usage bar
                         Rectangle {
                             width: parent.width
-                            height: 32
+                            height: 6
                             color: ThemeManager.surface2
-                            radius: 16
+                            radius: 3
                             
                             Rectangle {
                                 width: parent.width * (diskMonitor.currentValue / 100)
                                 height: parent.height
                                 color: diskMonitor.currentValue > 80 ? ThemeManager.accentRed : ThemeManager.accentPurple
-                                radius: 16
+                                radius: 3
                                 
                                 Behavior on width {
                                     NumberAnimation { duration: 300; easing.type: Easing.OutCubic }
