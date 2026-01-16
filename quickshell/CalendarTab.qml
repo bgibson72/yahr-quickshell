@@ -6,6 +6,8 @@ Item {
     id: root
     
     property bool active: false
+    property bool showSeconds: false
+    property bool use24HourFormat: true
     
     Row {
         anchors.fill: parent
@@ -128,12 +130,14 @@ Item {
                             
                             property int dayNumber: calendarModel.getDayNumber(index)
                             property bool isCurrentDay: calendarModel.isToday(index)
+                            property bool isSelectedDay: calendarModel.isSelected(index)
                             property bool isValidDay: dayNumber > 0
-                            property bool hasEvents: calendarModel.hasEventsOnDay(dayNumber)
+                            property bool hasEvents: isValidDay && calendarModel.hasEventsOnDay(dayNumber)
                             
                             color: {
                                 if (isValidDay && isCurrentDay) return ThemeManager.accentBlue
-                                if (dayMouseArea.containsMouse && isValidDay) return ThemeManager.surface2
+                                if (isValidDay && isSelectedDay && !isCurrentDay) return ThemeManager.surface2
+                                if (dayMouseArea.containsMouse && isValidDay) return Qt.rgba(ThemeManager.surface2.r, ThemeManager.surface2.g, ThemeManager.surface2.b, 0.5)
                                 return "transparent"
                             }
                             
@@ -227,7 +231,17 @@ Item {
                         let now = new Date()
                         let hours = now.getHours()
                         let minutes = now.getMinutes().toString().padStart(2, '0')
-                        timeDisplay.text = `${hours.toString().padStart(2, '0')}:${minutes}`
+                        let seconds = now.getSeconds().toString().padStart(2, '0')
+                        
+                        // Handle 12/24 hour format
+                        if (!root.use24HourFormat) {
+                            let ampm = hours >= 12 ? ' PM' : ' AM'
+                            hours = hours % 12
+                            if (hours === 0) hours = 12
+                            timeDisplay.text = root.showSeconds ? `${hours}:${minutes}:${seconds}${ampm}` : `${hours}:${minutes}${ampm}`
+                        } else {
+                            timeDisplay.text = root.showSeconds ? `${hours.toString().padStart(2, '0')}:${minutes}:${seconds}` : `${hours.toString().padStart(2, '0')}:${minutes}`
+                        }
                         
                         const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
                         const months = ["January", "February", "March", "April", "May", "June",
@@ -409,9 +423,49 @@ Item {
                    currentYear === now.getFullYear()
         }
         
+        function isSelected(index) {
+            let dayNumber = getDayNumber(index)
+            return dayNumber > 0 && dayNumber === selectedDay
+        }
+        
         function hasEventsOnDay(day) {
             // Check if there are events for this day from the loaded calendar
-            return false // Will be implemented with iCal parsing
+            let checkDate = new Date(currentYear, currentMonth, day)
+            
+            // Parse iCal data synchronously to check for events
+            if (icalLoader.buffer) {
+                let lines = icalLoader.buffer.split('\n')
+                let inEvent = false
+                let eventDate = null
+                
+                for (let i = 0; i < lines.length; i++) {
+                    let line = lines[i].trim()
+                    
+                    if (line === "BEGIN:VEVENT") {
+                        inEvent = true
+                        eventDate = null
+                    } else if (line === "END:VEVENT") {
+                        if (eventDate) {
+                            if (eventDate.getDate() === checkDate.getDate() &&
+                                eventDate.getMonth() === checkDate.getMonth() &&
+                                eventDate.getFullYear() === checkDate.getFullYear()) {
+                                return true
+                            }
+                        }
+                        inEvent = false
+                    } else if (inEvent && line.startsWith("DTSTART")) {
+                        let dateMatch = line.match(/(\d{8})/)
+                        if (dateMatch) {
+                            let dateStr = dateMatch[1]
+                            let year = parseInt(dateStr.substring(0, 4))
+                            let month = parseInt(dateStr.substring(4, 6)) - 1
+                            let day = parseInt(dateStr.substring(6, 8))
+                            eventDate = new Date(year, month, day)
+                        }
+                    }
+                }
+            }
+            return false
         }
         
         function selectDay(day) {
@@ -443,9 +497,9 @@ Item {
         onRunningChanged: {
             if (!running && buffer !== "") {
                 parseICalData(buffer)
-                buffer = ""
+                // Don't clear buffer - we need it for hasEventsOnDay checks
             } else if (running) {
-                buffer = ""
+                // Only clear when starting a new load
             }
         }
         
@@ -515,16 +569,45 @@ Item {
             calendarModel.eventsModel = events
         }
     }
-    
-    // Initial load
+        // Settings loader for clock format
+    Process {
+        id: settingsLoader
+        running: false
+        command: ["cat", Quickshell.env("HOME") + "/.config/quickshell/settings.json"]
+        property string buffer: ""
+        
+        stdout: SplitParser {
+            onRead: data => { settingsLoader.buffer += data }
+        }
+        
+        onRunningChanged: {
+            if (!running && buffer !== "") {
+                try {
+                    const settings = JSON.parse(buffer)
+                    if (settings.general) {
+                        root.showSeconds = settings.general.showSeconds === true
+                        root.use24HourFormat = settings.general.clockFormat24hr !== false
+                    }
+                } catch (e) {
+                    console.error("Failed to parse settings:", e)
+                }
+                buffer = ""
+            } else if (running) {
+                buffer = ""
+            }
+        }
+    }
+        // Initial load
     Component.onCompleted: {
         if (active) {
+            settingsLoader.running = true
             calendarModel.loadEvents()
         }
     }
     
     onActiveChanged: {
         if (active) {
+            settingsLoader.running = true
             calendarModel.loadEvents()
         }
     }
