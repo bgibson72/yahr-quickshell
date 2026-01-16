@@ -8,6 +8,7 @@ Item {
     property bool active: false
     property bool showSeconds: false
     property bool use24HourFormat: true
+    property string calendarPaths: "~/.config/quickshell/calendar.ics"
     
     Row {
         anchors.fill: parent
@@ -475,8 +476,8 @@ Item {
         }
         
         function loadEvents() {
-            // Load events for selected day from iCal file
-            icalLoader.running = true
+            // Load settings first to get calendar paths
+            settingsLoader.running = true
         }
     }
     
@@ -484,7 +485,7 @@ Item {
     Process {
         id: icalLoader
         running: false
-        command: ["sh", "-c", "test -f ~/.config/quickshell/calendar.ics && cat ~/.config/quickshell/calendar.ics || echo ''"]
+        command: ["sh", "-c", "echo ''"]
         
         property string buffer: ""
         
@@ -495,11 +496,25 @@ Item {
         }
         
         onRunningChanged: {
-            if (!running && buffer !== "") {
+            if (running) {
+                // Build command to load calendar file(s)
+                let expandedPaths = root.calendarPaths.replace(/~/g, Quickshell.env("HOME"))
+                
+                // Support multiple files separated by comma, semicolon, or space
+                let paths = expandedPaths.split(/[,;\s]+/).filter(p => p.trim() !== "")
+                
+                if (paths.length === 0) {
+                    paths = [Quickshell.env("HOME") + "/.config/quickshell/calendar.ics"]
+                }
+                
+                // Build command to cat all files that exist
+                let catCommands = paths.map(p => `test -f "${p}" && cat "${p}"`).join(" ; ")
+                command = ["sh", "-c", catCommands + " || echo ''"]
+                console.log("Loading calendars from:", paths.join(", "))
+            } else if (!running && buffer !== "") {
+                console.log("Calendar data loaded, size:", buffer.length)
                 parseICalData(buffer)
                 // Don't clear buffer - we need it for hasEventsOnDay checks
-            } else if (running) {
-                // Only clear when starting a new load
             }
         }
         
@@ -569,7 +584,7 @@ Item {
             calendarModel.eventsModel = events
         }
     }
-        // Settings loader for clock format
+        // Settings loader for clock format and calendar paths
     Process {
         id: settingsLoader
         running: false
@@ -588,6 +603,14 @@ Item {
                         root.showSeconds = settings.general.showSeconds === true
                         root.use24HourFormat = settings.general.clockFormat24hr !== false
                     }
+                    if (settings.calendar && settings.calendar.filePath) {
+                        root.calendarPaths = settings.calendar.filePath
+                    } else {
+                        root.calendarPaths = "~/.config/quickshell/calendar.ics"
+                    }
+                    
+                    // Now load calendar files
+                    icalLoader.running = true
                 } catch (e) {
                     console.error("Failed to parse settings:", e)
                 }

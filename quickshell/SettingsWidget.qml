@@ -559,7 +559,7 @@ SETTINGSEOF`
                             
                             Text {
                                 width: parent.width
-                                text: "Configure your calendar integration:"
+                                text: "Configure your calendar integration (supports multiple files):"
                                 font.family: "MapleMono NF"
                                 font.pixelSize: 11
                                 color: ThemeManager.fgSecondary
@@ -570,7 +570,7 @@ SETTINGSEOF`
                                 spacing: 4
                                 
                                 Text {
-                                    text: "Calendar File Path"
+                                    text: "Calendar File Path(s)"
                                     font.family: "MapleMono NF"
                                     font.pixelSize: 11
                                     color: ThemeManager.fgSecondary
@@ -607,7 +607,7 @@ SETTINGSEOF`
                             
                             Text {
                                 width: parent.width
-                                text: "Supports iCal format (.ics files). You can sync this file with Google Calendar, Outlook, or other calendar services."
+                                text: "Supports iCal format (.ics files). You can sync this file with Google Calendar, Outlook, or other services. For multiple calendars, separate paths with spaces or commas:\n~/.config/quickshell/calendar1.ics ~/.config/quickshell/calendar2.ics"
                                 font.family: "MapleMono NF"
                                 font.pixelSize: 10
                                 color: ThemeManager.fgTertiary
