@@ -219,7 +219,7 @@ Item {
                     }
                 }
                 
-                // Progress bar style for disk
+                // Dark container for disk info
                 Rectangle {
                     width: parent.width
                     height: parent.height - 80
@@ -228,27 +228,8 @@ Item {
                     
                     Column {
                         anchors.centerIn: parent
-                        spacing: 20
+                        spacing: 16
                         width: parent.width - 32
-                        
-                        // Disk usage bar
-                        Rectangle {
-                            width: parent.width
-                            height: 6
-                            color: ThemeManager.surface2
-                            radius: 3
-                            
-                            Rectangle {
-                                width: parent.width * (diskMonitor.currentValue / 100)
-                                height: parent.height
-                                color: diskMonitor.currentValue > 80 ? ThemeManager.accentRed : ThemeManager.accentPurple
-                                radius: 3
-                                
-                                Behavior on width {
-                                    NumberAnimation { duration: 300; easing.type: Easing.OutCubic }
-                                }
-                            }
-                        }
                         
                         // Disk info rows
                         Column {
@@ -316,30 +297,22 @@ Item {
                             }
                         }
                         
-                        // Filesystem info
-                        Row {
+                        // Disk usage bar
+                        Rectangle {
                             width: parent.width
-                            spacing: 8
+                            height: 6
+                            color: ThemeManager.surface2
+                            radius: 3
                             
-                            Text {
-                                text: "Mount: /"
-                                font.family: "MapleMono NF"
-                                font.pixelSize: 11
-                                color: ThemeManager.fgTertiary
-                            }
-                            
-                            Text {
-                                text: "•"
-                                font.family: "MapleMono NF"
-                                font.pixelSize: 11
-                                color: ThemeManager.fgTertiary
-                            }
-                            
-                            Text {
-                                text: diskMonitor.filesystem
-                                font.family: "MapleMono NF"
-                                font.pixelSize: 11
-                                color: ThemeManager.fgTertiary
+                            Rectangle {
+                                width: parent.width * (diskMonitor.currentValue / 100)
+                                height: parent.height
+                                color: diskMonitor.currentValue > 80 ? ThemeManager.accentRed : ThemeManager.accentPurple
+                                radius: 3
+                                
+                                Behavior on width {
+                                    NumberAnimation { duration: 300; easing.type: Easing.OutCubic }
+                                }
                             }
                         }
                     }
