@@ -69,11 +69,15 @@ Rectangle {
                             weatherState: "",
                             weatherCountry: "",
                             openWeatherApiKey: "",
-                            openWeatherApiKey: "",
                             useFahrenheit: true,
                             clockFormat24hr: true,
                             showSeconds: false,
                             enableBlur: false
+                        }
+                    }
+                    if (!root.settings.calendar) {
+                        root.settings.calendar = {
+                            filePath: "~/.config/quickshell/calendar.ics"
                         }
                     }
                     if (!root.settings.screenshot) {
@@ -204,6 +208,13 @@ SETTINGSEOF`
         useFahrenheit.checked = root.settings.general.useFahrenheit !== false
         clockFormat24hr.checked = root.settings.general.clockFormat24hr !== false
         showSeconds.checked = root.settings.general.showSeconds === true
+        
+        // Calendar settings
+        if (root.settings.calendar) {
+            calendarPathField.text = root.settings.calendar.filePath || "~/.config/quickshell/calendar.ics"
+        } else {
+            calendarPathField.text = "~/.config/quickshell/calendar.ics"
+        }
         
         if (root.settings.screenshot) {
             delaySpinBox.value = root.settings.screenshot.defaultDelay || 0
@@ -413,17 +424,213 @@ SETTINGSEOF`
                     
                     ColumnLayout {
                         width: parent.width
-                        spacing: 24
+                        spacing: 32
                         
-                        // Weather Settings Section
+                        // ========== CLOCK SETTINGS ==========
                         Column {
                             Layout.fillWidth: true
                             spacing: 16
                             
+                            Rectangle {
+                                width: parent.width
+                                height: 2
+                                color: ThemeManager.accentBlue
+                                opacity: 0.3
+                            }
+                            
                             Text {
-                                text: "Weather Settings"
+                                text: "⏰ Clock Settings"
                                 font.family: "MapleMono NF"
-                                font.pixelSize: 16
+                                font.pixelSize: 18
+                                font.weight: Font.Bold
+                                color: ThemeManager.accentBlue
+                            }
+                            
+                            // 24-hour format
+                            Row {
+                                spacing: 12
+                                
+                                Rectangle {
+                                    width: 24
+                                    height: 24
+                                    radius: 4
+                                    color: clockFormat24hr.checked ? ThemeManager.accentBlue : ThemeManager.surface1
+                                    border.width: 2
+                                    border.color: ThemeManager.accentBlue
+                                    
+                                    Text {
+                                        anchors.centerIn: parent
+                                        text: "✓"
+                                        font.family: "Symbols Nerd Font"
+                                        font.pixelSize: 16
+                                        color: ThemeManager.bgBase
+                                        visible: clockFormat24hr.checked
+                                    }
+                                    
+                                    MouseArea {
+                                        anchors.fill: parent
+                                        cursorShape: Qt.PointingHandCursor
+                                        onClicked: {
+                                            clockFormat24hr.checked = !clockFormat24hr.checked
+                                            root.settings.general.clockFormat24hr = clockFormat24hr.checked
+                                        }
+                                    }
+                                }
+                                
+                                Text {
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    text: "Use 24-hour format"
+                                    font.family: "MapleMono NF"
+                                    font.pixelSize: 12
+                                    color: ThemeManager.fgPrimary
+                                }
+                                
+                                QtObject {
+                                    id: clockFormat24hr
+                                    property bool checked: true
+                                }
+                            }
+                            
+                            // Show seconds
+                            Row {
+                                spacing: 12
+                                
+                                Rectangle {
+                                    width: 24
+                                    height: 24
+                                    radius: 4
+                                    color: showSeconds.checked ? ThemeManager.accentBlue : ThemeManager.surface1
+                                    border.width: 2
+                                    border.color: ThemeManager.accentBlue
+                                    
+                                    Text {
+                                        anchors.centerIn: parent
+                                        text: "✓"
+                                        font.family: "Symbols Nerd Font"
+                                        font.pixelSize: 16
+                                        color: ThemeManager.bgBase
+                                        visible: showSeconds.checked
+                                    }
+                                    
+                                    MouseArea {
+                                        anchors.fill: parent
+                                        cursorShape: Qt.PointingHandCursor
+                                        onClicked: {
+                                            showSeconds.checked = !showSeconds.checked
+                                            root.settings.general.showSeconds = showSeconds.checked
+                                        }
+                                    }
+                                }
+                                
+                                Text {
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    text: "Show seconds"
+                                    font.family: "MapleMono NF"
+                                    font.pixelSize: 12
+                                    color: ThemeManager.fgPrimary
+                                }
+                                
+                                QtObject {
+                                    id: showSeconds
+                                    property bool checked: false
+                                }
+                            }
+                        }
+                        
+                        // ========== CALENDAR SETTINGS ==========
+                        Column {
+                            Layout.fillWidth: true
+                            spacing: 16
+                            
+                            Rectangle {
+                                width: parent.width
+                                height: 2
+                                color: ThemeManager.accentBlue
+                                opacity: 0.3
+                            }
+                            
+                            Text {
+                                text: "📅 Calendar Settings"
+                                font.family: "MapleMono NF"
+                                font.pixelSize: 18
+                                font.weight: Font.Bold
+                                color: ThemeManager.accentBlue
+                            }
+                            
+                            Text {
+                                width: parent.width
+                                text: "Configure your calendar integration:"
+                                font.family: "MapleMono NF"
+                                font.pixelSize: 11
+                                color: ThemeManager.fgSecondary
+                                wrapMode: Text.WordWrap
+                            }
+                            
+                            Column {
+                                spacing: 4
+                                
+                                Text {
+                                    text: "Calendar File Path"
+                                    font.family: "MapleMono NF"
+                                    font.pixelSize: 11
+                                    color: ThemeManager.fgSecondary
+                                }
+                                
+                                Rectangle {
+                                    width: 500
+                                    height: 32
+                                    color: ThemeManager.bgBase
+                                    radius: 6
+                                    border.width: 1
+                                    border.color: calendarPathField.activeFocus ? ThemeManager.accentBlue : ThemeManager.surface2
+                                    
+                                    TextInput {
+                                        id: calendarPathField
+                                        anchors.fill: parent
+                                        anchors.margins: 8
+                                        font.family: "MapleMono NF"
+                                        font.pixelSize: 11
+                                        color: ThemeManager.fgPrimary
+                                        verticalAlignment: TextInput.AlignVCenter
+                                        selectByMouse: true
+                                        text: "~/.config/quickshell/calendar.ics"
+                                        
+                                        onTextChanged: {
+                                            if (!root.settings.calendar) {
+                                                root.settings.calendar = {}
+                                            }
+                                            root.settings.calendar.filePath = text
+                                        }
+                                    }
+                                }
+                            }
+                            
+                            Text {
+                                width: parent.width
+                                text: "Supports iCal format (.ics files). You can sync this file with Google Calendar, Outlook, or other calendar services."
+                                font.family: "MapleMono NF"
+                                font.pixelSize: 10
+                                color: ThemeManager.fgTertiary
+                                wrapMode: Text.WordWrap
+                            }
+                        }
+                        
+                        // ========== WEATHER SETTINGS ==========
+                        Column {
+                            Layout.fillWidth: true
+                            spacing: 16
+                            
+                            Rectangle {
+                                width: parent.width
+                                height: 2
+                                color: ThemeManager.accentBlue
+                                opacity: 0.3
+                            }
+                            
+                            Text {
+                                text: "🌤️ Weather Settings"
+                                font.family: "MapleMono NF"
+                                font.pixelSize: 18
                                 font.weight: Font.Bold
                                 color: ThemeManager.accentBlue
                             }
@@ -474,27 +681,18 @@ SETTINGSEOF`
                             }
                         }
                         
-                        // Location Settings Section
+                        // Weather Location Settings
                         Column {
                             Layout.fillWidth: true
-                            spacing: 16
-                            
-                            Text {
-                                text: "Location Settings"
-                                font.family: "MapleMono NF"
-                                font.pixelSize: 16
-                                font.weight: Font.Bold
-                                color: ThemeManager.accentBlue
-                            }
+                            spacing: 12
                             
                             Text {
                                 width: parent.width
-                                text: "Leave empty to auto-detect by IP, or enter coordinates for accuracy:"
+                                text: "Location (leave empty to auto-detect, or enter coordinates for accuracy):"
                                 font.family: "MapleMono NF"
                                 font.pixelSize: 11
                                 color: ThemeManager.fgSecondary
-                                wrapMode: Text.NoWrap
-                                elide: Text.ElideNone
+                                wrapMode: Text.WordWrap
                             }
                             
                             Row {
@@ -734,112 +932,6 @@ SETTINGSEOF`
                                 font.family: "MapleMono NF"
                                 font.pixelSize: 10
                                 color: ThemeManager.fgTertiary
-                            }
-                        }
-                        
-                        // Clock Settings Section
-                        Column {
-                            Layout.fillWidth: true
-                            spacing: 16
-                            
-                            Text {
-                                text: "Clock Settings"
-                                font.family: "MapleMono NF"
-                                font.pixelSize: 16
-                                font.weight: Font.Bold
-                                color: ThemeManager.accentBlue
-                            }
-                            
-                            // 24-hour format
-                            Row {
-                                spacing: 12
-                                
-                                Rectangle {
-                                    width: 24
-                                    height: 24
-                                    radius: 4
-                                    color: clockFormat24hr.checked ? ThemeManager.accentBlue : ThemeManager.surface1
-                                    border.width: 2
-                                    border.color: ThemeManager.accentBlue
-                                    
-                                    Text {
-                                        anchors.centerIn: parent
-                                        text: "✓"
-                                        font.family: "Symbols Nerd Font"
-                                        font.pixelSize: 16
-                                        color: ThemeManager.bgBase
-                                        visible: clockFormat24hr.checked
-                                    }
-                                    
-                                    MouseArea {
-                                        anchors.fill: parent
-                                        cursorShape: Qt.PointingHandCursor
-                                        onClicked: {
-                                            clockFormat24hr.checked = !clockFormat24hr.checked
-                                            root.settings.general.clockFormat24hr = clockFormat24hr.checked
-                                            saveSettings()
-                                        }
-                                    }
-                                }
-                                
-                                Text {
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    text: "Use 24-hour format"
-                                    font.family: "MapleMono NF"
-                                    font.pixelSize: 12
-                                    color: ThemeManager.fgPrimary
-                                }
-                                
-                                QtObject {
-                                    id: clockFormat24hr
-                                    property bool checked: true
-                                }
-                            }
-                            
-                            // Show seconds
-                            Row {
-                                spacing: 12
-                                
-                                Rectangle {
-                                    width: 24
-                                    height: 24
-                                    radius: 4
-                                    color: showSeconds.checked ? ThemeManager.accentBlue : ThemeManager.surface1
-                                    border.width: 2
-                                    border.color: ThemeManager.accentBlue
-                                    
-                                    Text {
-                                        anchors.centerIn: parent
-                                        text: "✓"
-                                        font.family: "Symbols Nerd Font"
-                                        font.pixelSize: 16
-                                        color: ThemeManager.bgBase
-                                        visible: showSeconds.checked
-                                    }
-                                    
-                                    MouseArea {
-                                        anchors.fill: parent
-                                        cursorShape: Qt.PointingHandCursor
-                                        onClicked: {
-                                            showSeconds.checked = !showSeconds.checked
-                                            root.settings.general.showSeconds = showSeconds.checked
-                                            saveSettings()
-                                        }
-                                    }
-                                }
-                                
-                                Text {
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    text: "Show seconds"
-                                    font.family: "MapleMono NF"
-                                    font.pixelSize: 12
-                                    color: ThemeManager.fgPrimary
-                                }
-                                
-                                QtObject {
-                                    id: showSeconds
-                                    property bool checked: false
-                                }
                             }
                         }
                     }
