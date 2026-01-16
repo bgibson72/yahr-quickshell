@@ -222,27 +222,27 @@ Item {
                 // Progress bar style for disk
                 Rectangle {
                     width: parent.width
-                    height: parent.height - 100
+                    height: parent.height - 80
                     color: ThemeManager.surface0
                     radius: 8
                     
                     Column {
                         anchors.centerIn: parent
-                        spacing: 16
+                        spacing: 20
                         width: parent.width - 32
                         
                         // Disk usage bar
                         Rectangle {
                             width: parent.width
-                            height: 40
+                            height: 32
                             color: ThemeManager.surface2
-                            radius: 20
+                            radius: 16
                             
                             Rectangle {
                                 width: parent.width * (diskMonitor.currentValue / 100)
                                 height: parent.height
                                 color: diskMonitor.currentValue > 80 ? ThemeManager.accentRed : ThemeManager.accentPurple
-                                radius: 20
+                                radius: 16
                                 
                                 Behavior on width {
                                     NumberAnimation { duration: 300; easing.type: Easing.OutCubic }
@@ -250,89 +250,99 @@ Item {
                             }
                         }
                         
-                        // Disk info grid
-                        Grid {
-                            columns: 2
-                            columnSpacing: 24
-                            rowSpacing: 12
-                            anchors.horizontalCenter: parent.horizontalCenter
+                        // Disk info rows
+                        Column {
+                            width: parent.width
+                            spacing: 10
                             
-                            Column {
-                                spacing: 4
+                            Row {
+                                width: parent.width
+                                spacing: 8
+                                
                                 Text {
-                                    text: "Used"
+                                    width: 60
+                                    text: "Used:"
                                     font.family: "MapleMono NF"
-                                    font.pixelSize: 11
+                                    font.pixelSize: 13
                                     color: ThemeManager.fgTertiary
                                 }
                                 Text {
                                     text: diskMonitor.usedGB + " GB"
                                     font.family: "MapleMono NF"
-                                    font.pixelSize: 16
+                                    font.pixelSize: 14
                                     font.weight: Font.Bold
                                     color: ThemeManager.fgPrimary
                                 }
                             }
                             
-                            Column {
-                                spacing: 4
+                            Row {
+                                width: parent.width
+                                spacing: 8
+                                
                                 Text {
-                                    text: "Free"
+                                    width: 60
+                                    text: "Free:"
                                     font.family: "MapleMono NF"
-                                    font.pixelSize: 11
+                                    font.pixelSize: 13
                                     color: ThemeManager.fgTertiary
                                 }
                                 Text {
                                     text: diskMonitor.freeGB + " GB"
                                     font.family: "MapleMono NF"
-                                    font.pixelSize: 16
+                                    font.pixelSize: 14
                                     font.weight: Font.Bold
                                     color: ThemeManager.accentGreen
                                 }
                             }
                             
-                            Column {
-                                spacing: 4
+                            Row {
+                                width: parent.width
+                                spacing: 8
+                                
                                 Text {
-                                    text: "Total"
+                                    width: 60
+                                    text: "Total:"
                                     font.family: "MapleMono NF"
-                                    font.pixelSize: 11
+                                    font.pixelSize: 13
                                     color: ThemeManager.fgTertiary
                                 }
                                 Text {
                                     text: diskMonitor.totalGB + " GB"
                                     font.family: "MapleMono NF"
-                                    font.pixelSize: 16
-                                    font.weight: Font.Bold
-                                    color: ThemeManager.fgPrimary
-                                }
-                            }
-                            
-                            Column {
-                                spacing: 4
-                                Text {
-                                    text: "Mount"
-                                    font.family: "MapleMono NF"
-                                    font.pixelSize: 11
-                                    color: ThemeManager.fgTertiary
-                                }
-                                Text {
-                                    text: "/"
-                                    font.family: "MapleMono NF"
-                                    font.pixelSize: 16
+                                    font.pixelSize: 14
                                     font.weight: Font.Bold
                                     color: ThemeManager.fgPrimary
                                 }
                             }
                         }
+                        
+                        // Filesystem info
+                        Row {
+                            width: parent.width
+                            spacing: 8
+                            
+                            Text {
+                                text: "Mount: /"
+                                font.family: "MapleMono NF"
+                                font.pixelSize: 11
+                                color: ThemeManager.fgTertiary
+                            }
+                            
+                            Text {
+                                text: "•"
+                                font.family: "MapleMono NF"
+                                font.pixelSize: 11
+                                color: ThemeManager.fgTertiary
+                            }
+                            
+                            Text {
+                                text: diskMonitor.filesystem
+                                font.family: "MapleMono NF"
+                                font.pixelSize: 11
+                                color: ThemeManager.fgTertiary
+                            }
+                        }
                     }
-                }
-                
-                Text {
-                    text: diskMonitor.filesystem
-                    font.family: "MapleMono NF"
-                    font.pixelSize: 11
-                    color: ThemeManager.fgTertiary
                 }
             }
         }
@@ -602,7 +612,7 @@ Item {
     // Temperature process
     Process {
         id: tempProcess
-        command: ["sh", "-c", "sensors 2>/dev/null | grep -E 'Core 0|Tctl' | head -1 | awk '{print $3}' | sed 's/+//;s/°C//' || echo 0"]
+        command: ["sh", "-c", "sensors 2>/dev/null | grep -E 'Core 0|Tctl|Package id 0' | head -1 | grep -oP '\\+[0-9]+\\.[0-9]+' | sed 's/\\+//' || echo 0"]
         running: false
         
         stdout: SplitParser {

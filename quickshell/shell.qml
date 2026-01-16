@@ -177,7 +177,7 @@ ShellRoot {
             }
             
             margins {
-                top: 42
+                top: 6
                 left: modelData.width / 2 - 400
             }
             
