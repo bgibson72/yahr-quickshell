@@ -65,6 +65,9 @@ Rectangle {
                         root.settings.general = {
                             weatherLatitude: "",
                             weatherLongitude: "",
+                            weatherCity: "",
+                            weatherState: "",
+                            weatherCountry: "",
                             useFahrenheit: true,
                             clockFormat24hr: true,
                             showSeconds: false,
@@ -192,6 +195,9 @@ SETTINGSEOF`
         
         latitudeField.text = root.settings.general.weatherLatitude || ""
         longitudeField.text = root.settings.general.weatherLongitude || ""
+        cityField.text = root.settings.general.weatherCity || ""
+        stateField.text = root.settings.general.weatherState || ""
+        countryField.text = root.settings.general.weatherCountry || ""
         useFahrenheit.checked = root.settings.general.useFahrenheit !== false
         clockFormat24hr.checked = root.settings.general.clockFormat24hr !== false
         showSeconds.checked = root.settings.general.showSeconds === true
@@ -558,6 +564,123 @@ SETTINGSEOF`
                                             onTextChanged: {
                                                 root.settings.general.weatherLongitude = text
                                                 console.log("Longitude changed to:", text)
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            
+                            Text {
+                                text: "Location Name (optional)"
+                                font.family: "MapleMono NF"
+                                font.pixelSize: 12
+                                color: ThemeManager.fgTertiary
+                                topPadding: 8
+                            }
+                            
+                            Row {
+                                spacing: 12
+                                
+                                Column {
+                                    spacing: 4
+                                    
+                                    Text {
+                                        text: "City"
+                                        font.family: "MapleMono NF"
+                                        font.pixelSize: 11
+                                        color: ThemeManager.fgSecondary
+                                    }
+                                    
+                                    Rectangle {
+                                        width: 150
+                                        height: 32
+                                        color: ThemeManager.bgBase
+                                        radius: 6
+                                        border.width: 1
+                                        border.color: cityField.activeFocus ? ThemeManager.accentBlue : ThemeManager.surface2
+                                        
+                                        TextInput {
+                                            id: cityField
+                                            anchors.fill: parent
+                                            anchors.margins: 8
+                                            font.family: "MapleMono NF"
+                                            font.pixelSize: 12
+                                            color: ThemeManager.fgPrimary
+                                            verticalAlignment: TextInput.AlignVCenter
+                                            selectByMouse: true
+                                            
+                                            onTextChanged: {
+                                                root.settings.general.weatherCity = text
+                                            }
+                                        }
+                                    }
+                                }
+                                
+                                Column {
+                                    spacing: 4
+                                    
+                                    Text {
+                                        text: "State/Region"
+                                        font.family: "MapleMono NF"
+                                        font.pixelSize: 11
+                                        color: ThemeManager.fgSecondary
+                                    }
+                                    
+                                    Rectangle {
+                                        width: 100
+                                        height: 32
+                                        color: ThemeManager.bgBase
+                                        radius: 6
+                                        border.width: 1
+                                        border.color: stateField.activeFocus ? ThemeManager.accentBlue : ThemeManager.surface2
+                                        
+                                        TextInput {
+                                            id: stateField
+                                            anchors.fill: parent
+                                            anchors.margins: 8
+                                            font.family: "MapleMono NF"
+                                            font.pixelSize: 12
+                                            color: ThemeManager.fgPrimary
+                                            verticalAlignment: TextInput.AlignVCenter
+                                            selectByMouse: true
+                                            
+                                            onTextChanged: {
+                                                root.settings.general.weatherState = text
+                                            }
+                                        }
+                                    }
+                                }
+                                
+                                Column {
+                                    spacing: 4
+                                    
+                                    Text {
+                                        text: "Country"
+                                        font.family: "MapleMono NF"
+                                        font.pixelSize: 11
+                                        color: ThemeManager.fgSecondary
+                                    }
+                                    
+                                    Rectangle {
+                                        width: 100
+                                        height: 32
+                                        color: ThemeManager.bgBase
+                                        radius: 6
+                                        border.width: 1
+                                        border.color: countryField.activeFocus ? ThemeManager.accentBlue : ThemeManager.surface2
+                                        
+                                        TextInput {
+                                            id: countryField
+                                            anchors.fill: parent
+                                            anchors.margins: 8
+                                            font.family: "MapleMono NF"
+                                            font.pixelSize: 12
+                                            color: ThemeManager.fgPrimary
+                                            verticalAlignment: TextInput.AlignVCenter
+                                            selectByMouse: true
+                                            
+                                            onTextChanged: {
+                                                root.settings.general.weatherCountry = text
                                             }
                                         }
                                     }

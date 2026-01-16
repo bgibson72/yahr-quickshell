@@ -301,16 +301,38 @@ Item {
                     const settings = JSON.parse(buffer)
                     let latitude = ""
                     let longitude = ""
+                    let city = ""
+                    let state = ""
+                    let country = ""
                     let useFahrenheit = true
                     
                     if (settings.general) {
                         latitude = settings.general.weatherLatitude || ""
                         longitude = settings.general.weatherLongitude || ""
+                        city = settings.general.weatherCity || ""
+                        state = settings.general.weatherState || ""
+                        country = settings.general.weatherCountry || ""
                         useFahrenheit = settings.general.useFahrenheit !== false
+                    }
+                    
+                    // Build location name for display
+                    let locationName = ""
+                    if (city) {
+                        locationName = city
+                        if (state) locationName += ", " + state
+                        if (country) locationName += " " + country
+                    } else if (latitude && longitude) {
+                        locationName = latitude + ", " + longitude
+                    }
+                    if (locationName) {
+                        locationText.text = "📍 " + locationName
                     }
                     
                     const tempUnit = useFahrenheit ? "u" : "m"
                     let location = (latitude && longitude) ? `${latitude},${longitude}` : ""
+                    
+                    // Store useFahrenheit setting for forecast parsing
+                    forecastModel.useFahrenheit = useFahrenheit
                     
                     // Current weather
                     let weatherCmd = `curl -s "wttr.in/${location}?${tempUnit}&format=%c|%t|%C|%h|%w|%l|%f|%p"`
@@ -389,14 +411,18 @@ Item {
         
         property var forecast: []
         
+        property bool useFahrenheit: true
+        
         function parseForecast(weatherData) {
             forecast = []
             for (let i = 0; i < Math.min(5, weatherData.length); i++) {
                 let day = weatherData[i]
+                let high = useFahrenheit ? (day.maxtempF + "°F") : (day.maxtempC + "°C")
+                let low = useFahrenheit ? (day.mintempF + "°F") : (day.mintempC + "°C")
                 forecast.push({
                     date: day.date || "",
-                    highTemp: day.maxtempF ? day.maxtempF + "°F" : day.maxtempC ? day.maxtempC + "°C" : "--",
-                    lowTemp: day.mintempF ? day.mintempF + "°F" : day.mintempC ? day.mintempC + "°C" : "--",
+                    highTemp: high || "--",
+                    lowTemp: low || "--",
                     condition: day.hourly && day.hourly[0] ? day.hourly[0].weatherDesc[0].value : "Unknown",
                     icon: getWeatherIcon(day.hourly && day.hourly[0] ? day.hourly[0].weatherCode : "")
                 })
