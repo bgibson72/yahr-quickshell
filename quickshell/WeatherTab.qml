@@ -7,6 +7,20 @@ Item {
     
     property bool active: false
     
+    // OpenWeather icon mapping (weather condition IDs)
+    function getOpenWeatherIcon(conditionId) {
+        if (conditionId >= 200 && conditionId < 300) return "⛈️" // Thunderstorm
+        if (conditionId >= 300 && conditionId < 400) return "🌦️" // Drizzle
+        if (conditionId >= 500 && conditionId < 600) return "🌧️" // Rain
+        if (conditionId >= 600 && conditionId < 700) return "❄️" // Snow
+        if (conditionId >= 700 && conditionId < 800) return "🌫️" // Atmosphere (fog, mist, etc)
+        if (conditionId === 800) return "☀️" // Clear
+        if (conditionId === 801) return "⛅" // Few clouds
+        if (conditionId === 802) return "⛅" // Scattered clouds
+        if (conditionId === 803 || conditionId === 804) return "☁️" // Broken/overcast clouds
+        return "🌡️" // Default
+    }
+    
     Column {
         anchors.fill: parent
         spacing: 16
@@ -356,6 +370,7 @@ Item {
                     let city = ""
                     let state = ""
                     let country = ""
+                    let apiKey = ""
                     let useFahrenheit = true
                     
                     if (settings.general) {
@@ -364,6 +379,7 @@ Item {
                         city = settings.general.weatherCity || ""
                         state = settings.general.weatherState || ""
                         country = settings.general.weatherCountry || ""
+                        apiKey = settings.general.openWeatherApiKey || ""
                         useFahrenheit = settings.general.useFahrenheit !== false
                     }
                     
@@ -387,15 +403,32 @@ Item {
                     // Store useFahrenheit setting for forecast parsing
                     forecastModel.useFahrenheit = useFahrenheit
                     
-                    // Current weather
-                    let weatherCmd = `curl -s "wttr.in/${location}?${tempUnit}&format=%c|%t|%C|%h|%w|%l|%f|%p"`
-                    weatherProcess.command = ["sh", "-c", weatherCmd]
-                    weatherProcess.running = true
-                    
-                    // Forecast - use wttr.in format v2 for better data
-                    let forecastCmd = `curl -s "wttr.in/${location}?${tempUnit}&format=j1"`
-                    forecastProcess.command = ["sh", "-c", forecastCmd]
-                    forecastProcess.running = true
+                    // Use OpenWeather API if key is available, otherwise use wttr.in
+                    if (apiKey && latitude && longitude) {
+                        console.log("Using OpenWeather API")
+                        const units = useFahrenheit ? "imperial" : "metric"
+                        
+                        // Current weather with OpenWeather
+                        let owWeatherCmd = `curl -s "https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&units=${units}&appid=${apiKey}"`
+                        openWeatherProcess.command = ["sh", "-c", owWeatherCmd]
+                        openWeatherProcess.running = true
+                        
+                        // 5-day forecast with OpenWeather
+                        let owForecastCmd = `curl -s "https://api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longitude}&units=${units}&appid=${apiKey}"`
+                        openWeatherForecastProcess.command = ["sh", "-c", owForecastCmd]
+                        openWeatherForecastProcess.running = true
+                    } else {
+                        console.log("Using wttr.in")
+                        // Current weather with wttr.in
+                        let weatherCmd = `curl -s "wttr.in/${location}?${tempUnit}&format=%c|%t|%C|%h|%w|%l|%f|%p"`
+                        weatherProcess.command = ["sh", "-c", weatherCmd]
+                        weatherProcess.running = true
+                        
+                        // Forecast with wttr.in (3 days)
+                        let forecastCmd = `curl -s "wttr.in/${location}?${tempUnit}&format=j1"`
+                        forecastProcess.command = ["sh", "-c", forecastCmd]
+                        forecastProcess.running = true
+                    }
                 } catch (e) {
                     console.error("Failed to parse settings:", e)
                 }
@@ -467,13 +500,90 @@ Item {
         }
     }
     
+    // OpenWeather current weather
+    Process {
+        id: openWeatherProcess
+        command: ["sh", "-c", "echo"]
+        running: false
+        property string buffer: ""
+        
+        stdout: SplitParser {
+            onRead: data => { openWeatherProcess.buffer += data }
+        }
+        
+        onRunningChanged: {
+            if (!running && buffer !== "") {
+                try {
+                    const data = JSON.parse(buffer)
+                    console.log("OpenWeather current data received")
+                    
+                    if (data.weather && data.weather[0]) {
+                        currentIcon.text = getOpenWeatherIcon(data.weather[0].id)
+                        currentCondition.text = data.weather[0].description
+                    }
+                    
+                    if (data.main) {
+                        const tempSymbol = forecastModel.useFahrenheit ? "°F" : "°C"
+                        currentTemp.text = Math.round(data.main.temp) + tempSymbol
+                        feelsLike.text = Math.round(data.main.feels_like) + tempSymbol
+                        humidity.text = data.main.humidity + "%"
+                        pressure.text = data.main.pressure + " hPa"
+                    }
+                    
+                    if (data.wind) {
+                        const speedUnit = forecastModel.useFahrenheit ? " mph" : " m/s"
+                        windSpeed.text = Math.round(data.wind.speed) + speedUnit
+                    }
+                    
+                    if (data.name) {
+                        locationText.text = "📍 " + data.name
+                    }
+                } catch (e) {
+                    console.error("Failed to parse OpenWeather data:", e)
+                }
+                buffer = ""
+            } else if (running) {
+                buffer = ""
+            }
+        }
+    }
+    
+    // OpenWeather 5-day forecast
+    Process {
+        id: openWeatherForecastProcess
+        command: ["sh", "-c", "echo"]
+        running: false
+        property string buffer: ""
+        
+        stdout: SplitParser {
+            onRead: data => { openWeatherForecastProcess.buffer += data }
+        }
+        
+        onRunningChanged: {
+            if (!running && buffer !== "") {
+                try {
+                    const data = JSON.parse(buffer)
+                    console.log("OpenWeather forecast data received, list length:", data.list ? data.list.length : 0)
+                    
+                    if (data.list && data.list.length > 0) {
+                        forecastModel.parseOpenWeatherForecast(data.list)
+                    }
+                } catch (e) {
+                    console.error("Failed to parse OpenWeather forecast:", e)
+                }
+                buffer = ""
+            } else if (running) {
+                buffer = ""
+            }
+        }
+    }
+    
     // Forecast model
     QtObject {
         id: forecastModel
         
         property var forecast: []
         property int updateCount: 0
-        signal forecastChanged()
         
         property bool useFahrenheit: true
         
@@ -496,7 +606,6 @@ Item {
             }
             console.log("Forecast array populated with", forecast.length, "items")
             updateCount++
-            forecastChanged()
         }
         
         function getWeatherIcon(code) {
@@ -514,6 +623,55 @@ Item {
                 "389": "⛈️", "392": "⛈️", "395": "❄️"
             }
             return iconMap[code] || "⛅"
+        }
+        
+        function parseOpenWeatherForecast(forecastList) {
+            // OpenWeather provides 3-hour forecasts, group by day
+            forecast = []
+            const tempSymbol = useFahrenheit ? "°F" : "°C"
+            let dailyData = {}
+            
+            // Group forecasts by date
+            for (let i = 0; i < forecastList.length; i++) {
+                const item = forecastList[i]
+                const dateStr = item.dt_txt.split(' ')[0] // Get date part
+                
+                if (!dailyData[dateStr]) {
+                    dailyData[dateStr] = {
+                        date: dateStr,
+                        temps: [],
+                        conditions: [],
+                        icons: []
+                    }
+                }
+                
+                dailyData[dateStr].temps.push(item.main.temp)
+                if (item.weather && item.weather[0]) {
+                    dailyData[dateStr].conditions.push(item.weather[0].description)
+                    dailyData[dateStr].icons.push(item.weather[0].id)
+                }
+            }
+            
+            // Convert to forecast array (take first 5 days)
+            const dates = Object.keys(dailyData).sort().slice(0, 5)
+            for (let i = 0; i < dates.length; i++) {
+                const day = dailyData[dates[i]]
+                const high = Math.max(...day.temps)
+                const low = Math.min(...day.temps)
+                const mostCommonIcon = day.icons[Math.floor(day.icons.length / 2)] || day.icons[0]
+                const condition = day.conditions[Math.floor(day.conditions.length / 2)] || day.conditions[0]
+                
+                forecast.push({
+                    date: day.date,
+                    highTemp: Math.round(high) + tempSymbol,
+                    lowTemp: Math.round(low) + tempSymbol,
+                    condition: condition,
+                    icon: getOpenWeatherIcon(mostCommonIcon)
+                })
+            }
+            
+            console.log("OpenWeather forecast parsed,", forecast.length, "days")
+            updateCount++
         }
         
         function getDayLabel(index) {

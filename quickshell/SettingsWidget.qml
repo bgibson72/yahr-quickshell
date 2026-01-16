@@ -68,6 +68,8 @@ Rectangle {
                             weatherCity: "",
                             weatherState: "",
                             weatherCountry: "",
+                            openWeatherApiKey: "",
+                            openWeatherApiKey: "",
                             useFahrenheit: true,
                             clockFormat24hr: true,
                             showSeconds: false,
@@ -198,6 +200,7 @@ SETTINGSEOF`
         cityField.text = root.settings.general.weatherCity || ""
         stateField.text = root.settings.general.weatherState || ""
         countryField.text = root.settings.general.weatherCountry || ""
+        apiKeyField.text = root.settings.general.openWeatherApiKey || ""
         useFahrenheit.checked = root.settings.general.useFahrenheit !== false
         clockFormat24hr.checked = root.settings.general.clockFormat24hr !== false
         showSeconds.checked = root.settings.general.showSeconds === true
@@ -685,6 +688,52 @@ SETTINGSEOF`
                                         }
                                     }
                                 }
+                            }
+                        }
+                        
+                        // OpenWeather API Key Section
+                        Column {
+                            Layout.fillWidth: true
+                            spacing: 12
+                            topPadding: 8
+                            
+                            Text {
+                                text: "OpenWeather API Key (optional, for 5-day forecast)"
+                                font.family: "MapleMono NF"
+                                font.pixelSize: 12
+                                color: ThemeManager.fgTertiary
+                            }
+                            
+                            Rectangle {
+                                width: 420
+                                height: 32
+                                color: ThemeManager.bgBase
+                                radius: 6
+                                border.width: 1
+                                border.color: apiKeyField.activeFocus ? ThemeManager.accentBlue : ThemeManager.surface2
+                                
+                                TextInput {
+                                    id: apiKeyField
+                                    anchors.fill: parent
+                                    anchors.margins: 8
+                                    font.family: "MapleMono NF"
+                                    font.pixelSize: 11
+                                    color: ThemeManager.fgPrimary
+                                    verticalAlignment: TextInput.AlignVCenter
+                                    selectByMouse: true
+                                    echoMode: TextInput.Password
+                                    
+                                    onTextChanged: {
+                                        root.settings.general.openWeatherApiKey = text
+                                    }
+                                }
+                            }
+                            
+                            Text {
+                                text: "Get a free API key at openweathermap.org/api"
+                                font.family: "MapleMono NF"
+                                font.pixelSize: 10
+                                color: ThemeManager.fgTertiary
                             }
                         }
                         
