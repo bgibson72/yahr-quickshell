@@ -122,18 +122,21 @@ Item {
                     
                     // Calendar days
                     Repeater {
+                        id: calendarRepeater
                         model: 42
                         
                         Rectangle {
                             width: (parent.parent.width - 24) / 7
                             height: 40
                             radius: 8
+                            objectName: "calendarDay_" + index
                             
                             property int dayNumber: calendarModel.getDayNumber(index)
                             property bool isCurrentDay: calendarModel.isToday(index)
                             property bool isSelectedDay: calendarModel.isSelected(index)
                             property bool isValidDay: dayNumber > 0
-                            property bool hasEvents: isValidDay ? (calendarModel.hasEventsOnDay(dayNumber) || false) : false
+                            property string dateKey: isValidDay ? `${calendarModel.currentYear}-${(calendarModel.currentMonth + 1).toString().padStart(2, '0')}-${dayNumber.toString().padStart(2, '0')}` : ""
+                            property bool hasEvents: false
                             
                             color: {
                                 if (isValidDay && isCurrentDay) return ThemeManager.accentBlue
@@ -172,12 +175,13 @@ Item {
                                 }
                                 
                                 Rectangle {
+                                    id: eventDot
                                     width: 6
                                     height: 6
                                     radius: 3
                                     anchors.horizontalCenter: parent.horizontalCenter
                                     color: parent.parent.parent.isCurrentDay ? ThemeManager.bgBase : ThemeManager.accentCyan
-                                    visible: parent.parent.parent.hasEvents
+                                    visible: false
                                 }
                             }
                         }
@@ -377,6 +381,7 @@ Item {
         property string monthYearText: getMonthYearText()
         property string selectedDateText: getSelectedDateText()
         property var eventDatesCache: ({})  // Cache of dates with events for fast lookup
+        property int eventsRevision: 0  // Increment to trigger grid updates
         
         function getMonthYearText() {
             const months = ["January", "February", "March", "April", "May", "June",
@@ -401,6 +406,8 @@ Item {
             }
             monthYearText = getMonthYearText()
             loadEvents()
+            // Update dots when month changes
+            Qt.callLater(updateEventDots)
         }
         
         function getDayNumber(index) {
@@ -430,13 +437,13 @@ Item {
             return dayNumber > 0 && dayNumber === selectedDay
         }
         
-        function hasEventsOnDay(day) {
-            // Fast lookup using cached event dates
-            if (!eventDatesCache || typeof eventDatesCache !== 'object') {
+        function hasEventsOnDay(day, revision) {
+            // Fast lookup using cached event dates (revision param tracks changes)
+            if (!day || !eventDatesCache || typeof eventDatesCache !== 'object') {
                 return false
             }
             let dateKey = `${currentYear}-${(currentMonth + 1).toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`
-            return eventDatesCache[dateKey] === true
+            return (eventDatesCache[dateKey] === true) || false
         }
         
         function selectDay(day) {
@@ -446,8 +453,43 @@ Item {
         }
         
         function loadEvents() {
-            // Load settings first to get calendar paths
+            // Load settings first to get calendar paths, then trigger calendar load
             settingsLoader.running = true
+        }
+        
+        function updateEventDots() {
+            // Manually update each calendar day's hasEvents property and dot visibility
+            let dotsShown = 0
+            for (let i = 0; i < 42; i++) {
+                let dayItem = calendarRepeater.itemAt(i)
+                if (dayItem && dayItem.isValidDay) {
+                    let hasEventOnDay = eventDatesCache[dayItem.dateKey] === true
+                    dayItem.hasEvents = hasEventOnDay
+                    // Find the event dot: Rectangle has [MouseArea, Column] as children
+                    // Column has [Text, Rectangle(dot)] as children
+                    if (dayItem.children && dayItem.children.length > 1) {
+                        let column = dayItem.children[1]  // Column is second child (after MouseArea)
+                        if (column && column.children && column.children.length > 1) {
+                            let dot = column.children[1]  // Event dot is second child in Column
+                            if (dot) {
+                                dot.visible = hasEventOnDay
+                                if (hasEventOnDay) dotsShown++
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        function triggerCalendarLoad() {
+            let expandedPaths = root.calendarPaths.replace(/~/g, Quickshell.env("HOME"))
+            let paths = expandedPaths.split(/[,;\s]+/).filter(p => p.trim() !== "")
+            if (paths.length === 0) {
+                paths = [Quickshell.env("HOME") + "/.config/quickshell/calendar.ics"]
+            }
+            let catCommands = paths.map(p => `(test -f "${p}" && cat "${p}" && echo "")`).join(" ; ")
+            icalLoader.command = ["sh", "-c", catCommands]
+            icalLoader.running = true
         }
     }
     
@@ -467,51 +509,57 @@ Item {
         
         onRunningChanged: {
             if (running) {
-                // Clear buffer before new load
                 buffer = ""
-                
-                // Build command to load calendar file(s)
-                let expandedPaths = root.calendarPaths.replace(/~/g, Quickshell.env("HOME"))
-                
-                // Support multiple files separated by comma, semicolon, or space
-                let paths = expandedPaths.split(/[,;\s]+/).filter(p => p.trim() !== "")
-                
-                if (paths.length === 0) {
-                    paths = [Quickshell.env("HOME") + "/.config/quickshell/calendar.ics"]
-                }
-                
-                // Build command to cat all files that exist
-                let catCommands = paths.map(p => `(test -f "${p}" && cat "${p}" && echo "")`).join(" ; ")
-                command = ["sh", "-c", catCommands]
-                console.log("Loading calendars from:", paths.join(", "))
             } else if (!running && buffer !== "") {
-                console.log("Calendar data loaded, size:", buffer.length, "bytes")
-                parseICalData(buffer)
-                // Keep buffer for hasEventsOnDay checks
+                icalLoader.parseICalData(buffer)
             } else if (!running) {
-                console.log("Calendar load complete but buffer is empty")
-                // Initialize empty cache
+                // Initialize empty cache if no data
                 calendarModel.eventDatesCache = {}
                 calendarModel.eventsModel = []
+                calendarModel.updateEventDots()
             }
         }
         
         function parseICalData(icalContent) {
-            // Simple iCal parser for VEVENT entries
             let events = []
             let eventDates = {}
             
-            console.log("Parsing iCal data, length:", icalContent.length)
-            
             if (!icalContent || icalContent.trim() === "") {
-                console.log("No calendar data to parse")
                 calendarModel.eventsModel = events
                 calendarModel.eventDatesCache = eventDates
+                calendarModel.updateEventDots()
                 return
             }
             
-            let lines = icalContent.split('\n')
-            console.log("Processing", lines.length, "lines")
+            // Fix malformed iCal files with no newlines by inserting them before keywords
+            if (icalContent.indexOf('\n') === -1 && icalContent.indexOf('\r') === -1) {
+                icalContent = icalContent
+                    .replace(/BEGIN:/g, '\nBEGIN:')
+                    .replace(/END:/g, '\nEND:')
+                    .replace(/DTSTART/g, '\nDTSTART')
+                    .replace(/DTEND/g, '\nDTEND')
+                    .replace(/SUMMARY:/g, '\nSUMMARY:')
+                    .replace(/DESCRIPTION:/g, '\nDESCRIPTION:')
+                    .replace(/LOCATION:/g, '\nLOCATION:')
+                    .replace(/UID:/g, '\nUID:')
+                    .replace(/DTSTAMP:/g, '\nDTSTAMP:')
+                    .replace(/CREATED:/g, '\nCREATED:')
+                    .replace(/LAST-MODIFIED:/g, '\nLAST-MODIFIED:')
+                    .replace(/SEQUENCE:/g, '\nSEQUENCE:')
+                    .replace(/STATUS:/g, '\nSTATUS:')
+                    .replace(/TRANSP:/g, '\nTRANSP:')
+                    .replace(/VERSION:/g, '\nVERSION:')
+                    .replace(/PRODID:/g, '\nPRODID:')
+                    .replace(/CALSCALE:/g, '\nCALSCALE:')
+                    .replace(/METHOD:/g, '\nMETHOD:')
+                    .trim()
+            }
+            
+            // Unfold iCal lines: lines starting with space are continuations
+            let unfolded = icalContent.replace(/\r\n /g, '').replace(/\n /g, '')
+            
+            // Split into lines
+            let lines = unfolded.split(/\r?\n/)
             let currentEvent = null
             let selectedDate = new Date(calendarModel.currentYear, calendarModel.currentMonth, calendarModel.selectedDay)
             let totalEvents = 0
@@ -572,11 +620,12 @@ Item {
                 }
             }
             
-            console.log("Parsed", totalEvents, "total events,", events.length, "events for selected day")
-            console.log("Event dates cache has", Object.keys(eventDates).length, "dates")
-            
             calendarModel.eventsModel = events
             calendarModel.eventDatesCache = eventDates
+            calendarModel.eventsRevision++
+            
+            // Update visual indicators after parsing
+            calendarModel.updateEventDots()
         }
     }
         // Settings loader for clock format and calendar paths
@@ -591,9 +640,12 @@ Item {
         }
         
         onRunningChanged: {
+            console.log("settingsLoader running changed:", running, "buffer length:", buffer.length)
             if (!running && buffer !== "") {
+                console.log("settingsLoader completed with data")
                 try {
                     const settings = JSON.parse(buffer)
+                    console.log("Settings parsed successfully")
                     if (settings.general) {
                         root.showSeconds = settings.general.showSeconds === true
                         root.use24HourFormat = settings.general.clockFormat24hr !== false
@@ -604,8 +656,10 @@ Item {
                         root.calendarPaths = "~/.config/quickshell/calendar.ics"
                     }
                     
+                    console.log("About to call triggerCalendarLoad")
                     // Now load calendar files
-                    icalLoader.running = true
+                    calendarModel.triggerCalendarLoad()
+                    console.log("triggerCalendarLoad call completed")
                 } catch (e) {
                     console.error("Failed to parse settings:", e)
                 }
@@ -613,13 +667,6 @@ Item {
             } else if (running) {
                 buffer = ""
             }
-        }
-    }
-        // Initial load
-    Component.onCompleted: {
-        if (active) {
-            settingsLoader.running = true
-            calendarModel.loadEvents()
         }
     }
     
