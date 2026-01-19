@@ -3,7 +3,7 @@
 # Sync configs FROM live ~/.config/ TO repo
 # Use this before committing to capture any changes made in live configs
 
-REPO_DIR="$HOME/Dev/yahr-quickshell"
+REPO_DIR="$HOME/yahr-quickshell"
 CONFIG_DIR="$HOME/.config"
 
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
