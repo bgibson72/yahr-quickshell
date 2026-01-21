@@ -83,21 +83,26 @@ fi
 # Export theme file path for sync scripts to use
 export QUICKSHELL_THEME_FILE="$THEME_FILE"
 
-# Sync Vencord/Vesktop theme
-if [ -f "$HOME/.config/quickshell/sync-vencord-theme.sh" ]; then
-    echo "Syncing Vencord theme..."
-    "$HOME/.config/quickshell/sync-vencord-theme.sh" --theme-file
-    echo -e "${GREEN}✓ Vencord theme synced${NC}"
-    
-    # Auto-restart Vesktop if running
-    if pgrep -x vesktop > /dev/null; then
-        echo -e "${YELLOW}  → Restarting Vesktop to apply theme...${NC}"
-        killall vesktop 2>/dev/null
-        sleep 0.5
-        vesktop &>/dev/null &
-        disown
-        echo -e "${GREEN}  ✓ Vesktop restarted${NC}"
-    else
+# Update theme reference immediately for wallpaper picker
+echo "$THEME" > "$HOME/.config/hypr/.current-theme"
+
+# Background all sync operations to speed up theme switching
+(
+    # Sync Vencord/Vesktop theme
+    if [ -f "$HOME/.config/quickshell/sync-vencord-theme.sh" ]; then
+        echo "Syncing Vencord theme..."
+        "$HOME/.config/quickshell/sync-vencord-theme.sh" --theme-file
+        echo -e "${GREEN}✓ Vencord theme synced${NC}"
+        
+        # Auto-restart Vesktop if running
+        if pgrep -x vesktop > /dev/null; then
+            echo -e "${YELLOW}  → Restarting Vesktop to apply theme...${NC}"
+            killall vesktop 2>/dev/null
+            sleep 0.5
+            vesktop &>/dev/null &
+            disown
+            echo -e "${GREEN}  ✓ Vesktop restarted${NC}"
+        else
         echo -e "${YELLOW}  → Vesktop not running (launch it to see theme)${NC}"
     fi
     
@@ -143,7 +148,7 @@ fi
 # Sync Papirus folder colors
 if [ -x "$HOME/.config/quickshell/sync-papirus-folders.sh" ]; then
     echo "Syncing Papirus folder colors..."
-    "$HOME/.config/quickshell/sync-papirus-folders.sh" &
+    "$HOME/.config/quickshell/sync-papirus-folders.sh"
 fi
 
 # Sync Hyprlock theme
@@ -183,6 +188,10 @@ if [ -x "$HOME/.config/quickshell/sync-vscode-theme.sh" ]; then
 fi
 
 echo ""
+) &
+
+# Main theme switch continues immediately
+echo -e "${GREEN}✓ Theme switching in progress (background)${NC}"
 
 # Check if quickshell is running
 if pgrep -x quickshell > /dev/null; then

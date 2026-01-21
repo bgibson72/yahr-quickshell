@@ -1,5 +1,5 @@
 # Mako Notification Daemon Configuration
-# Theme: Gruvbox
+# Theme: Kanagawa
 
 # General settings
 font=JetBrainsMono 13
@@ -12,10 +12,10 @@ margin=8
 padding=12
 border-size=2
 border-radius=12
-background-color=#282828
-text-color=#ebdbb2
-border-color=#83a598
-progress-color=over #83a598
+background-color=#1f1f28
+text-color=#dcd7ba
+border-color=#7e9cd8
+progress-color=over #7e9cd8
 
 # Default timeout
 default-timeout=10000
@@ -30,15 +30,15 @@ group-by=app-name
 
 # Urgency levels
 [urgency=low]
-border-color=#b8bb26
+border-color=#98bb6c
 default-timeout=5000
 
 [urgency=normal]
-border-color=#83a598
+border-color=#7e9cd8
 default-timeout=10000
 
 [urgency=critical]
-border-color=#fb4934
+border-color=#e46876
 default-timeout=0
 
 # Icons
@@ -47,4 +47,3 @@ icon-path=/usr/share/icons/Papirus-Dark
 
 # Format
 format=<b>%s</b>\n%b
-text-alignment=left

@@ -32,14 +32,14 @@ Item {
             color: ThemeManager.surface1
             radius: 12
             
-            Row {
+            Item {
                 anchors.fill: parent
                 anchors.margins: 24
-                spacing: 32
                 
                 // Left: Icon and temp
                 Column {
-                    width: (parent.width - 32) * 0.4
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.horizontalCenterOffset: -parent.width * 0.25
                     anchors.verticalCenter: parent.verticalCenter
                     spacing: 16
                     
@@ -73,7 +73,9 @@ Item {
                 
                 // Right: Details
                 Column {
-                    width: (parent.width - 32) * 0.6
+                    width: parent.width * 0.5
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.horizontalCenterOffset: parent.width * 0.25
                     anchors.verticalCenter: parent.verticalCenter
                     spacing: 20
                     
@@ -190,6 +192,7 @@ Item {
             height: (parent.height - 16) * 0.55
             color: ThemeManager.surface1
             radius: 12
+            clip: false
             
             Column {
                 anchors.fill: parent
@@ -207,7 +210,7 @@ Item {
                     }
                     
                     Text {
-                        text: "5-Day Forecast"
+                        text: "3-Day Forecast"
                         font.family: "MapleMono NF"
                         font.pixelSize: 18
                         font.weight: Font.Bold
@@ -226,13 +229,18 @@ Item {
                 Row {
                     width: parent.width
                     height: parent.height - 60
-                    spacing: 12
+                    spacing: 8
+                    clip: false
+                    
+                    Component.onCompleted: console.log("Forecast Row width:", width)
                     
                     Repeater {
-                        model: forecastModel.updateCount >= 0 ? Math.min(5, forecastModel.forecast.length) : 0
+                        model: forecastModel.updateCount >= 0 ? Math.min(3, forecastModel.forecast.length) : 0
+                        
+                        onModelChanged: console.log("Forecast Repeater model changed:", model)
                         
                         Rectangle {
-                            width: (parent.width - 48) / 5
+                            width: (parent.width - (2 * 8)) / 3
                             height: parent.height
                             color: ThemeManager.surface0
                             radius: 10

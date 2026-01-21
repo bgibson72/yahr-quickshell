@@ -1,90 +1,51 @@
-// ThemeManager.qml - Catppuccin Mocha Theme
 pragma Singleton
+
 import QtQuick
 
 QtObject {
-    id: themeManager
+    // Theme name
+    property string themeName: "Kanagawa"
     
-    property string currentTheme: "catppuccin-mocha"
+    // Accent colors
+    property color accentRose: "#d27e99"
+    property color accentCoral: "#e46876" 
+    property color accentPink: "#d27e99"
+    property color accentPurple: "#957fb8"
+    property color accentRed: "#e46876"
+    property color accentMaroon: "#e82424"
+    property color accentOrange: "#ffa066"
+    property color accentYellow: "#dca561"
+    property color accentGreen: "#98bb6c"
+    property color accentTeal: "#7fb4ca"
+    property color accentCyan: "#7fb4ca"
+    property color accentSapphire: "#7aa89f"
+    property color accentBlue: "#7e9cd8"
+    property color accentLavender: "#938aa9"
     
-    // Catppuccin Mocha Theme Colors
-    property color accentBlue: "#89b4fa"
-    Behavior on accentBlue { ColorAnimation { duration: 300; easing.type: Easing.InOutQuad } }
+    // Text colors  
+    property color fgPrimary: "#dcd7ba"
+    property color fgSecondary: "#c8c093"
+    property color fgTertiary: "#a6a69c"
     
-    property color accentPurple: "#cba6f7"
-    Behavior on accentPurple { ColorAnimation { duration: 300; easing.type: Easing.InOutQuad } }
+    // Border colors
+    property color border2: "#8a8980"
+    property color border1: "#727169"
+    property color border0: "#625e5a"
     
-    property color accentRed: "#f38ba8"
-    Behavior on accentRed { ColorAnimation { duration: 300; easing.type: Easing.InOutQuad } }
+    // Surface colors
+    property color surface2: "#49473e"
+    property color surface1: "#363636"
+    property color surface0: "#2a2a2a"
     
-    property color accentMaroon: "#eba0ac"
-    Behavior on accentMaroon { ColorAnimation { duration: 300; easing.type: Easing.InOutQuad } }
+    // Background colors
+    property color bgBase: "#1f1f28"
+    property color bgBaseAlpha: "#FF1f1f28"
+    property color bgMantle: "#16161d"
+    property color bgCrust: "#0d0c0c"
     
-    property color accentYellow: "#f9e2af"
-    Behavior on accentYellow { ColorAnimation { duration: 300; easing.type: Easing.InOutQuad } }
-    
-    property color accentGreen: "#a6e3a1"
-    Behavior on accentGreen { ColorAnimation { duration: 300; easing.type: Easing.InOutQuad } }
-    
-    property color accentOrange: "#fab387"
-    Behavior on accentOrange { ColorAnimation { duration: 300; easing.type: Easing.InOutQuad } }
-    
-    property color accentPink: "#f5c2e7"
-    Behavior on accentPink { ColorAnimation { duration: 300; easing.type: Easing.InOutQuad } }
-    
-    property color accentCyan: "#89dceb"
-    Behavior on accentCyan { ColorAnimation { duration: 300; easing.type: Easing.InOutQuad } }
-    
-    property color accentTeal: "#94e2d5"
-    Behavior on accentTeal { ColorAnimation { duration: 300; easing.type: Easing.InOutQuad } }
-    
-    property color fgPrimary: "#cdd6f4"
-    Behavior on fgPrimary { ColorAnimation { duration: 300; easing.type: Easing.InOutQuad } }
-    
-    property color fgSecondary: "#bac2de"
-    Behavior on fgSecondary { ColorAnimation { duration: 300; easing.type: Easing.InOutQuad } }
-    
-    property color fgTertiary: "#a6adc8"
-    Behavior on fgTertiary { ColorAnimation { duration: 300; easing.type: Easing.InOutQuad } }
-    
-    property color bgBase: "#1e1e2e"
-    Behavior on bgBase { ColorAnimation { duration: 300; easing.type: Easing.InOutQuad } }
-    
-    property color bgMantle: "#181825"
-    Behavior on bgMantle { ColorAnimation { duration: 300; easing.type: Easing.InOutQuad } }
-    
-    property color bgCrust: "#11111b"
-    Behavior on bgCrust { ColorAnimation { duration: 300; easing.type: Easing.InOutQuad } }
-    
-    property color surface0: "#313244"
-    Behavior on surface0 { ColorAnimation { duration: 300; easing.type: Easing.InOutQuad } }
-    
-    property color surface1: "#45475a"
-    Behavior on surface1 { ColorAnimation { duration: 300; easing.type: Easing.InOutQuad } }
-    
-    property color surface2: "#585b70"
-    Behavior on surface2 { ColorAnimation { duration: 300; easing.type: Easing.InOutQuad } }
-    
-    property color border0: "#6c7086"
-    Behavior on border0 { ColorAnimation { duration: 300; easing.type: Easing.InOutQuad } }
-    
-    property color border1: "#7f849c"
-    Behavior on border1 { ColorAnimation { duration: 300; easing.type: Easing.InOutQuad } }
-    
-    property color border2: "#9399b2"
-    Behavior on border2 { ColorAnimation { duration: 300; easing.type: Easing.InOutQuad } }
-    
-    property real barOpacity: 0.85
-    property color bgBaseAlpha: Qt.rgba(
-        parseInt(bgBase.toString().substr(1,2), 16) / 255,
-        parseInt(bgBase.toString().substr(3,2), 16) / 255,
-        parseInt(bgBase.toString().substr(5,2), 16) / 255,
-        barOpacity
-    )
-    
-    property int fontSizeClock: 14
-    property int fontSizeWorkspace: 14
-    property int fontSizeUpdates: 14
-    property int fontSizeIcon: 16
-    property int fontSizeLargeIcon: 24
+    // Font sizes
+    property int fontSizeSmall: 11
+    property int fontSizeNormal: 13
+    property int fontSizeLarge: 15
+    property int fontSizeIcon: 14
 }

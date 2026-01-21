@@ -173,6 +173,17 @@ SETTINGSEOF`
     
     // Save and apply settings
     function applySettings() {
+        // Capture current values from all fields before saving
+        if (!root.settings.calendar) {
+            root.settings.calendar = {}
+        }
+        root.settings.calendar.filePath = calendarPathField.text
+        
+        let interval = parseInt(refreshIntervalInput.text)
+        if (!isNaN(interval) && interval >= 0) {
+            root.settings.calendar.refreshInterval = interval
+        }
+        
         saveSettings()
         
         // Show success feedback
@@ -212,8 +223,10 @@ SETTINGSEOF`
         // Calendar settings
         if (root.settings.calendar) {
             calendarPathField.text = root.settings.calendar.filePath || "~/.config/quickshell/calendar.ics"
+            refreshIntervalInput.text = root.settings.calendar.refreshInterval?.toString() ?? "15"
         } else {
             calendarPathField.text = "~/.config/quickshell/calendar.ics"
+            refreshIntervalInput.text = "15"
         }
         
         if (root.settings.screenshot) {
@@ -347,10 +360,10 @@ SETTINGSEOF`
                 spacing: 8
                 
                 Repeater {
-                    model: ["General", "Widgets", "Screenshots", "Bar", "Theme"]
+                    model: ["Widgets", "Screenshots", "Bar", "Theme"]
                     
                     Rectangle {
-                        width: (parent.width - 32) / 5
+                        width: (parent.width - 24) / 4
                         height: parent.height
                         radius: 8
                         color: tabBar.currentIndex === index ? ThemeManager.accentBlue : "transparent"
@@ -392,29 +405,6 @@ SETTINGSEOF`
                 anchors.fill: parent
                 anchors.margins: 16
                 currentIndex: tabBar.currentIndex
-                
-                // General Tab
-                ScrollView {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    clip: true
-                    
-                    ColumnLayout {
-                        width: parent.width
-                        spacing: 24
-                        
-                        // Placeholder for future general settings
-                        Text {
-                            Layout.fillWidth: true
-                            text: "General settings will appear here"
-                            font.family: "MapleMono NF"
-                            font.pixelSize: 13
-                            color: ThemeManager.fgSecondary
-                            horizontalAlignment: Text.AlignHCenter
-                            Layout.topMargin: 40
-                        }
-                    }
-                }
                 
                 // Widgets Tab
                 ScrollView {
@@ -473,6 +463,7 @@ SETTINGSEOF`
                                         onClicked: {
                                             clockFormat24hr.checked = !clockFormat24hr.checked
                                             root.settings.general.clockFormat24hr = clockFormat24hr.checked
+                                            saveSettings()
                                         }
                                     }
                                 }
@@ -518,6 +509,7 @@ SETTINGSEOF`
                                         onClicked: {
                                             showSeconds.checked = !showSeconds.checked
                                             root.settings.general.showSeconds = showSeconds.checked
+                                            saveSettings()
                                         }
                                     }
                                 }
@@ -567,51 +559,193 @@ SETTINGSEOF`
                             }
                             
                             Column {
-                                spacing: 4
+                                width: parent.width
+                                spacing: 8
                                 
                                 Text {
-                                    text: "Calendar File Path(s)"
+                                    text: "Calendar File(s)"
                                     font.family: "MapleMono NF"
                                     font.pixelSize: 11
                                     color: ThemeManager.fgSecondary
                                 }
                                 
-                                Rectangle {
-                                    width: 500
-                                    height: 32
-                                    color: ThemeManager.bgBase
-                                    radius: 6
-                                    border.width: 1
-                                    border.color: calendarPathField.activeFocus ? ThemeManager.accentBlue : ThemeManager.surface2
+                                Row {
+                                    spacing: 12
+                                    width: parent.width
                                     
-                                    TextInput {
-                                        id: calendarPathField
-                                        anchors.fill: parent
-                                        anchors.margins: 8
-                                        font.family: "MapleMono NF"
-                                        font.pixelSize: 11
-                                        color: ThemeManager.fgPrimary
-                                        verticalAlignment: TextInput.AlignVCenter
-                                        selectByMouse: true
-                                        text: "~/.config/quickshell/calendar.ics"
+                                    Rectangle {
+                                        width: parent.width - 140
+                                        height: 32
+                                        radius: 6
+                                        color: ThemeManager.bgMantle
+                                        border.width: 1
+                                        border.color: calendarPathField.activeFocus ? ThemeManager.accentBlue : ThemeManager.border0
                                         
-                                        onTextChanged: {
+                                        TextInput {
+                                            id: calendarPathField
+                                            anchors.fill: parent
+                                            anchors.leftMargin: 12
+                                            anchors.rightMargin: 12
+                                            text: "~/.config/quickshell/calendar.ics"
+                                            font.family: "MapleMono NF"
+                                            font.pixelSize: 11
+                                            color: ThemeManager.fgPrimary
+                                            verticalAlignment: TextInput.AlignVCenter
+                                            selectByMouse: true
+                                            
+                                            onEditingFinished: {
+                                                if (!root.settings.calendar) {
+                                                    root.settings.calendar = {}
+                                                }
+                                                root.settings.calendar.filePath = text
+                                            }
+                                        }
+                                    }
+                                    
+                                    Rectangle {
+                                        width: 120
+                                        height: 32
+                                        radius: 6
+                                        color: filePickerMouseArea.containsMouse ? ThemeManager.accentBlue : ThemeManager.surface1
+                                        border.width: 2
+                                        border.color: ThemeManager.accentBlue
+                                        
+                                        Behavior on color {
+                                            ColorAnimation { duration: 150 }
+                                        }
+                                        
+                                        Text {
+                                            anchors.centerIn: parent
+                                            text: "Browse..."
+                                            font.family: "MapleMono NF"
+                                            font.pixelSize: 12
+                                            font.weight: Font.Medium
+                                            color: filePickerMouseArea.containsMouse ? ThemeManager.bgBase : ThemeManager.accentBlue
+                                            
+                                            Behavior on color {
+                                                ColorAnimation { duration: 150 }
+                                            }
+                                        }
+                                        
+                                        MouseArea {
+                                            id: filePickerMouseArea
+                                            anchors.fill: parent
+                                            hoverEnabled: true
+                                            cursorShape: Qt.PointingHandCursor
+                                            onClicked: {
+                                                filePickerProcess.running = true
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            
+                            Process {
+                                id: filePickerProcess
+                                running: false
+                                command: ["zenity", "--file-selection", "--title=Select Calendar File", "--file-filter=Calendar files (ics) | *.ics", "--file-filter=All files | *"]
+                                
+                                property string buffer: ""
+                                
+                                stdout: SplitParser {
+                                    onRead: data => {
+                                        filePickerProcess.buffer += data
+                                    }
+                                }
+                                
+                                onRunningChanged: {
+                                    if (!running && buffer !== "") {
+                                        const selectedPath = buffer.trim()
+                                        if (selectedPath) {
+                                            calendarPathField.text = selectedPath
                                             if (!root.settings.calendar) {
                                                 root.settings.calendar = {}
                                             }
-                                            root.settings.calendar.filePath = text
+                                            root.settings.calendar.filePath = selectedPath
                                         }
+                                        buffer = ""
+                                    } else if (running) {
+                                        buffer = ""
                                     }
                                 }
                             }
                             
                             Text {
                                 width: parent.width
-                                text: "Supports iCal format (.ics files). You can sync this file with Google Calendar, Outlook, or other services. For multiple calendars, separate paths with spaces or commas:\n~/.config/quickshell/calendar1.ics ~/.config/quickshell/calendar2.ics"
+                                text: "Supports iCal format (.ics files) or URLs. You can use:\n• Local file: ~/.config/quickshell/calendar.ics\n• Google Calendar URL: https://calendar.google.com/calendar/ical/...\n• Multiple sources (separate with commas or spaces)"
                                 font.family: "MapleMono NF"
                                 font.pixelSize: 10
                                 color: ThemeManager.fgTertiary
                                 wrapMode: Text.WordWrap
+                            }
+                            
+                            // Calendar Refresh Interval
+                            Column {
+                                width: parent.width
+                                spacing: 8
+                                
+                                Text {
+                                    text: "Auto-Refresh Interval (minutes)"
+                                    font.family: "MapleMono NF"
+                                    font.pixelSize: 12
+                                    font.weight: Font.Medium
+                                    color: ThemeManager.fgPrimary
+                                }
+                                
+                                Row {
+                                    spacing: 12
+                                    
+                                    Rectangle {
+                                        width: 100
+                                        height: 32
+                                        radius: 6
+                                        color: ThemeManager.bgMantle
+                                        border.width: 1
+                                        border.color: refreshIntervalInput.activeFocus ? ThemeManager.accentBlue : ThemeManager.border0
+                                        
+                                        TextInput {
+                                            id: refreshIntervalInput
+                                            anchors.fill: parent
+                                            anchors.margins: 8
+                                            text: root.settings.calendar?.refreshInterval ?? "15"
+                                            font.family: "MapleMono NF"
+                                            font.pixelSize: 12
+                                            color: ThemeManager.fgPrimary
+                                            verticalAlignment: TextInput.AlignVCenter
+                                            selectByMouse: true
+                                            validator: IntValidator { bottom: 0; top: 1440 }
+                                            
+                                            onEditingFinished: {
+                                                let interval = parseInt(text)
+                                                if (isNaN(interval) || interval < 0) {
+                                                    text = "15"
+                                                    interval = 15
+                                                }
+                                                if (!root.settings.calendar) {
+                                                    root.settings.calendar = {}
+                                                }
+                                                root.settings.calendar.refreshInterval = interval
+                                            }
+                                        }
+                                    }
+                                    
+                                    Text {
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        text: "minutes (0 = disabled)"
+                                        font.family: "MapleMono NF"
+                                        font.pixelSize: 11
+                                        color: ThemeManager.fgSecondary
+                                    }
+                                }
+                                
+                                Text {
+                                    width: parent.width
+                                    text: "How often to refresh calendar data from URLs. Set to 0 to disable auto-refresh."
+                                    font.family: "MapleMono NF"
+                                    font.pixelSize: 10
+                                    color: ThemeManager.fgTertiary
+                                    wrapMode: Text.WordWrap
+                                }
                             }
                         }
                         
@@ -1609,7 +1743,7 @@ SETTINGSEOF`
                                     // Theme mockup thumbnail
                                     Rectangle {
                                         width: 420
-                                        height: 150
+                                        height: 120
                                         radius: 6
                                         color: ThemeManager.bgMantle
                                         border.width: 1
@@ -1665,7 +1799,7 @@ SETTINGSEOF`
                        (applyButtonMouseArea.containsMouse ? ThemeManager.accentGreen : ThemeManager.surface1)
                 border.width: 2
                 border.color: ThemeManager.accentGreen
-                visible: tabBar.currentIndex === 0 || tabBar.currentIndex === 1  // Show on General and Screenshots tabs only
+                visible: tabBar.currentIndex === 0 || tabBar.currentIndex === 1  // Show on Widgets and Screenshots tabs
                 z: 100  // Ensure it's on top
                 
                 Behavior on color {

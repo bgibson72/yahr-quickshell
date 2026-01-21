@@ -12,6 +12,8 @@ ShellRoot {
     property bool themeSwitcherVisible: false
     property bool screenshotVisible: false
     property bool settingsVisible: false
+    property bool clipboardVisible: false
+    property bool controlCenterVisible: false
     property var wallpaperPicker: wallpaperPickerWindow
     
     // Make shellRoot globally accessible via objectName
@@ -46,6 +48,16 @@ ShellRoot {
     function toggleSettings() {
         console.log("IPC: Toggling settings")
         shellRoot.settingsVisible = !shellRoot.settingsVisible
+    }
+    
+    function toggleClipboard() {
+        console.log("IPC: Toggling clipboard")
+        shellRoot.clipboardVisible = !shellRoot.clipboardVisible
+    }
+    
+    function toggleControlCenter() {
+        console.log("IPC: Toggling control center")
+        shellRoot.controlCenterVisible = !shellRoot.controlCenterVisible
     }
     
     // Wallpaper Picker window
@@ -161,6 +173,22 @@ ShellRoot {
         }
     }
     
+    // File-based IPC watcher for clipboard keybind
+    Process {
+        id: clipboardWatcher
+        running: true
+        command: ["sh", "-c", "while true; do if [ -f /tmp/quickshell-clipboard.sock ]; then echo toggle; while [ -f /tmp/quickshell-clipboard.sock ]; do sleep 0.05; done; fi; sleep 0.1; done"]
+        
+        stdout: SplitParser {
+            onRead: line => {
+                if (line === "toggle") {
+                    shellRoot.clipboardVisible = !shellRoot.clipboardVisible
+                    console.log("Clipboard toggled via keybind:", shellRoot.clipboardVisible)
+                }
+            }
+        }
+    }
+    
     // Calendar popup - anchored below clock (center)
     Variants {
         model: Quickshell.screens
@@ -174,31 +202,57 @@ ShellRoot {
             anchors {
                 top: true
                 left: true
+                right: true
+                bottom: true
             }
             
             margins {
-                top: 6
-                left: modelData.width / 2 - 400
+                top: 0
+                left: 0
+                right: 0
+                bottom: 0
             }
-            
-            implicitWidth: 800
-            implicitHeight: 600
             
             color: "transparent"
             exclusiveZone: 0
             
             WlrLayershell.layer: WlrLayer.Overlay
+            WlrLayershell.keyboardFocus: WlrKeyboardFocus.OnDemand
             
-            Behavior on height {
-                NumberAnimation { duration: 200; easing.type: Easing.OutCubic }
+            // Background overlay - click to close
+            MouseArea {
+                anchors.fill: parent
+                onClicked: {
+                    console.log("Clicked outside calendar panel")
+                    shellRoot.calendarVisible = false
+                }
+                propagateComposedEvents: false
             }
             
-            SystemInfoWidget {
-                anchors.fill: parent
-                isVisible: shellRoot.calendarVisible
+            // Panel positioned at top-center, slides down
+            Item {
+                width: 800
+                height: 600
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.top: parent.top
+                anchors.topMargin: shellRoot.calendarVisible ? 6 : -700
                 
-                onRequestClose: {
-                    shellRoot.calendarVisible = false
+                Behavior on anchors.topMargin {
+                    NumberAnimation { duration: 300; easing.type: Easing.OutCubic }
+                }
+                
+                SystemInfoWidget {
+                    anchors.fill: parent
+                    isVisible: shellRoot.calendarVisible
+                    opacity: shellRoot.calendarVisible ? 1 : 0
+                    
+                    Behavior on opacity {
+                        NumberAnimation { duration: 250 }
+                    }
+                    
+                    onRequestClose: {
+                        shellRoot.calendarVisible = false
+                    }
                 }
             }
         }
@@ -217,15 +271,16 @@ ShellRoot {
             anchors {
                 top: true
                 left: true
+                right: true
+                bottom: true
             }
             
             margins {
-                top: modelData.height / 2 - 300
-                left: modelData.width / 2 - 500
+                top: 0
+                left: 0
+                right: 0
+                bottom: 0
             }
-            
-            implicitWidth: 1000
-            implicitHeight: shellRoot.appLauncherVisible ? 600 : 0
             
             color: "transparent"
             exclusiveZone: 0
@@ -233,16 +288,40 @@ ShellRoot {
             WlrLayershell.layer: WlrLayer.Overlay
             WlrLayershell.keyboardFocus: WlrKeyboardFocus.OnDemand
             
-            Behavior on height {
-                NumberAnimation { duration: 200; easing.type: Easing.OutCubic }
+            // Background overlay - click to close
+            MouseArea {
+                anchors.fill: parent
+                onClicked: {
+                    console.log("Clicked outside app launcher")
+                    shellRoot.appLauncherVisible = false
+                }
+                propagateComposedEvents: false
             }
             
-            AppLauncher {
-                anchors.fill: parent
-                isVisible: shellRoot.appLauncherVisible
+            // Panel positioned at center, slides down from top
+            Item {
+                width: 1000
+                height: 600
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.verticalCenterOffset: shellRoot.appLauncherVisible ? 0 : -800
                 
-                onRequestClose: {
-                    shellRoot.appLauncherVisible = false
+                Behavior on anchors.verticalCenterOffset {
+                    NumberAnimation { duration: 300; easing.type: Easing.OutCubic }
+                }
+                
+                AppLauncher {
+                    anchors.fill: parent
+                    isVisible: shellRoot.appLauncherVisible
+                    opacity: shellRoot.appLauncherVisible ? 1 : 0
+                    
+                    Behavior on opacity {
+                        NumberAnimation { duration: 250; easing.type: Easing.OutCubic }
+                    }
+                    
+                    onRequestClose: {
+                        shellRoot.appLauncherVisible = false
+                    }
                 }
             }
         }
@@ -261,15 +340,16 @@ ShellRoot {
             anchors {
                 top: true
                 left: true
+                right: true
+                bottom: true
             }
             
             margins {
-                top: (modelData.height - 120) / 2
-                left: (modelData.width - 586) / 2
+                top: 0
+                left: 0
+                right: 0
+                bottom: 0
             }
-            
-            implicitWidth: 586
-            implicitHeight: 120
             
             color: "transparent"
             exclusiveZone: 0
@@ -277,28 +357,202 @@ ShellRoot {
             WlrLayershell.layer: WlrLayer.Overlay
             WlrLayershell.keyboardFocus: WlrKeyboardFocus.OnDemand
             
-            Behavior on height {
-                NumberAnimation { duration: 200; easing.type: Easing.OutCubic }
-            }
-            
-            // Force close if the widget requests it but window is stuck open
-            Timer {
-                interval: 200
-                running: !shellRoot.powerMenuVisible && visible
-                onTriggered: {
-                    console.log("Force closing stuck PowerMenu window")
+            // Background overlay - click to close
+            MouseArea {
+                anchors.fill: parent
+                onClicked: {
+                    console.log("Clicked outside power menu")
                     shellRoot.powerMenuVisible = false
                 }
+                propagateComposedEvents: false
             }
             
-            PowerMenu {
-                id: powerMenu
-                anchors.fill: parent
-                isVisible: shellRoot.powerMenuVisible
+            // Panel positioned at center, slides down from top
+            Item {
+                width: 586
+                height: 120
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.verticalCenterOffset: shellRoot.powerMenuVisible ? 0 : -400
                 
-                onRequestClose: {
-                    console.log("PowerMenu requested close")
-                    shellRoot.powerMenuVisible = false
+                Behavior on anchors.verticalCenterOffset {
+                    NumberAnimation { duration: 300; easing.type: Easing.OutCubic }
+                }
+                
+                PowerMenu {
+                    id: powerMenu
+                    anchors.fill: parent
+                    isVisible: shellRoot.powerMenuVisible
+                    opacity: shellRoot.powerMenuVisible ? 1 : 0
+                    
+                    Behavior on opacity {
+                        NumberAnimation { duration: 250 }
+                    }
+                    
+                    onRequestClose: {
+                        console.log("PowerMenu requested close")
+                        shellRoot.powerMenuVisible = false
+                    }
+                    
+                    // Stop clicks from reaching the background MouseArea
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: {}
+                        propagateComposedEvents: false
+                    }
+                }
+            }
+        }
+    }
+    
+    // Clipboard Manager Panel
+    Variants {
+        model: Quickshell.screens
+        
+        PanelWindow {
+            property var modelData
+            screen: modelData
+            
+            visible: shellRoot.clipboardVisible
+            
+            anchors {
+                top: true
+                left: true
+                right: true
+                bottom: true
+            }
+            
+            margins {
+                top: 0
+                left: 0
+                right: 0
+                bottom: 0
+            }
+            
+            color: "transparent"
+            exclusiveZone: 0
+            
+            WlrLayershell.layer: WlrLayer.Overlay
+            WlrLayershell.keyboardFocus: WlrKeyboardFocus.OnDemand
+            
+            // Background overlay - click to close
+            MouseArea {
+                anchors.fill: parent
+                onClicked: {
+                    console.log("Clicked outside clipboard panel")
+                    shellRoot.clipboardVisible = false
+                }
+                
+                // Prevent clicks from reaching the background
+                propagateComposedEvents: false
+            }
+            
+            // Panel positioned at center, slides down from top
+            Item {
+                width: 500
+                height: 600
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.verticalCenterOffset: shellRoot.clipboardVisible ? 0 : -800
+                
+                Behavior on anchors.verticalCenterOffset {
+                    NumberAnimation { duration: 300; easing.type: Easing.OutCubic }
+                }
+                
+                ClipboardPanel {
+                    id: clipboardPanel
+                    anchors.fill: parent
+                    isVisible: shellRoot.clipboardVisible
+                    opacity: shellRoot.clipboardVisible ? 1 : 0
+                    
+                    Behavior on opacity {
+                        NumberAnimation { duration: 250 }
+                    }
+                    
+                    onRequestClose: {
+                        console.log("ClipboardPanel requested close")
+                        shellRoot.clipboardVisible = false
+                    }
+                    
+                    // Stop clicks from reaching the background MouseArea
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: {}  // Absorb clicks
+                        propagateComposedEvents: false
+                    }
+                }
+            }
+        }
+    }
+    
+    // Control Center Panel
+    Variants {
+        model: Quickshell.screens
+        
+        PanelWindow {
+            property var modelData
+            screen: modelData
+            visible: shellRoot.controlCenterVisible
+            
+            anchors {
+                top: true
+                left: true
+                right: true
+                bottom: true
+            }
+            
+            margins {
+                top: 0
+                left: 0
+                right: 0
+                bottom: 0
+            }
+            
+            color: "transparent"
+            exclusiveZone: 0
+            
+            WlrLayershell.layer: WlrLayer.Overlay
+            WlrLayershell.keyboardFocus: WlrKeyboardFocus.OnDemand
+            
+            // Background overlay - click to close
+            MouseArea {
+                anchors.fill: parent
+                onClicked: {
+                    console.log("Clicked outside control center panel")
+                    shellRoot.controlCenterVisible = false
+                }
+                
+                // Prevent clicks from reaching the background
+                propagateComposedEvents: false
+            }
+            
+            // Panel positioned at top-right, slides down from top
+            Item {
+                width: 420
+                height: 540
+                anchors.top: parent.top
+                anchors.right: parent.right
+                anchors.topMargin: shellRoot.controlCenterVisible ? 6 : -600
+                anchors.rightMargin: 6
+                
+                Behavior on anchors.topMargin {
+                    NumberAnimation { duration: 300; easing.type: Easing.OutCubic }
+                }
+                
+                ControlCenter {
+                    id: controlCenterPanel
+                    anchors.fill: parent
+                    isVisible: shellRoot.controlCenterVisible
+                    opacity: shellRoot.controlCenterVisible ? 1 : 0
+                    
+                    Behavior on opacity {
+                        NumberAnimation { duration: 250 }
+                    }
+                    
+                    onRequestClose: {
+                        console.log("ControlCenter requested close")
+                        shellRoot.controlCenterVisible = false
+                    }
                 }
             }
         }
@@ -473,6 +727,24 @@ ShellRoot {
                     function onClicked() {
                         shellRoot.settingsVisible = !shellRoot.settingsVisible
                         console.log("Settings toggled:", shellRoot.settingsVisible)
+                    }
+                }
+                
+                // Connect clipboard toggle signal
+                Connections {
+                    target: bar
+                    function onToggleClipboard() {
+                        shellRoot.clipboardVisible = !shellRoot.clipboardVisible
+                        console.log("Clipboard toggled:", shellRoot.clipboardVisible)
+                    }
+                }
+                
+                // Connect control center toggle signal
+                Connections {
+                    target: bar
+                    function onToggleControlCenter() {
+                        shellRoot.controlCenterVisible = !shellRoot.controlCenterVisible
+                        console.log("ControlCenter toggled:", shellRoot.controlCenterVisible)
                     }
                 }
             }

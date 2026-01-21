@@ -6,11 +6,14 @@ import Quickshell.Services.Mpris
 import QtQuick.Effects
 
 Item {
-    id: root
+    id: bar
     
     property bool transparentBackground: false
     property bool enableBlur: false
     property string position: "top"  // "top" or "bottom"
+    
+    signal toggleClipboard()
+    signal toggleControlCenter()
     
     // Load bar settings
     Process {
@@ -32,14 +35,14 @@ Item {
                     const settings = JSON.parse(buffer)
                     if (settings.bar) {
                         if (settings.bar.transparentBackground !== undefined) {
-                            root.transparentBackground = settings.bar.transparentBackground
+                            bar.transparentBackground = settings.bar.transparentBackground
                         }
                         if (settings.bar.position !== undefined) {
-                            root.position = settings.bar.position
+                            bar.position = settings.bar.position
                         }
                     }
                     if (settings.general && settings.general.enableBlur !== undefined) {
-                        root.enableBlur = settings.general.enableBlur
+                        bar.enableBlur = settings.general.enableBlur
                     }
                 } catch (e) {
                     console.log("🎨 Error parsing bar settings:", e)
@@ -65,7 +68,7 @@ Item {
     Rectangle {
         id: background
         anchors.fill: parent
-        color: root.transparentBackground ? "transparent" : ThemeManager.bgBaseAlpha
+        color: bar.transparentBackground ? "transparent" : ThemeManager.bgBaseAlpha
         z: -1
     }
     
@@ -120,9 +123,19 @@ Item {
             anchors.verticalCenter: parent.verticalCenter
             spacing: 8
             
-            ClipboardManager {}
+            ClipboardManager {
+                id: clipboardComponent
+                onToggleClipboard: {
+                    bar.toggleClipboard()
+                }
+            }
             Updates {}
-            SystemTray {}
+            SystemTray {
+                id: systemTrayComponent
+                onToggleControlCenter: {
+                    bar.toggleControlCenter()
+                }
+            }
             PowerButton {
                 id: powerComponent
             }

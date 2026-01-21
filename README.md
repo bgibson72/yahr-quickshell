@@ -186,7 +186,9 @@ Switch themes instantly with Super + T. All themes include matching wallpapers a
 </details>
 
 <details>
-<summary><b>Calendar</b> - Super + C - Monthly calendar widget</summary>
+<summary><b>Calendar</b> - Super + C - Google Calendar integration with recurring events</summary>
+
+Full-featured calendar with Google Calendar iCal URL support. Displays events, recurring events (daily, weekly, monthly, yearly), all-day events, and timezone-aware events. Click any day to view its events. Event indicators show which days have scheduled events. Auto-refreshes every 15 minutes.
 
 ![calendar.png](previews/calendar.png)
 </details>
@@ -288,7 +290,18 @@ git push
 
 ### Key Features & Recent Improvements
 
-**Latest Updates (v1.2)**
+**Latest Updates (v1.3)**
+- **Google Calendar Integration** - Full iCal URL support with recurring events (RRULE)
+  - Supports DAILY, WEEKLY, MONTHLY, and YEARLY recurring patterns
+  - Handles BYDAY, UNTIL, INTERVAL, and COUNT parameters
+  - UTC and timezone-aware event parsing
+  - All-day event support
+  - Click any day to view its events
+  - Event indicators on calendar days
+  - Auto-refresh every 15 minutes (configurable)
+  - Parses 1000+ events efficiently with caching
+
+**Previous Updates (v1.2)**
 - **Bar Position Toggle** - Choose top or bottom bar placement in Settings
 - **Neovim Theme Sync** - AstroVim colorschemes now sync with system theme
 - **Enhanced Installer** - Improved package detection, theme initialization, and optional component prompts

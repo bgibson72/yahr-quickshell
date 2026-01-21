@@ -6,6 +6,8 @@ import Quickshell.Io
 Rectangle {
     id: systemTray
     
+    signal toggleControlCenter()
+    
     property string networkType: "ethernet"
     property int signalStrength: 100  // 0-100 for wifi signal strength
     property real uploadSpeed: 0.0  // KB/s
@@ -14,6 +16,7 @@ Rectangle {
     property bool muted: false
     property int batteryLevel: 100
     property bool charging: false
+    property bool acOnline: false
     
     // Settings for showing details
     property bool showBatteryDetails: false
@@ -28,6 +31,18 @@ Rectangle {
     height: 35
     
     color: "transparent"
+    
+    // Clickable overlay on top of everything
+    MouseArea {
+        anchors.fill: parent
+        hoverEnabled: true
+        cursorShape: Qt.PointingHandCursor
+        z: 100
+        onClicked: {
+            console.log("System Tray clicked - toggling control center")
+            systemTray.toggleControlCenter()
+        }
+    }
     
     Component.onCompleted: {
         updateVolume()
@@ -99,29 +114,12 @@ Rectangle {
         anchors.centerIn: parent
         spacing: 0
         
-        // Network Icon - clickable
+        // Network Icon
         Item {
             width: systemTray.showNetworkDetails ? 105 : 35
             height: 32
             
-            scale: networkMouseArea.pressed ? 0.92 : 1.0
-            opacity: networkMouseArea.pressed ? 0.8 : 1.0
-            
-            Behavior on scale { NumberAnimation { duration: 100; easing.type: Easing.OutQuad } }
-            Behavior on opacity { NumberAnimation { duration: 100 } }
             Behavior on width { NumberAnimation { duration: 250; easing.type: Easing.OutCubic } }
-            
-            MouseArea {
-                id: networkMouseArea
-                anchors.fill: parent
-                hoverEnabled: true
-                cursorShape: Qt.PointingHandCursor
-                
-                onClicked: {
-                    console.log("Network icon clicked - launching nmtui")
-                    Quickshell.execDetached(["kitty", "--class", "kitty-nmtui", "-e", "nmtui"])
-                }
-            }
             
             Row {
                 anchors.centerIn: parent
@@ -166,7 +164,7 @@ Rectangle {
             }
         }
         
-        // Bluetooth Icon - clickable
+        // Bluetooth Icon
         Item {
             width: 35
             height: 32
@@ -174,26 +172,8 @@ Rectangle {
             
             property bool bluetoothAvailable: false
             
-            scale: bluetoothMouseArea.pressed ? 0.92 : 1.0
-            opacity: bluetoothMouseArea.pressed ? 0.8 : 1.0
-            
-            Behavior on scale { NumberAnimation { duration: 100; easing.type: Easing.OutQuad } }
-            Behavior on opacity { NumberAnimation { duration: 100 } }
-            
             Component.onCompleted: {
                 checkBluetoothProcess.running = true
-            }
-            
-            MouseArea {
-                id: bluetoothMouseArea
-                anchors.fill: parent
-                hoverEnabled: true
-                cursorShape: Qt.PointingHandCursor
-                
-                onClicked: {
-                    console.log("Bluetooth icon clicked - launching blueman-manager")
-                    Quickshell.execDetached(["blueman-manager"])
-                }
             }
             
             Text {
@@ -205,29 +185,12 @@ Rectangle {
             }
         }
         
-        // Audio Icon - clickable
+        // Audio Icon
         Item {
             width: systemTray.showVolumeDetails ? 70 : 35
             height: 32
             
-            scale: audioMouseArea.pressed ? 0.92 : 1.0
-            opacity: audioMouseArea.pressed ? 0.8 : 1.0
-            
-            Behavior on scale { NumberAnimation { duration: 100; easing.type: Easing.OutQuad } }
-            Behavior on opacity { NumberAnimation { duration: 100 } }
             Behavior on width { NumberAnimation { duration: 250; easing.type: Easing.OutCubic } }
-            
-            MouseArea {
-                id: audioMouseArea
-                anchors.fill: parent
-                hoverEnabled: true
-                cursorShape: Qt.PointingHandCursor
-                
-                onClicked: {
-                    console.log("Audio icon clicked - launching pavucontrol")
-                    Quickshell.execDetached(["pavucontrol"])
-                }
-            }
             
             Row {
                 anchors.centerIn: parent
@@ -299,6 +262,9 @@ Rectangle {
                 
                 Text {
                     text: {
+                        // Show AC icon when plugged in and fully charged
+                        if (systemTray.acOnline && systemTray.batteryLevel >= 99) return "󱐥"  // AC adapter icon
+                        
                         let level = systemTray.batteryLevel
                         if (systemTray.charging) return "󰂄"  // Charging icon
                         else if (level >= 95) return "󰁹"
@@ -315,7 +281,9 @@ Rectangle {
                     }
                     font.family: "Symbols Nerd Font"
                     font.pixelSize: 16
-                    color: ThemeManager.accentGreen
+                    color: systemTray.acOnline ? ThemeManager.accentGreen :
+                           systemTray.charging ? ThemeManager.accentGreen :
+                           systemTray.batteryLevel <= 20 ? ThemeManager.accentRed : ThemeManager.accentGreen
                     anchors.verticalCenter: parent.verticalCenter
                 }
                 
@@ -394,28 +362,46 @@ Rectangle {
     
     Process {
         id: batteryProcess
-        command: ["sh", "-c", "cat /sys/class/power_supply/BAT*/capacity 2>/dev/null || echo 100"]
+        command: ["sh", "-c", `
+            BAT_PATH=$(echo /sys/class/power_supply/BAT* 2>/dev/null | awk '{print $1}')
+            if [ -n "$BAT_PATH" ] && [ -d "$BAT_PATH" ]; then
+                LEVEL=$(cat "$BAT_PATH/capacity" 2>/dev/null || echo 100)
+                STATUS=$(cat "$BAT_PATH/status" 2>/dev/null || echo "Unknown")
+                
+                AC_ONLINE=0
+                for ac_path in /sys/class/power_supply/AC* /sys/class/power_supply/ACAD /sys/class/power_supply/ADP*; do
+                    if [ -f "$ac_path/online" ]; then
+                        AC_ONLINE=$(cat "$ac_path/online" 2>/dev/null || echo 0)
+                        break
+                    fi
+                done
+                
+                echo "$LEVEL|$STATUS|$AC_ONLINE"
+            else
+                echo "100|Unknown|0"
+            fi
+        `]
         running: false
         
-        stdout: SplitParser {
-            onRead: data => {
-                systemTray.batteryLevel = parseInt(data.trim()) || 100
-            }
-        }
-        
-        onExited: {
-            chargingProcess.running = true
-        }
-    }
-    
-    Process {
-        id: chargingProcess
-        command: ["sh", "-c", "cat /sys/class/power_supply/BAT*/status 2>/dev/null | grep -q Charging && echo 1 || echo 0"]
-        running: false
+        property string buffer: ""
         
         stdout: SplitParser {
-            onRead: data => {
-                systemTray.charging = (data.trim() === "1")
+            onRead: data => { batteryProcess.buffer += data }
+        }
+        
+        onRunningChanged: {
+            if (!running && buffer !== "") {
+                let parts = buffer.trim().split('|')
+                console.log("SystemTray battery check:", parts.length, "parts:", JSON.stringify(parts))
+                if (parts.length >= 3) {
+                    systemTray.batteryLevel = parseInt(parts[0]) || 100
+                    systemTray.charging = parts[1].includes("Charging")
+                    systemTray.acOnline = parts[2] === "1"
+                    console.log("SystemTray battery - Level:", systemTray.batteryLevel, "Charging:", systemTray.charging, "AC:", systemTray.acOnline)
+                }
+                buffer = ""
+            } else if (running) {
+                buffer = ""
             }
         }
     }

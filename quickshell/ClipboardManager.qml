@@ -9,11 +9,7 @@ Rectangle {
     height: 35
     color: "transparent"
     
-    Process {
-        id: clipboardProcess
-        running: false
-        command: [Quickshell.env("HOME") + "/.config/quickshell/show-clipboard-history.sh"]
-    }
+    signal toggleClipboard()
     
     MouseArea {
         id: mouseArea
@@ -22,8 +18,8 @@ Rectangle {
         cursorShape: Qt.PointingHandCursor
         
         onClicked: {
-            console.log("🎨 Opening clipboard history")
-            clipboardProcess.running = true
+            console.log("🎨 Toggling clipboard panel")
+            clipboardManager.toggleClipboard()
         }
         
         Rectangle {

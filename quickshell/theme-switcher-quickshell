@@ -536,6 +536,9 @@ apply_theme() {
     
     echo "Applying theme: $theme_name"
     
+    # Save current theme FIRST so wallpaper picker updates immediately
+    echo "$theme_name" > "$CURRENT_THEME_FILE"
+    
     # Create backup of current ThemeManager
     cp "$QUICKSHELL_DIR/ThemeManager.qml" "$QUICKSHELL_DIR/ThemeManager.qml.backup" 2>/dev/null || true
     
@@ -733,9 +736,6 @@ EOF
         echo "Syncing Neovim theme..."
         "$QUICKSHELL_DIR/sync-nvim-theme.sh" > /dev/null 2>&1
     fi
-    
-    # Save current theme
-    echo "$theme_name" > "$CURRENT_THEME_FILE"
     
     # Create completion marker file
     echo "done" > "$HOME/.config/quickshell/.theme-switch-complete"

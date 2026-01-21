@@ -1,5 +1,5 @@
 # Starship Prompt Configuration
-# Auto-synced with Quickshell Theme: catppuccin-mocha
+# Auto-synced with Quickshell Theme: Kanagawa
 
 format = """[](bg:#a6e3a1 fg:#1e1e2e)[󰣇 ](bg:#1e1e2e fg:#a6e3a1)[](fg:#1e1e2e bg:#313244)$time[](fg:#313244 bg:#1e1e2e)$directory[](fg:#1e1e2e bg:#1e1e2e)$git_branch$git_status$git_metrics[](fg:#1e1e2e bg:#a6e3a1)$character"""
 
