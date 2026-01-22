@@ -398,11 +398,15 @@ Item {
                         if (state) locationName += ", " + state
                         if (country) locationName += " " + country
                         cityName.text = "🏙️ " + locationName
-                    } else if (latitude && longitude) {
-                        // Try to get city name from coordinates using reverse geocoding
+                    } else {
                         cityName.text = ""
-                        reverseGeocodeProcess.command = ["sh", "-c", `curl -s "https://geocode.maps.co/reverse?lat=${latitude}&lon=${longitude}"`]
-                        reverseGeocodeProcess.running = true
+                    }
+                    
+                    // Display lat/long coordinates directly
+                    if (latitude && longitude) {
+                        locationText.text = `📍 ${latitude}, ${longitude}`
+                    } else {
+                        locationText.text = "📍 No location set"
                     }
                     
                     const tempUnit = useFahrenheit ? "u" : "m"
@@ -541,10 +545,6 @@ Item {
                     if (data.wind) {
                         const speedUnit = forecastModel.useFahrenheit ? " mph" : " m/s"
                         windSpeed.text = Math.round(data.wind.speed) + speedUnit
-                    }
-                    
-                    if (data.name) {
-                        locationText.text = "📍 " + data.name
                     }
                 } catch (e) {
                     console.error("Failed to parse OpenWeather data:", e)

@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Controls
+import QtQuick.Layouts
 import Quickshell
 import Quickshell.Io
 
@@ -22,19 +23,19 @@ Rectangle {
         root.requestClose()
     }
     
-    Column {
+    ColumnLayout {
         anchors.fill: parent
         anchors.margins: 20
         spacing: 16
         
         // Header with title and close button
-        Row {
-            width: parent.width
-            height: 40
+        RowLayout {
+            Layout.fillWidth: true
+            Layout.preferredHeight: 40
             
             Row {
                 spacing: 12
-                anchors.verticalCenter: parent.verticalCenter
+                Layout.alignment: Qt.AlignVCenter
                 
                 Text {
                     text: "📋"
@@ -53,8 +54,7 @@ Rectangle {
             }
             
             Item {
-                width: parent.width - 230  // Fill remaining space
-                height: 1
+                Layout.fillWidth: true  // Fill remaining space
             }
             
             // Close button
@@ -63,8 +63,7 @@ Rectangle {
                 height: 36
                 radius: 8
                 color: closeMouseArea.containsMouse ? ThemeManager.surface1 : "transparent"
-                anchors.right: parent.right
-                anchors.verticalCenter: parent.verticalCenter
+                Layout.alignment: Qt.AlignVCenter
                 
                 MouseArea {
                     id: closeMouseArea
@@ -85,8 +84,8 @@ Rectangle {
         
         // Search field
         Rectangle {
-            width: parent.width
-            height: 45
+            Layout.fillWidth: true
+            Layout.preferredHeight: 45
             color: ThemeManager.surface1
             radius: 10
             border.width: searchInput.activeFocus ? 2 : 0
@@ -131,8 +130,8 @@ Rectangle {
         
         // Clipboard items list
         Rectangle {
-            width: parent.width
-            height: parent.height - 120
+            Layout.fillWidth: true
+            Layout.fillHeight: true  // Take all remaining space
             color: ThemeManager.surface0
             radius: 12
             
@@ -216,13 +215,19 @@ Rectangle {
         }
         
         // Footer with item count
-        Text {
-            width: parent.width
-            text: `${clipboardListView.count} item${clipboardListView.count !== 1 ? 's' : ''}`
-            font.family: "MapleMono NF"
-            font.pixelSize: 12
-            color: ThemeManager.fgSecondary
-            horizontalAlignment: Text.AlignRight
+        Item {
+            Layout.fillWidth: true
+            Layout.preferredHeight: 20  // Fixed height for footer
+            
+            Text {
+                anchors.fill: parent
+                text: `${clipboardListView.count} item${clipboardListView.count !== 1 ? 's' : ''}`
+                font.family: "MapleMono NF"
+                font.pixelSize: 12
+                color: ThemeManager.fgSecondary
+                horizontalAlignment: Text.AlignRight
+                verticalAlignment: Text.AlignVCenter
+            }
         }
     }
     

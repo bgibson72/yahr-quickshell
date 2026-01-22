@@ -364,7 +364,7 @@ ShellRoot {
                     console.log("Clicked outside power menu")
                     shellRoot.powerMenuVisible = false
                 }
-                propagateComposedEvents: false
+                propagateComposedEvents: true
             }
             
             // Panel positioned at center, slides down from top
@@ -374,9 +374,19 @@ ShellRoot {
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.verticalCenterOffset: shellRoot.powerMenuVisible ? 0 : -400
+                z: 1  // Ensure menu is above background
                 
                 Behavior on anchors.verticalCenterOffset {
                     NumberAnimation { duration: 300; easing.type: Easing.OutCubic }
+                }
+                
+                // Stop background clicks from closing menu
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: {
+                        // Absorb clicks on the menu panel itself
+                    }
+                    propagateComposedEvents: true
                 }
                 
                 PowerMenu {
@@ -384,6 +394,7 @@ ShellRoot {
                     anchors.fill: parent
                     isVisible: shellRoot.powerMenuVisible
                     opacity: shellRoot.powerMenuVisible ? 1 : 0
+                    z: 2  // Ensure PowerMenu is above the absorbing MouseArea
                     
                     Behavior on opacity {
                         NumberAnimation { duration: 250 }
@@ -392,13 +403,6 @@ ShellRoot {
                     onRequestClose: {
                         console.log("PowerMenu requested close")
                         shellRoot.powerMenuVisible = false
-                    }
-                    
-                    // Stop clicks from reaching the background MouseArea
-                    MouseArea {
-                        anchors.fill: parent
-                        onClicked: {}
-                        propagateComposedEvents: false
                     }
                 }
             }
@@ -442,9 +446,7 @@ ShellRoot {
                     console.log("Clicked outside clipboard panel")
                     shellRoot.clipboardVisible = false
                 }
-                
-                // Prevent clicks from reaching the background
-                propagateComposedEvents: false
+                propagateComposedEvents: true
             }
             
             // Panel positioned at center, slides down from top
@@ -454,9 +456,19 @@ ShellRoot {
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.verticalCenterOffset: shellRoot.clipboardVisible ? 0 : -800
+                z: 1  // Ensure panel is above background
                 
                 Behavior on anchors.verticalCenterOffset {
                     NumberAnimation { duration: 300; easing.type: Easing.OutCubic }
+                }
+                
+                // Stop background clicks from closing panel
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: {
+                        // Absorb clicks on the panel itself
+                    }
+                    propagateComposedEvents: true
                 }
                 
                 ClipboardPanel {
@@ -464,6 +476,7 @@ ShellRoot {
                     anchors.fill: parent
                     isVisible: shellRoot.clipboardVisible
                     opacity: shellRoot.clipboardVisible ? 1 : 0
+                    z: 2  // Ensure ClipboardPanel is above the absorbing MouseArea
                     
                     Behavior on opacity {
                         NumberAnimation { duration: 250 }
@@ -472,13 +485,6 @@ ShellRoot {
                     onRequestClose: {
                         console.log("ClipboardPanel requested close")
                         shellRoot.clipboardVisible = false
-                    }
-                    
-                    // Stop clicks from reaching the background MouseArea
-                    MouseArea {
-                        anchors.fill: parent
-                        onClicked: {}  // Absorb clicks
-                        propagateComposedEvents: false
                     }
                 }
             }

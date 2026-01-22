@@ -624,8 +624,15 @@ Item {
                 currentYear--
             }
             monthYearText = getMonthYearText()
-            loadEvents()
+            
+            // Rebuild cache for new month
+            if (allEventsCache.length > 0) {
+                buildEventCacheForMonth(currentYear, currentMonth)
+                eventsRevision++
+            }
+            
             updateMoonPhase()
+            filterEventsForSelectedDay()
             // Update dots when month changes
             Qt.callLater(updateEventDots)
         }
@@ -726,6 +733,41 @@ Item {
                         }
                     }
                 }
+            }
+        }
+        
+        function buildEventCacheForMonth(year, month) {
+            // Build event cache only for the specified month (much faster)
+            let firstDay = new Date(year, month, 1)
+            let lastDay = new Date(year, month + 1, 0)
+            let currentDate = new Date(firstDay)
+            
+            while (currentDate <= lastDay) {
+                let dateKey = `${currentDate.getFullYear()}-${(currentDate.getMonth() + 1).toString().padStart(2, '0')}-${currentDate.getDate().toString().padStart(2, '0')}`
+                
+                // Check all cached events for this date
+                for (let i = 0; i < allEventsCache.length; i++) {
+                    let evt = allEventsCache[i]
+                    
+                    if (evt.rrule) {
+                        // Recurring event - check if it occurs on this date
+                        if (icalLoader.checkRecurringEvent(evt, currentDate)) {
+                            eventDatesCache[dateKey] = true
+                            break  // Found an event on this date, move to next date
+                        }
+                    } else if (evt.date) {
+                        // Single event - check if date matches
+                        let eventDate = new Date(evt.date)
+                        if (eventDate.getDate() === currentDate.getDate() &&
+                            eventDate.getMonth() === currentDate.getMonth() &&
+                            eventDate.getFullYear() === currentDate.getFullYear()) {
+                            eventDatesCache[dateKey] = true
+                            break  // Found an event on this date, move to next date
+                        }
+                    }
+                }
+                
+                currentDate.setDate(currentDate.getDate() + 1)
             }
         }
         
@@ -897,28 +939,6 @@ Item {
                     if (currentEvent.date) {
                         totalEvents++
                         allEvents.push(currentEvent)
-                        
-                        // Build cache of dates with events for dots
-                        if (currentEvent.rrule) {
-                            // For recurring events, mark dates for the next year
-                            let today = new Date()
-                            let endDate = new Date(today.getFullYear() + 1, today.getMonth(), today.getDate())
-                            let checkDate = new Date(currentEvent.date)
-                            
-                            // Check dates for the next year to build cache
-                            while (checkDate <= endDate) {
-                                if (icalLoader.checkRecurringEvent(currentEvent, checkDate)) {
-                                    let dateKey = `${checkDate.getFullYear()}-${(checkDate.getMonth() + 1).toString().padStart(2, '0')}-${checkDate.getDate().toString().padStart(2, '0')}`
-                                    eventDates[dateKey] = true
-                                }
-                                checkDate.setDate(checkDate.getDate() + 1)
-                            }
-                        } else {
-                            // Single event - add its specific date
-                            let eventDate = new Date(currentEvent.date)
-                            let dateKey = `${eventDate.getFullYear()}-${(eventDate.getMonth() + 1).toString().padStart(2, '0')}-${eventDate.getDate().toString().padStart(2, '0')}`
-                            eventDates[dateKey] = true
-                        }
                     }
                     currentEvent = null
                 } else if (currentEvent) {
@@ -963,12 +983,16 @@ Item {
                 }
             }
             
-            // Store all events and event dates cache
+            // Store all events and build cache for current month only
             calendarModel.allEventsCache = allEvents
-            calendarModel.eventDatesCache = eventDates
-            calendarModel.eventsRevision++
+            calendarModel.eventDatesCache = {}  // Clear old cache
             
             console.log("📅 Parsed", totalEvents, "total events into cache")
+            
+            // Build event cache for current month (fast)
+            calendarModel.buildEventCacheForMonth(calendarModel.currentYear, calendarModel.currentMonth)
+            
+            calendarModel.eventsRevision++
             
             // Filter events for the currently selected day
             calendarModel.filterEventsForSelectedDay()

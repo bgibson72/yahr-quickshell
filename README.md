@@ -57,8 +57,9 @@ cd yahr-quickshell
 - Fully automated, zero prompts
 - Auto-installs yay as AUR helper
 - Auto-selects proprietary NVIDIA drivers
-- Skips all optional components
+- Skips all optional components (including SDDM)
 - Perfect for scripted/VM installations
+- No sudoers files created (only core system modifications)
 
 **Installation Types**
 - **Full Install**: All core components + optional applications (recommended)
@@ -105,6 +106,7 @@ cd yahr-quickshell
 - **Thunar** - File manager with thumbnail support and custom plugins
 - **Firefox** - Browser with userChrome.css theming
 - **SDDM** - Display manager (login screen) with theme
+  - **Note**: Installing SDDM creates a sudoers rule (`/etc/sudoers.d/sddm-sync-yahr`) to allow passwordless theme synchronization. This only grants permission for the sync script to update SDDM theme files. You can skip SDDM installation if you prefer not to have this file created.
 - **Pacseek** - Modern TUI package manager with CLI launcher support
 
 ## 🎨 Included Themes
@@ -261,6 +263,28 @@ The Hyprland configuration is modularized for easier maintenance and customizati
 - **rules.conf** - Window and workspace rules
 
 The main `hyprland.conf` file sources all these modules, keeping it clean and organized. Edit individual files in `hypr/` to customize specific aspects of your setup without navigating through a large config file.
+
+## Security & Permissions
+
+### Sudoers Configuration
+
+The installer may create sudoers files for specific features (only with your permission during interactive installation):
+
+**SDDM Theme Sync** (`/etc/sudoers.d/sddm-sync-yahr`)
+- Created only if you choose to install SDDM
+- Allows passwordless theme synchronization to SDDM login screen
+- Grants limited permissions:
+  - Copy wallpapers to `/usr/share/sddm/themes/yahr-theme/`
+  - Update `/usr/share/sddm/themes/yahr-theme/theme.conf`
+- Restricted to users in the `wheel` group
+- You can manually remove this file if you prefer entering a password for SDDM theme updates
+
+**Papirus Folder Colors** (`/etc/sudoers.d/papirus-folders`)
+- Installed automatically with Papirus icons
+- Allows passwordless folder color changes
+- Single command: `/usr/bin/papirus-folders`
+
+Both files follow security best practices with minimal, specific permissions. You can review or remove them at any time from `/etc/sudoers.d/`.
 
 ## Development & Customization
 

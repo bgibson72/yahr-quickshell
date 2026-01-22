@@ -1223,6 +1223,29 @@ EOF
         print_success "SDDM sync script installed"
     fi
     
+    # Setup sudoers for passwordless SDDM theme sync
+    print_info "Setting up passwordless SDDM theme sync..."
+    local sudoers_file="/etc/sudoers.d/sddm-sync-yahr"
+    local sudoers_content="# Allow SDDM theme sync without password
+%wheel ALL=(ALL) NOPASSWD: /usr/bin/cp * /usr/share/sddm/themes/yahr-theme/*
+%wheel ALL=(ALL) NOPASSWD: /usr/bin/tee /usr/share/sddm/themes/yahr-theme/theme.conf"
+    
+    echo "$sudoers_content" | sudo tee "$sudoers_file" > /dev/null
+    
+    if [ $? -eq 0 ]; then
+        sudo chmod 0440 "$sudoers_file"
+        
+        # Validate sudoers file
+        if sudo visudo -c -f "$sudoers_file" &> /dev/null; then
+            print_success "Sudoers configured for SDDM theme sync"
+        else
+            print_error "Failed to validate sudoers file"
+            sudo rm -f "$sudoers_file"
+        fi
+    else
+        print_error "Failed to create sudoers file"
+    fi
+    
     # Enable SDDM service
     print_info "Enabling SDDM service..."
     sudo systemctl enable sddm
