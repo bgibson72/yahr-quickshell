@@ -86,6 +86,14 @@ export QUICKSHELL_THEME_FILE="$THEME_FILE"
 # Update theme reference immediately for wallpaper picker
 echo "$THEME" > "$HOME/.config/hypr/.current-theme"
 
+# Sync SDDM theme first (synchronously for reliability)
+SDDM_SYNC="$HOME/.config/quickshell/sync-sddm-theme.sh"
+if [ -f "$SDDM_SYNC" ]; then
+    echo "Syncing SDDM theme..."
+    "$SDDM_SYNC"
+    echo ""
+fi
+
 # Background all sync operations to speed up theme switching
 (
     # Sync Vencord/Vesktop theme
@@ -110,14 +118,6 @@ echo "$THEME" > "$HOME/.config/hypr/.current-theme"
     if command -v notify-send &> /dev/null; then
         notify-send "Theme Switched: $THEME" "Vesktop theme applied" -i preferences-desktop-theme 2>/dev/null &
     fi
-    echo ""
-fi
-
-# Sync SDDM theme
-SDDM_SYNC="$HOME/.config/quickshell/sync-sddm-theme.sh"
-if [ -f "$SDDM_SYNC" ]; then
-    echo "Syncing SDDM theme..."
-    "$SDDM_SYNC"
     echo ""
 fi
 

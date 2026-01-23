@@ -336,6 +336,10 @@ PanelWindow {
                 "--transition-duration", "2"
             ])
             
+            // Sync SDDM theme with new wallpaper
+            const sddmSync = Quickshell.env("HOME") + "/.config/quickshell/sync-sddm-theme.sh"
+            Quickshell.execDetached(["sh", "-c", sddmSync])
+            
             // Show notification
             Quickshell.execDetached([
                 "notify-send", "Wallpaper Changed", 
