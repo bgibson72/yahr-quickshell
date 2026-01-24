@@ -1484,6 +1484,7 @@ SETTINGSEOF`
                                 // Opaque option
                                 Row {
                                     spacing: 12
+                                    leftPadding: 20
                                     
                                     Rectangle {
                                         width: 20
@@ -1528,6 +1529,7 @@ SETTINGSEOF`
                                 // Translucent option
                                 Row {
                                     spacing: 12
+                                    leftPadding: 20
                                     
                                     Rectangle {
                                         width: 20
@@ -1571,6 +1573,7 @@ SETTINGSEOF`
                                 
                                 // Transparent option
                                 Row {
+                                    leftPadding: 20
                                     spacing: 12
                                     
                                     Rectangle {
