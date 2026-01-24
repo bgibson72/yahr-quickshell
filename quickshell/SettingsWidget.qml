@@ -22,6 +22,7 @@ Rectangle {
     property var themes: []
     property bool applyButtonSuccess: false
     property bool enableBlur: false
+    property bool bentoSettingsChanged: false  // Track if Bento settings were modified
     
     signal closeRequested()
     signal settingsUpdated()  // Signal to notify when settings change
@@ -34,6 +35,7 @@ Rectangle {
             loadSettings()
             loadThemes()
             root.forceActiveFocus()
+            bentoSettingsChanged = false  // Reset change tracking when opening panel
         }
     }
     
@@ -99,7 +101,7 @@ Rectangle {
                         root.settings.bento = {
                             enabled: false,
                             twelveHourFormat: true,
-                            greetingName: "Bryan",
+                            greetingName: "",
                             bentoPath: Quickshell.env("HOME") + "/bento"
                         }
                     }
@@ -192,8 +194,8 @@ SETTINGSEOF`
             root.settings.calendar.refreshInterval = interval
         }
         
-        // Update Bento config file if Bento settings exist
-        if (root.settings.bento) {
+        // Note: Bento config is only updated if user actually changed Bento settings
+        if (root.settings.bento && bentoSettingsChanged) {
             updateBentoConfig()
         }
         
@@ -264,7 +266,7 @@ SETTINGSEOF`
         if (root.settings.bento) {
             bentoEnabled.checked = root.settings.bento.enabled === true
             bentoTwelveHour.checked = root.settings.bento.twelveHourFormat !== false
-            bentoNameField.text = root.settings.bento.greetingName || "Bryan"
+            bentoNameField.text = root.settings.bento.greetingName || ""
             bentoPathField.text = root.settings.bento.bentoPath || (Quickshell.env("HOME") + "/bento")
         }
     }
@@ -1972,7 +1974,7 @@ SETTINGSEOF`
                                             bentoTwelveHour.checked = !bentoTwelveHour.checked
                                             if (root.settings.bento) {
                                                 root.settings.bento.twelveHourFormat = bentoTwelveHour.checked
-                                                updateBentoConfig()
+                                                bentoSettingsChanged = true
                                             }
                                         }
                                     }
@@ -2021,12 +2023,11 @@ SETTINGSEOF`
                                         color: ThemeManager.fgPrimary
                                         verticalAlignment: TextInput.AlignVCenter
                                         selectByMouse: true
-                                        text: "Bryan"
                                         
                                         onTextChanged: {
                                             if (root.settings.bento) {
                                                 root.settings.bento.greetingName = text
-                                                updateBentoConfig()
+                                                bentoSettingsChanged = true
                                             }
                                         }
                                     }
