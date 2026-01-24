@@ -95,6 +95,14 @@ Rectangle {
                             showNetworkDetails: false
                         }
                     }
+                    if (!root.settings.bento) {
+                        root.settings.bento = {
+                            enabled: false,
+                            twelveHourFormat: true,
+                            greetingName: "Bryan",
+                            bentoPath: Quickshell.env("HOME") + "/bento"
+                        }
+                    }
                     if (!root.settings.bar) {
                         root.settings.bar = {
                             transparentBackground: false
@@ -184,6 +192,11 @@ SETTINGSEOF`
             root.settings.calendar.refreshInterval = interval
         }
         
+        // Update Bento config file if Bento settings exist
+        if (root.settings.bento) {
+            updateBentoConfig()
+        }
+        
         saveSettings()
         
         // Show success feedback
@@ -246,6 +259,37 @@ SETTINGSEOF`
             transparentBackgroundCheck.checked = root.settings.bar.transparentBackground === true
             barPositionBottomCheck.checked = root.settings.bar.position === "bottom"
         }
+        
+        // Bento settings
+        if (root.settings.bento) {
+            bentoEnabled.checked = root.settings.bento.enabled === true
+            bentoTwelveHour.checked = root.settings.bento.twelveHourFormat !== false
+            bentoNameField.text = root.settings.bento.greetingName || "Bryan"
+            bentoPathField.text = root.settings.bento.bentoPath || (Quickshell.env("HOME") + "/bento")
+        }
+    }
+    
+    // Update Bento config.js file
+    function updateBentoConfig() {
+        if (!root.settings.bento) return
+        
+        var bentoPath = root.settings.bento.bentoPath || (Quickshell.env("HOME") + "/bento")
+        var configPath = bentoPath + "/config.js"
+        
+        console.log("Updating Bento config at:", configPath)
+        console.log("  twelveHourFormat:", root.settings.bento.twelveHourFormat)
+        console.log("  greetingName:", root.settings.bento.greetingName)
+        
+        // Update twelveHourFormat using bash script for reliability
+        var updateTimeFormat = `sed -i "s/twelveHourFormat: \\(true\\|false\\)/twelveHourFormat: ${root.settings.bento.twelveHourFormat ? "true" : "false"}/" "${configPath}"`
+        Quickshell.execDetached(["bash", "-c", updateTimeFormat])
+        
+        // Update ONLY the greeting name in the general settings (line ~14)
+        // This pattern specifically targets line 14 which is the main name field after "// General" comment
+        var updateName = `sed -i "14s/name: '[^']*'/name: '${root.settings.bento.greetingName}'/" "${configPath}"`
+        Quickshell.execDetached(["bash", "-c", updateName])
+        
+        console.log("✓ Bento config.js updated - refresh your browser to see changes")
     }
     
     // Load available themes
@@ -360,10 +404,10 @@ SETTINGSEOF`
                 spacing: 8
                 
                 Repeater {
-                    model: ["Widgets", "Screenshots", "Bar", "Theme"]
+                    model: ["Widgets", "Screenshots", "Bar", "Theme", "Bento"]
                     
                     Rectangle {
-                        width: (parent.width - 24) / 4
+                        width: (parent.width - 32) / 5
                         height: parent.height
                         radius: 8
                         color: tabBar.currentIndex === index ? ThemeManager.accentBlue : "transparent"
@@ -1785,6 +1829,410 @@ SETTINGSEOF`
                         }
                     }
                 }
+                
+                // Bento Tab
+                ScrollView {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    clip: true
+                    
+                    ColumnLayout {
+                        width: parent.width
+                        spacing: 32
+                        
+                        // ========== BENTO BROWSER START PAGE ==========
+                        Column {
+                            Layout.fillWidth: true
+                            spacing: 16
+                            
+                            Rectangle {
+                                width: parent.width
+                                height: 2
+                                color: ThemeManager.accentBlue
+                                opacity: 0.3
+                            }
+                            
+                            Text {
+                                text: "🏠 Bento Browser Start Page"
+                                font.family: "MapleMono NF"
+                                font.pixelSize: 18
+                                font.weight: Font.Bold
+                                color: ThemeManager.accentBlue
+                            }
+                            
+                            Text {
+                                text: "Configure your beautiful browser start page"
+                                font.family: "MapleMono NF"
+                                font.pixelSize: 12
+                                color: ThemeManager.fgSecondary
+                            }
+                            
+                            // Refresh reminder
+                            Rectangle {
+                                width: parent.width
+                                height: 50
+                                color: ThemeManager.accentYellow + "20"
+                                radius: 8
+                                border.width: 1
+                                border.color: ThemeManager.accentYellow
+                                
+                                Row {
+                                    anchors.centerIn: parent
+                                    spacing: 10
+                                    
+                                    Text {
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        text: "💡"
+                                        font.pixelSize: 18
+                                    }
+                                    
+                                    Text {
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        text: "After applying settings, refresh your browser (F5) to see changes"
+                                        font.family: "MapleMono NF"
+                                        font.pixelSize: 12
+                                        font.weight: Font.Medium
+                                        color: ThemeManager.fgPrimary
+                                    }
+                                }
+                            }
+                            
+                            // Enable Bento
+                            Row {
+                                spacing: 12
+                                
+                                Rectangle {
+                                    width: 24
+                                    height: 24
+                                    radius: 4
+                                    color: bentoEnabled.checked ? ThemeManager.accentBlue : ThemeManager.surface1
+                                    border.width: 2
+                                    border.color: ThemeManager.accentBlue
+                                    
+                                    Text {
+                                        anchors.centerIn: parent
+                                        text: "✓"
+                                        font.family: "Symbols Nerd Font"
+                                        font.pixelSize: 16
+                                        color: ThemeManager.bgBase
+                                        visible: bentoEnabled.checked
+                                    }
+                                    
+                                    MouseArea {
+                                        anchors.fill: parent
+                                        cursorShape: Qt.PointingHandCursor
+                                        onClicked: {
+                                            bentoEnabled.checked = !bentoEnabled.checked
+                                            if (root.settings.bento) {
+                                                root.settings.bento.enabled = bentoEnabled.checked
+                                            }
+                                        }
+                                    }
+                                }
+                                
+                                Text {
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    text: "Enable Bento Integration"
+                                    font.family: "MapleMono NF"
+                                    font.pixelSize: 12
+                                    color: ThemeManager.fgPrimary
+                                }
+                                
+                                QtObject {
+                                    id: bentoEnabled
+                                    property bool checked: false
+                                }
+                            }
+                            
+                            // 12-hour format
+                            Row {
+                                spacing: 12
+                                
+                                Rectangle {
+                                    width: 24
+                                    height: 24
+                                    radius: 4
+                                    color: bentoTwelveHour.checked ? ThemeManager.accentBlue : ThemeManager.surface1
+                                    border.width: 2
+                                    border.color: ThemeManager.accentBlue
+                                    
+                                    Text {
+                                        anchors.centerIn: parent
+                                        text: "✓"
+                                        font.family: "Symbols Nerd Font"
+                                        font.pixelSize: 16
+                                        color: ThemeManager.bgBase
+                                        visible: bentoTwelveHour.checked
+                                    }
+                                    
+                                    MouseArea {
+                                        anchors.fill: parent
+                                        cursorShape: Qt.PointingHandCursor
+                                        onClicked: {
+                                            bentoTwelveHour.checked = !bentoTwelveHour.checked
+                                            if (root.settings.bento) {
+                                                root.settings.bento.twelveHourFormat = bentoTwelveHour.checked
+                                                updateBentoConfig()
+                                            }
+                                        }
+                                    }
+                                }
+                                
+                                Text {
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    text: "Use 12-hour time format"
+                                    font.family: "MapleMono NF"
+                                    font.pixelSize: 12
+                                    color: ThemeManager.fgPrimary
+                                }
+                                
+                                QtObject {
+                                    id: bentoTwelveHour
+                                    property bool checked: true
+                                }
+                            }
+                            
+                            // Greeting Name
+                            Column {
+                                spacing: 8
+                                
+                                Text {
+                                    text: "Greeting Name"
+                                    font.family: "MapleMono NF"
+                                    font.pixelSize: 14
+                                    font.weight: Font.DemiBold
+                                    color: ThemeManager.accentBlue
+                                }
+                                
+                                Rectangle {
+                                    width: 300
+                                    height: 36
+                                    color: ThemeManager.bgBase
+                                    radius: 6
+                                    border.width: 1
+                                    border.color: bentoNameField.activeFocus ? ThemeManager.accentBlue : ThemeManager.surface2
+                                    
+                                    TextInput {
+                                        id: bentoNameField
+                                        anchors.fill: parent
+                                        anchors.margins: 10
+                                        font.family: "MapleMono NF"
+                                        font.pixelSize: 13
+                                        color: ThemeManager.fgPrimary
+                                        verticalAlignment: TextInput.AlignVCenter
+                                        selectByMouse: true
+                                        text: "Bryan"
+                                        
+                                        onTextChanged: {
+                                            if (root.settings.bento) {
+                                                root.settings.bento.greetingName = text
+                                                updateBentoConfig()
+                                            }
+                                        }
+                                    }
+                                }
+                                
+                                Text {
+                                    text: "This name will appear in the Bento greeting messages"
+                                    font.family: "MapleMono NF"
+                                    font.pixelSize: 10
+                                    font.italic: true
+                                    color: ThemeManager.fgTertiary
+                                }
+                            }
+                            
+                            // Bento Path
+                            Column {
+                                spacing: 8
+                                
+                                Text {
+                                    text: "Bento Installation Path"
+                                    font.family: "MapleMono NF"
+                                    font.pixelSize: 14
+                                    font.weight: Font.DemiBold
+                                    color: ThemeManager.accentBlue
+                                }
+                                
+                                Rectangle {
+                                    width: 400
+                                    height: 36
+                                    color: ThemeManager.bgBase
+                                    radius: 6
+                                    border.width: 1
+                                    border.color: bentoPathField.activeFocus ? ThemeManager.accentBlue : ThemeManager.surface2
+                                    
+                                    TextInput {
+                                        id: bentoPathField
+                                        anchors.fill: parent
+                                        anchors.margins: 10
+                                        font.family: "MapleMono NF"
+                                        font.pixelSize: 12
+                                        color: ThemeManager.fgPrimary
+                                        verticalAlignment: TextInput.AlignVCenter
+                                        selectByMouse: true
+                                        text: Quickshell.env("HOME") + "/bento"
+                                        
+                                        onTextChanged: {
+                                            if (root.settings.bento) {
+                                                root.settings.bento.bentoPath = text
+                                            }
+                                        }
+                                    }
+                                }
+                                
+                                Text {
+                                    text: "Path where Bento is installed (typically ~/bento)"
+                                    font.family: "MapleMono NF"
+                                    font.pixelSize: 10
+                                    font.italic: true
+                                    color: ThemeManager.fgTertiary
+                                }
+                            }
+                            
+                            // Quick Links Section
+                            Column {
+                                spacing: 12
+                                
+                                Text {
+                                    text: "Quick Links Configuration"
+                                    font.family: "MapleMono NF"
+                                    font.pixelSize: 14
+                                    font.weight: Font.DemiBold
+                                    color: ThemeManager.accentBlue
+                                }
+                                
+                                Text {
+                                    text: "To edit your Bento quick links, open the config file directly:"
+                                    font.family: "MapleMono NF"
+                                    font.pixelSize: 11
+                                    color: ThemeManager.fgSecondary
+                                    wrapMode: Text.WordWrap
+                                }
+                                
+                                Row {
+                                    spacing: 8
+                                    
+                                    Rectangle {
+                                        width: 350
+                                        height: 32
+                                        color: ThemeManager.surface1
+                                        radius: 6
+                                        border.width: 1
+                                        border.color: ThemeManager.surface2
+                                        
+                                        Text {
+                                            anchors.fill: parent
+                                            anchors.margins: 8
+                                            text: bentoPathField.text + "/config.js"
+                                            font.family: "MapleMono NF"
+                                            font.pixelSize: 11
+                                            color: ThemeManager.fgSecondary
+                                            verticalAlignment: Text.AlignVCenter
+                                            elide: Text.ElideMiddle
+                                        }
+                                    }
+                                    
+                                    Rectangle {
+                                        width: 120
+                                        height: 32
+                                        radius: 6
+                                        color: openConfigMouseArea.containsMouse ? ThemeManager.accentBlue : ThemeManager.surface1
+                                        border.width: 1
+                                        border.color: ThemeManager.accentBlue
+                                        
+                                        Text {
+                                            anchors.centerIn: parent
+                                            text: "Open in Editor"
+                                            font.family: "MapleMono NF"
+                                            font.pixelSize: 11
+                                            color: openConfigMouseArea.containsMouse ? ThemeManager.bgBase : ThemeManager.accentBlue
+                                        }
+                                        
+                                        MouseArea {
+                                            id: openConfigMouseArea
+                                            anchors.fill: parent
+                                            hoverEnabled: true
+                                            cursorShape: Qt.PointingHandCursor
+                                            
+                                            onClicked: {
+                                                var configPath = bentoPathField.text + "/config.js"
+                                                console.log("Opening Bento config in editor:", configPath)
+                                                
+                                                // Use code (VS Code) to open the file
+                                                Quickshell.execDetached(["code", configPath])
+                                                console.log("Launched editor with command: code", configPath)
+                                            }
+                                        }
+                                    }
+                                }
+                                
+                                Text {
+                                    text: "Edit the 'firstButtonsContainer' and 'secondButtonsContainer' arrays to customize your links"
+                                    font.family: "MapleMono NF"
+                                    font.pixelSize: 10
+                                    font.italic: true
+                                    color: ThemeManager.fgTertiary
+                                    wrapMode: Text.WordWrap
+                                }
+                            }
+                            
+                            // Browser Homepage Instructions
+                            Column {
+                                spacing: 8
+                                
+                                Rectangle {
+                                    width: parent.width
+                                    height: 1
+                                    color: ThemeManager.surface2
+                                    opacity: 0.5
+                                }
+                                
+                                Text {
+                                    text: "Browser Setup"
+                                    font.family: "MapleMono NF"
+                                    font.pixelSize: 14
+                                    font.weight: Font.DemiBold
+                                    color: ThemeManager.accentBlue
+                                }
+                                
+                                Text {
+                                    text: "To use Bento as your browser homepage, set your browser's homepage to:"
+                                    font.family: "MapleMono NF"
+                                    font.pixelSize: 11
+                                    color: ThemeManager.fgSecondary
+                                    wrapMode: Text.WordWrap
+                                }
+                                
+                                Rectangle {
+                                    width: 500
+                                    height: 36
+                                    color: ThemeManager.bgBase
+                                    radius: 6
+                                    border.width: 1
+                                    border.color: ThemeManager.surface2
+                                    
+                                    Text {
+                                        anchors.fill: parent
+                                        anchors.margins: 10
+                                        text: "file://" + bentoPathField.text + "/index.html"
+                                        font.family: "MapleMono NF"
+                                        font.pixelSize: 12
+                                        color: ThemeManager.accentGreen
+                                        verticalAlignment: Text.AlignVCenter
+                                    }
+                                }
+                                
+                                Text {
+                                    text: "The colors will automatically sync with your Quickshell theme!"
+                                    font.family: "MapleMono NF"
+                                    font.pixelSize: 10
+                                    font.italic: true
+                                    color: ThemeManager.accentGreen
+                                }
+                            }
+                        }
+                    }
+                }
             }
             
             // Apply Button Overlay (bottom-right corner)
@@ -1799,7 +2247,7 @@ SETTINGSEOF`
                        (applyButtonMouseArea.containsMouse ? ThemeManager.accentGreen : ThemeManager.surface1)
                 border.width: 2
                 border.color: ThemeManager.accentGreen
-                visible: tabBar.currentIndex === 0 || tabBar.currentIndex === 1  // Show on Widgets and Screenshots tabs
+                visible: tabBar.currentIndex === 0 || tabBar.currentIndex === 1 || tabBar.currentIndex === 4  // Show on Widgets, Screenshots, and Bento tabs
                 z: 100  // Ensure it's on top
                 
                 Behavior on color {

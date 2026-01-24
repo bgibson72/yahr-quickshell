@@ -14,12 +14,12 @@ const CONFIG = {
 	name: 'Bryan',
 	imageBackground: false,
 	openInNewTab: true,
-	twelveHourFormat: false,
+	twelveHourFormat: true,
 
 	// Greetings
 	greetingMorning: 'Good morning!',
-	greetingAfternoon: 'Good afternoon,',
-	greetingEvening: 'Good evening,',
+	greetingAfternoon: 'Good afternoon!',
+	greetingEvening: 'Good evening!',
 	greetingNight: 'Go to Sleep!',
 
 	// Layout
@@ -50,6 +50,9 @@ const CONFIG = {
 	// ├┴┐│ │ │  │ │ ││││└─┐
 	// └─┘└─┘ ┴  ┴ └─┘┘└┘└─┘
 
+	// Icon names: Browse available icons at https://lucide.dev/icons/
+	// Use the icon name (e.g., 'github', 'mail', 'calendar') in the 'icon' field below
+
 	firstButtonsContainer: [
 		{
 			id: '1',
@@ -59,7 +62,7 @@ const CONFIG = {
 		},
 		{
 			id: '2',
-			name: 'Gmail',
+			name: 'Mail',
 			icon: 'mail',
 			link: 'https://gmail.com/',
 		},
@@ -83,7 +86,7 @@ const CONFIG = {
 		},
 		{
 			id: '6',
-			name: 'YouTube',
+			name: 'Youtube',
 			icon: 'youtube',
 			link: 'https://youtube.com/',
 		},
@@ -92,19 +95,19 @@ const CONFIG = {
 	secondButtonsContainer: [
 		{
 			id: '1',
-			name: 'Music',
+			name: 'Spotify',
 			icon: 'headphones',
 			link: 'https://open.spotify.com',
 		},
 		{
 			id: '2',
-			name: 'twitter',
+			name: 'Twitter',
 			icon: 'twitter',
 			link: 'https://twitter.com/',
 		},
 		{
 			id: '3',
-			name: 'bot',
+			name: 'Discord',
 			icon: 'bot',
 			link: 'https://discord.com/app',
 		},
