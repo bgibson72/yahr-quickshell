@@ -351,7 +351,7 @@ Item {
                         anchors.verticalCenter: parent.verticalCenter
                     }
                     
-                    Item { width: parent.width - 200; height: 1 }
+                    Item { Layout.fillWidth: true }
                     
                     Text {
                         id: tempText
@@ -361,6 +361,9 @@ Item {
                         font.weight: Font.Bold
                         color: tempMonitor.currentValue > 70 ? ThemeManager.accentRed : ThemeManager.accentGreen
                         anchors.verticalCenter: parent.verticalCenter
+                        horizontalAlignment: Text.AlignRight
+                        elide: Text.ElideRight
+                        width: Math.min(implicitWidth, 120)
                     }
                 }
                 
@@ -585,7 +588,7 @@ Item {
     // Temperature process
     Process {
         id: tempProcess
-        command: ["sh", "-c", "sensors 2>/dev/null | grep -E 'Core 0|Tctl|Package id 0' | head -1 | grep -oP '\\+[0-9]+\\.[0-9]+' | sed 's/\\+//' || echo 0"]
+        command: ["sh", "-c", "sensors 2>/dev/null | grep -E 'Package id 0|Tctl|Core 0' | head -1 | awk '{print $4}' | sed 's/[+°C]//g' || echo 0"]
         running: false
         
         stdout: SplitParser {
