@@ -351,7 +351,10 @@ Item {
                         anchors.verticalCenter: parent.verticalCenter
                     }
                     
-                    Item { Layout.fillWidth: true }
+                    Item { 
+                        width: Math.max(0, parent.width - 250)
+                        height: 1 
+                    }
                     
                     Text {
                         id: tempText
