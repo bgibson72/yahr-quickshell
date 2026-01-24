@@ -258,7 +258,11 @@ SETTINGSEOF`
         }
         
         if (root.settings.bar) {
-            transparentBackgroundCheck.checked = root.settings.bar.transparentBackground === true
+            // Set background style (default to translucent if not set)
+            var bgStyle = root.settings.bar.backgroundStyle || "translucent"
+            barBackgroundOpaque.checked = (bgStyle === "opaque")
+            barBackgroundTranslucent.checked = (bgStyle === "translucent")
+            barBackgroundTransparent.checked = (bgStyle === "transparent")
             barPositionBottomCheck.checked = root.settings.bar.position === "bottom"
         }
         
@@ -1465,49 +1469,160 @@ SETTINGSEOF`
                                 Layout.fillWidth: true
                             }
                             
-                            // Transparent Background Toggle
-                            Row {
-                                spacing: 12
-                                
-                                Rectangle {
-                                    width: 24
-                                    height: 24
-                                    radius: 4
-                                    color: transparentBackgroundCheck.checked ? ThemeManager.accentBlue : ThemeManager.surface1
-                                    border.width: 2
-                                    border.color: ThemeManager.accentBlue
-                                    
-                                    Text {
-                                        anchors.centerIn: parent
-                                        text: "✓"
-                                        font.family: "Symbols Nerd Font"
-                                        font.pixelSize: 16
-                                        color: ThemeManager.bgBase
-                                        visible: transparentBackgroundCheck.checked
-                                    }
-                                    
-                                    MouseArea {
-                                        anchors.fill: parent
-                                        cursorShape: Qt.PointingHandCursor
-                                        onClicked: {
-                                            transparentBackgroundCheck.checked = !transparentBackgroundCheck.checked
-                                            if (!root.settings.bar) root.settings.bar = {}
-                                            root.settings.bar.transparentBackground = transparentBackgroundCheck.checked
-                                            saveSettings()
-                                        }
-                                    }
-                                }
+                            // Bar Background Style
+                            Column {
+                                spacing: 8
                                 
                                 Text {
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    text: "Transparent bar background"
+                                    text: "Bar Background Style"
                                     font.family: "MapleMono NF"
                                     font.pixelSize: 12
+                                    font.bold: true
                                     color: ThemeManager.fgPrimary
                                 }
                                 
+                                // Opaque option
+                                Row {
+                                    spacing: 12
+                                    
+                                    Rectangle {
+                                        width: 20
+                                        height: 20
+                                        radius: 10
+                                        color: barBackgroundOpaque.checked ? ThemeManager.accentBlue : ThemeManager.surface1
+                                        border.width: 2
+                                        border.color: ThemeManager.accentBlue
+                                        
+                                        Rectangle {
+                                            anchors.centerIn: parent
+                                            width: 8
+                                            height: 8
+                                            radius: 4
+                                            color: ThemeManager.fgPrimary
+                                            visible: barBackgroundOpaque.checked
+                                        }
+                                        
+                                        MouseArea {
+                                            anchors.fill: parent
+                                            cursorShape: Qt.PointingHandCursor
+                                            onClicked: {
+                                                barBackgroundOpaque.checked = true
+                                                barBackgroundTranslucent.checked = false
+                                                barBackgroundTransparent.checked = false
+                                                if (!root.settings.bar) root.settings.bar = {}
+                                                root.settings.bar.backgroundStyle = "opaque"
+                                                saveSettings()
+                                            }
+                                        }
+                                    }
+                                    
+                                    Text {
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        text: "Opaque (solid background)"
+                                        font.family: "MapleMono NF"
+                                        font.pixelSize: 12
+                                        color: ThemeManager.fgPrimary
+                                    }
+                                }
+                                
+                                // Translucent option
+                                Row {
+                                    spacing: 12
+                                    
+                                    Rectangle {
+                                        width: 20
+                                        height: 20
+                                        radius: 10
+                                        color: barBackgroundTranslucent.checked ? ThemeManager.accentBlue : ThemeManager.surface1
+                                        border.width: 2
+                                        border.color: ThemeManager.accentBlue
+                                        
+                                        Rectangle {
+                                            anchors.centerIn: parent
+                                            width: 8
+                                            height: 8
+                                            radius: 4
+                                            color: ThemeManager.fgPrimary
+                                            visible: barBackgroundTranslucent.checked
+                                        }
+                                        
+                                        MouseArea {
+                                            anchors.fill: parent
+                                            cursorShape: Qt.PointingHandCursor
+                                            onClicked: {
+                                                barBackgroundOpaque.checked = false
+                                                barBackgroundTranslucent.checked = true
+                                                barBackgroundTransparent.checked = false
+                                                if (!root.settings.bar) root.settings.bar = {}
+                                                root.settings.bar.backgroundStyle = "translucent"
+                                                saveSettings()
+                                            }
+                                        }
+                                    }
+                                    
+                                    Text {
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        text: "Translucent (semi-transparent)"
+                                        font.family: "MapleMono NF"
+                                        font.pixelSize: 12
+                                        color: ThemeManager.fgPrimary
+                                    }
+                                }
+                                
+                                // Transparent option
+                                Row {
+                                    spacing: 12
+                                    
+                                    Rectangle {
+                                        width: 20
+                                        height: 20
+                                        radius: 10
+                                        color: barBackgroundTransparent.checked ? ThemeManager.accentBlue : ThemeManager.surface1
+                                        border.width: 2
+                                        border.color: ThemeManager.accentBlue
+                                        
+                                        Rectangle {
+                                            anchors.centerIn: parent
+                                            width: 8
+                                            height: 8
+                                            radius: 4
+                                            color: ThemeManager.fgPrimary
+                                            visible: barBackgroundTransparent.checked
+                                        }
+                                        
+                                        MouseArea {
+                                            anchors.fill: parent
+                                            cursorShape: Qt.PointingHandCursor
+                                            onClicked: {
+                                                barBackgroundOpaque.checked = false
+                                                barBackgroundTranslucent.checked = false
+                                                barBackgroundTransparent.checked = true
+                                                if (!root.settings.bar) root.settings.bar = {}
+                                                root.settings.bar.backgroundStyle = "transparent"
+                                                saveSettings()
+                                            }
+                                        }
+                                    }
+                                    
+                                    Text {
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        text: "Transparent (no background)"
+                                        font.family: "MapleMono NF"
+                                        font.pixelSize: 12
+                                        color: ThemeManager.fgPrimary
+                                    }
+                                }
+                                
                                 QtObject {
-                                    id: transparentBackgroundCheck
+                                    id: barBackgroundOpaque
+                                    property bool checked: false
+                                }
+                                QtObject {
+                                    id: barBackgroundTranslucent
+                                    property bool checked: true  // default
+                                }
+                                QtObject {
+                                    id: barBackgroundTransparent
                                     property bool checked: false
                                 }
                             }

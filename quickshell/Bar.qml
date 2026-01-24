@@ -8,7 +8,7 @@ import QtQuick.Effects
 Item {
     id: bar
     
-    property bool transparentBackground: false
+    property string backgroundStyle: "translucent"  // "opaque", "translucent", or "transparent"
     property bool enableBlur: false
     property string position: "top"  // "top" or "bottom"
     
@@ -34,8 +34,8 @@ Item {
                 try {
                     const settings = JSON.parse(buffer)
                     if (settings.bar) {
-                        if (settings.bar.transparentBackground !== undefined) {
-                            bar.transparentBackground = settings.bar.transparentBackground
+                        if (settings.bar.backgroundStyle !== undefined) {
+                            bar.backgroundStyle = settings.bar.backgroundStyle
                         }
                         if (settings.bar.position !== undefined) {
                             bar.position = settings.bar.position
@@ -68,7 +68,11 @@ Item {
     Rectangle {
         id: background
         anchors.fill: parent
-        color: bar.transparentBackground ? "transparent" : ThemeManager.bgBaseAlpha
+        color: {
+            if (bar.backgroundStyle === "transparent") return "transparent"
+            if (bar.backgroundStyle === "opaque") return ThemeManager.bgBase
+            return ThemeManager.bgBaseAlpha  // translucent (default)
+        }
         z: -1
     }
     
