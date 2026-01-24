@@ -133,6 +133,12 @@ if [ -x "$HOME/.config/quickshell/sync-starship-theme.sh" ]; then
     "$HOME/.config/quickshell/sync-starship-theme.sh" > /dev/null 2>&1
 fi
 
+# Sync Bento browser start page
+if [ -x "$HOME/.config/quickshell/sync-bento-theme.sh" ]; then
+    echo "Syncing Bento start page..."
+    "$HOME/.config/quickshell/sync-bento-theme.sh" > /dev/null 2>&1
+fi
+
 # Sync Firefox theme
 if [ -x "$HOME/.config/quickshell/sync-firefox-theme.sh" ]; then
     echo "Syncing Firefox theme..."

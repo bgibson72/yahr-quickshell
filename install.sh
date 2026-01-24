@@ -1351,6 +1351,16 @@ initialize_wallpaper() {
             
             # Mark current theme
             echo "Catppuccin" > "$HOME/.config/hypr/.current-theme" 2>/dev/null || true
+            
+            # Run theme sync scripts to initialize all application themes
+            print_step "Syncing Catppuccin theme to applications..."
+            [ -x "$HOME/.config/quickshell/sync-kitty-theme.sh" ] && "$HOME/.config/quickshell/sync-kitty-theme.sh" >/dev/null 2>&1 && print_success "Kitty theme synced"
+            [ -x "$HOME/.config/quickshell/sync-nvim-theme.sh" ] && "$HOME/.config/quickshell/sync-nvim-theme.sh" >/dev/null 2>&1 && print_success "Neovim theme synced"
+            [ -x "$HOME/.config/quickshell/sync-firefox-theme.sh" ] && "$HOME/.config/quickshell/sync-firefox-theme.sh" >/dev/null 2>&1 && print_success "Firefox theme synced"
+            [ -x "$HOME/.config/quickshell/sync-gtk-theme.sh" ] && "$HOME/.config/quickshell/sync-gtk-theme.sh" >/dev/null 2>&1 && print_success "GTK theme synced"
+            [ -x "$HOME/.config/quickshell/sync-hyprlock-theme.sh" ] && "$HOME/.config/quickshell/sync-hyprlock-theme.sh" >/dev/null 2>&1 && print_success "Hyprlock theme synced"
+            [ -x "$HOME/.config/quickshell/sync-bento-theme.sh" ] && "$HOME/.config/quickshell/sync-bento-theme.sh" >/dev/null 2>&1 && print_success "Bento start page synced"
+            print_success "Theme synchronization complete"
         fi
         
         print_info "The wallpaper system is configured and ready to use"
@@ -1620,6 +1630,86 @@ install_extras() {
     print_success "Optional extras configuration complete"
 }
 
+# Install Bento browser start page
+install_bento() {
+    print_header "Bento Browser Start Page"
+    
+    local bento_dir="$HOME/bento"
+    local repo_bento="$SCRIPT_DIR/bento"
+    
+    # Check if bento exists in repo
+    if [ ! -d "$repo_bento" ]; then
+        print_warning "Bento directory not found in repository"
+        return
+    fi
+    
+    # Ask if user wants to install Bento
+    local install_choice="n"
+    if [ "$YOLO_MODE" = true ]; then
+        install_choice="y"
+    else
+        echo ""
+        print_info "The Bento start page is a beautiful browser homepage that"
+        print_info "automatically syncs with your Quickshell theme colors."
+        echo ""
+        read -p "$(echo -e ${CYAN}?${NC}) Install Bento browser start page? (y/n): " install_choice
+    fi
+    
+    if [[ ! "$install_choice" =~ ^[Yy]$ ]]; then
+        print_info "Skipping Bento installation"
+        SKIPPED_COMPONENTS+=("Bento")
+        return
+    fi
+    
+    # Check if already exists
+    if [ -d "$bento_dir" ]; then
+        print_warning "Bento directory already exists at $bento_dir"
+        local overwrite="n"
+        if [ "$YOLO_MODE" = true ]; then
+            print_info "YOLO mode: Backing up and overwriting existing Bento"
+            overwrite="y"
+        else
+            read -p "$(echo -e ${CYAN}?${NC}) Overwrite existing Bento? (y/n): " overwrite
+        fi
+        
+        if [[ "$overwrite" =~ ^[Yy]$ ]]; then
+            print_step "Backing up existing Bento..."
+            mv "$bento_dir" "${bento_dir}.backup-$(date +%Y%m%d-%H%M%S)"
+            print_success "Backup created"
+        else
+            print_info "Skipping Bento installation"
+            SKIPPED_COMPONENTS+=("Bento")
+            return
+        fi
+    fi
+    
+    # Copy Bento to home directory
+    print_step "Installing Bento start page..."
+    cp -r "$repo_bento" "$bento_dir"
+    
+    if [ $? -eq 0 ]; then
+        print_success "Bento installed to $bento_dir"
+        
+        # Sync theme for Bento
+        if [ -x "$HOME/.config/quickshell/sync-bento-theme.sh" ]; then
+            print_step "Syncing Bento with current theme..."
+            "$HOME/.config/quickshell/sync-bento-theme.sh" >/dev/null 2>&1
+            print_success "Bento theme synced"
+        fi
+        
+        echo ""
+        print_info "To use Bento, set your browser's homepage to:"
+        echo "  file://$bento_dir/index.html"
+        echo ""
+        print_info "The start page colors will automatically sync with your theme!"
+        
+        INSTALLED_COMPONENTS+=("Bento Start Page")
+    else
+        print_error "Failed to install Bento"
+        return 1
+    fi
+}
+
 # Configure Hyprland autostart
 configure_hyprland() {
     print_header "Configuring Hyprland Integration"
@@ -1837,6 +1927,7 @@ main() {
     
     install_gtk_themes
     install_extras
+    install_bento
     
     # Verify installation
     verify_installation
