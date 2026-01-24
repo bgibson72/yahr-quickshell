@@ -2,8 +2,24 @@
 
 # Sync Bento Browser Start Page with Current Hyprland Theme
 
+SETTINGS_JSON="$HOME/.config/quickshell/settings.json"
 HYPRLAND_CONF="$HOME/.config/hypr/hyprland.conf"
 BENTO_CSS="$HOME/bento/app.css"
+
+# Check if Bento integration is enabled in settings
+if [ -f "$SETTINGS_JSON" ]; then
+    bento_enabled=$(grep -A 20 '"bento"' "$SETTINGS_JSON" | grep '"enabled"' | grep -o 'true\|false' | head -1)
+    if [ "$bento_enabled" = "false" ]; then
+        echo "Bento integration is disabled in settings - skipping sync"
+        exit 0
+    fi
+fi
+
+# Check if Bento directory exists
+if [ ! -f "$BENTO_CSS" ]; then
+    echo "Bento not installed at $HOME/bento - skipping sync"
+    exit 0
+fi
 
 # Get current theme from Hyprland config
 THEME_FILE=$(grep "^source.*themes.*\.conf" "$HYPRLAND_CONF" | sed 's/.*= *//')
