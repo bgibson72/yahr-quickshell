@@ -443,7 +443,10 @@ Rectangle {
                         }
                     }
                     
-                    Item { width: 1; height: 1 }
+                    Item { 
+                        width: Math.max(0, parent.width - 340)
+                        height: 1 
+                    }
                     
                     // Bluetooth toggle
                     Rectangle {
@@ -452,7 +455,6 @@ Rectangle {
                         radius: 12
                         color: root.bluetoothEnabled ? ThemeManager.accentBlue : ThemeManager.surface0
                         anchors.verticalCenter: parent.verticalCenter
-                        anchors.right: parent.right
                         
                         Rectangle {
                             width: 18
@@ -518,7 +520,7 @@ Rectangle {
                     
                     Text {
                         anchors.centerIn: parent
-                        text: "Bluetooth Manager"
+                        text: "Bluetooth Settings"
                         font.family: "MapleMono NF"
                         font.pixelSize: 13
                         color: ThemeManager.fgPrimary
