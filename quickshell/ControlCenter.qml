@@ -7,7 +7,7 @@ Rectangle {
     id: root
     
     width: 420
-    height: 540
+    height: 750
     color: ThemeManager.bgBase
     radius: 16
     border.width: 3
@@ -34,6 +34,9 @@ Rectangle {
     property bool charging: false
     property bool acOnline: false
     property string batteryTimeRemaining: ""
+    property bool bluetoothEnabled: false
+    property var bluetoothDevices: []
+    property int brightness: 50
     
     focus: true
     
@@ -157,7 +160,7 @@ Rectangle {
                         }
                     }
                     
-                    Item { Layout.fillWidth: true }
+                    Item { width: Math.max(0, parent.width - 320); height: 1 }
                     
                     Column {
                         spacing: 2
@@ -187,6 +190,38 @@ Rectangle {
                                 font.family: "MapleMono NF"
                                 font.pixelSize: 11
                                 color: ThemeManager.fgSecondary
+                            }
+                        }
+                    }
+                    
+                    // Wi-Fi toggle
+                    Rectangle {
+                        width: 48
+                        height: 24
+                        radius: 12
+                        color: root.networkType === "wifi" ? ThemeManager.accentGreen : ThemeManager.surface0
+                        anchors.verticalCenter: parent.verticalCenter
+                        
+                        Rectangle {
+                            width: 18
+                            height: 18
+                            radius: 9
+                            color: ThemeManager.fgPrimary
+                            x: root.networkType === "wifi" ? parent.width - width - 3 : 3
+                            anchors.verticalCenter: parent.verticalCenter
+                            
+                            Behavior on x { NumberAnimation { duration: 200 } }
+                        }
+                        
+                        MouseArea {
+                            anchors.fill: parent
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: {
+                                if (root.networkType === "wifi") {
+                                    wifiDisableProcess.running = true
+                                } else {
+                                    wifiEnableProcess.running = true
+                                }
                             }
                         }
                     }
@@ -364,6 +399,249 @@ Rectangle {
             }
         }
         
+        // Bluetooth Section
+        Rectangle {
+            width: parent.width
+            height: Math.max(116, 80 + (bluetoothDevicesColumn.children.length * 28))
+            color: ThemeManager.surface1
+            radius: 12
+            
+            Column {
+                anchors.fill: parent
+                anchors.margins: 16
+                spacing: 12
+                
+                Row {
+                    width: parent.width
+                    spacing: 12
+                    
+                    Text {
+                        text: "󰂯"
+                        font.family: "Symbols Nerd Font"
+                        font.pixelSize: 28
+                        color: root.bluetoothEnabled ? ThemeManager.accentBlue : ThemeManager.fgTertiary
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+                    
+                    Column {
+                        spacing: 4
+                        anchors.verticalCenter: parent.verticalCenter
+                        
+                        Text {
+                            text: "Bluetooth"
+                            font.family: "MapleMono NF"
+                            font.pixelSize: 16
+                            font.weight: Font.Bold
+                            color: ThemeManager.fgPrimary
+                        }
+                        
+                        Text {
+                            text: root.bluetoothEnabled ? (root.bluetoothDevices.length > 0 ? root.bluetoothDevices.length + " device(s) connected" : "No devices connected") : "Off"
+                            font.family: "MapleMono NF"
+                            font.pixelSize: 13
+                            color: ThemeManager.fgSecondary
+                        }
+                    }
+                    
+                    Item { width: Math.max(0, parent.width - 270); height: 1 }
+                    
+                    // Bluetooth toggle
+                    Rectangle {
+                        width: 48
+                        height: 24
+                        radius: 12
+                        color: root.bluetoothEnabled ? ThemeManager.accentBlue : ThemeManager.surface0
+                        anchors.verticalCenter: parent.verticalCenter
+                        
+                        Rectangle {
+                            width: 18
+                            height: 18
+                            radius: 9
+                            color: ThemeManager.fgPrimary
+                            x: root.bluetoothEnabled ? parent.width - width - 3 : 3
+                            anchors.verticalCenter: parent.verticalCenter
+                            
+                            Behavior on x { NumberAnimation { duration: 200 } }
+                        }
+                        
+                        MouseArea {
+                            anchors.fill: parent
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: {
+                                if (root.bluetoothEnabled) {
+                                    bluetoothDisableProcess.running = true
+                                } else {
+                                    bluetoothEnableProcess.running = true
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                // Connected devices list
+                Column {
+                    id: bluetoothDevicesColumn
+                    width: parent.width
+                    spacing: 4
+                    visible: root.bluetoothDevices.length > 0
+                    
+                    Repeater {
+                        model: root.bluetoothDevices
+                        delegate: Text {
+                            text: "  • " + modelData
+                            font.family: "MapleMono NF"
+                            font.pixelSize: 12
+                            color: ThemeManager.fgSecondary
+                        }
+                    }
+                }
+                
+                // Bluetooth manager button
+                Rectangle {
+                    width: parent.width
+                    height: 32
+                    color: btSettingsMouseArea.containsMouse ? ThemeManager.surface2 : ThemeManager.surface0
+                    radius: 8
+                    
+                    MouseArea {
+                        id: btSettingsMouseArea
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: {
+                            console.log("Opening Bluetooth manager")
+                            Quickshell.execDetached(["blueman-manager"])
+                            root.requestClose()
+                        }
+                    }
+                    
+                    Text {
+                        anchors.centerIn: parent
+                        text: "Bluetooth Manager"
+                        font.family: "MapleMono NF"
+                        font.pixelSize: 13
+                        color: ThemeManager.fgPrimary
+                    }
+                }
+            }
+        }
+        
+        // Brightness Section
+        Rectangle {
+            width: parent.width
+            height: 116
+            color: ThemeManager.surface1
+            radius: 12
+            
+            Column {
+                anchors.fill: parent
+                anchors.margins: 16
+                spacing: 12
+                
+                Row {
+                    width: parent.width
+                    spacing: 12
+                    
+                    Text {
+                        text: root.brightness >= 70 ? "󰃠" : root.brightness >= 40 ? "󰃟" : "󰃞"
+                        font.family: "Symbols Nerd Font"
+                        font.pixelSize: 28
+                        color: ThemeManager.accentYellow
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+                    
+                    Column {
+                        spacing: 4
+                        anchors.verticalCenter: parent.verticalCenter
+                        
+                        Text {
+                            text: "Brightness"
+                            font.family: "MapleMono NF"
+                            font.pixelSize: 16
+                            font.weight: Font.Bold
+                            color: ThemeManager.fgPrimary
+                        }
+                        
+                        Text {
+                            text: root.brightness + "%"
+                            font.family: "MapleMono NF"
+                            font.pixelSize: 13
+                            color: ThemeManager.fgSecondary
+                        }
+                    }
+                }
+                
+                // Brightness slider
+                Rectangle {
+                    width: parent.width
+                    height: 8
+                    color: ThemeManager.surface0
+                    radius: 4
+                    
+                    Rectangle {
+                        width: parent.width * (root.brightness / 100)
+                        height: parent.height
+                        color: ThemeManager.accentYellow
+                        radius: 4
+                    }
+                }
+                
+                // Brightness controls
+                Row {
+                    width: parent.width
+                    spacing: 8
+                    
+                    Rectangle {
+                        width: (parent.width - 8) / 2
+                        height: 32
+                        color: brightDownMouseArea.containsMouse ? ThemeManager.surface2 : ThemeManager.surface0
+                        radius: 8
+                        
+                        MouseArea {
+                            id: brightDownMouseArea
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: {
+                                brightnessDownProcess.running = true
+                            }
+                        }
+                        
+                        Text {
+                            anchors.centerIn: parent
+                            text: "−"
+                            font.pixelSize: 20
+                            color: ThemeManager.fgPrimary
+                        }
+                    }
+                    
+                    Rectangle {
+                        width: (parent.width - 8) / 2
+                        height: 32
+                        color: brightUpMouseArea.containsMouse ? ThemeManager.surface2 : ThemeManager.surface0
+                        radius: 8
+                        
+                        MouseArea {
+                            id: brightUpMouseArea
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: {
+                                brightnessUpProcess.running = true
+                            }
+                        }
+                        
+                        Text {
+                            anchors.centerIn: parent
+                            text: "+"
+                            font.pixelSize: 20
+                            color: ThemeManager.fgPrimary
+                        }
+                    }
+                }
+            }
+        }
+        
         // Battery/Power Section
         Rectangle {
             width: parent.width
@@ -505,6 +783,8 @@ Rectangle {
             updateVolume()
             updateBattery()
             updateNetwork()
+            updateBluetooth()
+            updateBrightness()
         }
     }
     
@@ -768,5 +1048,128 @@ Rectangle {
         onTriggered: {
             trafficProcess.running = true
         }
+    }
+    
+    // Wi-Fi toggle processes
+    Process {
+        id: wifiEnableProcess
+        running: false
+        command: ["sh", "-c", "nmcli radio wifi on"]
+        onRunningChanged: if (!running) Qt.callLater(updateNetwork)
+    }
+    
+    Process {
+        id: wifiDisableProcess
+        running: false
+        command: ["sh", "-c", "nmcli radio wifi off"]
+        onRunningChanged: if (!running) Qt.callLater(updateNetwork)
+    }
+    
+    // Bluetooth functions
+    function updateBluetooth() {
+        bluetoothStatusProcess.running = true
+    }
+    
+    Process {
+        id: bluetoothStatusProcess
+        running: false
+        command: ["sh", "-c", "bluetoothctl show | grep 'Powered: yes' && echo 1 || echo 0"]
+        
+        property string buffer: ""
+        
+        stdout: SplitParser {
+            onRead: data => { bluetoothStatusProcess.buffer += data }
+        }
+        
+        onRunningChanged: {
+            if (!running && buffer !== "") {
+                root.bluetoothEnabled = buffer.trim() === "1"
+                buffer = ""
+                
+                // If bluetooth is on, get connected devices
+                if (root.bluetoothEnabled) {
+                    bluetoothDevicesProcess.running = true
+                } else {
+                    root.bluetoothDevices = []
+                }
+            } else if (running) {
+                buffer = ""
+            }
+        }
+    }
+    
+    Process {
+        id: bluetoothDevicesProcess
+        running: false
+        command: ["sh", "-c", "bluetoothctl devices Connected | awk '{$1=$2=\"\"; print substr($0,3)}'"]
+        
+        property string buffer: ""
+        
+        stdout: SplitParser {
+            onRead: data => { bluetoothDevicesProcess.buffer += data }
+        }
+        
+        onRunningChanged: {
+            if (!running && buffer !== "") {
+                let lines = buffer.trim().split('\n').filter(line => line.length > 0)
+                root.bluetoothDevices = lines
+                buffer = ""
+            } else if (running) {
+                buffer = ""
+            }
+        }
+    }
+    
+    Process {
+        id: bluetoothEnableProcess
+        running: false
+        command: ["sh", "-c", "bluetoothctl power on"]
+        onRunningChanged: if (!running) Qt.callLater(updateBluetooth)
+    }
+    
+    Process {
+        id: bluetoothDisableProcess
+        running: false
+        command: ["sh", "-c", "bluetoothctl power off"]
+        onRunningChanged: if (!running) Qt.callLater(updateBluetooth)
+    }
+    
+    // Brightness functions
+    function updateBrightness() {
+        brightnessLevelProcess.running = true
+    }
+    
+    Process {
+        id: brightnessLevelProcess
+        running: false
+        command: ["sh", "-c", "brightnessctl -m | cut -d',' -f4 | tr -d '%'"]
+        
+        stdout: SplitParser {
+            onRead: data => {
+                root.brightness = parseInt(data.trim()) || 50
+            }
+        }
+    }
+    
+    Process {
+        id: brightnessUpProcess
+        running: false
+        command: ["sh", "-c", "brightnessctl set +5%"]
+        onRunningChanged: if (!running) brightnessUpdateTimer.restart()
+    }
+    
+    Process {
+        id: brightnessDownProcess
+        running: false
+        command: ["sh", "-c", "brightnessctl set 5%-"]
+        onRunningChanged: if (!running) brightnessUpdateTimer.restart()
+    }
+    
+    // Delay timer for brightness updates after button clicks
+    Timer {
+        id: brightnessUpdateTimer
+        interval: 100
+        repeat: false
+        onTriggered: updateBrightness()
     }
 }
