@@ -443,7 +443,7 @@ Rectangle {
                         }
                     }
                     
-                    Item { width: Math.max(0, parent.width - 320); height: 1 }
+                    Item { width: 1; height: 1 }
                     
                     // Bluetooth toggle
                     Rectangle {
@@ -452,6 +452,7 @@ Rectangle {
                         radius: 12
                         color: root.bluetoothEnabled ? ThemeManager.accentBlue : ThemeManager.surface0
                         anchors.verticalCenter: parent.verticalCenter
+                        anchors.right: parent.right
                         
                         Rectangle {
                             width: 18
