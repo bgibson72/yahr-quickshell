@@ -443,7 +443,7 @@ Rectangle {
                         }
                     }
                     
-                    Item { width: Math.max(0, parent.width - 270); height: 1 }
+                    Item { width: Math.max(0, parent.width - 320); height: 1 }
                     
                     // Bluetooth toggle
                     Rectangle {
