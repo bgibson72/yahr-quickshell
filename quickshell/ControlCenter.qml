@@ -107,7 +107,7 @@ Rectangle {
         // WiFi Section
         Rectangle {
             width: parent.width
-            height: 116
+            height: 140
             color: ThemeManager.surface1
             radius: 12
             
@@ -116,90 +116,62 @@ Rectangle {
                 anchors.margins: 16
                 spacing: 12
                 
-                Row {
+                Item {
                     width: parent.width
-                    spacing: 12
+                    height: 44
                     
-                    Text {
-                        text: {
-                            if (root.networkType === "wifi") {
-                                if (root.signalStrength >= 80) return "󰤨"
-                                else if (root.signalStrength >= 60) return "󰤥"
-                                else if (root.signalStrength >= 40) return "󰤢"
-                                else if (root.signalStrength >= 20) return "󰤟"
-                                else return "󰤯"
-                            } else if (root.networkType === "ethernet") {
-                                return "󰈀"
-                            } else {
-                                return "󰌙"
+                    Row {
+                        width: parent.width - 60
+                        spacing: 12
+                        
+                        Text {
+                            text: {
+                                if (root.networkType === "wifi") {
+                                    if (root.signalStrength >= 80) return "󰤨"
+                                    else if (root.signalStrength >= 60) return "󰤥"
+                                    else if (root.signalStrength >= 40) return "󰤢"
+                                    else if (root.signalStrength >= 20) return "󰤟"
+                                    else return "󰤯"
+                                } else if (root.networkType === "ethernet") {
+                                    return "󰈀"
+                                } else {
+                                    return "󰌙"
+                                }
                             }
-                        }
-                        font.family: "Symbols Nerd Font"
-                        font.pixelSize: 28
-                        color: ThemeManager.accentGreen
-                        anchors.verticalCenter: parent.verticalCenter
-                    }
-                    
-                    Column {
-                        spacing: 4
-                        anchors.verticalCenter: parent.verticalCenter
-                        
-                        Text {
-                            text: root.networkType === "wifi" ? "Wi-Fi" : root.networkType === "ethernet" ? "Ethernet" : "Disconnected"
-                            font.family: "MapleMono NF"
-                            font.pixelSize: 16
-                            font.weight: Font.Bold
-                            color: ThemeManager.fgPrimary
+                            font.family: "Symbols Nerd Font"
+                            font.pixelSize: 28
+                            color: ThemeManager.accentGreen
+                            anchors.verticalCenter: parent.verticalCenter
                         }
                         
-                        Text {
-                            text: root.networkName
-                            font.family: "MapleMono NF"
-                            font.pixelSize: 13
-                            color: ThemeManager.fgSecondary
-                        }
-                    }
-                    
-                    Item { width: Math.max(0, parent.width - 320); height: 1 }
-                    
-                    Column {
-                        spacing: 2
-                        anchors.verticalCenter: parent.verticalCenter
-                        
-                        Text {
-                            text: root.networkType === "wifi" ? root.signalStrength + "%" : ""
-                            font.family: "MapleMono NF"
-                            font.pixelSize: 14
-                            font.weight: Font.Bold
-                            color: ThemeManager.accentBlue
-                            visible: root.networkType === "wifi"
-                        }
-                        
-                        Row {
-                            spacing: 8
+                        Column {
+                            spacing: 4
+                            anchors.verticalCenter: parent.verticalCenter
                             
                             Text {
-                                text: "↓ " + root.downloadRate
+                                text: root.networkType === "wifi" ? "Wi-Fi" : root.networkType === "ethernet" ? "Ethernet" : "Disconnected"
                                 font.family: "MapleMono NF"
-                                font.pixelSize: 11
-                                color: ThemeManager.fgSecondary
+                                font.pixelSize: 16
+                                font.weight: Font.Bold
+                                color: ThemeManager.fgPrimary
                             }
                             
                             Text {
-                                text: "↑ " + root.uploadRate
+                                text: root.networkName
                                 font.family: "MapleMono NF"
-                                font.pixelSize: 11
+                                font.pixelSize: 13
                                 color: ThemeManager.fgSecondary
                             }
                         }
                     }
                     
-                    // Wi-Fi toggle
+                    // Wi-Fi toggle - positioned absolutely in top right
                     Rectangle {
                         width: 48
                         height: 24
                         radius: 12
                         color: root.networkType === "wifi" ? ThemeManager.accentGreen : ThemeManager.surface0
+                        anchors.right: parent.right
                         anchors.verticalCenter: parent.verticalCenter
                         
                         Rectangle {
@@ -224,6 +196,35 @@ Rectangle {
                                 }
                             }
                         }
+                    }
+                }
+                
+                // Network stats row
+                Row {
+                    width: parent.width
+                    spacing: 16
+                    
+                    Text {
+                        text: root.networkType === "wifi" ? root.signalStrength + "%" : ""
+                        font.family: "MapleMono NF"
+                        font.pixelSize: 14
+                        font.weight: Font.Bold
+                        color: ThemeManager.accentBlue
+                        visible: root.networkType === "wifi"
+                    }
+                    
+                    Text {
+                        text: "↓ " + root.downloadRate
+                        font.family: "MapleMono NF"
+                        font.pixelSize: 11
+                        color: ThemeManager.fgSecondary
+                    }
+                    
+                    Text {
+                        text: "↑ " + root.uploadRate
+                        font.family: "MapleMono NF"
+                        font.pixelSize: 11
+                        color: ThemeManager.fgSecondary
                     }
                 }
                 
@@ -1077,7 +1078,7 @@ Rectangle {
     Process {
         id: bluetoothStatusProcess
         running: false
-        command: ["sh", "-c", "bluetoothctl show | grep 'Powered: yes' && echo 1 || echo 0"]
+        command: ["sh", "-c", "bluetoothctl show | grep 'Powered:' | awk '{print $2}'"]
         
         property string buffer: ""
         
@@ -1087,7 +1088,7 @@ Rectangle {
         
         onRunningChanged: {
             if (!running && buffer !== "") {
-                root.bluetoothEnabled = buffer.trim() === "1"
+                root.bluetoothEnabled = buffer.trim() === "yes"
                 buffer = ""
                 
                 // If bluetooth is on, get connected devices
