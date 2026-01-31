@@ -7,7 +7,7 @@ Rectangle {
     id: root
     
     width: 420
-    height: 850
+    height: 790
     color: ThemeManager.bgBase
     radius: 16
     border.width: 3
