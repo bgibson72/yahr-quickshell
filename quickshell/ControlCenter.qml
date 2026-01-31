@@ -411,49 +411,50 @@ Rectangle {
                 anchors.margins: 16
                 spacing: 12
                 
-                Row {
+                Item {
                     width: parent.width
-                    spacing: 12
+                    height: 44
                     
-                    Text {
-                        text: "󰂯"
-                        font.family: "Symbols Nerd Font"
-                        font.pixelSize: 28
-                        color: root.bluetoothEnabled ? ThemeManager.accentBlue : ThemeManager.fgTertiary
-                        anchors.verticalCenter: parent.verticalCenter
-                    }
-                    
-                    Column {
-                        spacing: 4
-                        anchors.verticalCenter: parent.verticalCenter
+                    Row {
+                        width: parent.width - 60
+                        spacing: 12
                         
                         Text {
-                            text: "Bluetooth"
-                            font.family: "MapleMono NF"
-                            font.pixelSize: 16
-                            font.weight: Font.Bold
-                            color: ThemeManager.fgPrimary
+                            text: "󰂯"
+                            font.family: "Symbols Nerd Font"
+                            font.pixelSize: 28
+                            color: root.bluetoothEnabled ? ThemeManager.accentBlue : ThemeManager.fgTertiary
+                            anchors.verticalCenter: parent.verticalCenter
                         }
                         
-                        Text {
-                            text: root.bluetoothEnabled ? (root.bluetoothDevices.length > 0 ? root.bluetoothDevices.length + " device(s) connected" : "No devices connected") : "Off"
-                            font.family: "MapleMono NF"
-                            font.pixelSize: 13
-                            color: ThemeManager.fgSecondary
+                        Column {
+                            spacing: 4
+                            anchors.verticalCenter: parent.verticalCenter
+                            
+                            Text {
+                                text: "Bluetooth"
+                                font.family: "MapleMono NF"
+                                font.pixelSize: 16
+                                font.weight: Font.Bold
+                                color: ThemeManager.fgPrimary
+                            }
+                            
+                            Text {
+                                text: root.bluetoothEnabled ? (root.bluetoothDevices.length > 0 ? root.bluetoothDevices.length + " device(s) connected" : "No devices connected") : "Off"
+                                font.family: "MapleMono NF"
+                                font.pixelSize: 13
+                                color: ThemeManager.fgSecondary
+                            }
                         }
                     }
                     
-                    Item { 
-                        width: Math.max(0, parent.width - 340)
-                        height: 1 
-                    }
-                    
-                    // Bluetooth toggle
+                    // Bluetooth toggle - positioned absolutely in top right
                     Rectangle {
                         width: 48
                         height: 24
                         radius: 12
                         color: root.bluetoothEnabled ? ThemeManager.accentBlue : ThemeManager.surface0
+                        anchors.right: parent.right
                         anchors.verticalCenter: parent.verticalCenter
                         
                         Rectangle {
