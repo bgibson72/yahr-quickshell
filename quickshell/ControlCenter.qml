@@ -529,7 +529,7 @@ Rectangle {
         // Brightness Section
         Rectangle {
             width: parent.width
-            height: 116
+            height: 136
             color: ThemeManager.surface1
             radius: 12
             
