@@ -535,10 +535,10 @@ ShellRoot {
             // Panel positioned at top-right, slides down from top
             Item {
                 width: 420
-                height: 540
+                height: 850
                 anchors.top: parent.top
                 anchors.right: parent.right
-                anchors.topMargin: shellRoot.controlCenterVisible ? 6 : -600
+                anchors.topMargin: shellRoot.controlCenterVisible ? 6 : -900
                 anchors.rightMargin: 6
                 
                 Behavior on anchors.topMargin {
