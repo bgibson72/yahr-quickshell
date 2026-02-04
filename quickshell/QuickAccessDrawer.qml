@@ -7,13 +7,8 @@ Item {
     property bool expanded: false
     property alias settingsButton: settingsButton
     
-    // Calculate width based on expanded state
-    implicitWidth: expanded ? chevronButton.width + (quickAccessRow.children.length * 32) + ((quickAccessRow.children.length - 1) * 4) + 8 : chevronButton.width
+    implicitWidth: expanded ? 276 : 32
     implicitHeight: 35
-    
-    Behavior on implicitWidth {
-        NumberAnimation { duration: 300; easing.type: Easing.OutCubic }
-    }
     
     // Container for the drawer content
     Rectangle {
@@ -37,7 +32,7 @@ Item {
                 
                 Text {
                     anchors.centerIn: parent
-                    text: drawer.expanded ? "" : ""  // right chevron when expanded, up chevron when collapsed
+                    text: drawer.expanded ? "\uf054" : "\uf077"
                     font.family: "Symbols Nerd Font"
                     font.pixelSize: 14
                     color: ThemeManager.fgPrimary
@@ -50,37 +45,22 @@ Item {
                     cursorShape: Qt.PointingHandCursor
                     
                     onClicked: {
-                        console.log("Chevron clicked, toggling drawer")
                         drawer.expanded = !drawer.expanded
                     }
                 }
-                
-                Behavior on color {
-                    ColorAnimation { duration: 200 }
-                }
             }
             
-            // Quick access buttons row - slides out from chevron position
+            // Quick access buttons - only visible when expanded
             Item {
-                width: drawer.expanded ? 220 : 0  // 6 buttons * 32px + 5 gaps * 4px = 212px, rounded to 220
-                height: 32
-                clip: true  // This ensures buttons don't show when width is 0
-                visible: drawer.expanded  // Hide completely when collapsed to prevent click blocking
-                
-                Behavior on width {
-                    NumberAnimation { duration: 300; easing.type: Easing.OutCubic }
-                }
+                Layout.preferredWidth: drawer.expanded ? 236 : 0
+                Layout.preferredHeight: 32
+                clip: true
+                visible: drawer.expanded
                 
                 RowLayout {
-                    id: quickAccessRow
                     spacing: 4
                     anchors.left: parent.left
                     anchors.verticalCenter: parent.verticalCenter
-                    opacity: drawer.expanded ? 1.0 : 0.0
-                    
-                    Behavior on opacity {
-                        NumberAnimation { duration: 200; easing.type: Easing.OutCubic }
-                    }
                     
                     KittyButton {}
                     FilesButton {}

@@ -67,6 +67,8 @@ declare -A HYPR_THEME_MAP=(
     ["nightfox"]="NightFox"
     ["eldritch"]="Eldritch"
     ["material"]="Material"
+    ["monochrome"]="Monochrome"
+    ["solarized"]="Solarized"
 )
 
 HYPR_THEME="${HYPR_THEME_MAP[$THEME]}"
@@ -84,7 +86,26 @@ fi
 export QUICKSHELL_THEME_FILE="$THEME_FILE"
 
 # Update theme reference immediately for wallpaper picker
-echo "$THEME" > "$HOME/.config/hypr/.current-theme"
+# Write the Title Case theme name (from HYPR_THEME_MAP) for wallpaper folders
+if [ -n "$HYPR_THEME" ]; then
+    echo "$HYPR_THEME" > "$HOME/.config/hypr/.current-theme"
+else
+    echo "$THEME" > "$HOME/.config/hypr/.current-theme"
+fi
+
+# Update wallpaper to match new theme
+# Use HYPR_THEME (Title Case) for wallpaper directory name
+THEME_FOR_WALLPAPER="${HYPR_THEME:-$THEME}"
+WALLPAPER_DIR="$HOME/Pictures/Wallpapers/$THEME_FOR_WALLPAPER"
+if [ -d "$WALLPAPER_DIR" ] && command -v swww &> /dev/null; then
+    # Get a random wallpaper from the theme directory
+    WALLPAPER=$(find "$WALLPAPER_DIR" -type f \( -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" -o -iname "*.webp" \) | shuf -n 1)
+    if [ -n "$WALLPAPER" ]; then
+        echo "Updating wallpaper..."
+        swww img "$WALLPAPER" --transition-type fade --transition-fps 60 &
+        echo -e "${GREEN}✓ Wallpaper updated${NC}"
+    fi
+fi
 
 # Sync SDDM theme first (synchronously for reliability)
 SDDM_SYNC="$HOME/.config/quickshell/sync-sddm-theme.sh"
@@ -149,6 +170,14 @@ fi
 if [ -x "$HOME/.config/quickshell/sync-gtk-theme.sh" ]; then
     echo "Syncing GTK theme..."
     "$HOME/.config/quickshell/sync-gtk-theme.sh"
+    
+    # Source the GTK theme environment and update Hyprland
+    if [ -f "$HOME/.config/gtk-3.0/gtk-theme-env.sh" ]; then
+        source "$HOME/.config/gtk-3.0/gtk-theme-env.sh"
+        if command -v hyprctl &> /dev/null; then
+            hyprctl setenv GTK_THEME "$GTK_THEME"
+        fi
+    fi
 fi
 
 # Sync Papirus folder colors

@@ -77,113 +77,51 @@ ShellRoot {
         }
     }
     
-    // File-based IPC watcher for theme switcher keybind
+    // Consolidated IPC watcher - single process for all keybinds (efficient!)
     Process {
-        id: themeSwitcherWatcher
+        id: consolidatedIpcWatcher
         running: true
-        command: ["sh", "-c", "while true; do if [ -f /tmp/quickshell-themeswitcher.sock ]; then echo toggle; while [ -f /tmp/quickshell-themeswitcher.sock ]; do sleep 0.05; done; fi; sleep 0.1; done"]
+        command: [Quickshell.env("HOME") + "/.config/quickshell/consolidated-ipc-watcher.sh"]
         
         stdout: SplitParser {
             onRead: line => {
-                if (line === "toggle") {
-                    shellRoot.themeSwitcherVisible = !shellRoot.themeSwitcherVisible
-                    console.log("Theme switcher toggled via keybind:", shellRoot.themeSwitcherVisible)
-                }
-            }
-        }
-    }
-    
-    // File-based IPC watcher for app launcher keybind
-    Process {
-        id: appLauncherWatcher
-        running: true
-        command: ["sh", "-c", "while true; do if [ -f /tmp/quickshell-applauncher.sock ]; then echo toggle; while [ -f /tmp/quickshell-applauncher.sock ]; do sleep 0.05; done; fi; sleep 0.1; done"]
-        
-        stdout: SplitParser {
-            onRead: line => {
-                if (line === "toggle") {
-                    shellRoot.appLauncherVisible = !shellRoot.appLauncherVisible
-                    console.log("App launcher toggled via keybind:", shellRoot.appLauncherVisible)
-                }
-            }
-        }
-    }
-    
-    // File-based IPC watcher for calendar keybind
-    Process {
-        id: calendarWatcher
-        running: true
-        command: ["sh", "-c", "while true; do if [ -f /tmp/quickshell-calendar.sock ]; then echo toggle; while [ -f /tmp/quickshell-calendar.sock ]; do sleep 0.05; done; fi; sleep 0.1; done"]
-        
-        stdout: SplitParser {
-            onRead: line => {
-                if (line === "toggle") {
-                    shellRoot.calendarVisible = !shellRoot.calendarVisible
-                    console.log("Calendar toggled via keybind:", shellRoot.calendarVisible)
-                }
-            }
-        }
-    }
-    
-    // File-based IPC watcher for power menu keybind
-    Process {
-        id: powerMenuWatcher
-        running: true
-        command: ["sh", "-c", "while true; do if [ -f /tmp/quickshell-powermenu.sock ]; then echo toggle; while [ -f /tmp/quickshell-powermenu.sock ]; do sleep 0.05; done; fi; sleep 0.1; done"]
-        
-        stdout: SplitParser {
-            onRead: line => {
-                if (line === "toggle") {
-                    shellRoot.powerMenuVisible = !shellRoot.powerMenuVisible
-                    console.log("Power menu toggled via keybind:", shellRoot.powerMenuVisible)
-                }
-            }
-        }
-    }
-    
-    // File-based IPC watcher for screenshot widget keybind
-    Process {
-        id: screenshotWatcher
-        running: true
-        command: ["sh", "-c", "while true; do if [ -f /tmp/quickshell-screenshot.sock ]; then echo toggle; while [ -f /tmp/quickshell-screenshot.sock ]; do sleep 0.05; done; fi; sleep 0.1; done"]
-        
-        stdout: SplitParser {
-            onRead: line => {
-                if (line === "toggle") {
-                    shellRoot.screenshotVisible = !shellRoot.screenshotVisible
-                    console.log("Screenshot widget toggled via keybind:", shellRoot.screenshotVisible)
-                }
-            }
-        }
-    }
-    
-    // File-based IPC watcher for settings widget keybind
-    Process {
-        id: settingsWatcher
-        running: true
-        command: ["sh", "-c", "while true; do if [ -f /tmp/quickshell-settings.sock ]; then echo toggle; while [ -f /tmp/quickshell-settings.sock ]; do sleep 0.05; done; fi; sleep 0.1; done"]
-        
-        stdout: SplitParser {
-            onRead: line => {
-                if (line === "toggle") {
-                    shellRoot.settingsVisible = !shellRoot.settingsVisible
-                    console.log("Settings widget toggled via keybind:", shellRoot.settingsVisible)
-                }
-            }
-        }
-    }
-    
-    // File-based IPC watcher for clipboard keybind
-    Process {
-        id: clipboardWatcher
-        running: true
-        command: ["sh", "-c", "while true; do if [ -f /tmp/quickshell-clipboard.sock ]; then echo toggle; while [ -f /tmp/quickshell-clipboard.sock ]; do sleep 0.05; done; fi; sleep 0.1; done"]
-        
-        stdout: SplitParser {
-            onRead: line => {
-                if (line === "toggle") {
-                    shellRoot.clipboardVisible = !shellRoot.clipboardVisible
-                    console.log("Clipboard toggled via keybind:", shellRoot.clipboardVisible)
+                const parts = line.split(":")
+                if (parts.length !== 2) return
+                
+                const component = parts[0]
+                const action = parts[1]
+                
+                if (action === "toggle") {
+                    switch (component) {
+                        case "themeswitcher":
+                            shellRoot.themeSwitcherVisible = !shellRoot.themeSwitcherVisible
+                            console.log("Theme switcher toggled via keybind:", shellRoot.themeSwitcherVisible)
+                            break
+                        case "applauncher":
+                            shellRoot.appLauncherVisible = !shellRoot.appLauncherVisible
+                            console.log("App launcher toggled via keybind:", shellRoot.appLauncherVisible)
+                            break
+                        case "calendar":
+                            shellRoot.calendarVisible = !shellRoot.calendarVisible
+                            console.log("Calendar toggled via keybind:", shellRoot.calendarVisible)
+                            break
+                        case "powermenu":
+                            shellRoot.powerMenuVisible = !shellRoot.powerMenuVisible
+                            console.log("Power menu toggled via keybind:", shellRoot.powerMenuVisible)
+                            break
+                        case "screenshot":
+                            shellRoot.screenshotVisible = !shellRoot.screenshotVisible
+                            console.log("Screenshot widget toggled via keybind:", shellRoot.screenshotVisible)
+                            break
+                        case "settings":
+                            shellRoot.settingsVisible = !shellRoot.settingsVisible
+                            console.log("Settings widget toggled via keybind:", shellRoot.settingsVisible)
+                            break
+                        case "clipboard":
+                            shellRoot.clipboardVisible = !shellRoot.clipboardVisible
+                            console.log("Clipboard toggled via keybind:", shellRoot.clipboardVisible)
+                            break
+                    }
                 }
             }
         }
@@ -638,8 +576,10 @@ ShellRoot {
             screen: modelData
             
             property bool barAtBottom: false
+            property bool barAutoHide: false
+            property bool barHovered: false
             
-            // Load bar position setting
+            // Load bar position and auto-hide settings
             Process {
                 id: barPositionLoader
                 running: true
@@ -657,8 +597,13 @@ ShellRoot {
                     if (!running && buffer !== "") {
                         try {
                             const settings = JSON.parse(buffer)
-                            if (settings.bar && settings.bar.position) {
-                                barAtBottom = settings.bar.position === "bottom"
+                            if (settings.bar) {
+                                if (settings.bar.position) {
+                                    barAtBottom = settings.bar.position === "bottom"
+                                }
+                                if (settings.bar.autoHide !== undefined) {
+                                    barAutoHide = settings.bar.autoHide
+                                }
                             }
                         } catch (e) {}
                         buffer = ""
@@ -686,15 +631,38 @@ ShellRoot {
             color: "transparent"
             
             margins {
-                top: 0
-                bottom: 0
+                top: barAutoHide && !barHovered ? (barAtBottom ? 0 : -implicitHeight) : 0
+                bottom: barAutoHide && !barHovered ? (barAtBottom ? -implicitHeight : 0) : 0
                 left: 0
                 right: 0
             }
             
+            Behavior on margins.top {
+                NumberAnimation { duration: 200; easing.type: Easing.OutCubic }
+            }
+            
+            Behavior on margins.bottom {
+                NumberAnimation { duration: 200; easing.type: Easing.OutCubic }
+            }
+            
             // Explicitly enable interaction
             visible: true
-            exclusiveZone: height
+            exclusiveZone: barAutoHide ? 0 : height
+            
+            // Mouse detection area for auto-hide
+            MouseArea {
+                anchors.fill: parent
+                anchors.topMargin: barAtBottom ? 0 : -10
+                anchors.bottomMargin: barAtBottom ? -10 : 0
+                hoverEnabled: true
+                propagateComposedEvents: true
+                enabled: barAutoHide
+                z: 100
+                
+                onEntered: barHovered = true
+                onExited: barHovered = false
+                onClicked: function(mouse) { mouse.accepted = false }
+            }
             
             Bar {
                 id: bar

@@ -349,13 +349,27 @@ Item {
         }
     }
     
-    // Weather update timer
+    // Weather update timer - delayed start for performance
     Timer {
+        id: weatherUpdateTimer
         interval: 300000 // 5 minutes
-        running: root.active
+        running: root.active && hasInitialLoad
         repeat: true
-        triggeredOnStart: true
+        triggeredOnStart: false
         onTriggered: settingsLoader.running = true
+    }
+    
+    // Lazy loading: Delay first weather load by 5 seconds
+    property bool hasInitialLoad: false
+    Timer {
+        id: initialLoadTimer
+        interval: 5000 // 5 seconds
+        running: root.active && !hasInitialLoad
+        repeat: false
+        onTriggered: {
+            hasInitialLoad = true
+            settingsLoader.running = true
+        }
     }
     
     // Load weather settings

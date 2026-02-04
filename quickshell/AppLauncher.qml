@@ -21,6 +21,7 @@ Rectangle {
     property int selectedIndex: -1
     property int hoverIndex: -1
     property string searchText: ""
+    property bool hasLoadedApps: false
     
     signal requestClose()
     
@@ -85,7 +86,11 @@ Rectangle {
             hoverIndex = -1
             searchText = ""
             searchField.text = ""
-            loadApps()
+            // Lazy loading: only load apps on first open
+            if (!hasLoadedApps) {
+                hasLoadedApps = true
+                loadApps()
+            }
             blurSettingsLoader.running = true
         }
     }
@@ -162,9 +167,9 @@ Rectangle {
         appLoader.running = true
     }
     
-    // Load apps initially when component is created
+    // Don't load apps on startup - wait until first open (lazy loading)
     Component.onCompleted: {
-        loadApps()
+        // Apps will load when first opened via onIsVisibleChanged
     }
     
     Column {

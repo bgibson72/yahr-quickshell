@@ -245,6 +245,12 @@ set_theme_wallpaper() {
         "Eldritch")
             wallpaper_dir="$wallpaper_base/Eldritch"
             ;;
+        "Monochrome")
+            wallpaper_dir="$wallpaper_base/Monochrome"
+            ;;
+        "Solarized")
+            wallpaper_dir="$wallpaper_base/Solarized"
+            ;;
         *)
             echo "No wallpaper directory found for theme: $theme_name"
             return 1
@@ -542,6 +548,16 @@ apply_theme() {
     # Create backup of current ThemeManager
     cp "$QUICKSHELL_DIR/ThemeManager.qml" "$QUICKSHELL_DIR/ThemeManager.qml.backup" 2>/dev/null || true
     
+    # Read bar opacity from settings.json to preserve user preference
+    local bar_opacity="0.70"  # Default value
+    if [ -f "$HOME/.config/quickshell/settings.json" ]; then
+        # Extract barOpacity value if it exists in settings
+        local settings_opacity=$(grep -o '"barOpacity"[[:space:]]*:[[:space:]]*[0-9.]*' "$HOME/.config/quickshell/settings.json" | grep -o '[0-9.]*$')
+        if [ -n "$settings_opacity" ]; then
+            bar_opacity="$settings_opacity"
+        fi
+    fi
+    
     # Create new ThemeManager.qml with colors from the theme file
     cat > "$QUICKSHELL_DIR/ThemeManager.qml.tmp" << 'EOF'
 pragma Singleton
@@ -551,6 +567,9 @@ import QtQuick
 QtObject {
     // Theme name
     property string themeName: "THEME_NAME_PLACEHOLDER"
+    
+    // Bar opacity setting (0.0 - 1.0)
+    property real barOpacity: BAR_OPACITY_PLACEHOLDER
     
     // Accent colors
     property color accentRose: "ACCENT_ROSE_PLACEHOLDER"
@@ -585,7 +604,7 @@ QtObject {
     
     // Background colors
     property color bgBase: "BG_BASE_PLACEHOLDER"
-    property color bgBaseAlpha: "BG_BASE_ALPHA_PLACEHOLDER"
+    property color bgBaseAlpha: Qt.rgba(bgBase.r, bgBase.g, bgBase.b, barOpacity)
     property color bgMantle: "BG_MANTLE_PLACEHOLDER"
     property color bgCrust: "BG_CRUST_PLACEHOLDER"
     
@@ -632,6 +651,7 @@ EOF
     
     # Replace placeholders with actual colors
     sed -i "s/THEME_NAME_PLACEHOLDER/$theme_name/g" "$QUICKSHELL_DIR/ThemeManager.qml.tmp"
+    sed -i "s/BAR_OPACITY_PLACEHOLDER/$bar_opacity/g" "$QUICKSHELL_DIR/ThemeManager.qml.tmp"
     sed -i "s/ACCENT_ROSE_PLACEHOLDER/#$accent_rose/g" "$QUICKSHELL_DIR/ThemeManager.qml.tmp"
     sed -i "s/ACCENT_CORAL_PLACEHOLDER/#$accent_coral/g" "$QUICKSHELL_DIR/ThemeManager.qml.tmp"
     sed -i "s/ACCENT_PINK_PLACEHOLDER/#$accent_pink/g" "$QUICKSHELL_DIR/ThemeManager.qml.tmp"
@@ -660,7 +680,6 @@ EOF
     sed -i "s/SURFACE_0_PLACEHOLDER/#$surface_0/g" "$QUICKSHELL_DIR/ThemeManager.qml.tmp"
     
     sed -i "s/BG_BASE_PLACEHOLDER/#$bg_base/g" "$QUICKSHELL_DIR/ThemeManager.qml.tmp"
-    sed -i "s/BG_BASE_ALPHA_PLACEHOLDER/#FF$bg_base_alpha/g" "$QUICKSHELL_DIR/ThemeManager.qml.tmp"  # Add alpha (FF = 100% opacity)
     sed -i "s/BG_MANTLE_PLACEHOLDER/#$bg_mantle/g" "$QUICKSHELL_DIR/ThemeManager.qml.tmp"
     sed -i "s/BG_CRUST_PLACEHOLDER/#$bg_crust/g" "$QUICKSHELL_DIR/ThemeManager.qml.tmp"
     

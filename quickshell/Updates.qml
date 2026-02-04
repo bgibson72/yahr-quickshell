@@ -14,8 +14,22 @@ Rectangle {
     color: "transparent"
     
     Component.onCompleted: {
-        updateCheckProcess.running = true
-        lastCheckTime = new Date()
+        // Lazy loading: Delay first update check by 10 seconds
+        initialDelayTimer.start()
+    }
+    
+    // Startup delay timer - wait 10 seconds before first update check
+    Timer {
+        id: initialDelayTimer
+        interval: 10000  // 10 seconds
+        running: false
+        repeat: false
+        onTriggered: {
+            updateCheckProcess.running = true
+            lastCheckTime = new Date()
+            // Start the regular update timer
+            updateTimer.running = true
+        }
     }
     
     MouseArea {
@@ -134,9 +148,9 @@ Rectangle {
     Timer {
         id: updateTimer
         interval: 3600000  // 1 hour
-        running: true
+        running: false  // Don't start until after initial delay
         repeat: true
-        triggeredOnStart: true
+        triggeredOnStart: false
         
         onTriggered: {
             console.log("Update timer triggered")

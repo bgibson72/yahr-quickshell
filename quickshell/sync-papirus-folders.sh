@@ -3,7 +3,7 @@
 # Sync Papirus Folder Colors with Current Theme
 # Uses papirus-folders utility to change folder icon colors
 
-THEME_MANAGER="$HOME/.config/quickshell/ThemeManager.qml"
+CURRENT_THEME_FILE="$HOME/.config/hypr/.current-theme"
 
 # Check if papirus-folders is available
 if ! command -v papirus-folders &> /dev/null; then
@@ -12,14 +12,14 @@ if ! command -v papirus-folders &> /dev/null; then
     exit 1
 fi
 
-# Check if ThemeManager exists
-if [[ ! -f "$THEME_MANAGER" ]]; then
-    echo "Error: ThemeManager.qml not found at $THEME_MANAGER"
+# Check if current theme file exists
+if [[ ! -f "$CURRENT_THEME_FILE" ]]; then
+    echo "Error: Current theme file not found at $CURRENT_THEME_FILE"
     exit 1
 fi
 
-# Get current theme name (check for both themeName and currentTheme properties)
-theme_name=$(grep -E 'property string (themeName|currentTheme):' "$THEME_MANAGER" | sed -E 's/.*"([^"]+)".*/\1/')
+# Get current theme name
+theme_name=$(cat "$CURRENT_THEME_FILE" | tr -d '[:space:]')
 
 echo "Setting Papirus folder colors for theme: $theme_name"
 
@@ -58,6 +58,12 @@ case "$theme_name" in
         ;;
     "eldritch"|"Eldritch")
         folder_color="violet"  # Eldritch purple/violet
+        ;;
+    "monochrome"|"Monochrome")
+        folder_color="black"  # Monochrome black/white aesthetic
+        ;;
+    "solarized"|"Solarized")
+        folder_color="yaru"  # Solarized balanced colors
         ;;
     *)
         folder_color="blue"  # Default fallback

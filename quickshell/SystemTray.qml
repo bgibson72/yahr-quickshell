@@ -45,17 +45,32 @@ Rectangle {
     }
     
     Component.onCompleted: {
-        updateVolume()
-        updateBattery()
-        updateNetwork()
-        updateNetworkTraffic()
-        loadSettings()
+        // Lazy loading: Delay tray updates by 2 seconds for smoother startup
+        startupDelayTimer.start()
     }
     
-    // Timer to periodically reload settings
+    // Startup delay timer
     Timer {
+        id: startupDelayTimer
+        interval: 2000  // 2 seconds
+        running: false
+        repeat: false
+        onTriggered: {
+            updateVolume()
+            updateBattery()
+            updateNetwork()
+            updateNetworkTraffic()
+            loadSettings()
+            // Start the regular settings polling
+            settingsPollingTimer.running = true
+        }
+    }
+    
+    // Timer to periodically reload settings - only starts after initial delay
+    Timer {
+        id: settingsPollingTimer
         interval: 1000  // Check every second
-        running: true
+        running: false
         repeat: true
         onTriggered: loadSettings()
     }

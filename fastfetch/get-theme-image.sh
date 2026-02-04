@@ -15,16 +15,20 @@ if [ -z "$THEME_NAME" ]; then
     exit 1
 fi
 
-# Convert theme name to lowercase for filename (format: themename_arch.png)
+# Convert theme name to lowercase for filename
 THEME_LOWER=$(echo "$THEME_NAME" | tr '[:upper:]' '[:lower:]')
 
-# Construct the logo path
-LOGO_PATH="$HOME/.config/fastfetch/logos/${THEME_LOWER}_arch.png"
+# Try simple name first (themename.png), then fall back to themename_arch.png
+LOGO_PATH="$HOME/.config/fastfetch/logos/${THEME_LOWER}.png"
+
+if [ ! -f "$LOGO_PATH" ]; then
+    LOGO_PATH="$HOME/.config/fastfetch/logos/${THEME_LOWER}_arch.png"
+fi
 
 # Check if the logo exists
 if [ -f "$LOGO_PATH" ]; then
     echo "$LOGO_PATH"
 else
-    echo "Error: Logo not found at $LOGO_PATH" >&2
+    echo "Error: Logo not found at $HOME/.config/fastfetch/logos/${THEME_LOWER}.png or ${THEME_LOWER}_arch.png" >&2
     exit 1
 fi

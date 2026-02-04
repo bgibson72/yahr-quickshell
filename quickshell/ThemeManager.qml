@@ -4,44 +4,47 @@ import QtQuick
 
 QtObject {
     // Theme name
-    property string themeName: "Kanagawa"
+    property string themeName: "Eldritch"
+    
+    // Bar opacity setting (0.0 - 1.0)
+    property real barOpacity: 0.750495079212674
     
     // Accent colors
-    property color accentRose: "#d27e99"
-    property color accentCoral: "#e46876" 
-    property color accentPink: "#d27e99"
-    property color accentPurple: "#957fb8"
-    property color accentRed: "#e46876"
-    property color accentMaroon: "#e82424"
-    property color accentOrange: "#ffa066"
-    property color accentYellow: "#dca561"
-    property color accentGreen: "#98bb6c"
-    property color accentTeal: "#7fb4ca"
-    property color accentCyan: "#7fb4ca"
-    property color accentSapphire: "#7aa89f"
-    property color accentBlue: "#7e9cd8"
-    property color accentLavender: "#938aa9"
+    property color accentRose: "#f265b5"
+    property color accentCoral: "#f265b5" 
+    property color accentPink: "#f265b5"
+    property color accentPurple: "#a48cf2"
+    property color accentRed: "#f16c75"
+    property color accentMaroon: "#f16c75"
+    property color accentOrange: "#f7c67f"
+    property color accentYellow: "#f1fc79"
+    property color accentGreen: "#37f499"
+    property color accentTeal: "#04d1f9"
+    property color accentCyan: "#04d1f9"
+    property color accentSapphire: "#04d1f9"
+    property color accentBlue: "#a48cf2"
+    property color accentLavender: "#a48cf2"
     
     // Text colors  
-    property color fgPrimary: "#dcd7ba"
-    property color fgSecondary: "#c8c093"
-    property color fgTertiary: "#a6a69c"
+    property color fgPrimary: "#ebfafa"
+    property color fgSecondary: "#ebfafa"
+    property color fgTertiary: "#7081d0"
     
     // Border colors
-    property color border2: "#8a8980"
-    property color border1: "#727169"
-    property color border0: "#625e5a"
+    property color border2: "#7081d0"
+    property color border1: "#7081d0"
+    property color border0: "#323449"
     
     // Surface colors
-    property color surface2: "#49473e"
-    property color surface1: "#363636"
-    property color surface0: "#2a2a2a"
+    property color surface2: "#323449"
+    property color surface1: "#323449"
+    property color surface0: "#323449"
     
     // Background colors
-    property color bgBase: "#1f1f28"
-    property color bgBaseAlpha: "#FF1f1f28"
-    property color bgMantle: "#16161d"
-    property color bgCrust: "#0d0c0c"
+    property color bgBase: "#212337"
+    property color bgBaseAlpha: Qt.rgba(bgBase.r, bgBase.g, bgBase.b, barOpacity)
+    property color bgMantle: "#212337"
+    property color bgCrust: "#212337"
     
     // Font sizes
     property int fontSizeSmall: 11

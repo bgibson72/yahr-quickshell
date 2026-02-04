@@ -160,6 +160,14 @@ toolbar {
     border: none !important;
     box-shadow: none !important;
     outline: none !important;
+    -moz-appearance: none !important;
+}
+
+/* Force URL bar input text color */
+#urlbar-input,
+#urlbar input {
+    color: var(--fg-primary) !important;
+    background-color: transparent !important;
 }
 
 /* URL bar when it expands on focus */
@@ -256,6 +264,13 @@ menupopup,
 menu,
 menuitem,
 .panel-arrowcontent {
+    background-color: var(--surface0) !important;
+    color: var(--fg-primary) !important;
+    -moz-appearance: none !important;
+}
+
+menupopup menu,
+menupopup menuitem {
     background-color: var(--surface0) !important;
     color: var(--fg-primary) !important;
 }

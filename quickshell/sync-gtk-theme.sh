@@ -3,19 +3,20 @@
 # Sync GTK Theme with Current Quickshell Theme
 # Maps Quickshell themes to corresponding GTK themes
 
-THEME_MANAGER="$HOME/.config/quickshell/ThemeManager.qml"
+CURRENT_THEME_FILE="$HOME/.config/hypr/.current-theme"
 GTK3_SETTINGS="$HOME/.config/gtk-3.0/settings.ini"
 GTK4_SETTINGS="$HOME/.config/gtk-4.0/settings.ini"
 GTK2_SETTINGS="$HOME/.gtkrc-2.0"
+GTK_ENV_FILE="$HOME/.config/gtk-3.0/gtk-theme-env.sh"
 
-# Check if ThemeManager exists
-if [[ ! -f "$THEME_MANAGER" ]]; then
-    echo "Error: ThemeManager.qml not found at $THEME_MANAGER"
+# Check if current theme file exists
+if [[ ! -f "$CURRENT_THEME_FILE" ]]; then
+    echo "Error: Current theme file not found at $CURRENT_THEME_FILE"
     exit 1
 fi
 
-# Extract current theme name (check for both themeName and currentTheme properties)
-theme_name=$(grep -E 'property string (themeName|currentTheme):' "$THEME_MANAGER" | sed -E 's/.*"([^"]+)".*/\1/')
+# Extract current theme name
+theme_name=$(cat "$CURRENT_THEME_FILE" | tr -d '[:space:]')
 
 echo "Syncing GTK theme for: $theme_name"
 
@@ -74,10 +75,18 @@ case "$theme_name" in
         gtk_theme="Eldritch"
         icon_theme="Papirus-Dark"
         ;;
+    "monochrome"|"Monochrome")
+        gtk_theme="Monochrome"
+        icon_theme="Papirus-Dark"
+        ;;
+    "solarized"|"Solarized"|"Solarized Dark")
+        gtk_theme="Solarized-Dark"
+        icon_theme="Papirus-Dark"
+        ;;
     *)
         echo "⚠ No GTK theme mapping for: $theme_name"
         echo "  Using default with Papirus-Dark icons"
-        gtk_theme="Adwaita-dark"
+        gtk_theme="Catppuccin-Dark"
         icon_theme="Papirus-Dark"
         ;;
 esac
@@ -141,6 +150,11 @@ echo "✓ GTK theme updated"
 echo "  GTK Theme: $gtk_theme"
 echo "  Icon Theme: $icon_theme"
 
+# Create environment file for GTK apps
+cat > "$GTK_ENV_FILE" << EOF
+export GTK_THEME="$gtk_theme"
+EOF
+
 # Update gsettings (used by some GTK4 apps like pavucontrol)
 if command -v gsettings &> /dev/null; then
     gsettings set org.gnome.desktop.interface gtk-theme "$gtk_theme" 2>/dev/null
@@ -148,6 +162,15 @@ if command -v gsettings &> /dev/null; then
     gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark' 2>/dev/null
     echo "  gsettings updated"
 fi
+
+# Force reload GTK theme cache
+if command -v gtk-update-icon-cache &> /dev/null; then
+    gtk-update-icon-cache -f -t ~/.icons/"$icon_theme" 2>/dev/null || true
+fi
+
+# Restart GTK file managers to apply theme immediately
+pkill -HUP thunar 2>/dev/null || true
+pkill -HUP pcmanfm 2>/dev/null || true
 
 echo ""
 echo "Note: Running GTK applications will need to be restarted to see changes"

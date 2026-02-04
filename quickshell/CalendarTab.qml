@@ -10,18 +10,26 @@ Item {
     property bool use24HourFormat: true
     property string calendarPaths: "~/.config/quickshell/calendar.ics"
     property int refreshInterval: 15
+    property bool hasLoadedOnce: false
     
     // Reload settings when panel becomes active
     onActiveChanged: {
         if (active) {
             settingsLoader.running = true
-            calendarModel.loadEvents()
+            // Lazy load: only load calendar events when first opened
+            if (!hasLoadedOnce) {
+                hasLoadedOnce = true
+                calendarModel.loadEvents()
+            }
         }
     }
     
-    // Settings loader
+    // Settings loader - delayed start for performance
     Component.onCompleted: {
-        settingsLoader.running = true
+        // Delay initial settings load by 1 second
+        Qt.callLater(() => {
+            settingsLoader.running = true
+        })
     }
     
     Process {

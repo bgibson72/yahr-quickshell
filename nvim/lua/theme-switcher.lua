@@ -3,5 +3,5 @@
 -- DO NOT EDIT MANUALLY - changes will be overwritten
 
 return {
-  theme = "kanagawa"
+  theme = "eldritch"
 }

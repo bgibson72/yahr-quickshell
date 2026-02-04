@@ -18,6 +18,7 @@ PanelWindow {
     
     property string currentTheme: ""
     property string wallpaperDir: ""
+    property bool showAllWallpapers: false
     
     function show() {
         loadCurrentTheme()
@@ -33,6 +34,11 @@ PanelWindow {
         // Always reload theme from file when showing picker
         console.log("Loading current theme...")
         wallpaperModel.clear()  // Clear old wallpapers immediately
+        
+        // Load wallpaper settings
+        settingsLoader.running = false
+        settingsLoader.running = true
+        
         // Read current theme from file
         const themeFile = Quickshell.env("HOME") + "/.config/hypr/.current-theme"
         currentTheme = "TokyoNight" // fallback
@@ -40,6 +46,37 @@ PanelWindow {
         // Force the process to restart
         themeProcess.running = false
         themeProcess.running = true
+    }
+    
+    Process {
+        id: settingsLoader
+        running: false
+        command: ["cat", Quickshell.env("HOME") + "/.config/quickshell/settings.json"]
+        
+        property string buffer: ""
+        
+        stdout: SplitParser {
+            onRead: data => {
+                settingsLoader.buffer += data
+            }
+        }
+        
+        onRunningChanged: {
+            if (!running && buffer !== "") {
+                try {
+                    const settings = JSON.parse(buffer)
+                    if (settings.wallpaper && settings.wallpaper.showAllWallpapers !== undefined) {
+                        showAllWallpapers = settings.wallpaper.showAllWallpapers
+                        console.log("Wallpaper filter mode:", showAllWallpapers ? "All wallpapers" : "Themed only")
+                    }
+                } catch (e) {
+                    console.error("Failed to parse settings:", e)
+                }
+                buffer = ""
+            } else if (running) {
+                buffer = ""
+            }
+        }
     }
     
     Process {
@@ -60,8 +97,13 @@ PanelWindow {
     
     function updateWallpaperDir() {
         const base = Quickshell.env("HOME") + "/Pictures/Wallpapers/"
-        wallpaperDir = base + currentTheme
-        console.log("Updated wallpaper directory to:", wallpaperDir)
+        if (showAllWallpapers) {
+            wallpaperDir = base
+            console.log("Updated wallpaper directory to:", wallpaperDir, "(all wallpapers)")
+        } else {
+            wallpaperDir = base + currentTheme
+            console.log("Updated wallpaper directory to:", wallpaperDir, "(themed only)")
+        }
         loadWallpapers()
     }
     
@@ -76,7 +118,7 @@ PanelWindow {
     Process {
         id: wallpaperLoader
         running: false
-        command: ["sh", "-c", "find '" + wallpaperDir + "' -maxdepth 1 -type f \\( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' -o -iname '*.webp' \\) -print0"]
+        command: ["sh", "-c", "find '" + wallpaperDir + "' " + (showAllWallpapers ? "" : "-maxdepth 1 ") + "-type f \\( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' -o -iname '*.webp' \\) -print0"]
         
         stdout: SplitParser {
             splitMarker: "\0"
@@ -145,7 +187,7 @@ PanelWindow {
                 }
                 
                 Text {
-                    text: "Wallpaper Picker - " + currentTheme
+                    text: "Wallpaper Picker - " + (showAllWallpapers ? "All Wallpapers" : currentTheme)
                     font.family: "Maple Mono NF"
                     font.pixelSize: 20
                     font.weight: Font.Bold

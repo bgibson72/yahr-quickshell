@@ -11,6 +11,7 @@ Item {
     property string backgroundStyle: "translucent"  // "opaque", "translucent", or "transparent"
     property bool enableBlur: false
     property string position: "top"  // "top" or "bottom"
+    property real barOpacity: 0.70  // Dynamic opacity value from settings
     
     signal toggleClipboard()
     signal toggleControlCenter()
@@ -40,6 +41,9 @@ Item {
                         if (settings.bar.position !== undefined) {
                             bar.position = settings.bar.position
                         }
+                        if (settings.bar.barOpacity !== undefined) {
+                            bar.barOpacity = settings.bar.barOpacity
+                        }
                     }
                     if (settings.general && settings.general.enableBlur !== undefined) {
                         bar.enableBlur = settings.general.enableBlur
@@ -54,14 +58,24 @@ Item {
         }
     }
     
-    // Auto-reload settings every second
+    // Auto-reload settings every second - delayed start for performance
     Timer {
+        id: barSettingsTimer
         interval: 1000
-        running: true
+        running: false  // Don't start immediately
         repeat: true
         onTriggered: {
             barSettingsLoader.running = true
         }
+    }
+    
+    // Delayed initial settings load
+    Component.onCompleted: {
+        // Wait 500ms before starting settings polling
+        Qt.callLater(() => {
+            barSettingsLoader.running = true
+            barSettingsTimer.running = true
+        })
     }
     
     // Background rectangle
@@ -71,7 +85,8 @@ Item {
         color: {
             if (bar.backgroundStyle === "transparent") return "transparent"
             if (bar.backgroundStyle === "opaque") return ThemeManager.bgBase
-            return ThemeManager.bgBaseAlpha  // translucent (default)
+            // Calculate translucent color dynamically using barOpacity property
+            return Qt.rgba(ThemeManager.bgBase.r, ThemeManager.bgBase.g, ThemeManager.bgBase.b, bar.barOpacity)
         }
         z: -1
     }

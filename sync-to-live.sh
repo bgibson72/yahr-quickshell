@@ -14,7 +14,7 @@ echo ""
 # Quickshell
 if [ -d "$REPO_DIR/quickshell" ]; then
     echo "Syncing quickshell..."
-    rsync -av --exclude='*.backup*' --exclude='settings.json' \
+    rsync -av --exclude='*.backup*' --exclude='settings.json' --exclude='ThemeManager.qml' \
         "$REPO_DIR/quickshell/" "$CONFIG_DIR/quickshell/"
     echo "✓ Quickshell synced"
 fi

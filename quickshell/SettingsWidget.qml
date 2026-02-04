@@ -115,6 +115,11 @@ Rectangle {
                             current: "TokyoNight"
                         }
                     }
+                    if (!root.settings.wallpaper) {
+                        root.settings.wallpaper = {
+                            showAllWallpapers: false
+                        }
+                    }
                     
                     // Update the reactive currentTheme property
                     root.currentTheme = root.settings.theme.current || "TokyoNight"
@@ -260,10 +265,17 @@ SETTINGSEOF`
         if (root.settings.bar) {
             // Set background style (default to translucent if not set)
             var bgStyle = root.settings.bar.backgroundStyle || "translucent"
-            barBackgroundOpaque.checked = (bgStyle === "opaque")
-            barBackgroundTranslucent.checked = (bgStyle === "translucent")
-            barBackgroundTransparent.checked = (bgStyle === "transparent")
+            barSolidCheck.checked = (bgStyle === "opaque")
+            
+            // Set slider value from barOpacity setting (default 0.70)
+            if (root.settings.bar.barOpacity !== undefined) {
+                barOpacitySlider.value = root.settings.bar.barOpacity
+            } else {
+                barOpacitySlider.value = 0.70
+            }
+            
             barPositionBottomCheck.checked = root.settings.bar.position === "bottom"
+            barAutoHideCheck.checked = root.settings.bar.autoHide === true
         }
         
         // Bento settings
@@ -272,6 +284,11 @@ SETTINGSEOF`
             bentoTwelveHour.checked = root.settings.bento.twelveHourFormat !== false
             bentoNameField.text = root.settings.bento.greetingName || ""
             bentoPathField.text = root.settings.bento.bentoPath || (Quickshell.env("HOME") + "/bento")
+        }
+        
+        // Wallpaper settings
+        if (root.settings.wallpaper) {
+            showAllWallpapers.checked = root.settings.wallpaper.showAllWallpapers === true
         }
     }
     
@@ -795,6 +812,97 @@ SETTINGSEOF`
                                     font.pixelSize: 10
                                     color: ThemeManager.fgTertiary
                                     wrapMode: Text.WordWrap
+                                }
+                            }
+                        }
+                        
+                        // ========== WALLPAPER SETTINGS ==========
+                        Column {
+                            Layout.fillWidth: true
+                            spacing: 16
+                            
+                            Rectangle {
+                                width: parent.width
+                                height: 2
+                                color: ThemeManager.accentBlue
+                                opacity: 0.3
+                            }
+                            
+                            Text {
+                                text: "🖼️ Wallpaper Settings"
+                                font.family: "MapleMono NF"
+                                font.pixelSize: 18
+                                font.weight: Font.Bold
+                                color: ThemeManager.accentBlue
+                            }
+                            
+                            Text {
+                                width: parent.width
+                                text: "Configure wallpaper picker behavior:"
+                                font.family: "MapleMono NF"
+                                font.pixelSize: 11
+                                color: ThemeManager.fgSecondary
+                                wrapMode: Text.WordWrap
+                            }
+                            
+                            // Show all wallpapers toggle
+                            Row {
+                                spacing: 12
+                                
+                                Rectangle {
+                                    width: 24
+                                    height: 24
+                                    radius: 4
+                                    color: showAllWallpapers.checked ? ThemeManager.accentBlue : ThemeManager.surface1
+                                    border.width: 2
+                                    border.color: ThemeManager.accentBlue
+                                    
+                                    Text {
+                                        anchors.centerIn: parent
+                                        text: "✓"
+                                        font.family: "Symbols Nerd Font"
+                                        font.pixelSize: 16
+                                        color: ThemeManager.bgBase
+                                        visible: showAllWallpapers.checked
+                                    }
+                                    
+                                    MouseArea {
+                                        anchors.fill: parent
+                                        cursorShape: Qt.PointingHandCursor
+                                        onClicked: {
+                                            showAllWallpapers.checked = !showAllWallpapers.checked
+                                            if (!root.settings.wallpaper) {
+                                                root.settings.wallpaper = {}
+                                            }
+                                            root.settings.wallpaper.showAllWallpapers = showAllWallpapers.checked
+                                            saveSettings()
+                                        }
+                                    }
+                                }
+                                
+                                Column {
+                                    spacing: 4
+                                    
+                                    Text {
+                                        text: "Show all wallpapers"
+                                        font.family: "MapleMono NF"
+                                        font.pixelSize: 12
+                                        color: ThemeManager.fgPrimary
+                                    }
+                                    
+                                    Text {
+                                        width: 600
+                                        text: "When enabled, wallpaper picker shows all images from ~/Pictures/Wallpapers (including subfolders). When disabled, shows only theme-specific wallpapers."
+                                        font.family: "MapleMono NF"
+                                        font.pixelSize: 10
+                                        color: ThemeManager.fgTertiary
+                                        wrapMode: Text.WordWrap
+                                    }
+                                }
+                                
+                                QtObject {
+                                    id: showAllWallpapers
+                                    property bool checked: false
                                 }
                             }
                         }
@@ -1471,7 +1579,7 @@ SETTINGSEOF`
                             
                             // Bar Background Style
                             Column {
-                                spacing: 8
+                                spacing: 16
                                 
                                 Text {
                                     text: "Bar Background Style"
@@ -1481,37 +1589,40 @@ SETTINGSEOF`
                                     color: ThemeManager.fgPrimary
                                 }
                                 
-                                // Opaque option
+                                // Solid Background Toggle
                                 Row {
                                     spacing: 12
                                     leftPadding: 20
                                     
                                     Rectangle {
-                                        width: 20
-                                        height: 20
-                                        radius: 10
-                                        color: barBackgroundOpaque.checked ? ThemeManager.accentBlue : ThemeManager.surface1
+                                        width: 24
+                                        height: 24
+                                        radius: 4
+                                        color: barSolidCheck.checked ? ThemeManager.accentBlue : ThemeManager.surface1
                                         border.width: 2
                                         border.color: ThemeManager.accentBlue
                                         
-                                        Rectangle {
+                                        Text {
                                             anchors.centerIn: parent
-                                            width: 8
-                                            height: 8
-                                            radius: 4
+                                            text: "✓"
+                                            font.family: "Symbols Nerd Font"
+                                            font.pixelSize: 16
                                             color: ThemeManager.fgPrimary
-                                            visible: barBackgroundOpaque.checked
+                                            visible: barSolidCheck.checked
                                         }
                                         
                                         MouseArea {
                                             anchors.fill: parent
                                             cursorShape: Qt.PointingHandCursor
                                             onClicked: {
-                                                barBackgroundOpaque.checked = true
-                                                barBackgroundTranslucent.checked = false
-                                                barBackgroundTransparent.checked = false
+                                                barSolidCheck.checked = !barSolidCheck.checked
                                                 if (!root.settings.bar) root.settings.bar = {}
-                                                root.settings.bar.backgroundStyle = "opaque"
+                                                if (barSolidCheck.checked) {
+                                                    root.settings.bar.backgroundStyle = "opaque"
+                                                } else {
+                                                    // Use transparency slider value
+                                                    root.settings.bar.backgroundStyle = "translucent"
+                                                }
                                                 saveSettings()
                                             }
                                         }
@@ -1519,114 +1630,119 @@ SETTINGSEOF`
                                     
                                     Text {
                                         anchors.verticalCenter: parent.verticalCenter
-                                        text: "Opaque (solid background)"
+                                        text: "Solid background (no transparency)"
                                         font.family: "MapleMono NF"
                                         font.pixelSize: 12
                                         color: ThemeManager.fgPrimary
                                     }
                                 }
                                 
-                                // Translucent option
-                                Row {
-                                    spacing: 12
+                                // Opacity Slider
+                                Column {
+                                    spacing: 8
                                     leftPadding: 20
+                                    width: parent.width - 40
+                                    opacity: barSolidCheck.checked ? 0.5 : 1.0
                                     
-                                    Rectangle {
-                                        width: 20
-                                        height: 20
-                                        radius: 10
-                                        color: barBackgroundTranslucent.checked ? ThemeManager.accentBlue : ThemeManager.surface1
-                                        border.width: 2
-                                        border.color: ThemeManager.accentBlue
+                                    Row {
+                                        spacing: 12
+                                        width: parent.width
+                                        
+                                        Text {
+                                            text: "Transparency: " + Math.round((1.0 - barOpacitySlider.value) * 100) + "%"
+                                            font.family: "MapleMono NF"
+                                            font.pixelSize: 12
+                                            color: ThemeManager.fgPrimary
+                                            width: 180
+                                        }
+                                        
+                                        Text {
+                                            text: "(Opacity: " + Math.round(barOpacitySlider.value * 100) + "%)"
+                                            font.family: "MapleMono NF"
+                                            font.pixelSize: 11
+                                            color: ThemeManager.fgSecondary
+                                        }
+                                    }
+                                    
+                                    // Slider
+                                    Item {
+                                        width: parent.width
+                                        height: 40
                                         
                                         Rectangle {
+                                            id: sliderTrack
                                             anchors.centerIn: parent
-                                            width: 8
-                                            height: 8
-                                            radius: 4
-                                            color: ThemeManager.fgPrimary
-                                            visible: barBackgroundTranslucent.checked
+                                            width: parent.width
+                                            height: 6
+                                            radius: 3
+                                            color: ThemeManager.surface2
+                                            
+                                            Rectangle {
+                                                width: sliderHandle.x + sliderHandle.width / 2
+                                                height: parent.height
+                                                radius: parent.radius
+                                                color: ThemeManager.accentBlue
+                                            }
+                                        }
+                                        
+                                        Rectangle {
+                                            id: sliderHandle
+                                            width: 20
+                                            height: 20
+                                            radius: 10
+                                            color: sliderMouseArea.containsMouse || sliderMouseArea.pressed ? 
+                                                   ThemeManager.accentBlue : ThemeManager.fgPrimary
+                                            border.width: 2
+                                            border.color: ThemeManager.accentBlue
+                                            y: (parent.height - height) / 2
+                                            
+                                            property real value: barOpacitySlider.value
+                                            x: (sliderTrack.width - width) * value
+                                            
+                                            Behavior on color {
+                                                ColorAnimation { duration: 150 }
+                                            }
                                         }
                                         
                                         MouseArea {
+                                            id: sliderMouseArea
                                             anchors.fill: parent
+                                            hoverEnabled: true
                                             cursorShape: Qt.PointingHandCursor
-                                            onClicked: {
-                                                barBackgroundOpaque.checked = false
-                                                barBackgroundTranslucent.checked = true
-                                                barBackgroundTransparent.checked = false
+                                            enabled: !barSolidCheck.checked
+                                            
+                                            function updateValue(mouse) {
+                                                var newValue = Math.max(0.0, Math.min(1.0, mouse.x / width))
+                                                barOpacitySlider.value = newValue
                                                 if (!root.settings.bar) root.settings.bar = {}
+                                                root.settings.bar.barOpacity = newValue
                                                 root.settings.bar.backgroundStyle = "translucent"
                                                 saveSettings()
                                             }
+                                            
+                                            onPressed: updateValue(mouse)
+                                            onPositionChanged: if (pressed) updateValue(mouse)
                                         }
                                     }
                                     
                                     Text {
-                                        anchors.verticalCenter: parent.verticalCenter
-                                        text: "Translucent (semi-transparent)"
+                                        text: "Drag slider: 0% = fully transparent, 100% = completely opaque"
                                         font.family: "MapleMono NF"
-                                        font.pixelSize: 12
-                                        color: ThemeManager.fgPrimary
-                                    }
-                                }
-                                
-                                // Transparent option
-                                Row {
-                                    leftPadding: 20
-                                    spacing: 12
-                                    
-                                    Rectangle {
-                                        width: 20
-                                        height: 20
-                                        radius: 10
-                                        color: barBackgroundTransparent.checked ? ThemeManager.accentBlue : ThemeManager.surface1
-                                        border.width: 2
-                                        border.color: ThemeManager.accentBlue
-                                        
-                                        Rectangle {
-                                            anchors.centerIn: parent
-                                            width: 8
-                                            height: 8
-                                            radius: 4
-                                            color: ThemeManager.fgPrimary
-                                            visible: barBackgroundTransparent.checked
-                                        }
-                                        
-                                        MouseArea {
-                                            anchors.fill: parent
-                                            cursorShape: Qt.PointingHandCursor
-                                            onClicked: {
-                                                barBackgroundOpaque.checked = false
-                                                barBackgroundTranslucent.checked = false
-                                                barBackgroundTransparent.checked = true
-                                                if (!root.settings.bar) root.settings.bar = {}
-                                                root.settings.bar.backgroundStyle = "transparent"
-                                                saveSettings()
-                                            }
-                                        }
-                                    }
-                                    
-                                    Text {
-                                        anchors.verticalCenter: parent.verticalCenter
-                                        text: "Transparent (no background)"
-                                        font.family: "MapleMono NF"
-                                        font.pixelSize: 12
-                                        color: ThemeManager.fgPrimary
+                                        font.pixelSize: 10
+                                        color: ThemeManager.fgTertiary
+                                        wrapMode: Text.WordWrap
+                                        width: parent.width
                                     }
                                 }
                                 
                                 QtObject {
-                                    id: barBackgroundOpaque
+                                    id: barSolidCheck
                                     property bool checked: false
                                 }
+                                
                                 QtObject {
-                                    id: barBackgroundTranslucent
-                                    property bool checked: true  // default
-                                }
-                                QtObject {
-                                    id: barBackgroundTransparent
-                                    property bool checked: false
+                                    id: barOpacitySlider
+                                    property real value: 0.70  // default 70% opacity (30% transparent)
                                 }
                             }
                             
@@ -1673,6 +1789,64 @@ SETTINGSEOF`
                                 
                                 QtObject {
                                     id: barPositionBottomCheck
+                                    property bool checked: false
+                                }
+                            }
+                            
+                            // Auto-Hide Bar Toggle
+                            Row {
+                                spacing: 12
+                                
+                                Rectangle {
+                                    width: 24
+                                    height: 24
+                                    radius: 4
+                                    color: barAutoHideCheck.checked ? ThemeManager.accentBlue : ThemeManager.surface1
+                                    border.width: 2
+                                    border.color: ThemeManager.accentBlue
+                                    
+                                    Text {
+                                        anchors.centerIn: parent
+                                        text: "✓"
+                                        font.family: "Symbols Nerd Font"
+                                        font.pixelSize: 16
+                                        color: ThemeManager.bgBase
+                                        visible: barAutoHideCheck.checked
+                                    }
+                                    
+                                    MouseArea {
+                                        anchors.fill: parent
+                                        cursorShape: Qt.PointingHandCursor
+                                        onClicked: {
+                                            barAutoHideCheck.checked = !barAutoHideCheck.checked
+                                            if (!root.settings.bar) root.settings.bar = {}
+                                            root.settings.bar.autoHide = barAutoHideCheck.checked
+                                            saveSettings()
+                                        }
+                                    }
+                                }
+                                
+                                Column {
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    spacing: 2
+                                    
+                                    Text {
+                                        text: "Auto-hide bar"
+                                        font.family: "MapleMono NF"
+                                        font.pixelSize: 12
+                                        color: ThemeManager.fgPrimary
+                                    }
+                                    
+                                    Text {
+                                        text: "Bar slides out when mouse approaches edge"
+                                        font.family: "MapleMono NF"
+                                        font.pixelSize: 10
+                                        color: ThemeManager.fgSecondary
+                                    }
+                                }
+                                
+                                QtObject {
+                                    id: barAutoHideCheck
                                     property bool checked: false
                                 }
                             }
@@ -1904,7 +2078,7 @@ SETTINGSEOF`
                                         }
                                     }
                                     
-                                    // Theme mockup thumbnail
+                                    // Theme color chips
                                     Rectangle {
                                         width: 420
                                         height: 120
@@ -1915,21 +2089,42 @@ SETTINGSEOF`
                                         clip: true
                                         anchors.verticalCenter: parent.verticalCenter
                                         
-                                        Image {
-                                            anchors.fill: parent
-                                            anchors.margins: 2
-                                            source: "file://" + Quickshell.env("HOME") + "/.config/quickshell/theme-mockups/" + model.name.toLowerCase() + ".png"
-                                            fillMode: Image.PreserveAspectFit
-                                            smooth: true
-                                            antialiasing: true
+                                        property var themePalettes: {
+                                            "Catppuccin": ["#89b4fa", "#cba6f7", "#f5c2e7", "#f38ba8", "#fab387", "#f9e2af", "#a6e3a1", "#94e2d5", "#89dceb", "#74c7ec"],
+                                            "Dracula": ["#bd93f9", "#ff79c6", "#ff6e6e", "#ffb86c", "#f1fa8c", "#50fa7b", "#8be9fd", "#6272a4", "#44475a", "#282a36"],
+                                            "Eldritch": ["#f16c75", "#ebfafa", "#7081d0", "#a48cf2", "#f16c75", "#37f499", "#04d1f9", "#f265b5", "#ffd700", "#323449"],
+                                            "Everforest": ["#7fbbb3", "#d699b6", "#dbbc7f", "#e67e80", "#a7c080", "#83c092", "#d699b6", "#7fbbb3", "#e69875", "#374247"],
+                                            "Gruvbox": ["#fe8019", "#fb4934", "#d3869b", "#b16286", "#fabd2f", "#b8bb26", "#8ec07c", "#689d6a", "#83a598", "#458588"],
+                                            "Kanagawa": ["#7fb4ca", "#957fb8", "#d27e99", "#e46876", "#dca561", "#98bb6c", "#7fb4ca", "#938aa9", "#2d4f67", "#16161d"],
+                                            "Material": ["#82aaff", "#c792ea", "#f07178", "#f78c6c", "#ffcb6b", "#c3e88d", "#89ddff", "#676e95", "#2e3c43", "#263238"],
+                                            "Monochrome": ["#bebebe", "#a8a8a8", "#999999", "#888888", "#777777", "#666666", "#555555", "#444444", "#333333", "#252525"],
+                                            "NightFox": ["#719cd6", "#9d79d6", "#d67ad2", "#f52a65", "#f4a261", "#dbc074", "#63cdcf", "#4d688e", "#2b3b51", "#131a24"],
+                                            "Nord": ["#88c0d0", "#81a1c1", "#5e81ac", "#bf616a", "#d08770", "#ebcb8b", "#a3be8c", "#b48ead", "#4c566a", "#2e3440"],
+                                            "Rosepine": ["#c4a7e7", "#ebbcba", "#eb6f92", "#f6c177", "#ea9a97", "#9ccfd8", "#31748f", "#26233a", "#1f1d2e", "#191724"],
+                                            "Solarized": ["#268bd2", "#6c71c4", "#d33682", "#dc322f", "#cb4b16", "#b58900", "#859900", "#2aa198", "#073642", "#002b36"],
+                                            "TokyoNight": ["#7aa2f7", "#bb9af7", "#f7768e", "#ff9e64", "#e0af68", "#9ece6a", "#73daca", "#7dcfff", "#1f2335", "#1a1b26"]
+                                        }
+                                        
+                                        property var currentPalette: themePalettes[model.name] || ["#89b4fa", "#cba6f7", "#f5c2e7", "#f38ba8", "#fab387", "#f9e2af", "#a6e3a1", "#94e2d5", "#89dceb", "#74c7ec"]
+                                        
+                                        Grid {
+                                            anchors.centerIn: parent
+                                            columns: 5
+                                            rows: 2
+                                            spacing: 8
                                             
-                                            Text {
-                                                anchors.centerIn: parent
-                                                text: "No preview"
-                                                font.family: "MapleMono NF"
-                                                font.pixelSize: 10
-                                                color: ThemeManager.fgTertiary
-                                                visible: parent.status === Image.Error
+                                            Repeater {
+                                                model: parent.parent.currentPalette
+                                                
+                                                Rectangle {
+                                                    width: 76
+                                                    height: 48
+                                                    radius: 6
+                                                    color: modelData
+                                                    border.width: 1
+                                                    border.color: Qt.darker(modelData, 1.2)
+                                                    antialiasing: true
+                                                }
                                             }
                                         }
                                     }

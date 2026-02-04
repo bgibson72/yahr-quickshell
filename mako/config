@@ -1,5 +1,5 @@
 # Mako Notification Daemon Configuration
-# Theme: Kanagawa
+# Theme: Eldritch
 
 # General settings
 font=JetBrainsMono 13
@@ -12,10 +12,10 @@ margin=8
 padding=12
 border-size=2
 border-radius=12
-background-color=#1f1f28
-text-color=#dcd7ba
-border-color=#7e9cd8
-progress-color=over #7e9cd8
+background-color=#212337
+text-color=#ebfafa
+border-color=#a48cf2
+progress-color=over #a48cf2
 
 # Default timeout
 default-timeout=10000
@@ -30,15 +30,15 @@ group-by=app-name
 
 # Urgency levels
 [urgency=low]
-border-color=#98bb6c
+border-color=#37f499
 default-timeout=5000
 
 [urgency=normal]
-border-color=#7e9cd8
+border-color=#a48cf2
 default-timeout=10000
 
 [urgency=critical]
-border-color=#e46876
+border-color=#f16c75
 default-timeout=0
 
 # Icons
