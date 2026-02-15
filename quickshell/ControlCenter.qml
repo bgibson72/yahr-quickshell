@@ -1128,14 +1128,14 @@ Rectangle {
     Process {
         id: bluetoothEnableProcess
         running: false
-        command: ["sh", "-c", "bluetoothctl power on"]
+        command: ["sh", "-c", "rfkill unblock bluetooth && bluetoothctl power on"]
         onRunningChanged: if (!running) Qt.callLater(updateBluetooth)
     }
     
     Process {
         id: bluetoothDisableProcess
         running: false
-        command: ["sh", "-c", "bluetoothctl power off"]
+        command: ["sh", "-c", "bluetoothctl power off && rfkill block bluetooth"]
         onRunningChanged: if (!running) Qt.callLater(updateBluetooth)
     }
     
