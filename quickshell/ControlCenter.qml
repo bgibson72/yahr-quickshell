@@ -1078,7 +1078,7 @@ Rectangle {
     Process {
         id: bluetoothStatusProcess
         running: false
-        command: ["sh", "-c", "bluetoothctl show | grep 'Powered:' | awk '{print $2}'"]
+        command: ["sh", "-c", "rfkill list bluetooth | grep 'Soft blocked:' | head -n1 | awk '{print $3}'"]
         
         property string buffer: ""
         
@@ -1088,7 +1088,8 @@ Rectangle {
         
         onRunningChanged: {
             if (!running && buffer !== "") {
-                root.bluetoothEnabled = buffer.trim() === "yes"
+                // rfkill returns "no" when NOT blocked (i.e., when enabled)
+                root.bluetoothEnabled = buffer.trim() === "no"
                 buffer = ""
                 
                 // If bluetooth is on, get connected devices
@@ -1128,14 +1129,14 @@ Rectangle {
     Process {
         id: bluetoothEnableProcess
         running: false
-        command: ["sh", "-c", "rfkill unblock bluetooth && bluetoothctl power on"]
+        command: ["sh", "-c", "rfkill unblock bluetooth"]
         onRunningChanged: if (!running) Qt.callLater(updateBluetooth)
     }
     
     Process {
         id: bluetoothDisableProcess
         running: false
-        command: ["sh", "-c", "bluetoothctl power off && rfkill block bluetooth"]
+        command: ["sh", "-c", "rfkill block bluetooth"]
         onRunningChanged: if (!running) Qt.callLater(updateBluetooth)
     }
     
