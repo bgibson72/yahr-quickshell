@@ -1323,10 +1323,10 @@ initialize_wallpaper() {
         print_info "Not in a Wayland session - wallpaper will be set on first launch"
         
         # Still set default theme wallpaper in settings.json for wallpaper picker
-        print_info "Setting default catppuccin-mocha wallpaper for first launch..."
-        local catppuccin_wallpapers=("$HOME/Pictures/Wallpapers/"*catppuccin-mocha*)
+        print_info "Setting default Catppuccin wallpaper for first launch..."
+        local catppuccin_wallpapers=("$HOME/Pictures/Wallpapers/Catppuccin/"*)
         if [ -f "${catppuccin_wallpapers[0]}" ]; then
-            # Pick a random catppuccin-mocha wallpaper
+            # Pick a random Catppuccin wallpaper
             local random_wallpaper="${catppuccin_wallpapers[$RANDOM % ${#catppuccin_wallpapers[@]}]}"
             
             # Update settings.json with the wallpaper
@@ -1376,13 +1376,13 @@ initialize_wallpaper() {
         print_info "swww daemon already running"
     fi
     
-    # Set a random catppuccin-mocha wallpaper
-    local catppuccin_wallpapers=("$HOME/Pictures/Wallpapers/"*catppuccin-mocha*)
+    # Set a random Catppuccin wallpaper
+    local catppuccin_wallpapers=("$HOME/Pictures/Wallpapers/Catppuccin/"*)
     
     if [ -f "${catppuccin_wallpapers[0]}" ]; then
-        # Pick a random catppuccin-mocha wallpaper
+        # Pick a random Catppuccin wallpaper
         local random_wallpaper="${catppuccin_wallpapers[$RANDOM % ${#catppuccin_wallpapers[@]}]}"
-        print_info "Setting random catppuccin-mocha wallpaper..."
+        print_info "Setting random Catppuccin wallpaper..."
         swww img "$random_wallpaper" --transition-type fade --transition-duration 2
         
         # Update settings.json with the wallpaper
@@ -1412,7 +1412,7 @@ apply_default_theme() {
     # Skip theme application during installation to avoid Papirus async issues
     # Theme will be applied automatically on first Quickshell launch
     print_info "Theme will be applied on first Quickshell launch"
-    print_info "Default theme: catppuccin-mocha"
+    print_info "Default theme: Catppuccin"
 }
 
 # Test theme switching functionality

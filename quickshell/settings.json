@@ -13,7 +13,7 @@
     "saveLocation": "~/Pictures/Screenshots"
   },
   "theme": {
-    "current": "Everforest"
+    "current": "Catppuccin"
   },
   "systemTray": {
     "showBatteryDetails": false,
