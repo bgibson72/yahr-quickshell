@@ -736,6 +736,11 @@ check_dependencies() {
         missing_recommended+=("blueman")
     fi
     
+    # Check for Bluetooth stack
+    if ! command_exists "bluetoothctl"; then
+        missing_recommended+=("bluez" "bluez-utils")
+    fi
+    
     if ! command_exists "nmtui"; then
         missing_recommended+=("networkmanager")
     fi
@@ -1711,6 +1716,40 @@ install_bento() {
 }
 
 # Configure Hyprland autostart
+# Enable system services
+enable_services() {
+    print_header "Enabling System Services"
+    
+    # Enable Bluetooth service
+    if command_exists "bluetoothctl"; then
+        print_info "Enabling Bluetooth service..."
+        sudo systemctl enable bluetooth.service
+        if [ $? -eq 0 ]; then
+            print_success "Bluetooth service enabled"
+            print_info "Starting Bluetooth service..."
+            sudo systemctl start bluetooth.service 2>/dev/null && print_success "Bluetooth service started" || print_info "Bluetooth will start on next boot"
+        else
+            print_warning "Failed to enable Bluetooth service"
+        fi
+    fi
+    
+    # Enable NetworkManager service
+    if command_exists "nmcli"; then
+        print_info "Enabling NetworkManager service..."
+        sudo systemctl enable NetworkManager.service
+        if [ $? -eq 0 ]; then
+            print_success "NetworkManager service enabled"
+            # Start if not already running
+            if ! systemctl is-active --quiet NetworkManager.service; then
+                print_info "Starting NetworkManager service..."
+                sudo systemctl start NetworkManager.service 2>/dev/null && print_success "NetworkManager service started" || print_info "NetworkManager will start on next boot"
+            fi
+        else
+            print_warning "Failed to enable NetworkManager service"
+        fi
+    fi
+}
+
 configure_hyprland() {
     print_header "Configuring Hyprland Integration"
     
@@ -1914,6 +1953,7 @@ main() {
     create_settings
     fix_permissions
     setup_papirus
+    enable_services
     configure_hyprland
     initialize_wallpaper
     apply_default_theme
