@@ -246,7 +246,7 @@ ShellRoot {
                 anchors.verticalCenterOffset: shellRoot.appLauncherVisible ? 0 : -800
 
                 Behavior on anchors.verticalCenterOffset {
-                    NumberAnimation { duration: 600; easing.type: Easing.OutBounce }
+                    NumberAnimation { duration: 350; easing.type: Easing.OutCubic }
                 }
                 
                 AppLauncher {
@@ -474,10 +474,10 @@ ShellRoot {
             // Panel positioned at top-right, slides down from top
             Item {
                 width: 420
-                height: 790
+                height: 820
                 anchors.top: parent.top
                 anchors.right: parent.right
-                anchors.topMargin: shellRoot.controlCenterVisible ? 6 : -840
+                anchors.topMargin: shellRoot.controlCenterVisible ? 6 : -860
                 anchors.rightMargin: 6
                 
                 Behavior on anchors.topMargin {

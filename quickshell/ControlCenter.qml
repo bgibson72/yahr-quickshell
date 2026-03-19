@@ -7,7 +7,7 @@ Rectangle {
     id: root
     
     width: 420
-    height: 790
+    height: 820
     color: Qt.rgba(ThemeManager.bgBase.r, ThemeManager.bgBase.g, ThemeManager.bgBase.b, 0.92)
     radius: 16
     border.width: 1
@@ -47,6 +47,7 @@ Rectangle {
     Column {
         anchors.fill: parent
         anchors.margins: 16
+        anchors.bottomMargin: 26
         spacing: 16
         
         // Header
@@ -55,16 +56,7 @@ Rectangle {
             height: 44
             
             Text {
-                id: gearIcon
                 anchors.left: parent.left
-                anchors.verticalCenter: parent.verticalCenter
-                text: "⚙️"
-                font.pixelSize: 24
-            }
-            
-            Text {
-                anchors.left: gearIcon.right
-                anchors.leftMargin: 12
                 anchors.verticalCenter: parent.verticalCenter
                 text: "Control Center"
                 font.family: "Sen"
