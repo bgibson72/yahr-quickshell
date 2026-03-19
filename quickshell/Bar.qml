@@ -78,17 +78,34 @@ Item {
         })
     }
     
-    // Background rectangle
+    // Background rectangle – glass style
     Rectangle {
         id: background
         anchors.fill: parent
         color: {
             if (bar.backgroundStyle === "transparent") return "transparent"
             if (bar.backgroundStyle === "opaque") return ThemeManager.bgBase
-            // Calculate translucent color dynamically using barOpacity property
             return Qt.rgba(ThemeManager.bgBase.r, ThemeManager.bgBase.g, ThemeManager.bgBase.b, bar.barOpacity)
         }
         z: -1
+
+        // Bottom edge accent line
+        Rectangle {
+            anchors.bottom: parent.bottom
+            anchors.left: parent.left
+            anchors.right: parent.right
+            height: 1
+            color: Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.35)
+        }
+
+        // Top specular highlight
+        Rectangle {
+            anchors.top: parent.top
+            anchors.left: parent.left
+            anchors.right: parent.right
+            height: 1
+            color: Qt.rgba(1, 1, 1, 0.10)
+        }
     }
     
     property alias clockComponent: clockComponent

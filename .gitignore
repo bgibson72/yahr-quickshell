@@ -1,3 +1,6 @@
+# Claude Code project files
+.claude/
+
 # Cache and temporary files
 quickshell/gtk-themes/
 quickshell/gtk-icons/

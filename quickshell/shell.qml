@@ -205,27 +205,28 @@ ShellRoot {
             screen: modelData
             
             visible: shellRoot.appLauncherVisible
-            
+
             anchors {
                 top: true
                 left: true
                 right: true
                 bottom: true
             }
-            
+
             margins {
                 top: 0
                 left: 0
                 right: 0
                 bottom: 0
             }
-            
+
             color: "transparent"
             exclusiveZone: 0
-            
+
+            WlrLayershell.namespace: "quickshell-launcher"
             WlrLayershell.layer: WlrLayer.Overlay
             WlrLayershell.keyboardFocus: WlrKeyboardFocus.OnDemand
-            
+
             // Background overlay - click to close
             MouseArea {
                 anchors.fill: parent
@@ -243,9 +244,9 @@ ShellRoot {
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.verticalCenterOffset: shellRoot.appLauncherVisible ? 0 : -800
-                
+
                 Behavior on anchors.verticalCenterOffset {
-                    NumberAnimation { duration: 300; easing.type: Easing.OutCubic }
+                    NumberAnimation { duration: 600; easing.type: Easing.OutBounce }
                 }
                 
                 AppLauncher {

@@ -433,18 +433,17 @@ EOF
 update_mako_theme() {
     local theme_file="$1"
     local theme_name="$2"
-    
+
     # Parse colors from theme file
     local accent_blue=$(grep '\$accent-blue = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
     local accent_red=$(grep '\$accent-red = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
     local accent_green=$(grep '\$accent-green = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
     local fg_primary=$(grep '\$fg-primary = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
     local bg_base=$(grep '\$bg-base = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
-    local border_0=$(grep '\$border-0 = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
-    
+
     # Update mako config
     local mako_config="$HOME/.config/mako/config"
-    
+
     cat > "$mako_config" << EOF
 # Mako Notification Daemon Configuration
 # Theme: $theme_name
@@ -457,13 +456,13 @@ sort=-time
 layer=overlay
 anchor=top-right
 margin=8
-padding=12
-border-size=2
-border-radius=12
-background-color=#$bg_base
+padding=14
+border-size=1
+border-radius=16
+background-color=#${bg_base}E8
 text-color=#$fg_primary
-border-color=#$accent_blue
-progress-color=over #$accent_blue
+border-color=#${accent_blue}59
+progress-color=over #${accent_blue}59
 
 # Default timeout
 default-timeout=10000
@@ -478,15 +477,15 @@ group-by=app-name
 
 # Urgency levels
 [urgency=low]
-border-color=#$accent_green
+border-color=#${accent_green}59
 default-timeout=5000
 
 [urgency=normal]
-border-color=#$accent_blue
+border-color=#${accent_blue}59
 default-timeout=10000
 
 [urgency=critical]
-border-color=#$accent_red
+border-color=#${accent_red}99
 default-timeout=0
 
 # Icons
@@ -496,11 +495,11 @@ icon-path=/usr/share/icons/Papirus-Dark
 # Format
 format=<b>%s</b>\n%b
 EOF
-    
+
     # Reload mako
     echo "Updating mako theme..."
     makoctl reload
-    
+
     echo "Mako theme updated successfully"
 }
 

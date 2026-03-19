@@ -332,6 +332,7 @@ install_gpu_drivers() {
         "qt5-imageformats"
         "qt6-wayland"
         "qt6-5compat"
+        "qt6-shadertools"
         "qt6-imageformats"
         "glfw-wayland"
     )
@@ -697,18 +698,17 @@ check_dependencies() {
         missing_critical+=("ttf-nerd-fonts-symbols")
     fi
     
-    # Check for Maple Mono font family (need multiple packages for complete coverage)
-    local maple_found=false
-    if fc-list | grep -qi "maple"; then
-        maple_found=true
-    fi
-    
-    if [ "$maple_found" = false ]; then
-        # Install all Maple Mono variants for proper font coverage
-        missing_critical+=("maplemono-nf-unhinted")
-        missing_critical+=("maplemono-ttf")
-        missing_critical+=("maplemononl-ttf")
-        missing_critical+=("maplemono-cn-unhinted")
+    # Check for Sen font (UI text font) – downloaded from GitHub, not pacman
+    if ! fc-list | grep -qi "Sen:"; then
+        print_step "Installing Sen font..."
+        local sen_dir="$HOME/.local/share/fonts/sen"
+        mkdir -p "$sen_dir"
+        local sen_base="https://raw.githubusercontent.com/philatype/Sen/master/fonts/ttf"
+        for weight in Regular Medium SemiBold Bold ExtraBold; do
+            curl -sL "${sen_base}/Sen-${weight}.ttf" -o "${sen_dir}/Sen-${weight}.ttf"
+        done
+        fc-cache -f "$sen_dir"
+        print_success "Sen font installed"
     fi
     
     # Check for emoji font (needed for colored weather icons)
@@ -1364,7 +1364,6 @@ initialize_wallpaper() {
             [ -x "$HOME/.config/quickshell/sync-firefox-theme.sh" ] && "$HOME/.config/quickshell/sync-firefox-theme.sh" >/dev/null 2>&1 && print_success "Firefox theme synced"
             [ -x "$HOME/.config/quickshell/sync-gtk-theme.sh" ] && "$HOME/.config/quickshell/sync-gtk-theme.sh" >/dev/null 2>&1 && print_success "GTK theme synced"
             [ -x "$HOME/.config/quickshell/sync-hyprlock-theme.sh" ] && "$HOME/.config/quickshell/sync-hyprlock-theme.sh" >/dev/null 2>&1 && print_success "Hyprlock theme synced"
-            [ -x "$HOME/.config/quickshell/sync-bento-theme.sh" ] && "$HOME/.config/quickshell/sync-bento-theme.sh" >/dev/null 2>&1 && print_success "Bento start page synced"
             print_success "Theme synchronization complete"
         fi
         
@@ -1635,82 +1634,69 @@ install_extras() {
     print_success "Optional extras configuration complete"
 }
 
-# Install Bento browser start page
-install_bento() {
-    print_header "Bento Browser Start Page"
-    
-    local bento_dir="$HOME/bento"
-    local repo_bento="$SCRIPT_DIR/bento"
-    
-    # Check if bento exists in repo
-    if [ ! -d "$repo_bento" ]; then
-        print_warning "Bento directory not found in repository"
-        return
-    fi
-    
-    # Ask if user wants to install Bento
+# Install Sip StartPage browser start page
+install_sip_startpage() {
+    print_header "Sip StartPage Browser Start Page"
+
+    local sip_dir="$HOME/Sip-StartPage"
+
+    # Ask if user wants to install Sip StartPage
     local install_choice="n"
     if [ "$YOLO_MODE" = true ]; then
         install_choice="y"
     else
         echo ""
-        print_info "The Bento start page is a beautiful browser homepage that"
-        print_info "automatically syncs with your Quickshell theme colors."
+        print_info "Sip StartPage is a beautiful browser homepage."
         echo ""
-        read -p "$(echo -e ${CYAN}?${NC}) Install Bento browser start page? (y/n): " install_choice
+        read -p "$(echo -e ${CYAN}?${NC}) Install Sip StartPage browser start page? (y/n): " install_choice
     fi
-    
+
     if [[ ! "$install_choice" =~ ^[Yy]$ ]]; then
-        print_info "Skipping Bento installation"
-        SKIPPED_COMPONENTS+=("Bento")
+        print_info "Skipping Sip StartPage installation"
+        SKIPPED_COMPONENTS+=("Sip StartPage")
         return
     fi
-    
+
+    # Check if git is available
+    if ! command_exists git; then
+        print_error "git is required to install Sip StartPage but was not found"
+        return 1
+    fi
+
     # Check if already exists
-    if [ -d "$bento_dir" ]; then
-        print_warning "Bento directory already exists at $bento_dir"
+    if [ -d "$sip_dir" ]; then
+        print_warning "Sip StartPage directory already exists at $sip_dir"
         local overwrite="n"
         if [ "$YOLO_MODE" = true ]; then
-            print_info "YOLO mode: Backing up and overwriting existing Bento"
+            print_info "YOLO mode: Pulling latest changes"
             overwrite="y"
         else
-            read -p "$(echo -e ${CYAN}?${NC}) Overwrite existing Bento? (y/n): " overwrite
+            read -p "$(echo -e ${CYAN}?${NC}) Update existing Sip StartPage? (y/n): " overwrite
         fi
-        
+
         if [[ "$overwrite" =~ ^[Yy]$ ]]; then
-            print_step "Backing up existing Bento..."
-            mv "$bento_dir" "${bento_dir}.backup-$(date +%Y%m%d-%H%M%S)"
-            print_success "Backup created"
+            print_step "Updating Sip StartPage..."
+            git -C "$sip_dir" pull && print_success "Sip StartPage updated"
         else
-            print_info "Skipping Bento installation"
-            SKIPPED_COMPONENTS+=("Bento")
-            return
+            print_info "Skipping Sip StartPage update"
+            SKIPPED_COMPONENTS+=("Sip StartPage")
         fi
+        return
     fi
-    
-    # Copy Bento to home directory
-    print_step "Installing Bento start page..."
-    cp -r "$repo_bento" "$bento_dir"
-    
+
+    # Clone from GitHub
+    print_step "Cloning Sip StartPage from GitHub..."
+    git clone https://github.com/bgibson72/Sip-StartPage.git "$sip_dir"
+
     if [ $? -eq 0 ]; then
-        print_success "Bento installed to $bento_dir"
-        
-        # Sync theme for Bento
-        if [ -x "$HOME/.config/quickshell/sync-bento-theme.sh" ]; then
-            print_step "Syncing Bento with current theme..."
-            "$HOME/.config/quickshell/sync-bento-theme.sh" >/dev/null 2>&1
-            print_success "Bento theme synced"
-        fi
-        
+        print_success "Sip StartPage installed to $sip_dir"
         echo ""
-        print_info "To use Bento, set your browser's homepage to:"
-        echo "  file://$bento_dir/index.html"
+        print_info "To use Sip StartPage, set your browser's homepage to:"
+        echo "  file://$sip_dir/index.html"
         echo ""
-        print_info "The start page colors will automatically sync with your theme!"
-        
-        INSTALLED_COMPONENTS+=("Bento Start Page")
+        INSTALLED_COMPONENTS+=("Sip StartPage")
     else
-        print_error "Failed to install Bento"
+        print_error "Failed to clone Sip StartPage"
         return 1
     fi
 }
@@ -1967,7 +1953,7 @@ main() {
     
     install_gtk_themes
     install_extras
-    install_bento
+    install_sip_startpage
     
     # Verify installation
     verify_installation

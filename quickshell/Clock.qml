@@ -8,22 +8,27 @@ Rectangle {
     width: clockText.width + 40
     height: parent.height - 10
     
-    color: mouseArea.containsMouse ? ThemeManager.surface1 : ThemeManager.surface0
+    color: mouseArea.containsMouse ? Qt.rgba(1, 1, 1, 0.10) : "transparent"
     radius: 6
-    
+    border.width: mouseArea.containsMouse ? 1 : 0
+    border.color: Qt.rgba(1, 1, 1, 0.18)
+
     signal toggleCalendar()
-    
+
     property bool use24Hour: false
     property bool showSeconds: false
-    
+
     Behavior on color {
         ColorAnimation { duration: 200 }
+    }
+    Behavior on border.width {
+        NumberAnimation { duration: 200 }
     }
     
     Text {
         id: clockText
         anchors.centerIn: parent
-        font.family: "MapleMono NF"
+        font.family: "Sen"
         font.pixelSize: 13
         color: ThemeManager.fgPrimary
     }

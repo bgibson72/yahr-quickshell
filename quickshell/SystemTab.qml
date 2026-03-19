@@ -17,8 +17,10 @@ Item {
         Rectangle {
             width: (parent.width - 16) / 2
             height: (parent.height - 16) / 2
-            color: ThemeManager.surface1
+            color: Qt.rgba(1, 1, 1, 0.07)
             radius: 12
+            border.width: 1
+            border.color: Qt.rgba(1, 1, 1, 0.10)
             
             Column {
                 anchors.fill: parent
@@ -37,7 +39,7 @@ Item {
                     
                     Text {
                         text: "CPU Usage"
-                        font.family: "MapleMono NF"
+                        font.family: "Sen"
                         font.pixelSize: 16
                         font.weight: Font.Bold
                         color: ThemeManager.fgPrimary
@@ -49,7 +51,7 @@ Item {
                     Text {
                         id: cpuPercentText
                         text: "0%"
-                        font.family: "MapleMono NF"
+                        font.family: "Sen"
                         font.pixelSize: 24
                         font.weight: Font.Bold
                         color: cpuMonitor.currentValue > 80 ? ThemeManager.accentRed : ThemeManager.accentBlue
@@ -79,14 +81,14 @@ Item {
                     
                     Text {
                         text: "Cores: " + cpuMonitor.coreCount
-                        font.family: "MapleMono NF"
+                        font.family: "Sen"
                         font.pixelSize: 12
                         color: ThemeManager.fgSecondary
                     }
                     
                     Text {
                         text: "Avg: " + cpuMonitor.avgValue + "%"
-                        font.family: "MapleMono NF"
+                        font.family: "Sen"
                         font.pixelSize: 12
                         color: ThemeManager.fgSecondary
                     }
@@ -98,8 +100,10 @@ Item {
         Rectangle {
             width: (parent.width - 16) / 2
             height: (parent.height - 16) / 2
-            color: ThemeManager.surface1
+            color: Qt.rgba(1, 1, 1, 0.07)
             radius: 12
+            border.width: 1
+            border.color: Qt.rgba(1, 1, 1, 0.10)
             
             Column {
                 anchors.fill: parent
@@ -118,7 +122,7 @@ Item {
                     
                     Text {
                         text: "Memory Usage"
-                        font.family: "MapleMono NF"
+                        font.family: "Sen"
                         font.pixelSize: 16
                         font.weight: Font.Bold
                         color: ThemeManager.fgPrimary
@@ -130,7 +134,7 @@ Item {
                     Text {
                         id: memPercentText
                         text: "0%"
-                        font.family: "MapleMono NF"
+                        font.family: "Sen"
                         font.pixelSize: 24
                         font.weight: Font.Bold
                         color: memMonitor.currentValue > 80 ? ThemeManager.accentRed : ThemeManager.accentCyan
@@ -160,14 +164,14 @@ Item {
                     
                     Text {
                         text: "Used: " + memMonitor.usedGB + " GB"
-                        font.family: "MapleMono NF"
+                        font.family: "Sen"
                         font.pixelSize: 12
                         color: ThemeManager.fgSecondary
                     }
                     
                     Text {
                         text: "Total: " + memMonitor.totalGB + " GB"
-                        font.family: "MapleMono NF"
+                        font.family: "Sen"
                         font.pixelSize: 12
                         color: ThemeManager.fgSecondary
                     }
@@ -179,8 +183,10 @@ Item {
         Rectangle {
             width: (parent.width - 16) / 2
             height: (parent.height - 16) / 2
-            color: ThemeManager.surface1
+            color: Qt.rgba(1, 1, 1, 0.07)
             radius: 12
+            border.width: 1
+            border.color: Qt.rgba(1, 1, 1, 0.10)
             
             Column {
                 anchors.fill: parent
@@ -199,7 +205,7 @@ Item {
                     
                     Text {
                         text: "Disk Usage"
-                        font.family: "MapleMono NF"
+                        font.family: "Sen"
                         font.pixelSize: 16
                         font.weight: Font.Bold
                         color: ThemeManager.fgPrimary
@@ -211,7 +217,7 @@ Item {
                     Text {
                         id: diskPercentText
                         text: "0%"
-                        font.family: "MapleMono NF"
+                        font.family: "Sen"
                         font.pixelSize: 24
                         font.weight: Font.Bold
                         color: diskMonitor.currentValue > 80 ? ThemeManager.accentRed : ThemeManager.accentPurple
@@ -223,7 +229,7 @@ Item {
                 Rectangle {
                     width: parent.width
                     height: parent.height - 80
-                    color: ThemeManager.surface0
+                    color: Qt.rgba(1, 1, 1, 0.07)
                     radius: 8
                     
                     Column {
@@ -243,13 +249,13 @@ Item {
                                 Text {
                                     width: 60
                                     text: "Used:"
-                                    font.family: "MapleMono NF"
+                                    font.family: "Sen"
                                     font.pixelSize: 13
                                     color: ThemeManager.fgTertiary
                                 }
                                 Text {
                                     text: diskMonitor.usedGB + " GB"
-                                    font.family: "MapleMono NF"
+                                    font.family: "Sen"
                                     font.pixelSize: 14
                                     font.weight: Font.Bold
                                     color: ThemeManager.fgPrimary
@@ -263,13 +269,13 @@ Item {
                                 Text {
                                     width: 60
                                     text: "Free:"
-                                    font.family: "MapleMono NF"
+                                    font.family: "Sen"
                                     font.pixelSize: 13
                                     color: ThemeManager.fgTertiary
                                 }
                                 Text {
                                     text: diskMonitor.freeGB + " GB"
-                                    font.family: "MapleMono NF"
+                                    font.family: "Sen"
                                     font.pixelSize: 14
                                     font.weight: Font.Bold
                                     color: ThemeManager.accentGreen
@@ -283,13 +289,13 @@ Item {
                                 Text {
                                     width: 60
                                     text: "Total:"
-                                    font.family: "MapleMono NF"
+                                    font.family: "Sen"
                                     font.pixelSize: 13
                                     color: ThemeManager.fgTertiary
                                 }
                                 Text {
                                     text: diskMonitor.totalGB + " GB"
-                                    font.family: "MapleMono NF"
+                                    font.family: "Sen"
                                     font.pixelSize: 14
                                     font.weight: Font.Bold
                                     color: ThemeManager.fgPrimary
@@ -301,7 +307,7 @@ Item {
                         Rectangle {
                             width: parent.width
                             height: 6
-                            color: ThemeManager.surface2
+                            color: Qt.rgba(1, 1, 1, 0.10)
                             radius: 3
                             
                             Rectangle {
@@ -324,8 +330,10 @@ Item {
         Rectangle {
             width: (parent.width - 16) / 2
             height: (parent.height - 16) / 2
-            color: ThemeManager.surface1
+            color: Qt.rgba(1, 1, 1, 0.07)
             radius: 12
+            border.width: 1
+            border.color: Qt.rgba(1, 1, 1, 0.10)
             
             Column {
                 anchors.fill: parent
@@ -344,7 +352,7 @@ Item {
                     
                     Text {
                         text: "Temperature"
-                        font.family: "MapleMono NF"
+                        font.family: "Sen"
                         font.pixelSize: 16
                         font.weight: Font.Bold
                         color: ThemeManager.fgPrimary
@@ -359,7 +367,7 @@ Item {
                     Text {
                         id: tempText
                         text: "0°C"
-                        font.family: "MapleMono NF"
+                        font.family: "Sen"
                         font.pixelSize: 24
                         font.weight: Font.Bold
                         color: tempMonitor.currentValue > 70 ? ThemeManager.accentRed : ThemeManager.accentGreen
@@ -392,14 +400,14 @@ Item {
                     
                     Text {
                         text: "Min: " + tempMonitor.minValue + "°C"
-                        font.family: "MapleMono NF"
+                        font.family: "Sen"
                         font.pixelSize: 12
                         color: ThemeManager.fgSecondary
                     }
                     
                     Text {
                         text: "Max: " + tempMonitor.maxValue + "°C"
-                        font.family: "MapleMono NF"
+                        font.family: "Sen"
                         font.pixelSize: 12
                         color: ThemeManager.fgSecondary
                     }

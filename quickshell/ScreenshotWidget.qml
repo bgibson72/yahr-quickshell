@@ -1,7 +1,6 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
-import QtQuick.Effects
 import Quickshell
 import Quickshell.Io
 import Quickshell.Wayland
@@ -160,10 +159,10 @@ PanelWindow {
     Rectangle {
         id: background
         anchors.fill: parent
-        color: ThemeManager.bgBase
+        color: Qt.rgba(ThemeManager.bgBase.r, ThemeManager.bgBase.g, ThemeManager.bgBase.b, 0.92)
         radius: 16
-        border.width: 3
-        border.color: ThemeManager.accentBlue
+        border.width: 1
+        border.color: Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.35)
         antialiasing: true
         
         ColumnLayout {
@@ -180,7 +179,7 @@ PanelWindow {
                 Text {
                     anchors.centerIn: parent
                     text: "Screenshot"
-                    font.family: "MapleMono NF"
+                    font.family: "Sen"
                     font.pixelSize: 16
                     font.weight: Font.DemiBold
                     color: ThemeManager.fgPrimary
@@ -188,22 +187,26 @@ PanelWindow {
                 
                 // Close button
                 Rectangle {
-                    width: 28
-                    height: 28
+                    width: 32
+                    height: 32
                     anchors.right: parent.right
                     anchors.verticalCenter: parent.verticalCenter
                     radius: 6
-                    color: closeMouseArea.containsMouse ? ThemeManager.accentRed : "transparent"
-                    
+                    color: closeMouseArea.containsMouse ? Qt.rgba(ThemeManager.accentRed.r, ThemeManager.accentRed.g, ThemeManager.accentRed.b, 0.30) : "transparent"
+                    border.width: closeMouseArea.containsMouse ? 1 : 0
+                    border.color: Qt.rgba(ThemeManager.accentRed.r, ThemeManager.accentRed.g, ThemeManager.accentRed.b, 0.5)
+
+                    Behavior on color { ColorAnimation { duration: 150 } }
+
                     Text {
                         anchors.centerIn: parent
                         text: "✕"
-                        font.family: "Maple Mono NF"
-                        font.pixelSize: 16
+                        font.family: "Sen"
+                        font.pixelSize: 18
                         font.weight: Font.Bold
-                        color: closeMouseArea.containsMouse ? ThemeManager.bgBase : ThemeManager.fgSecondary
+                        color: ThemeManager.fgSecondary
                     }
-                    
+
                     MouseArea {
                         id: closeMouseArea
                         anchors.fill: parent
@@ -218,8 +221,10 @@ PanelWindow {
             Rectangle {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                color: ThemeManager.surface1
+                color: Qt.rgba(1, 1, 1, 0.07)
                 radius: 12
+                border.width: 1
+                border.color: Qt.rgba(1, 1, 1, 0.10)
                 
                 ColumnLayout {
                     anchors.fill: parent
@@ -234,7 +239,7 @@ PanelWindow {
                         Text {
                             anchors.horizontalCenter: parent.horizontalCenter
                             text: "Select Capture Mode"
-                            font.family: "MapleMono NF"
+                            font.family: "Sen"
                             font.pixelSize: 14
                             font.weight: Font.Medium
                             color: ThemeManager.fgSecondary
@@ -248,42 +253,34 @@ PanelWindow {
                             Rectangle {
                                 width: (parent.width - 24) / 3
                                 height: 100
-                                color: workspaceMouseArea.containsMouse ? ThemeManager.accentBlue : ThemeManager.surface0
+                                color: workspaceMouseArea.containsMouse ? Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.25) : Qt.rgba(1, 1, 1, 0.07)
                                 radius: 8
-                                border.width: workspaceMouseArea.containsMouse ? 2 : 0
-                                border.color: ThemeManager.accentBlue
-                                
+                                border.width: 1
+                                border.color: workspaceMouseArea.containsMouse ? Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.6) : Qt.rgba(1, 1, 1, 0.10)
+
                                 Behavior on color {
                                     ColorAnimation { duration: 150 }
                                 }
-                                
+
                                 Column {
                                     anchors.centerIn: parent
                                     spacing: 10
-                                    
+
                                     Text {
                                         anchors.horizontalCenter: parent.horizontalCenter
                                         text: "󰍹"
                                         font.family: "Symbols Nerd Font"
                                         font.pixelSize: 32
-                                        color: workspaceMouseArea.containsMouse ? ThemeManager.bgBase : ThemeManager.accentBlue
-                                        
-                                        Behavior on color {
-                                            ColorAnimation { duration: 150 }
-                                        }
+                                        color: ThemeManager.accentBlue
                                     }
-                                    
+
                                     Text {
                                         anchors.horizontalCenter: parent.horizontalCenter
                                         text: "Workspace"
-                                        font.family: "MapleMono NF"
+                                        font.family: "Sen"
                                         font.pixelSize: 12
                                         font.weight: Font.Medium
-                                        color: workspaceMouseArea.containsMouse ? ThemeManager.bgBase : ThemeManager.fgPrimary
-                                        
-                                        Behavior on color {
-                                            ColorAnimation { duration: 150 }
-                                        }
+                                        color: ThemeManager.fgPrimary
                                     }
                                 }
                                 
@@ -300,42 +297,34 @@ PanelWindow {
                             Rectangle {
                                 width: (parent.width - 24) / 3
                                 height: 100
-                                color: windowMouseArea.containsMouse ? ThemeManager.accentGreen : ThemeManager.surface0
+                                color: windowMouseArea.containsMouse ? Qt.rgba(ThemeManager.accentGreen.r, ThemeManager.accentGreen.g, ThemeManager.accentGreen.b, 0.25) : Qt.rgba(1, 1, 1, 0.07)
                                 radius: 8
-                                border.width: windowMouseArea.containsMouse ? 2 : 0
-                                border.color: ThemeManager.accentGreen
-                                
+                                border.width: 1
+                                border.color: windowMouseArea.containsMouse ? Qt.rgba(ThemeManager.accentGreen.r, ThemeManager.accentGreen.g, ThemeManager.accentGreen.b, 0.6) : Qt.rgba(1, 1, 1, 0.10)
+
                                 Behavior on color {
                                     ColorAnimation { duration: 150 }
                                 }
-                                
+
                                 Column {
                                     anchors.centerIn: parent
                                     spacing: 10
-                                    
+
                                     Text {
                                         anchors.horizontalCenter: parent.horizontalCenter
                                         text: "󰖲"
                                         font.family: "Symbols Nerd Font"
                                         font.pixelSize: 32
-                                        color: windowMouseArea.containsMouse ? ThemeManager.bgBase : ThemeManager.accentGreen
-                                        
-                                        Behavior on color {
-                                            ColorAnimation { duration: 150 }
-                                        }
+                                        color: ThemeManager.accentGreen
                                     }
-                                    
+
                                     Text {
                                         anchors.horizontalCenter: parent.horizontalCenter
                                         text: "Window"
-                                        font.family: "MapleMono NF"
+                                        font.family: "Sen"
                                         font.pixelSize: 12
                                         font.weight: Font.Medium
-                                        color: windowMouseArea.containsMouse ? ThemeManager.bgBase : ThemeManager.fgPrimary
-                                        
-                                        Behavior on color {
-                                            ColorAnimation { duration: 150 }
-                                        }
+                                        color: ThemeManager.fgPrimary
                                     }
                                 }
                                 
@@ -352,42 +341,34 @@ PanelWindow {
                             Rectangle {
                                 width: (parent.width - 24) / 3
                                 height: 100
-                                color: regionMouseArea.containsMouse ? ThemeManager.accentPurple : ThemeManager.surface0
+                                color: regionMouseArea.containsMouse ? Qt.rgba(ThemeManager.accentPurple.r, ThemeManager.accentPurple.g, ThemeManager.accentPurple.b, 0.25) : Qt.rgba(1, 1, 1, 0.07)
                                 radius: 8
-                                border.width: regionMouseArea.containsMouse ? 2 : 0
-                                border.color: ThemeManager.accentPurple
-                                
+                                border.width: 1
+                                border.color: regionMouseArea.containsMouse ? Qt.rgba(ThemeManager.accentPurple.r, ThemeManager.accentPurple.g, ThemeManager.accentPurple.b, 0.6) : Qt.rgba(1, 1, 1, 0.10)
+
                                 Behavior on color {
                                     ColorAnimation { duration: 150 }
                                 }
-                                
+
                                 Column {
                                     anchors.centerIn: parent
                                     spacing: 10
-                                    
+
                                     Text {
                                         anchors.horizontalCenter: parent.horizontalCenter
                                         text: "󰆟"
                                         font.family: "Symbols Nerd Font"
                                         font.pixelSize: 32
-                                        color: regionMouseArea.containsMouse ? ThemeManager.bgBase : ThemeManager.accentPurple
-                                        
-                                        Behavior on color {
-                                            ColorAnimation { duration: 150 }
-                                        }
+                                        color: ThemeManager.accentPurple
                                     }
-                                    
+
                                     Text {
                                         anchors.horizontalCenter: parent.horizontalCenter
                                         text: "Selection"
-                                        font.family: "MapleMono NF"
+                                        font.family: "Sen"
                                         font.pixelSize: 12
                                         font.weight: Font.Medium
-                                        color: regionMouseArea.containsMouse ? ThemeManager.bgBase : ThemeManager.fgPrimary
-                                        
-                                        Behavior on color {
-                                            ColorAnimation { duration: 150 }
-                                        }
+                                        color: ThemeManager.fgPrimary
                                     }
                                 }
                                 
@@ -404,8 +385,36 @@ PanelWindow {
                 }
             }
         }
+
+        // Top specular highlight
+        Rectangle {
+            anchors.top: parent.top
+            anchors.left: parent.left
+            anchors.right: parent.right
+            height: 60
+            radius: 16
+            gradient: Gradient {
+                GradientStop { position: 0.0; color: Qt.rgba(1, 1, 1, 0.07) }
+                GradientStop { position: 1.0; color: Qt.rgba(1, 1, 1, 0.0) }
+            }
+            z: 10
+        }
+
+        // Bottom fade
+        Rectangle {
+            anchors.bottom: parent.bottom
+            anchors.left: parent.left
+            anchors.right: parent.right
+            height: 40
+            radius: 16
+            gradient: Gradient {
+                GradientStop { position: 0.0; color: Qt.rgba(0, 0, 0, 0.0) }
+                GradientStop { position: 1.0; color: Qt.rgba(0, 0, 0, 0.12) }
+            }
+            z: 10
+        }
     }
-    
+
     // Keyboard handler for ESC key
     Shortcut {
         sequence: "Escape"

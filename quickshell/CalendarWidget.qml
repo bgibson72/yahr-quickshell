@@ -1,17 +1,16 @@
 import QtQuick
-import QtQuick.Effects
 import Quickshell
 import Quickshell.Io
 
 Rectangle {
     id: root
-    
+
     width: 540
     height: 432
-    color: ThemeManager.bgBase
+    color: Qt.rgba(ThemeManager.bgBase.r, ThemeManager.bgBase.g, ThemeManager.bgBase.b, 0.92)
     radius: 16
-    border.width: 3
-    border.color: ThemeManager.accentBlue
+    border.width: 1
+    border.color: Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.35)
     antialiasing: true
     
     property bool isVisible: false
@@ -77,8 +76,10 @@ Rectangle {
             Rectangle {
                 width: (parent.width - 16) * 0.6
                 height: parent.height
-                color: ThemeManager.surface1
+                color: Qt.rgba(1, 1, 1, 0.07)
                 radius: 12
+                border.width: 1
+                border.color: Qt.rgba(1, 1, 1, 0.10)
                 
                 Column {
                     anchors {
@@ -96,7 +97,7 @@ Rectangle {
                                               "July", "August", "September", "October", "November", "December"]
                             return monthNames[now.getMonth()] + " " + now.getFullYear()
                         }
-                        font.family: "MapleMono NF"
+                        font.family: "Sen"
                         font.pixelSize: 18
                         font.weight: Font.Bold
                         color: ThemeManager.fgPrimary
@@ -116,7 +117,7 @@ Rectangle {
                             
                             Text {
                                 text: modelData
-                                font.family: "MapleMono NF"
+                                font.family: "Sen"
                                 font.pixelSize: 11
                                 font.weight: Font.Bold
                                 color: ThemeManager.accentBlue
@@ -156,7 +157,7 @@ Rectangle {
                                 Text {
                                     anchors.centerIn: parent
                                     text: parent.isValidDay ? parent.dayNumber : ""
-                                    font.family: "MapleMono NF"
+                                    font.family: "Sen"
                                     font.pixelSize: 13
                                     color: {
                                         if (parent.isValidDay && parent.isCurrentDay) return ThemeManager.bgBase
@@ -182,8 +183,10 @@ Rectangle {
                     id: clockSection
                     width: parent.width
                     height: 80
-                    color: ThemeManager.surface1
+                    color: Qt.rgba(1, 1, 1, 0.07)
                     radius: 12
+                    border.width: 1
+                    border.color: Qt.rgba(1, 1, 1, 0.10)
                     
                     Row {
                         anchors.centerIn: parent
@@ -193,7 +196,7 @@ Rectangle {
                         
                         Text {
                             id: timeText
-                            font.family: "MapleMono NF"
+                            font.family: "Sen"
                             font.pixelSize: 32
                             font.weight: Font.Bold
                             color: ThemeManager.accentBlue
@@ -202,7 +205,7 @@ Rectangle {
                         
                         Text {
                             id: periodText
-                            font.family: "MapleMono NF"
+                            font.family: "Sen"
                             font.pixelSize: 16
                             font.weight: Font.Medium
                             color: ThemeManager.fgSecondary
@@ -290,8 +293,10 @@ Rectangle {
                 Rectangle {
                     width: parent.width
                     height: 178
-                    color: ThemeManager.surface1
+                    color: Qt.rgba(1, 1, 1, 0.07)
                     radius: 12
+                    border.width: 1
+                    border.color: Qt.rgba(1, 1, 1, 0.10)
                 
                 Column {
                     anchors.centerIn: parent
@@ -313,7 +318,7 @@ Rectangle {
                         Text {
                             id: temperatureText
                             text: "..."
-                            font.family: "MapleMono NF"
+                            font.family: "Sen"
                             font.pixelSize: 36
                             font.weight: Font.Bold
                             color: ThemeManager.fgPrimary
@@ -326,7 +331,7 @@ Rectangle {
                         id: conditionText
                         anchors.horizontalCenter: parent.horizontalCenter
                         text: "Sunny"
-                        font.family: "MapleMono NF"
+                        font.family: "Sen"
                         font.pixelSize: 16
                         font.weight: Font.Medium
                         color: ThemeManager.fgPrimary
@@ -340,7 +345,7 @@ Rectangle {
                         Text {
                             id: humidityText
                             text: "💧 47%"
-                            font.family: "MapleMono NF"
+                            font.family: "Sen"
                             font.pixelSize: 14
                             color: ThemeManager.fgSecondary
                         }
@@ -348,7 +353,7 @@ Rectangle {
                         Text {
                             id: windText
                             text: "💨 4mph"
-                            font.family: "MapleMono NF"
+                            font.family: "Sen"
                             font.pixelSize: 14
                             color: ThemeManager.fgSecondary
                         }
@@ -362,13 +367,15 @@ Rectangle {
         Rectangle {
             width: parent.width
             height: 106
-            color: ThemeManager.surface1
+            color: Qt.rgba(1, 1, 1, 0.07)
             radius: 12
-            
+            border.width: 1
+            border.color: Qt.rgba(1, 1, 1, 0.10)
+
             Row {
                 spacing: 40
                 anchors.centerIn: parent
-                
+
                 // CPU Gauge
                 Item {
                     width: 84
@@ -414,7 +421,7 @@ Rectangle {
                             Text {
                                 anchors.centerIn: parent
                                 text: Math.round(cpuCanvas.percentage) + "%"
-                                font.family: "MapleMono NF"
+                                font.family: "Sen"
                                 font.pixelSize: 14
                                 font.weight: Font.Bold
                                 color: ThemeManager.fgPrimary
@@ -424,7 +431,7 @@ Rectangle {
                         Text {
                             anchors.horizontalCenter: parent.horizontalCenter
                             text: "CPU"
-                            font.family: "MapleMono NF"
+                            font.family: "Sen"
                             font.pixelSize: 11
                             color: ThemeManager.fgSecondary
                         }
@@ -474,7 +481,7 @@ Rectangle {
                             Text {
                                 anchors.centerIn: parent
                                 text: Math.round(ramCanvas.percentage) + "%"
-                                font.family: "MapleMono NF"
+                                font.family: "Sen"
                                 font.pixelSize: 14
                                 font.weight: Font.Bold
                                 color: ThemeManager.fgPrimary
@@ -484,7 +491,7 @@ Rectangle {
                         Text {
                             anchors.horizontalCenter: parent.horizontalCenter
                             text: "RAM"
-                            font.family: "MapleMono NF"
+                            font.family: "Sen"
                             font.pixelSize: 11
                             color: ThemeManager.fgSecondary
                         }
@@ -534,7 +541,7 @@ Rectangle {
                             Text {
                                 anchors.centerIn: parent
                                 text: Math.round(diskCanvas.percentage) + "%"
-                                font.family: "MapleMono NF"
+                                font.family: "Sen"
                                 font.pixelSize: 14
                                 font.weight: Font.Bold
                                 color: ThemeManager.fgPrimary
@@ -544,7 +551,7 @@ Rectangle {
                         Text {
                             anchors.horizontalCenter: parent.horizontalCenter
                             text: "Disk"
-                            font.family: "MapleMono NF"
+                            font.family: "Sen"
                             font.pixelSize: 11
                             color: ThemeManager.fgSecondary
                         }
@@ -678,5 +685,33 @@ Rectangle {
                 }
             }
         }
+    }
+
+    // Top specular highlight
+    Rectangle {
+        anchors.top: parent.top
+        anchors.left: parent.left
+        anchors.right: parent.right
+        height: 80
+        radius: 16
+        gradient: Gradient {
+            GradientStop { position: 0.0; color: Qt.rgba(1, 1, 1, 0.07) }
+            GradientStop { position: 1.0; color: Qt.rgba(1, 1, 1, 0.0) }
+        }
+        z: 10
+    }
+
+    // Bottom fade
+    Rectangle {
+        anchors.bottom: parent.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        height: 50
+        radius: 16
+        gradient: Gradient {
+            GradientStop { position: 0.0; color: Qt.rgba(0, 0, 0, 0.0) }
+            GradientStop { position: 1.0; color: Qt.rgba(0, 0, 0, 0.12) }
+        }
+        z: 10
     }
 }

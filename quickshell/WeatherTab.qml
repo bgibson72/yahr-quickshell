@@ -29,8 +29,10 @@ Item {
         Rectangle {
             width: parent.width
             height: (parent.height - 16) * 0.45
-            color: ThemeManager.surface1
+            color: Qt.rgba(1, 1, 1, 0.07)
             radius: 12
+            border.width: 1
+            border.color: Qt.rgba(1, 1, 1, 0.10)
             
             Item {
                 anchors.fill: parent
@@ -55,7 +57,7 @@ Item {
                         id: currentTemp
                         anchors.horizontalCenter: parent.horizontalCenter
                         text: "..."
-                        font.family: "MapleMono NF"
+                        font.family: "Sen"
                         font.pixelSize: 48
                         font.weight: Font.Bold
                         color: ThemeManager.fgPrimary
@@ -65,7 +67,7 @@ Item {
                         id: currentCondition
                         anchors.horizontalCenter: parent.horizontalCenter
                         text: "Loading..."
-                        font.family: "MapleMono NF"
+                        font.family: "Sen"
                         font.pixelSize: 18
                         color: ThemeManager.fgSecondary
                     }
@@ -82,7 +84,7 @@ Item {
                     Text {
                         id: cityName
                         text: ""
-                        font.family: "MapleMono NF"
+                        font.family: "Sen"
                         font.pixelSize: 16
                         font.weight: Font.Bold
                         color: ThemeManager.accentBlue
@@ -94,7 +96,7 @@ Item {
                     Text {
                         id: locationText
                         text: "📍 Loading location..."
-                        font.family: "MapleMono NF"
+                        font.family: "Sen"
                         font.pixelSize: 14
                         color: ThemeManager.fgSecondary
                         width: parent.width
@@ -111,14 +113,14 @@ Item {
                             spacing: 4
                             Text {
                                 text: "Feels Like"
-                                font.family: "MapleMono NF"
+                                font.family: "Sen"
                                 font.pixelSize: 12
                                 color: ThemeManager.fgTertiary
                             }
                             Text {
                                 id: feelsLike
                                 text: "--"
-                                font.family: "MapleMono NF"
+                                font.family: "Sen"
                                 font.pixelSize: 16
                                 font.weight: Font.Bold
                                 color: ThemeManager.fgPrimary
@@ -130,14 +132,14 @@ Item {
                             spacing: 4
                             Text {
                                 text: "Humidity"
-                                font.family: "MapleMono NF"
+                                font.family: "Sen"
                                 font.pixelSize: 12
                                 color: ThemeManager.fgTertiary
                             }
                             Text {
                                 id: humidity
                                 text: "--"
-                                font.family: "MapleMono NF"
+                                font.family: "Sen"
                                 font.pixelSize: 16
                                 font.weight: Font.Bold
                                 color: ThemeManager.accentCyan
@@ -149,14 +151,14 @@ Item {
                             spacing: 4
                             Text {
                                 text: "Wind Speed"
-                                font.family: "MapleMono NF"
+                                font.family: "Sen"
                                 font.pixelSize: 12
                                 color: ThemeManager.fgTertiary
                             }
                             Text {
                                 id: windSpeed
                                 text: "--"
-                                font.family: "MapleMono NF"
+                                font.family: "Sen"
                                 font.pixelSize: 16
                                 font.weight: Font.Bold
                                 color: ThemeManager.accentGreen
@@ -168,14 +170,14 @@ Item {
                             spacing: 4
                             Text {
                                 text: "Pressure"
-                                font.family: "MapleMono NF"
+                                font.family: "Sen"
                                 font.pixelSize: 12
                                 color: ThemeManager.fgTertiary
                             }
                             Text {
                                 id: pressure
                                 text: "--"
-                                font.family: "MapleMono NF"
+                                font.family: "Sen"
                                 font.pixelSize: 16
                                 font.weight: Font.Bold
                                 color: ThemeManager.fgPrimary
@@ -190,9 +192,11 @@ Item {
         Rectangle {
             width: parent.width
             height: (parent.height - 16) * 0.55
-            color: ThemeManager.surface1
+            color: Qt.rgba(1, 1, 1, 0.07)
             radius: 12
             clip: false
+            border.width: 1
+            border.color: Qt.rgba(1, 1, 1, 0.10)
             
             Column {
                 anchors.fill: parent
@@ -211,7 +215,7 @@ Item {
                     
                     Text {
                         text: "3-Day Forecast"
-                        font.family: "MapleMono NF"
+                        font.family: "Sen"
                         font.pixelSize: 18
                         font.weight: Font.Bold
                         color: ThemeManager.fgPrimary
@@ -222,7 +226,7 @@ Item {
                 Rectangle {
                     width: parent.width
                     height: 2
-                    color: ThemeManager.surface2
+                    color: Qt.rgba(1, 1, 1, 0.10)
                 }
                 
                 // Forecast items
@@ -242,7 +246,7 @@ Item {
                         Rectangle {
                             width: (parent.width - (2 * 8)) / 3
                             height: parent.height
-                            color: ThemeManager.surface0
+                            color: Qt.rgba(1, 1, 1, 0.07)
                             radius: 10
                             
                             Column {
@@ -253,7 +257,7 @@ Item {
                                     id: dayLabel
                                     anchors.horizontalCenter: parent.horizontalCenter
                                     text: forecastModel.getDayLabel(index)
-                                    font.family: "MapleMono NF"
+                                    font.family: "Sen"
                                     font.pixelSize: 14
                                     font.weight: Font.Bold
                                     color: ThemeManager.fgPrimary
@@ -274,7 +278,7 @@ Item {
                                     Text {
                                         anchors.horizontalCenter: parent.horizontalCenter
                                         text: forecastModel.getHighTemp(index)
-                                        font.family: "MapleMono NF"
+                                        font.family: "Sen"
                                         font.pixelSize: 16
                                         font.weight: Font.Bold
                                         color: ThemeManager.accentRed
@@ -283,7 +287,7 @@ Item {
                                     Text {
                                         anchors.horizontalCenter: parent.horizontalCenter
                                         text: forecastModel.getLowTemp(index)
-                                        font.family: "MapleMono NF"
+                                        font.family: "Sen"
                                         font.pixelSize: 14
                                         color: ThemeManager.accentCyan
                                     }
@@ -292,7 +296,7 @@ Item {
                                 Text {
                                     anchors.horizontalCenter: parent.horizontalCenter
                                     text: forecastModel.getCondition(index)
-                                    font.family: "MapleMono NF"
+                                    font.family: "Sen"
                                     font.pixelSize: 11
                                     color: ThemeManager.fgSecondary
                                     width: parent.parent.width - 16

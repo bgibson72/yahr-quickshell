@@ -7,8 +7,8 @@ Item {
     Text {
         anchors.centerIn: parent
         text: "|"
-        font.family: "MapleMono NF"
+        font.family: "Sen"
         font.pixelSize: 13
-        color: ThemeManager.border1
+        color: Qt.rgba(1, 1, 1, 0.18)
     }
 }

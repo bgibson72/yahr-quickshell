@@ -106,8 +106,10 @@ Item {
         Rectangle {
             width: parent.width
             height: 80
-            color: ThemeManager.surface1
+            color: Qt.rgba(1, 1, 1, 0.07)
             radius: 12
+            border.width: 1
+            border.color: Qt.rgba(1, 1, 1, 0.10)
             
             Row {
                 anchors.centerIn: parent
@@ -119,7 +121,7 @@ Item {
                     
                     Text {
                         id: timeText
-                        font.family: "MapleMono NF"
+                        font.family: "Sen"
                         font.pixelSize: 40
                         font.weight: Font.Bold
                         color: ThemeManager.accentBlue
@@ -129,7 +131,7 @@ Item {
                     
                     Text {
                         id: periodText
-                        font.family: "MapleMono NF"
+                        font.family: "Sen"
                         font.pixelSize: 18
                         font.weight: Font.Medium
                         color: ThemeManager.fgSecondary
@@ -144,7 +146,7 @@ Item {
                 Rectangle {
                     width: 2
                     height: 50
-                    color: ThemeManager.surface2
+                    color: Qt.rgba(1, 1, 1, 0.10)
                 }
                 
                 // Date
@@ -154,7 +156,7 @@ Item {
                     
                     Text {
                         id: dateText
-                        font.family: "MapleMono NF"
+                        font.family: "Sen"
                         font.pixelSize: 18
                         font.weight: Font.Bold
                         color: ThemeManager.fgPrimary
@@ -163,7 +165,7 @@ Item {
                     
                     Text {
                         id: yearText
-                        font.family: "MapleMono NF"
+                        font.family: "Sen"
                         font.pixelSize: 14
                         color: ThemeManager.fgSecondary
                         text: "2026"
@@ -203,8 +205,10 @@ Item {
         Rectangle {
             width: (parent.width - 16) * 0.55
             height: parent.height
-            color: ThemeManager.surface1
+            color: Qt.rgba(1, 1, 1, 0.07)
             radius: 12
+            border.width: 1
+            border.color: Qt.rgba(1, 1, 1, 0.10)
             
             Column {
                 anchors.fill: parent
@@ -220,7 +224,7 @@ Item {
                         width: 32
                         height: 32
                         radius: 6
-                        color: prevMouseArea.containsMouse ? ThemeManager.surface2 : "transparent"
+                        color: prevMouseArea.containsMouse ? Qt.rgba(1, 1, 1, 0.16) : "transparent"
                         
                         MouseArea {
                             id: prevMouseArea
@@ -246,7 +250,7 @@ Item {
                         width: parent.width - 80
                         height: parent.height
                         text: calendarModel.monthYearText
-                        font.family: "MapleMono NF"
+                        font.family: "Sen"
                         font.pixelSize: 20
                         font.weight: Font.Bold
                         color: ThemeManager.fgPrimary
@@ -260,7 +264,7 @@ Item {
                         width: 32
                         height: 32
                         radius: 6
-                        color: nextMouseArea.containsMouse ? ThemeManager.surface2 : "transparent"
+                        color: nextMouseArea.containsMouse ? Qt.rgba(1, 1, 1, 0.16) : "transparent"
                         
                         MouseArea {
                             id: nextMouseArea
@@ -294,7 +298,7 @@ Item {
                         
                         Text {
                             text: modelData
-                            font.family: "MapleMono NF"
+                            font.family: "Sen"
                             font.pixelSize: 12
                             font.weight: Font.Bold
                             color: ThemeManager.accentBlue
@@ -325,8 +329,8 @@ Item {
                             
                             color: {
                                 if (isValidDay && isCurrentDay) return ThemeManager.accentBlue
-                                if (isValidDay && isSelectedDay && !isCurrentDay) return ThemeManager.surface2
-                                if (dayMouseArea.containsMouse && isValidDay) return Qt.rgba(ThemeManager.surface2.r, ThemeManager.surface2.g, ThemeManager.surface2.b, 0.5)
+                                if (isValidDay && isSelectedDay && !isCurrentDay) return Qt.rgba(1, 1, 1, 0.16)
+                                if (dayMouseArea.containsMouse && isValidDay) return Qt.rgba(Qt.rgba(1, 1, 1, 0.16).r, Qt.rgba(1, 1, 1, 0.16).g, Qt.rgba(1, 1, 1, 0.16).b, 0.5)
                                 return "transparent"
                             }
                             
@@ -349,7 +353,7 @@ Item {
                                 Text {
                                     anchors.horizontalCenter: parent.horizontalCenter
                                     text: parent.parent.isValidDay ? parent.parent.dayNumber : ""
-                                    font.family: "MapleMono NF"
+                                    font.family: "Sen"
                                     font.pixelSize: 14
                                     color: {
                                         if (parent.parent.isValidDay && parent.parent.isCurrentDay) return ThemeManager.bgBase
@@ -377,8 +381,10 @@ Item {
                 Rectangle {
                     width: parent.width
                     height: 55
-                    color: ThemeManager.surface0
+                    color: Qt.rgba(1, 1, 1, 0.07)
                     radius: 8
+                    border.width: 1
+                    border.color: Qt.rgba(1, 1, 1, 0.10)
                     
                     Row {
                         anchors.fill: parent
@@ -406,7 +412,7 @@ Item {
                                     
                                     Text {
                                         text: calendarModel.moonPhaseName
-                                        font.family: "MapleMono NF"
+                                        font.family: "Sen"
                                         font.pixelSize: 13
                                         font.weight: Font.Bold
                                         color: ThemeManager.fgPrimary
@@ -414,7 +420,7 @@ Item {
                                     
                                     Text {
                                         text: calendarModel.moonIllumination
-                                        font.family: "MapleMono NF"
+                                        font.family: "Sen"
                                         font.pixelSize: 11
                                         color: ThemeManager.fgSecondary
                                     }
@@ -426,7 +432,7 @@ Item {
                         Rectangle {
                             width: 2
                             height: 36
-                            color: ThemeManager.surface2
+                            color: Qt.rgba(1, 1, 1, 0.10)
                             anchors.verticalCenter: parent.verticalCenter
                         }
                         
@@ -452,7 +458,7 @@ Item {
                                     
                                     Text {
                                         text: calendarModel.sunriseTime
-                                        font.family: "MapleMono NF"
+                                        font.family: "Sen"
                                         font.pixelSize: 12
                                         color: ThemeManager.accentYellow
                                         anchors.verticalCenter: parent.verticalCenter
@@ -472,7 +478,7 @@ Item {
                                     
                                     Text {
                                         text: calendarModel.sunsetTime
-                                        font.family: "MapleMono NF"
+                                        font.family: "Sen"
                                         font.pixelSize: 12
                                         color: ThemeManager.accentOrange
                                         anchors.verticalCenter: parent.verticalCenter
@@ -489,8 +495,10 @@ Item {
         Rectangle {
             width: (parent.width - 16) * 0.45
             height: parent.height
-            color: ThemeManager.surface1
+            color: Qt.rgba(1, 1, 1, 0.07)
             radius: 12
+            border.width: 1
+            border.color: Qt.rgba(1, 1, 1, 0.10)
                 
                 Column {
                     anchors.fill: parent
@@ -509,7 +517,7 @@ Item {
                         
                         Text {
                             text: calendarModel.selectedDateText
-                            font.family: "MapleMono NF"
+                            font.family: "Sen"
                             font.pixelSize: 16
                             font.weight: Font.Bold
                             color: ThemeManager.fgPrimary
@@ -520,7 +528,7 @@ Item {
                     Rectangle {
                         width: parent.width
                         height: 2
-                        color: ThemeManager.surface2
+                        color: Qt.rgba(1, 1, 1, 0.10)
                     }
                     
                     // Events scroll area
@@ -536,7 +544,7 @@ Item {
                         delegate: Rectangle {
                             width: eventsListView.width
                             height: 70
-                            color: ThemeManager.surface0
+                            color: Qt.rgba(1, 1, 1, 0.07)
                             radius: 8
                             
                             Row {
@@ -558,7 +566,7 @@ Item {
                                     Text {
                                         width: parent.width
                                         text: modelData.title || "Event"
-                                        font.family: "MapleMono NF"
+                                        font.family: "Sen"
                                         font.pixelSize: 14
                                         font.weight: Font.Bold
                                         color: ThemeManager.fgPrimary
@@ -567,7 +575,7 @@ Item {
                                     
                                     Text {
                                         text: modelData.time || "All day"
-                                        font.family: "MapleMono NF"
+                                        font.family: "Sen"
                                         font.pixelSize: 12
                                         color: ThemeManager.fgSecondary
                                     }
@@ -578,7 +586,7 @@ Item {
                         Text {
                             anchors.centerIn: parent
                             text: "No events for this day"
-                            font.family: "MapleMono NF"
+                            font.family: "Sen"
                             font.pixelSize: 13
                             color: ThemeManager.fgTertiary
                             visible: eventsListView.count === 0

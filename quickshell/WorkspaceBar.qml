@@ -39,15 +39,12 @@ RowLayout {
                 width: 35
                 height: parent.height - 10
                 
-                color: staticWorkspaceButton.containsMouse ? 
-                    Qt.rgba(ThemeManager.fgPrimary.r, ThemeManager.fgPrimary.g, ThemeManager.fgPrimary.b, 0.2) : 
-                    "transparent"
-                
+                color: staticWorkspaceButton.containsMouse ? Qt.rgba(1, 1, 1, 0.10) : "transparent"
+
                 radius: 6
-                
-                // Add a subtle glow effect on hover
+
                 border.width: staticWorkspaceButton.containsMouse ? 1 : 0
-                border.color: Qt.rgba(ThemeManager.fgPrimary.r, ThemeManager.fgPrimary.g, ThemeManager.fgPrimary.b, 0.3)
+                border.color: Qt.rgba(1, 1, 1, 0.18)
                 
                 Behavior on color {
                     ColorAnimation { duration: 150 }
@@ -62,7 +59,7 @@ RowLayout {
                 id: workspaceText
                 anchors.centerIn: workspaceRect
                 text: staticWorkspaceButton.workspaceId.toString()
-                font.family: "MapleMono NF"
+                font.family: "Sen"
                 font.pixelSize: 13
                 textFormat: Text.PlainText
                 
@@ -205,14 +202,12 @@ RowLayout {
                 width: 35
                 height: parent.height - 10
                 
-                color: dynamicWorkspaceButton.containsMouse ? 
-                    Qt.rgba(ThemeManager.fgPrimary.r, ThemeManager.fgPrimary.g, ThemeManager.fgPrimary.b, 0.2) : 
-                    "transparent"
-                
+                color: dynamicWorkspaceButton.containsMouse ? Qt.rgba(1, 1, 1, 0.10) : "transparent"
+
                 radius: 6
-                
+
                 border.width: dynamicWorkspaceButton.containsMouse ? 1 : 0
-                border.color: Qt.rgba(ThemeManager.fgPrimary.r, ThemeManager.fgPrimary.g, ThemeManager.fgPrimary.b, 0.3)
+                border.color: Qt.rgba(1, 1, 1, 0.18)
                 
                 Behavior on color {
                     ColorAnimation { duration: 150 }
@@ -227,7 +222,7 @@ RowLayout {
                 id: dynamicWorkspaceText
                 anchors.centerIn: dynamicWorkspaceRect
                 text: dynamicWorkspaceButton.modelData.id.toString()
-                font.family: "MapleMono NF"
+                font.family: "Sen"
                 font.pixelSize: 13
                 textFormat: Text.PlainText
                 

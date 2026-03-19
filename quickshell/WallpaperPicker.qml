@@ -142,10 +142,10 @@ PanelWindow {
     Rectangle {
         id: bgRect
         anchors.fill: parent
-        color: ThemeManager.surface0
+        color: Qt.rgba(ThemeManager.bgBase.r, ThemeManager.bgBase.g, ThemeManager.bgBase.b, 0.92)
         radius: 24
-        border.width: 2
-        border.color: ThemeManager.accentBlue
+        border.width: 1
+        border.color: Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.35)
         clip: true
         focus: true
         
@@ -188,7 +188,7 @@ PanelWindow {
                 
                 Text {
                     text: "Wallpaper Picker - " + (showAllWallpapers ? "All Wallpapers" : currentTheme)
-                    font.family: "Maple Mono NF"
+                    font.family: "Sen"
                     font.pixelSize: 20
                     font.weight: Font.Bold
                     color: ThemeManager.fgPrimary
@@ -202,14 +202,18 @@ PanelWindow {
                     width: 40
                     height: 40
                     radius: 8
-                    color: closeMouseArea.containsMouse ? ThemeManager.accentRed : ThemeManager.surface2
+                    color: closeMouseArea.containsMouse ? Qt.rgba(ThemeManager.accentRed.r, ThemeManager.accentRed.g, ThemeManager.accentRed.b, 0.30) : Qt.rgba(1, 1, 1, 0.07)
+                    border.width: closeMouseArea.containsMouse ? 1 : 0
+                    border.color: Qt.rgba(ThemeManager.accentRed.r, ThemeManager.accentRed.g, ThemeManager.accentRed.b, 0.5)
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.right: parent.right
-                    
+
+                    Behavior on color { ColorAnimation { duration: 150 } }
+
                     Text {
                         anchors.centerIn: parent
                         text: "✕"
-                        font.family: "Maple Mono NF"
+                        font.family: "Sen"
                         font.pixelSize: 20
                         font.weight: Font.Bold
                         color: ThemeManager.fgPrimary
@@ -285,7 +289,7 @@ PanelWindow {
                             anchors.fill: parent
                             anchors.margins: 3
                             radius: 10
-                            color: ThemeManager.surface2
+                            color: Qt.rgba(1, 1, 1, 0.07)
                             visible: thumbnail.status === Image.Error || thumbnail.status === Image.Null
                             
                             Column {
@@ -302,7 +306,7 @@ PanelWindow {
                                 
                                 Text {
                                     text: "Failed to load"
-                                    font.family: "MapleMono NF"
+                                    font.family: "Sen"
                                     font.pixelSize: 10
                                     color: ThemeManager.fgSecondary
                                     anchors.horizontalCenter: parent.horizontalCenter
@@ -315,7 +319,7 @@ PanelWindow {
                             anchors.fill: parent
                             anchors.margins: 3
                             radius: 10
-                            color: ThemeManager.surface2
+                            color: Qt.rgba(1, 1, 1, 0.07)
                             visible: thumbnail.status === Image.Loading
                             
                             Text {
@@ -361,8 +365,36 @@ PanelWindow {
                 }
             }
         }
+
+        // Top specular highlight
+        Rectangle {
+            anchors.top: parent.top
+            anchors.left: parent.left
+            anchors.right: parent.right
+            height: 120
+            radius: 24
+            gradient: Gradient {
+                GradientStop { position: 0.0; color: Qt.rgba(1, 1, 1, 0.07) }
+                GradientStop { position: 1.0; color: Qt.rgba(1, 1, 1, 0.0) }
+            }
+            z: 10
+        }
+
+        // Bottom fade
+        Rectangle {
+            anchors.bottom: parent.bottom
+            anchors.left: parent.left
+            anchors.right: parent.right
+            height: 80
+            radius: 24
+            gradient: Gradient {
+                GradientStop { position: 0.0; color: Qt.rgba(0, 0, 0, 0.0) }
+                GradientStop { position: 1.0; color: Qt.rgba(0, 0, 0, 0.12) }
+            }
+            z: 10
+        }
     }
-    
+
     function setWallpaper(path) {
         console.log("Setting wallpaper:", path)
         

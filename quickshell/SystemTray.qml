@@ -163,7 +163,7 @@ Rectangle {
                     id: networkDetailsText
                     anchors.verticalCenter: parent.verticalCenter
                     text: "↓" + systemTray.downloadSpeed.toFixed(1) + " ↑" + systemTray.uploadSpeed.toFixed(1)
-                    font.family: "MapleMono NF"
+                    font.family: "Sen"
                     font.pixelSize: 10
                     color: ThemeManager.fgPrimary
                     visible: systemTray.showNetworkDetails
@@ -228,7 +228,7 @@ Rectangle {
                     id: volumeDetailsText
                     anchors.verticalCenter: parent.verticalCenter
                     text: systemTray.muted ? "Muted" : systemTray.volume + "%"
-                    font.family: "MapleMono NF"
+                    font.family: "Sen"
                     font.pixelSize: 11
                     color: ThemeManager.fgPrimary
                     visible: systemTray.showVolumeDetails
@@ -305,7 +305,7 @@ Rectangle {
                 Text {
                     id: batteryDetailsText
                     text: systemTray.batteryLevel + "%"
-                    font.family: "MapleMono NF"
+                    font.family: "Sen"
                     font.pixelSize: 12
                     color: ThemeManager.fgPrimary
                     anchors.verticalCenter: parent.verticalCenter

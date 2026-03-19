@@ -77,11 +77,16 @@ Rectangle {
             width: 60  // Wider for icon + number
             height: 32
             
-            color: mouseArea.containsMouse ? ThemeManager.surface1 : ThemeManager.surface0
+            color: mouseArea.containsMouse ? Qt.rgba(1, 1, 1, 0.10) : "transparent"
             radius: 6
-        
+            border.width: mouseArea.containsMouse ? 1 : 0
+            border.color: Qt.rgba(1, 1, 1, 0.18)
+
         Behavior on color {
             ColorAnimation { duration: 200 }
+        }
+        Behavior on border.width {
+            NumberAnimation { duration: 200 }
         }
         
         Row {
@@ -103,7 +108,7 @@ Rectangle {
             
             Text {
                 text: updatesArea.updateCount.toString()
-                font.family: "MapleMono NF"
+                font.family: "Sen"
                 font.pixelSize: 13
                 color: updatesArea.updateCount > 0 ? ThemeManager.accentYellow : ThemeManager.accentBlue
                 anchors.verticalCenter: parent.verticalCenter

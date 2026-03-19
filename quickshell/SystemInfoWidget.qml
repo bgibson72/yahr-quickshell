@@ -1,17 +1,16 @@
 import QtQuick
-import QtQuick.Effects
 import Quickshell
 import Quickshell.Io
 
 Rectangle {
     id: root
-    
+
     width: 800
     height: 600
-    color: ThemeManager.bgBase
+    color: Qt.rgba(ThemeManager.bgBase.r, ThemeManager.bgBase.g, ThemeManager.bgBase.b, 0.92)
     radius: 16
-    border.width: 3
-    border.color: ThemeManager.accentBlue
+    border.width: 1
+    border.color: Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.35)
     antialiasing: true
     
     property bool isVisible: false
@@ -70,110 +69,124 @@ Rectangle {
         Rectangle {
             width: parent.width
             height: 50
-            color: ThemeManager.surface0
+            color: Qt.rgba(1, 1, 1, 0.07)
             radius: 10
-            
+            border.width: 1
+            border.color: Qt.rgba(1, 1, 1, 0.10)
+
             Row {
                 anchors.centerIn: parent
                 spacing: 8
-                
+
                 // Calendar Tab
                 Rectangle {
                     width: 150
                     height: 38
                     radius: 8
-                    color: root.currentTab === 0 ? ThemeManager.accentBlue : "transparent"
-                    
+                    color: root.currentTab === 0 ? Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.30) : "transparent"
+                    border.width: root.currentTab === 0 ? 1 : 0
+                    border.color: Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.55)
+
+                    Behavior on color { ColorAnimation { duration: 150 } }
+
                     MouseArea {
                         anchors.fill: parent
                         cursorShape: Qt.PointingHandCursor
                         onClicked: root.currentTab = 0
                     }
-                    
+
                     Row {
                         anchors.centerIn: parent
                         spacing: 8
-                        
+
                         Text {
                             text: "📅"
                             font.pixelSize: 18
                             anchors.verticalCenter: parent.verticalCenter
                         }
-                        
+
                         Text {
                             text: "Calendar"
-                            font.family: "MapleMono NF"
+                            font.family: "Sen"
                             font.pixelSize: 14
                             font.weight: Font.Medium
-                            color: root.currentTab === 0 ? ThemeManager.bgBase : ThemeManager.fgPrimary
+                            color: ThemeManager.fgPrimary
                             anchors.verticalCenter: parent.verticalCenter
                         }
                     }
                 }
-                
+
                 // Weather Tab
                 Rectangle {
                     width: 150
                     height: 38
                     radius: 8
-                    color: root.currentTab === 1 ? ThemeManager.accentBlue : "transparent"
-                    
+                    color: root.currentTab === 1 ? Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.30) : "transparent"
+                    border.width: root.currentTab === 1 ? 1 : 0
+                    border.color: Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.55)
+
+                    Behavior on color { ColorAnimation { duration: 150 } }
+
                     MouseArea {
                         anchors.fill: parent
                         cursorShape: Qt.PointingHandCursor
                         onClicked: root.currentTab = 1
                     }
-                    
+
                     Row {
                         anchors.centerIn: parent
                         spacing: 8
-                        
+
                         Text {
                             text: "⛅"
                             font.pixelSize: 18
                             anchors.verticalCenter: parent.verticalCenter
                         }
-                        
+
                         Text {
                             text: "Weather"
-                            font.family: "MapleMono NF"
+                            font.family: "Sen"
                             font.pixelSize: 14
                             font.weight: Font.Medium
-                            color: root.currentTab === 1 ? ThemeManager.bgBase : ThemeManager.fgPrimary
+                            color: ThemeManager.fgPrimary
                             anchors.verticalCenter: parent.verticalCenter
                         }
                     }
                 }
-                
+
                 // System Tab
                 Rectangle {
                     width: 150
                     height: 38
                     radius: 8
-                    color: root.currentTab === 2 ? ThemeManager.accentBlue : "transparent"
-                    
+                    color: root.currentTab === 2 ? Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.30) : "transparent"
+                    border.width: root.currentTab === 2 ? 1 : 0
+                    border.color: Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.55)
+
+                    Behavior on color { ColorAnimation { duration: 150 } }
+
                     MouseArea {
                         anchors.fill: parent
                         cursorShape: Qt.PointingHandCursor
                         onClicked: root.currentTab = 2
                     }
-                    
+
                     Row {
                         anchors.centerIn: parent
                         spacing: 8
-                        
+
                         Text {
                             text: "💻"
                             font.pixelSize: 18
                             anchors.verticalCenter: parent.verticalCenter
                         }
-                        
+
                         Text {
                             text: "System"
-                            font.family: "MapleMono NF"
+                            font.family: "Sen"
                             font.pixelSize: 14
                             font.weight: Font.Medium
-                            color: root.currentTab === 2 ? ThemeManager.bgBase : ThemeManager.fgPrimary
+                            color: ThemeManager.fgPrimary
                             anchors.verticalCenter: parent.verticalCenter
                         }
                     }
@@ -211,5 +224,33 @@ Rectangle {
                 active: root.isVisible && root.currentTab === 2
             }
         }
+    }
+
+    // Top specular highlight
+    Rectangle {
+        anchors.top: parent.top
+        anchors.left: parent.left
+        anchors.right: parent.right
+        height: 120
+        radius: 16
+        gradient: Gradient {
+            GradientStop { position: 0.0; color: Qt.rgba(1, 1, 1, 0.07) }
+            GradientStop { position: 1.0; color: Qt.rgba(1, 1, 1, 0.0) }
+        }
+        z: 10
+    }
+
+    // Bottom fade
+    Rectangle {
+        anchors.bottom: parent.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        height: 80
+        radius: 16
+        gradient: Gradient {
+            GradientStop { position: 0.0; color: Qt.rgba(0, 0, 0, 0.0) }
+            GradientStop { position: 1.0; color: Qt.rgba(0, 0, 0, 0.12) }
+        }
+        z: 10
     }
 }

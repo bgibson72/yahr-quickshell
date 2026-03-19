@@ -8,10 +8,10 @@ Rectangle {
     
     width: 420
     height: 790
-    color: ThemeManager.bgBase
+    color: Qt.rgba(ThemeManager.bgBase.r, ThemeManager.bgBase.g, ThemeManager.bgBase.b, 0.92)
     radius: 16
-    border.width: 3
-    border.color: ThemeManager.accentBlue
+    border.width: 1
+    border.color: Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.35)
     clip: true
     
     property bool isVisible: false
@@ -67,7 +67,7 @@ Rectangle {
                 anchors.leftMargin: 12
                 anchors.verticalCenter: parent.verticalCenter
                 text: "Control Center"
-                font.family: "MapleMono NF"
+                font.family: "Sen"
                 font.pixelSize: 20
                 font.weight: Font.Bold
                 color: ThemeManager.fgPrimary
@@ -77,12 +77,25 @@ Rectangle {
             Rectangle {
                 anchors.right: parent.right
                 anchors.verticalCenter: parent.verticalCenter
-                width: 36
-                height: 36
-                radius: 8
-                color: closeMouseArea.containsMouse ? Qt.darker(ThemeManager.accentRed, 1.2) : ThemeManager.accentRed
+                width: 32
+                height: 32
+                radius: 6
+                color: closeMouseArea.containsMouse ? Qt.rgba(ThemeManager.accentRed.r, ThemeManager.accentRed.g, ThemeManager.accentRed.b, 0.30) : "transparent"
+                border.width: closeMouseArea.containsMouse ? 1 : 0
+                border.color: Qt.rgba(ThemeManager.accentRed.r, ThemeManager.accentRed.g, ThemeManager.accentRed.b, 0.5)
                 z: 1000
-                
+
+                Behavior on color { ColorAnimation { duration: 150 } }
+
+                Text {
+                    anchors.centerIn: parent
+                    text: "✕"
+                    font.family: "Sen"
+                    font.pixelSize: 18
+                    font.weight: Font.Bold
+                    color: ThemeManager.fgSecondary
+                }
+
                 MouseArea {
                     id: closeMouseArea
                     anchors.fill: parent
@@ -94,13 +107,6 @@ Rectangle {
                         root.requestClose()
                     }
                 }
-                
-                Text {
-                    anchors.centerIn: parent
-                    text: "✕"
-                    font.pixelSize: 18
-                    color: ThemeManager.bgBase
-                }
             }
         }
         
@@ -108,8 +114,10 @@ Rectangle {
         Rectangle {
             width: parent.width
             height: 140
-            color: ThemeManager.surface1
+            color: Qt.rgba(1, 1, 1, 0.07)
             radius: 12
+            border.width: 1
+            border.color: Qt.rgba(1, 1, 1, 0.10)
             
             Column {
                 anchors.fill: parent
@@ -150,7 +158,7 @@ Rectangle {
                             
                             Text {
                                 text: root.networkType === "wifi" ? "Wi-Fi" : root.networkType === "ethernet" ? "Ethernet" : "Disconnected"
-                                font.family: "MapleMono NF"
+                                font.family: "Sen"
                                 font.pixelSize: 16
                                 font.weight: Font.Bold
                                 color: ThemeManager.fgPrimary
@@ -158,7 +166,7 @@ Rectangle {
                             
                             Text {
                                 text: root.networkName
-                                font.family: "MapleMono NF"
+                                font.family: "Sen"
                                 font.pixelSize: 13
                                 color: ThemeManager.fgSecondary
                             }
@@ -170,7 +178,7 @@ Rectangle {
                         width: 48
                         height: 24
                         radius: 12
-                        color: root.networkType === "wifi" ? ThemeManager.accentGreen : ThemeManager.surface0
+                        color: root.networkType === "wifi" ? ThemeManager.accentGreen : Qt.rgba(1, 1, 1, 0.07)
                         anchors.right: parent.right
                         anchors.verticalCenter: parent.verticalCenter
                         
@@ -206,7 +214,7 @@ Rectangle {
                     
                     Text {
                         text: root.networkType === "wifi" ? root.signalStrength + "%" : ""
-                        font.family: "MapleMono NF"
+                        font.family: "Sen"
                         font.pixelSize: 14
                         font.weight: Font.Bold
                         color: ThemeManager.accentBlue
@@ -215,14 +223,14 @@ Rectangle {
                     
                     Text {
                         text: "↓ " + root.downloadRate
-                        font.family: "MapleMono NF"
+                        font.family: "Sen"
                         font.pixelSize: 11
                         color: ThemeManager.fgSecondary
                     }
                     
                     Text {
                         text: "↑ " + root.uploadRate
-                        font.family: "MapleMono NF"
+                        font.family: "Sen"
                         font.pixelSize: 11
                         color: ThemeManager.fgSecondary
                     }
@@ -232,7 +240,7 @@ Rectangle {
                 Rectangle {
                     width: parent.width
                     height: 32
-                    color: netSettingsMouseArea.containsMouse ? ThemeManager.surface2 : ThemeManager.surface0
+                    color: netSettingsMouseArea.containsMouse ? Qt.rgba(1, 1, 1, 0.16) : Qt.rgba(1, 1, 1, 0.07)
                     radius: 8
                     
                     MouseArea {
@@ -251,7 +259,7 @@ Rectangle {
                     Text {
                         anchors.centerIn: parent
                         text: "Network Settings"
-                        font.family: "MapleMono NF"
+                        font.family: "Sen"
                         font.pixelSize: 13
                         color: ThemeManager.fgPrimary
                     }
@@ -263,8 +271,10 @@ Rectangle {
         Rectangle {
             width: parent.width
             height: 136
-            color: ThemeManager.surface1
+            color: Qt.rgba(1, 1, 1, 0.07)
             radius: 12
+            border.width: 1
+            border.color: Qt.rgba(1, 1, 1, 0.10)
             
             Column {
                 anchors.fill: parent
@@ -289,7 +299,7 @@ Rectangle {
                         
                         Text {
                             text: "Volume"
-                            font.family: "MapleMono NF"
+                            font.family: "Sen"
                             font.pixelSize: 16
                             font.weight: Font.Bold
                             color: ThemeManager.fgPrimary
@@ -297,7 +307,7 @@ Rectangle {
                         
                         Text {
                             text: root.muted ? "Muted" : root.volume + "%"
-                            font.family: "MapleMono NF"
+                            font.family: "Sen"
                             font.pixelSize: 13
                             color: ThemeManager.fgSecondary
                         }
@@ -308,7 +318,7 @@ Rectangle {
                 Rectangle {
                     width: parent.width
                     height: 8
-                    color: ThemeManager.surface0
+                    color: Qt.rgba(1, 1, 1, 0.07)
                     radius: 4
                     
                     Rectangle {
@@ -327,7 +337,7 @@ Rectangle {
                     Rectangle {
                         width: (parent.width - 16) / 3
                         height: 32
-                        color: volDownMouseArea.containsMouse ? ThemeManager.surface2 : ThemeManager.surface0
+                        color: volDownMouseArea.containsMouse ? Qt.rgba(1, 1, 1, 0.16) : Qt.rgba(1, 1, 1, 0.07)
                         radius: 8
                         
                         MouseArea {
@@ -351,7 +361,7 @@ Rectangle {
                     Rectangle {
                         width: (parent.width - 16) / 3
                         height: 32
-                        color: volMuteMouseArea.containsMouse ? ThemeManager.surface2 : ThemeManager.surface0
+                        color: volMuteMouseArea.containsMouse ? Qt.rgba(1, 1, 1, 0.16) : Qt.rgba(1, 1, 1, 0.07)
                         radius: 8
                         
                         MouseArea {
@@ -376,7 +386,7 @@ Rectangle {
                     Rectangle {
                         width: (parent.width - 16) / 3
                         height: 32
-                        color: volUpMouseArea.containsMouse ? ThemeManager.surface2 : ThemeManager.surface0
+                        color: volUpMouseArea.containsMouse ? Qt.rgba(1, 1, 1, 0.16) : Qt.rgba(1, 1, 1, 0.07)
                         radius: 8
                         
                         MouseArea {
@@ -404,8 +414,10 @@ Rectangle {
         Rectangle {
             width: parent.width
             height: Math.max(116, 80 + (bluetoothDevicesColumn.children.length * 28))
-            color: ThemeManager.surface1
+            color: Qt.rgba(1, 1, 1, 0.07)
             radius: 12
+            border.width: 1
+            border.color: Qt.rgba(1, 1, 1, 0.10)
             
             Column {
                 anchors.fill: parent
@@ -434,7 +446,7 @@ Rectangle {
                             
                             Text {
                                 text: "Bluetooth"
-                                font.family: "MapleMono NF"
+                                font.family: "Sen"
                                 font.pixelSize: 16
                                 font.weight: Font.Bold
                                 color: ThemeManager.fgPrimary
@@ -442,7 +454,7 @@ Rectangle {
                             
                             Text {
                                 text: root.bluetoothEnabled ? (root.bluetoothDevices.length > 0 ? root.bluetoothDevices.length + " device(s) connected" : "No devices connected") : "Off"
-                                font.family: "MapleMono NF"
+                                font.family: "Sen"
                                 font.pixelSize: 13
                                 color: ThemeManager.fgSecondary
                             }
@@ -454,7 +466,7 @@ Rectangle {
                         width: 48
                         height: 24
                         radius: 12
-                        color: root.bluetoothEnabled ? ThemeManager.accentBlue : ThemeManager.surface0
+                        color: root.bluetoothEnabled ? ThemeManager.accentBlue : Qt.rgba(1, 1, 1, 0.07)
                         anchors.right: parent.right
                         anchors.verticalCenter: parent.verticalCenter
                         
@@ -494,7 +506,7 @@ Rectangle {
                         model: root.bluetoothDevices
                         delegate: Text {
                             text: "  • " + modelData
-                            font.family: "MapleMono NF"
+                            font.family: "Sen"
                             font.pixelSize: 12
                             color: ThemeManager.fgSecondary
                         }
@@ -505,7 +517,7 @@ Rectangle {
                 Rectangle {
                     width: parent.width
                     height: 32
-                    color: btSettingsMouseArea.containsMouse ? ThemeManager.surface2 : ThemeManager.surface0
+                    color: btSettingsMouseArea.containsMouse ? Qt.rgba(1, 1, 1, 0.16) : Qt.rgba(1, 1, 1, 0.07)
                     radius: 8
                     
                     MouseArea {
@@ -523,7 +535,7 @@ Rectangle {
                     Text {
                         anchors.centerIn: parent
                         text: "Bluetooth Settings"
-                        font.family: "MapleMono NF"
+                        font.family: "Sen"
                         font.pixelSize: 13
                         color: ThemeManager.fgPrimary
                     }
@@ -535,8 +547,10 @@ Rectangle {
         Rectangle {
             width: parent.width
             height: 136
-            color: ThemeManager.surface1
+            color: Qt.rgba(1, 1, 1, 0.07)
             radius: 12
+            border.width: 1
+            border.color: Qt.rgba(1, 1, 1, 0.10)
             
             Column {
                 anchors.fill: parent
@@ -561,7 +575,7 @@ Rectangle {
                         
                         Text {
                             text: "Brightness"
-                            font.family: "MapleMono NF"
+                            font.family: "Sen"
                             font.pixelSize: 16
                             font.weight: Font.Bold
                             color: ThemeManager.fgPrimary
@@ -569,7 +583,7 @@ Rectangle {
                         
                         Text {
                             text: root.brightness + "%"
-                            font.family: "MapleMono NF"
+                            font.family: "Sen"
                             font.pixelSize: 13
                             color: ThemeManager.fgSecondary
                         }
@@ -580,7 +594,7 @@ Rectangle {
                 Rectangle {
                     width: parent.width
                     height: 8
-                    color: ThemeManager.surface0
+                    color: Qt.rgba(1, 1, 1, 0.07)
                     radius: 4
                     
                     Rectangle {
@@ -599,7 +613,7 @@ Rectangle {
                     Rectangle {
                         width: (parent.width - 8) / 2
                         height: 32
-                        color: brightDownMouseArea.containsMouse ? ThemeManager.surface2 : ThemeManager.surface0
+                        color: brightDownMouseArea.containsMouse ? Qt.rgba(1, 1, 1, 0.16) : Qt.rgba(1, 1, 1, 0.07)
                         radius: 8
                         
                         MouseArea {
@@ -623,7 +637,7 @@ Rectangle {
                     Rectangle {
                         width: (parent.width - 8) / 2
                         height: 32
-                        color: brightUpMouseArea.containsMouse ? ThemeManager.surface2 : ThemeManager.surface0
+                        color: brightUpMouseArea.containsMouse ? Qt.rgba(1, 1, 1, 0.16) : Qt.rgba(1, 1, 1, 0.07)
                         radius: 8
                         
                         MouseArea {
@@ -651,8 +665,10 @@ Rectangle {
         Rectangle {
             width: parent.width
             height: 116
-            color: ThemeManager.surface1
+            color: Qt.rgba(1, 1, 1, 0.07)
             radius: 12
+            border.width: 1
+            border.color: Qt.rgba(1, 1, 1, 0.10)
             
             Column {
                 anchors.fill: parent
@@ -699,7 +715,7 @@ Rectangle {
                                     if (root.charging) return "Charging"
                                     return "Battery"
                                 }
-                                font.family: "MapleMono NF"
+                                font.family: "Sen"
                                 font.pixelSize: 16
                                 font.weight: Font.Bold
                                 color: ThemeManager.fgPrimary
@@ -708,7 +724,7 @@ Rectangle {
                             
                             Text {
                                 text: root.batteryLevel + "%"
-                                font.family: "MapleMono NF"
+                                font.family: "Sen"
                                 font.pixelSize: 16
                                 font.weight: Font.Bold
                                 color: ThemeManager.accentBlue
@@ -719,7 +735,7 @@ Rectangle {
                         // Battery time info
                         Text {
                             text: root.batteryTimeRemaining
-                            font.family: "MapleMono NF"
+                            font.family: "Sen"
                             font.pixelSize: 12
                             color: ThemeManager.fgSecondary
                             visible: root.batteryTimeRemaining !== ""
@@ -729,7 +745,7 @@ Rectangle {
                         Rectangle {
                             width: 240
                             height: 8
-                            color: ThemeManager.surface0
+                            color: Qt.rgba(1, 1, 1, 0.07)
                             radius: 4
                             
                             Rectangle {
@@ -1177,5 +1193,33 @@ Rectangle {
         interval: 100
         repeat: false
         onTriggered: updateBrightness()
+    }
+
+    // Top specular highlight
+    Rectangle {
+        anchors.top: parent.top
+        anchors.left: parent.left
+        anchors.right: parent.right
+        height: 120
+        radius: 16
+        gradient: Gradient {
+            GradientStop { position: 0.0; color: Qt.rgba(1, 1, 1, 0.07) }
+            GradientStop { position: 1.0; color: Qt.rgba(1, 1, 1, 0.0) }
+        }
+        z: 10
+    }
+
+    // Bottom fade
+    Rectangle {
+        anchors.bottom: parent.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        height: 80
+        radius: 16
+        gradient: Gradient {
+            GradientStop { position: 0.0; color: Qt.rgba(0, 0, 0, 0.0) }
+            GradientStop { position: 1.0; color: Qt.rgba(0, 0, 0, 0.12) }
+        }
+        z: 10
     }
 }

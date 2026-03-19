@@ -29,11 +29,16 @@ Rectangle {
             anchors.centerIn: parent
             width: contentRow.width + 16
             height: 32
-            color: mouseArea.containsMouse ? ThemeManager.surface1 : ThemeManager.surface0
+            color: mouseArea.containsMouse ? Qt.rgba(1, 1, 1, 0.10) : "transparent"
             radius: 6
-            
+            border.width: mouseArea.containsMouse ? 1 : 0
+            border.color: Qt.rgba(1, 1, 1, 0.18)
+
             Behavior on color {
                 ColorAnimation { duration: 200 }
+            }
+            Behavior on border.width {
+                NumberAnimation { duration: 200 }
             }
             
             Row {
@@ -71,7 +76,7 @@ Rectangle {
                         }
                         return "No media"
                     }
-                    font.family: "MapleMono NF"
+                    font.family: "Sen"
                     font.pixelSize: 11
                     color: ThemeManager.fgPrimary
                     anchors.verticalCenter: parent.verticalCenter
@@ -82,7 +87,7 @@ Rectangle {
                     width: 24
                     height: 24
                     radius: 4
-                    color: prevMouseArea.containsMouse ? ThemeManager.surface2 : "transparent"
+                    color: prevMouseArea.containsMouse ? Qt.rgba(1, 1, 1, 0.12) : "transparent"
                     
                     Behavior on color {
                         ColorAnimation { duration: 150 }
@@ -114,7 +119,7 @@ Rectangle {
                     width: 24
                     height: 24
                     radius: 4
-                    color: nextMouseArea.containsMouse ? ThemeManager.surface2 : "transparent"
+                    color: nextMouseArea.containsMouse ? Qt.rgba(1, 1, 1, 0.12) : "transparent"
                     
                     Behavior on color {
                         ColorAnimation { duration: 150 }

@@ -9,13 +9,13 @@ sort=-time
 layer=overlay
 anchor=top-right
 margin=8
-padding=12
-border-size=2
-border-radius=12
-background-color=#212337
+padding=14
+border-size=1
+border-radius=16
+background-color=#212337E8
 text-color=#ebfafa
-border-color=#a48cf2
-progress-color=over #a48cf2
+border-color=#a48cf259
+progress-color=over #a48cf259
 
 # Default timeout
 default-timeout=10000
@@ -30,15 +30,15 @@ group-by=app-name
 
 # Urgency levels
 [urgency=low]
-border-color=#37f499
+border-color=#37f49959
 default-timeout=5000
 
 [urgency=normal]
-border-color=#a48cf2
+border-color=#a48cf259
 default-timeout=10000
 
 [urgency=critical]
-border-color=#f16c75
+border-color=#f16c7599
 default-timeout=0
 
 # Icons

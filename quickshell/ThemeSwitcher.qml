@@ -229,7 +229,7 @@ Scope {
                         Text {
                             anchors.centerIn: parent
                             text: "Select Theme"
-                            font.family: "MapleMono NF"
+                            font.family: "Sen"
                             font.pixelSize: ThemeManager.fontSizeLarge
                             font.weight: Font.DemiBold
                             color: ThemeManager.fgPrimary
@@ -247,7 +247,7 @@ Scope {
                             Text {
                                 anchors.centerIn: parent
                                 text: "✕"
-                                font.family: "Maple Mono NF"
+                                font.family: "Sen"
                                 font.pixelSize: 16
                                 font.weight: Font.Bold
                                 color: closeMouseArea.containsMouse ? ThemeManager.bgBase : ThemeManager.fgSecondary
@@ -313,7 +313,7 @@ Scope {
                             Text {
                                 anchors.centerIn: parent
                                 text: modelData
-                                font.family: "MapleMono NF"
+                                font.family: "Sen"
                                 font.pixelSize: ThemeManager.fontSizeNormal
                                 font.weight: Font.Medium
                                 color: {

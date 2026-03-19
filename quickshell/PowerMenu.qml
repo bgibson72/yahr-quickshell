@@ -1,17 +1,16 @@
 import QtQuick
-import QtQuick.Effects
 import Quickshell
 import Quickshell.Io
 
 Rectangle {
     id: root
-    
+
     width: 586
     height: 120
-    color: ThemeManager.bgBase
+    color: Qt.rgba(ThemeManager.bgBase.r, ThemeManager.bgBase.g, ThemeManager.bgBase.b, 0.92)
     radius: 16
-    border.width: 3
-    border.color: ThemeManager.accentBlue
+    border.width: 1
+    border.color: Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.35)
     antialiasing: true
     
     property bool isVisible: false
@@ -75,19 +74,24 @@ Rectangle {
         Rectangle {
             width: 70
             height: 70
-            color: lockMouseArea.containsMouse ? ThemeManager.accentBlue : "transparent"
+            color: lockMouseArea.containsMouse ? Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.25) : "transparent"
             radius: 12
-            
+            border.width: lockMouseArea.containsMouse ? 1 : 0
+            border.color: Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.5)
+
             Behavior on color {
                 ColorAnimation { duration: 150 }
             }
-            
+            Behavior on border.width {
+                NumberAnimation { duration: 150 }
+            }
+
             Text {
                 anchors.centerIn: parent
                 text: "󰌾"
                 font.family: "Symbols Nerd Font"
                 font.pixelSize: 32
-                color: lockMouseArea.containsMouse ? ThemeManager.bgBase : ThemeManager.fgPrimary
+                color: ThemeManager.fgPrimary
             }
             
             MouseArea {
@@ -103,19 +107,24 @@ Rectangle {
         Rectangle {
             width: 70
             height: 70
-            color: logoutMouseArea.containsMouse ? ThemeManager.accentBlue : "transparent"
+            color: logoutMouseArea.containsMouse ? Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.25) : "transparent"
             radius: 12
-            
+            border.width: logoutMouseArea.containsMouse ? 1 : 0
+            border.color: Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.5)
+
             Behavior on color {
                 ColorAnimation { duration: 150 }
             }
-            
+            Behavior on border.width {
+                NumberAnimation { duration: 150 }
+            }
+
             Text {
                 anchors.centerIn: parent
                 text: "󰍃"
                 font.family: "Symbols Nerd Font"
                 font.pixelSize: 32
-                color: logoutMouseArea.containsMouse ? ThemeManager.bgBase : ThemeManager.fgPrimary
+                color: ThemeManager.fgPrimary
             }
             
             MouseArea {
@@ -131,19 +140,24 @@ Rectangle {
         Rectangle {
             width: 70
             height: 70
-            color: suspendMouseArea.containsMouse ? ThemeManager.accentBlue : "transparent"
+            color: suspendMouseArea.containsMouse ? Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.25) : "transparent"
             radius: 12
-            
+            border.width: suspendMouseArea.containsMouse ? 1 : 0
+            border.color: Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.5)
+
             Behavior on color {
                 ColorAnimation { duration: 150 }
             }
-            
+            Behavior on border.width {
+                NumberAnimation { duration: 150 }
+            }
+
             Text {
                 anchors.centerIn: parent
                 text: "󰒲"
                 font.family: "Symbols Nerd Font"
                 font.pixelSize: 32
-                color: suspendMouseArea.containsMouse ? ThemeManager.bgBase : ThemeManager.fgPrimary
+                color: ThemeManager.fgPrimary
             }
             
             MouseArea {
@@ -159,19 +173,24 @@ Rectangle {
         Rectangle {
             width: 70
             height: 70
-            color: rebootMouseArea.containsMouse ? ThemeManager.accentRed : "transparent"
+            color: rebootMouseArea.containsMouse ? Qt.rgba(ThemeManager.accentRed.r, ThemeManager.accentRed.g, ThemeManager.accentRed.b, 0.25) : "transparent"
             radius: 12
-            
+            border.width: rebootMouseArea.containsMouse ? 1 : 0
+            border.color: Qt.rgba(ThemeManager.accentRed.r, ThemeManager.accentRed.g, ThemeManager.accentRed.b, 0.5)
+
             Behavior on color {
                 ColorAnimation { duration: 150 }
             }
-            
+            Behavior on border.width {
+                NumberAnimation { duration: 150 }
+            }
+
             Text {
                 anchors.centerIn: parent
                 text: "󰜉"
                 font.family: "Symbols Nerd Font"
                 font.pixelSize: 32
-                color: rebootMouseArea.containsMouse ? ThemeManager.bgBase : ThemeManager.fgPrimary
+                color: ThemeManager.fgPrimary
             }
             
             MouseArea {
@@ -187,19 +206,24 @@ Rectangle {
         Rectangle {
             width: 70
             height: 70
-            color: shutdownMouseArea.containsMouse ? ThemeManager.accentRed : "transparent"
+            color: shutdownMouseArea.containsMouse ? Qt.rgba(ThemeManager.accentRed.r, ThemeManager.accentRed.g, ThemeManager.accentRed.b, 0.25) : "transparent"
             radius: 12
-            
+            border.width: shutdownMouseArea.containsMouse ? 1 : 0
+            border.color: Qt.rgba(ThemeManager.accentRed.r, ThemeManager.accentRed.g, ThemeManager.accentRed.b, 0.5)
+
             Behavior on color {
                 ColorAnimation { duration: 150 }
             }
-            
+            Behavior on border.width {
+                NumberAnimation { duration: 150 }
+            }
+
             Text {
                 anchors.centerIn: parent
                 text: "󰐥"
                 font.family: "Symbols Nerd Font"
                 font.pixelSize: 32
-                color: shutdownMouseArea.containsMouse ? ThemeManager.bgBase : ThemeManager.fgPrimary
+                color: ThemeManager.fgPrimary
             }
             
             MouseArea {
@@ -215,11 +239,16 @@ Rectangle {
         Rectangle {
             width: 70
             height: 70
-            color: cancelMouseArea.containsMouse ? ThemeManager.surface0 : "transparent"
+            color: cancelMouseArea.containsMouse ? Qt.rgba(1, 1, 1, 0.10) : "transparent"
             radius: 12
-            
+            border.width: cancelMouseArea.containsMouse ? 1 : 0
+            border.color: Qt.rgba(1, 1, 1, 0.18)
+
             Behavior on color {
                 ColorAnimation { duration: 150 }
+            }
+            Behavior on border.width {
+                NumberAnimation { duration: 150 }
             }
             
             Text {
@@ -265,5 +294,33 @@ Rectangle {
         root.requestClose()
         executeTimer.pendingAction = action
         executeTimer.start()
+    }
+
+    // Top specular highlight
+    Rectangle {
+        anchors.top: parent.top
+        anchors.left: parent.left
+        anchors.right: parent.right
+        height: 60
+        radius: 16
+        gradient: Gradient {
+            GradientStop { position: 0.0; color: Qt.rgba(1, 1, 1, 0.07) }
+            GradientStop { position: 1.0; color: Qt.rgba(1, 1, 1, 0.0) }
+        }
+        z: 10
+    }
+
+    // Bottom fade
+    Rectangle {
+        anchors.bottom: parent.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        height: 40
+        radius: 16
+        gradient: Gradient {
+            GradientStop { position: 0.0; color: Qt.rgba(0, 0, 0, 0.0) }
+            GradientStop { position: 1.0; color: Qt.rgba(0, 0, 0, 0.12) }
+        }
+        z: 10
     }
 }
