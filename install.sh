@@ -334,6 +334,7 @@ install_gpu_drivers() {
         "qt6-5compat"
         "qt6-shadertools"
         "qt6-imageformats"
+        "qt6-svg"
         "glfw-wayland"
     )
     
