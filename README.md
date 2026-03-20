@@ -5,8 +5,9 @@ Complete Arch Linux desktop environment featuring Hyprland + Quickshell with uni
 ![yahr_home.png](previews/yahr_home.png)
 
 ## ✨ Features
-- 🎨 **11 Beautiful Themes** - Instant switching across all applications
-- 🖥️ **Quickshell Desktop** - Modern QML-based desktop environment
+- 🎨 **13 Beautiful Themes** - Instant switching across all applications
+- 🖥️ **Quickshell Desktop** - Modern QML-based desktop environment with glass/liquid glass UI
+- 🪟 **Glassmorphism UI** - Semi-transparent panels, frosted glass cards, and gradient borders throughout
 - ⚡ **Unified Theme System** - Synced themes for Hyprland, GTK, Kitty, Firefox, VSCodium, Discord, and more
 - 🎯 **GPU-Aware Installation** - Auto-detects and installs appropriate drivers (NVIDIA/AMD/Intel/Hybrid)
 - 🚀 **Fully Automated Installer** - One command from minimal Arch to complete desktop
@@ -178,6 +179,18 @@ Switch themes instantly with Super + T. All themes include matching wallpapers a
 ![tokyo_night.png](previews/tokyo_night.png)
 </details>
 
+<details>
+<summary><b>Monochrome</b></summary>
+
+*(preview coming soon)*
+</details>
+
+<details>
+<summary><b>Solarized</b></summary>
+
+*(preview coming soon)*
+</details>
+
 
 ### Custom Widgets
 
@@ -210,7 +223,7 @@ Full-featured calendar with Google Calendar iCal URL support. Displays events, r
 <details>
 <summary><b>Settings</b> - Super + Shift + S - Quickshell configuration panel</summary>
 
-Configure weather, clock format, screenshots, system tray visibility, theme selection, bar transparency, and bar position (top/bottom).
+Configure weather, clock format, screenshots, system tray visibility, theme selection, bar transparency, bar position (top/bottom), and Sip-StartPage installation.
 
 ![settings.png](previews/settings.png)
 </details>
@@ -239,8 +252,10 @@ Custom SDDM theme that automatically syncs colors and wallpaper with your select
 ### System Integration
 - Workspace management with visual indicators
 - System tray with audio, network, and updates
-- Notification system with urgency-based styling
+- Notification system with glass styling: semi-transparent background, thin accent border, and compositor blur
 - GTK theme synchronization
+- **Glass/Liquid Glass UI** - All widgets use semi-transparent panels, frosted glass cards, specular highlights, and smooth hover transitions
+- **Glass window borders** - Hyprland borders use a 45° gradient (dark shadow → theme accent → white specular), adapting to each theme
 - **Configurable bar position** - Toggle between top and bottom placement
 - **SDDM theme synchronization** - Login screen automatically syncs with system theme
 - **Firefox theme synchronization** - Automatic Firefox UI theming via userChrome.css
@@ -314,7 +329,24 @@ git push
 
 ### Key Features & Recent Improvements
 
-**Latest Updates (v1.3)**
+**Latest Updates (v1.4)**
+- **Glass/Liquid Glass UI Overhaul** - Complete redesign of all widgets with glassmorphism aesthetics
+  - Semi-transparent panel backgrounds (92% opacity) with 1px accent borders at 35% alpha
+  - Frosted glass cards with subtle white fill and border throughout
+  - Specular top-highlight and bottom-fade gradient overlays on all panels
+  - Smooth 150ms color transitions on all hover and active states
+- **Glass Window Borders** - Hyprland borders now use a 45° diagonal gradient per theme
+  - Dark shadow corner → theme accent color → white specular highlight
+  - Subtle inactive borders with near-transparent white gradient
+  - `$glass-accent-rgba` variable added to all 13 theme files
+- **Glass Notification Styling** - Mako updated to match the glass design language
+  - Semi-transparent background with thin accent border (urgency-aware)
+  - Compositor blur via Hyprland layerrule
+- **Consistent Close Buttons** - Unified glass close button style across all widgets
+- **Sip-StartPage** - Personal startpage installer replaces Bento in Settings
+- **AppLauncher Animation** - Refined slide-in from bounce to smooth cubic easing
+
+**Previous Updates (v1.3)**
 - **Google Calendar Integration** - Full iCal URL support with recurring events (RRULE)
   - Supports DAILY, WEEKLY, MONTHLY, and YEARLY recurring patterns
   - Handles BYDAY, UNTIL, INTERVAL, and COUNT parameters
@@ -349,6 +381,7 @@ git push
 - **Papirus Icons** - Folder colors automatically match active theme
 - **Starship** - Color-only updates preserving custom glyphs
 - **Hyprlock** - Lock screen colors match active theme
+- **Mako** - Notification glass styling (background, border color, and progress bar) adapts to active theme
 - **Fastfetch** - Logo updates to match theme
 
 ## Contributing
