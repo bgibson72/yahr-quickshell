@@ -3,64 +3,47 @@ import Quickshell
 
 Rectangle {
     id: powerButton
-    
-    width: contentRect.width + 20
+
+    width: 40
     height: 35
-    
-    color: "transparent"
-    
+
     signal togglePowerMenu()
-    
+
+    color: {
+        if (mouseArea.pressed) return Qt.rgba(ThemeManager.accentRed.r, ThemeManager.accentRed.g, ThemeManager.accentRed.b, 0.45)
+        if (mouseArea.containsMouse) return Qt.rgba(ThemeManager.accentRed.r, ThemeManager.accentRed.g, ThemeManager.accentRed.b, 0.30)
+        return "transparent"
+    }
+
+    radius: 6
+
+    border.width: mouseArea.containsMouse || mouseArea.pressed ? 1 : 0
+    border.color: Qt.rgba(ThemeManager.accentRed.r, ThemeManager.accentRed.g, ThemeManager.accentRed.b, 0.55)
+
+    Text {
+        anchors.centerIn: parent
+        text: "󰐥"
+        font.family: "Symbols Nerd Font"
+        font.pixelSize: 18
+        color: mouseArea.containsMouse || mouseArea.pressed ? ThemeManager.fgPrimary : ThemeManager.accentRed
+    }
+
     MouseArea {
         id: mouseArea
         anchors.fill: parent
         hoverEnabled: true
         cursorShape: Qt.PointingHandCursor
-        
+
         onClicked: {
             console.log("Power button clicked, opening power menu")
             powerButton.togglePowerMenu()
         }
-        
-        Rectangle {
-            id: contentRect
-            anchors.centerIn: parent
-            width: 50
-            height: 32
-            
-            color: {
-                if (mouseArea.pressed) return Qt.darker(ThemeManager.accentRed, 1.3)
-                else if (mouseArea.containsMouse) return ThemeManager.accentRed
-                else return ThemeManager.accentRed
-            }
-            radius: 6
-            
-            // Scale effect - smaller when pressed
-            scale: mouseArea.pressed ? 0.92 : 1.0
-            
-            // Subtle opacity change when pressed
-            opacity: mouseArea.pressed ? 0.8 : 1.0
-            
-            Text {
-                id: powerText
-                anchors.centerIn: parent
-                text: "󰐥"
-                font.family: "Symbols Nerd Font"
-                font.pixelSize: 18
-                color: ThemeManager.bgBase
-            }
-            
-            Behavior on color {
-                ColorAnimation { duration: 150 }
-            }
-            
-            Behavior on scale {
-                NumberAnimation { duration: 100; easing.type: Easing.OutQuad }
-            }
-            
-            Behavior on opacity {
-                NumberAnimation { duration: 100 }
-            }
-        }
+    }
+
+    Behavior on color {
+        ColorAnimation { duration: 150 }
+    }
+    Behavior on border.width {
+        NumberAnimation { duration: 150 }
     }
 }
