@@ -12,6 +12,8 @@ Item {
     property bool enableBlur: false
     property string position: "top"  // "top" or "bottom"
     property real barOpacity: 0.70  // Dynamic opacity value from settings
+    property bool showBorder: false
+    property bool floating: false
     
     signal toggleClipboard()
     signal toggleControlCenter()
@@ -43,6 +45,12 @@ Item {
                         }
                         if (settings.bar.barOpacity !== undefined) {
                             bar.barOpacity = settings.bar.barOpacity
+                        }
+                        if (settings.bar.showBorder !== undefined) {
+                            bar.showBorder = settings.bar.showBorder
+                        }
+                        if (settings.bar.floating !== undefined) {
+                            bar.floating = settings.bar.floating
                         }
                     }
                     if (settings.general && settings.general.enableBlur !== undefined) {
@@ -87,24 +95,32 @@ Item {
             if (bar.backgroundStyle === "opaque") return ThemeManager.bgBase
             return Qt.rgba(ThemeManager.bgBase.r, ThemeManager.bgBase.g, ThemeManager.bgBase.b, bar.barOpacity)
         }
+        radius: bar.floating ? 6 : 0
+        border.width: bar.showBorder ? 1 : 0
+        border.color: Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.35)
         z: -1
 
-        // Bottom edge accent line
+        Behavior on radius { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
+        Behavior on border.width { NumberAnimation { duration: 150 } }
+
+        // Bottom edge accent line — only when docked without a full border
         Rectangle {
             anchors.bottom: parent.bottom
             anchors.left: parent.left
             anchors.right: parent.right
             height: 1
             color: Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.35)
+            visible: !bar.showBorder && !bar.floating
         }
 
-        // Top specular highlight
+        // Top specular highlight — only when no border is shown
         Rectangle {
             anchors.top: parent.top
             anchors.left: parent.left
             anchors.right: parent.right
             height: 1
             color: Qt.rgba(1, 1, 1, 0.10)
+            visible: !bar.showBorder
         }
     }
     

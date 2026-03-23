@@ -260,6 +260,8 @@ SETTINGSEOF`
             
             barPositionBottomCheck.checked = root.settings.bar.position === "bottom"
             barAutoHideCheck.checked = root.settings.bar.autoHide === true
+            showBorderCheck.checked = root.settings.bar.showBorder === true
+            floatingBarCheck.checked = root.settings.bar.floating === true
         }
         
         // Wallpaper settings
@@ -1711,10 +1713,115 @@ SETTINGSEOF`
                                 }
                             }
                             
+                            // Bar Border Toggle
+                            Row {
+                                spacing: 12
+
+                                Rectangle {
+                                    width: 24
+                                    height: 24
+                                    radius: 4
+                                    color: showBorderCheck.checked ? ThemeManager.accentBlue : Qt.rgba(1, 1, 1, 0.07)
+                                    border.width: 2
+                                    border.color: ThemeManager.accentBlue
+
+                                    Text {
+                                        anchors.centerIn: parent
+                                        text: "✓"
+                                        font.family: "Symbols Nerd Font"
+                                        font.pixelSize: 16
+                                        color: ThemeManager.fgPrimary
+                                        visible: showBorderCheck.checked
+                                    }
+
+                                    MouseArea {
+                                        anchors.fill: parent
+                                        cursorShape: Qt.PointingHandCursor
+                                        onClicked: {
+                                            showBorderCheck.checked = !showBorderCheck.checked
+                                            if (!root.settings.bar) root.settings.bar = {}
+                                            root.settings.bar.showBorder = showBorderCheck.checked
+                                            saveSettings()
+                                        }
+                                    }
+                                }
+
+                                Text {
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    text: "Show 1px border around the bar"
+                                    font.family: "Sen"
+                                    font.pixelSize: 12
+                                    color: ThemeManager.fgPrimary
+                                }
+
+                                QtObject {
+                                    id: showBorderCheck
+                                    property bool checked: false
+                                }
+                            }
+
+                            // Floating Bar Toggle
+                            Row {
+                                spacing: 12
+
+                                Rectangle {
+                                    width: 24
+                                    height: 24
+                                    radius: 4
+                                    color: floatingBarCheck.checked ? ThemeManager.accentBlue : Qt.rgba(1, 1, 1, 0.07)
+                                    border.width: 2
+                                    border.color: ThemeManager.accentBlue
+
+                                    Text {
+                                        anchors.centerIn: parent
+                                        text: "✓"
+                                        font.family: "Symbols Nerd Font"
+                                        font.pixelSize: 16
+                                        color: ThemeManager.fgPrimary
+                                        visible: floatingBarCheck.checked
+                                    }
+
+                                    MouseArea {
+                                        anchors.fill: parent
+                                        cursorShape: Qt.PointingHandCursor
+                                        onClicked: {
+                                            floatingBarCheck.checked = !floatingBarCheck.checked
+                                            if (!root.settings.bar) root.settings.bar = {}
+                                            root.settings.bar.floating = floatingBarCheck.checked
+                                            saveSettings()
+                                        }
+                                    }
+                                }
+
+                                Column {
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    spacing: 2
+
+                                    Text {
+                                        text: "Floating bar"
+                                        font.family: "Sen"
+                                        font.pixelSize: 12
+                                        color: ThemeManager.fgPrimary
+                                    }
+
+                                    Text {
+                                        text: "Adds padding around the bar with rounded corners"
+                                        font.family: "Sen"
+                                        font.pixelSize: 10
+                                        color: ThemeManager.fgSecondary
+                                    }
+                                }
+
+                                QtObject {
+                                    id: floatingBarCheck
+                                    property bool checked: false
+                                }
+                            }
+
                             // Bar Position Toggle
                             Row {
                                 spacing: 12
-                                
+
                                 Rectangle {
                                     width: 24
                                     height: 24
@@ -1722,7 +1829,7 @@ SETTINGSEOF`
                                     color: barPositionBottomCheck.checked ? ThemeManager.accentBlue : Qt.rgba(1, 1, 1, 0.07)
                                     border.width: 2
                                     border.color: ThemeManager.accentBlue
-                                    
+
                                     Text {
                                         anchors.centerIn: parent
                                         text: "✓"
@@ -1731,7 +1838,7 @@ SETTINGSEOF`
                                         color: ThemeManager.fgPrimary
                                         visible: barPositionBottomCheck.checked
                                     }
-                                    
+
                                     MouseArea {
                                         anchors.fill: parent
                                         cursorShape: Qt.PointingHandCursor
@@ -1743,7 +1850,7 @@ SETTINGSEOF`
                                         }
                                     }
                                 }
-                                
+
                                 Text {
                                     anchors.verticalCenter: parent.verticalCenter
                                     text: "Position bar at bottom"
@@ -1751,7 +1858,7 @@ SETTINGSEOF`
                                     font.pixelSize: 12
                                     color: ThemeManager.fgPrimary
                                 }
-                                
+
                                 QtObject {
                                     id: barPositionBottomCheck
                                     property bool checked: false

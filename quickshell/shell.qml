@@ -579,6 +579,7 @@ ShellRoot {
             property bool barAtBottom: false
             property bool barAutoHide: false
             property bool barHovered: false
+            property bool barFloating: false
             
             // Load bar position and auto-hide settings
             Process {
@@ -604,6 +605,9 @@ ShellRoot {
                                 }
                                 if (settings.bar.autoHide !== undefined) {
                                     barAutoHide = settings.bar.autoHide
+                                }
+                                if (settings.bar.floating !== undefined) {
+                                    barFloating = settings.bar.floating
                                 }
                             }
                         } catch (e) {}
@@ -632,17 +636,25 @@ ShellRoot {
             color: "transparent"
             
             margins {
-                top: barAutoHide && !barHovered ? (barAtBottom ? 0 : -implicitHeight) : 0
-                bottom: barAutoHide && !barHovered ? (barAtBottom ? -implicitHeight : 0) : 0
-                left: 0
-                right: 0
+                top: barAutoHide && !barHovered ? (barAtBottom ? 0 : -implicitHeight) : (barFloating && !barAtBottom ? 8 : 0)
+                bottom: barAutoHide && !barHovered ? (barAtBottom ? -implicitHeight : 0) : (barFloating && barAtBottom ? 8 : 0)
+                left: barFloating ? 8 : 0
+                right: barFloating ? 8 : 0
             }
-            
+
             Behavior on margins.top {
                 NumberAnimation { duration: 200; easing.type: Easing.OutCubic }
             }
-            
+
             Behavior on margins.bottom {
+                NumberAnimation { duration: 200; easing.type: Easing.OutCubic }
+            }
+
+            Behavior on margins.left {
+                NumberAnimation { duration: 200; easing.type: Easing.OutCubic }
+            }
+
+            Behavior on margins.right {
                 NumberAnimation { duration: 200; easing.type: Easing.OutCubic }
             }
             
