@@ -18,10 +18,11 @@ Rectangle {
     property int backgroundBlur: config.intValue("BackgroundBlur") || 20
     property color themeColor: config.stringValue("ThemeColor") || "#82aaff"
     property color accentColor: config.stringValue("AccentColor") || "#c792ea"
-    property color bgBase: config.stringValue("BgBase") || "#292d3e"
-    property color bgSurface: config.stringValue("BgSurface") || "#1e2030"
-    property color fgPrimary: config.stringValue("FgPrimary") || "#d9d7ce"
-    property color fgSecondary: config.stringValue("FgSecondary") || "#7d83a1"
+    property color bgBase: config.stringValue("BgBase") || "#1e1e2e"
+    property color bgSurface: config.stringValue("BgSurface") || "#313244"
+    property color fgPrimary: config.stringValue("FgPrimary") || "#cdd6f4"
+    property color fgSecondary: config.stringValue("FgSecondary") || "#bac2de"
+    property color failColor: config.stringValue("FailColor") || "#f38ba8"
     property string fontFamily: config.stringValue("Font") || "MapleMono NF"
     property int fontSize: config.intValue("FontSize") || 11
     property int titleFontSize: config.intValue("TitleFontSize") || 32
@@ -280,7 +281,7 @@ Rectangle {
                     text: translateLoginFailed
                     font.family: fontFamily
                     font.pixelSize: fontSize - 1
-                    color: "#ff5370"
+                    color: failColor
                     horizontalAlignment: Text.AlignHCenter
                     visible: false
                     
@@ -380,18 +381,24 @@ Rectangle {
             PowerButton {
                 icon: "suspend"
                 text: translateSuspend
+                buttonBg: bgSurface
+                buttonFg: fgPrimary
                 onClicked: sddm.suspend()
             }
-            
+
             PowerButton {
                 icon: "reboot"
                 text: translateReboot
+                buttonBg: bgSurface
+                buttonFg: fgPrimary
                 onClicked: sddm.reboot()
             }
-            
+
             PowerButton {
                 icon: "shutdown"
                 text: translateShutdown
+                buttonBg: bgSurface
+                buttonFg: fgPrimary
                 onClicked: sddm.powerOff()
             }
         }

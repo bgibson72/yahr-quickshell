@@ -6,12 +6,14 @@ Rectangle {
     width: 64
     height: 64
     radius: 32
-    color: mouseArea.containsPress ? Qt.lighter("#1e2030", 1.3) :
-           mouseArea.containsMouse ? Qt.lighter("#1e2030", 1.2) : "#1e2030"
+    color: mouseArea.containsPress ? Qt.lighter(buttonBg, 1.3) :
+           mouseArea.containsMouse ? Qt.lighter(buttonBg, 1.2) : buttonBg
     opacity: 0.95
-    
+
     property string icon: ""
     property alias text: toolTip.text
+    property color buttonBg: "#313244"
+    property color buttonFg: "#cdd6f4"
     signal clicked()
     
     Behavior on color {
@@ -23,7 +25,7 @@ Rectangle {
         text: getIconText()
         font.family: "MapleMono NF"
         font.pixelSize: 24
-        color: mouseArea.containsPress ? Qt.darker("#d9d7ce", 1.2) : "#d9d7ce"
+        color: mouseArea.containsPress ? Qt.darker(buttonFg, 1.2) : buttonFg
         
         Behavior on color {
             ColorAnimation { duration: 150 }

@@ -25,6 +25,7 @@ get_color() {
 
 accent_blue=$(get_color '\$accent-blue')
 accent_purple=$(get_color '\$accent-purple')
+accent_red=$(get_color '\$accent-red')
 fg_primary=$(get_color '\$fg-primary')
 fg_secondary=$(get_color '\$fg-secondary')
 bg_base=$(get_color '\$bg-base')
@@ -33,6 +34,7 @@ surface0=$(get_color '\$surface-0')
 # Convert RGB hex to #RRGGBB format
 accent_blue="#$accent_blue"
 accent_purple="#$accent_purple"
+accent_red="#$accent_red"
 fg_primary="#$fg_primary"
 fg_secondary="#$fg_secondary"
 bg_base="#$bg_base"
@@ -68,7 +70,7 @@ fi
 echo "Syncing SDDM theme..."
 echo "  Theme: $current_theme"
 echo "  Wallpaper: $current_wallpaper"
-echo "  Colors: $accent_blue, $accent_purple, etc."
+echo "  Colors: $accent_blue, $accent_purple, $accent_red, etc."
 
 # Update theme.conf with extracted colors and wallpaper
 sudo tee "$THEME_CONF" > /dev/null << EOF
@@ -83,6 +85,7 @@ BgBase="$bg_base"
 BgSurface="$surface0"
 FgPrimary="$fg_primary"
 FgSecondary="$fg_secondary"
+FailColor="$accent_red"
 
 # Typography
 Font="MapleMono NF"
