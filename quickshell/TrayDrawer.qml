@@ -56,7 +56,7 @@ Item {
                 ? Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.30)
                 : Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.20)
 
-        border.width: toggleMouse.containsMouse || toggleMouse.pressed ? 1 : 0
+        border.width: trayDrawer.expanded || toggleMouse.containsMouse || toggleMouse.pressed ? 1 : 0
         border.color: Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.55)
 
         Behavior on color { ColorAnimation { duration: 150 } }
@@ -64,7 +64,7 @@ Item {
 
         Text {
             anchors.centerIn: parent
-            text: trayDrawer.expanded ? "\uf054" : "\uf053"
+            text: trayDrawer.expanded ? "\uf053" : "\uf077"
             font.family: "Symbols Nerd Font"
             font.pixelSize: 14
             color: ThemeManager.fgPrimary

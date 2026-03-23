@@ -26,10 +26,18 @@ Item {
                 width: 32
                 height: 32
                 radius: 6
-                color: chevronMouse.containsMouse ? 
-                    Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.3) :
-                    Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.2)
-                
+                color: chevronMouse.pressed
+                    ? Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.45)
+                    : chevronMouse.containsMouse
+                        ? Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.30)
+                        : Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.20)
+
+                border.width: chevronMouse.containsMouse || chevronMouse.pressed ? 1 : 0
+                border.color: Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.55)
+
+                Behavior on color { ColorAnimation { duration: 150 } }
+                Behavior on border.width { NumberAnimation { duration: 150 } }
+
                 Text {
                     anchors.centerIn: parent
                     text: drawer.expanded ? "\uf054" : "\uf077"
