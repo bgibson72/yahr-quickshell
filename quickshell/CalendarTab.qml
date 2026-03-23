@@ -328,11 +328,13 @@ Item {
                             property bool hasEvents: false
                             
                             color: {
-                                if (isValidDay && isCurrentDay) return ThemeManager.accentBlue
+                                if (isValidDay && isCurrentDay) return Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.30)
                                 if (isValidDay && isSelectedDay && !isCurrentDay) return Qt.rgba(1, 1, 1, 0.16)
                                 if (dayMouseArea.containsMouse && isValidDay) return Qt.rgba(Qt.rgba(1, 1, 1, 0.16).r, Qt.rgba(1, 1, 1, 0.16).g, Qt.rgba(1, 1, 1, 0.16).b, 0.5)
                                 return "transparent"
                             }
+                            border.width: isValidDay && isCurrentDay ? 1 : 0
+                            border.color: Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.55)
                             
                             MouseArea {
                                 id: dayMouseArea
@@ -356,7 +358,7 @@ Item {
                                     font.family: "Sen"
                                     font.pixelSize: 14
                                     color: {
-                                        if (parent.parent.isValidDay && parent.parent.isCurrentDay) return ThemeManager.bgBase
+                                        if (parent.parent.isValidDay && parent.parent.isCurrentDay) return ThemeManager.accentBlue
                                         if (!parent.parent.isValidDay) return ThemeManager.border0
                                         return ThemeManager.fgPrimary
                                     }
@@ -369,7 +371,7 @@ Item {
                                     height: 6
                                     radius: 3
                                     anchors.horizontalCenter: parent.horizontalCenter
-                                    color: parent.parent.parent.isCurrentDay ? ThemeManager.bgBase : ThemeManager.accentCyan
+                                    color: ThemeManager.accentCyan
                                     visible: false
                                 }
                             }
