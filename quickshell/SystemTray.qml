@@ -113,19 +113,6 @@ Rectangle {
         }
     }
     
-    // Shared background for all tray icons
-    Rectangle {
-        anchors.fill: parent
-        color: ThemeManager.surface0
-        radius: 6
-        border.width: 1
-        border.color: Qt.rgba(1, 1, 1, 0.10)
-
-        Behavior on color {
-            ColorAnimation { duration: 200 }
-        }
-    }
-    
     Row {
         id: trayRow
         anchors.centerIn: parent

@@ -159,18 +159,10 @@ Item {
             anchors.verticalCenter: parent.verticalCenter
             spacing: 8
             
-            ClipboardManager {
-                id: clipboardComponent
-                onToggleClipboard: {
-                    bar.toggleClipboard()
-                }
-            }
-            Updates {}
-            SystemTray {
-                id: systemTrayComponent
-                onToggleControlCenter: {
-                    bar.toggleControlCenter()
-                }
+            TrayDrawer {
+                id: trayDrawerComponent
+                onToggleClipboard: bar.toggleClipboard()
+                onToggleControlCenter: bar.toggleControlCenter()
             }
             PowerButton {
                 id: powerComponent
