@@ -747,7 +747,7 @@ check_dependencies() {
     fi
     
     if ! command_exists "thunar"; then
-        missing_recommended+=("thunar" "tumbler" "ffmpegthumbnailer" "thunar-archive-plugin" "thunar-media-tags-plugin" "thunar-volman")
+        missing_recommended+=("thunar" "tumbler" "ffmpegthumbnailer" "thunar-archive-plugin" "thunar-media-tags-plugin" "thunar-volman" "file-roller")
     fi
     
     if ! command_exists "firefox"; then
