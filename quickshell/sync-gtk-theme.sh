@@ -76,7 +76,7 @@ case "$theme_name" in
         icon_theme="Papirus-Dark"
         ;;
     "monochrome"|"Monochrome")
-        gtk_theme="Monochrome"
+        gtk_theme="Graphite-Dark"
         icon_theme="Papirus-Dark"
         ;;
     "solarized"|"Solarized"|"Solarized Dark")
