@@ -40,11 +40,11 @@ fg_secondary="#$fg_secondary"
 bg_base="#$bg_base"
 surface0="#$surface0"
 
-# Get current wallpaper from swww
+# Get current wallpaper from awww
 current_wallpaper=""
-if command -v swww &> /dev/null; then
-    # swww query returns format like: "eDP-1: ... image: /path/to/wallpaper"
-    wallpaper_line=$(swww query | head -n1)
+if command -v awww &> /dev/null; then
+    # awww query returns format like: "eDP-1: ... image: /path/to/wallpaper"
+    wallpaper_line=$(awww query | head -n1)
     if [[ $wallpaper_line =~ image:\ (.+)$ ]]; then
         current_wallpaper="${BASH_REMATCH[1]}"
         # Trim any trailing whitespace

@@ -292,14 +292,14 @@ set_theme_wallpaper() {
     
     echo "Setting wallpaper: $random_wallpaper"
     
-    # Use swww if available, otherwise try other wallpaper setters
-    if command -v swww &> /dev/null; then
-        # Check if swww-daemon is running, start it if not
-        if ! pgrep -x swww-daemon > /dev/null; then
-            swww-daemon &
+    # Use awww if available, otherwise try other wallpaper setters
+    if command -v awww &> /dev/null; then
+        # Check if awww-daemon is running, start it if not
+        if ! pgrep -x awww-daemon > /dev/null; then
+            awww-daemon &
             sleep 1
         fi
-        swww img "$random_wallpaper" --transition-type grow --transition-pos 0.5,0.5 --transition-duration 2
+        awww img "$random_wallpaper" --transition-type grow --transition-pos 0.5,0.5 --transition-duration 2
     elif command -v hyprpaper &> /dev/null; then
         # Configure hyprpaper
         cat > "$HOME/.config/hypr/hyprpaper.conf" << EOF
@@ -312,7 +312,7 @@ EOF
         killall swaybg 2>/dev/null
         swaybg -i "$random_wallpaper" -m fill &
     else
-        echo "No wallpaper setter found (swww, hyprpaper, or swaybg)"
+        echo "No wallpaper setter found (awww, hyprpaper, or swaybg)"
         return 1
     fi
     

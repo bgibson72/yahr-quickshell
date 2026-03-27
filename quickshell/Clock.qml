@@ -17,6 +17,9 @@ Rectangle {
 
     property bool use24Hour: false
     property bool showSeconds: false
+    property bool dateFormatDMY: false
+    property bool dateLong: false
+    property bool showDayOfWeek: false
 
     Behavior on color {
         ColorAnimation { duration: 200 }
@@ -78,6 +81,9 @@ Rectangle {
                     if (settings.general) {
                         clockArea.use24Hour = settings.general.clockFormat24hr === true
                         clockArea.showSeconds = settings.general.showSeconds === true
+                        clockArea.dateFormatDMY = settings.general.dateFormat === "DMY"
+                        clockArea.dateLong = settings.general.dateLong === true
+                        clockArea.showDayOfWeek = settings.general.showDayOfWeek === true
                     }
                 } catch (e) {
                     // Use defaults on error
@@ -101,17 +107,43 @@ Rectangle {
             let now = new Date()
             let month = (now.getMonth() + 1).toString().padStart(2, '0')
             let day = now.getDate().toString().padStart(2, '0')
+            let dayNum = now.getDate()
             let year = now.getFullYear()
             let hours = now.getHours()
             let minutes = now.getMinutes().toString().padStart(2, '0')
             let seconds = now.getSeconds().toString().padStart(2, '0')
-            
+
+            // Build date string
+            let dateStr
+            if (clockArea.dateLong) {
+                const monthNames = ["January", "February", "March", "April", "May", "June",
+                                    "July", "August", "September", "October", "November", "December"]
+                const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+                const monthName = monthNames[now.getMonth()]
+                let longDate
+                if (clockArea.dateFormatDMY) {
+                    longDate = `${dayNum} ${monthName} ${year}`
+                } else {
+                    longDate = `${monthName} ${dayNum}, ${year}`
+                }
+                if (clockArea.showDayOfWeek) {
+                    longDate = `${dayNames[now.getDay()]}, ${longDate}`
+                }
+                dateStr = longDate
+            } else {
+                if (clockArea.dateFormatDMY) {
+                    dateStr = `${day}/${month}/${year}`
+                } else {
+                    dateStr = `${month}/${day}/${year}`
+                }
+            }
+
             if (clockArea.use24Hour) {
                 // 24-hour format
                 let timeStr = clockArea.showSeconds 
                     ? `${hours.toString().padStart(2, '0')}:${minutes}:${seconds}`
                     : `${hours.toString().padStart(2, '0')}:${minutes}`
-                clockText.text = `${month}/${day}/${year}  ${timeStr}`
+                clockText.text = `${dateStr}  ${timeStr}`
             } else {
                 // 12-hour format with AM/PM
                 let ampm = hours >= 12 ? 'PM' : 'AM'
@@ -121,7 +153,7 @@ Rectangle {
                 let timeStr = clockArea.showSeconds 
                     ? `${hours}:${minutes}:${seconds}`
                     : `${hours}:${minutes}`
-                clockText.text = `${month}/${day}/${year}  ${timeStr} ${ampm}`
+                clockText.text = `${dateStr}  ${timeStr} ${ampm}`
             }
         }
     }

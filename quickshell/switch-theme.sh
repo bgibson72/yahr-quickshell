@@ -97,12 +97,12 @@ fi
 # Use HYPR_THEME (Title Case) for wallpaper directory name
 THEME_FOR_WALLPAPER="${HYPR_THEME:-$THEME}"
 WALLPAPER_DIR="$HOME/Pictures/Wallpapers/$THEME_FOR_WALLPAPER"
-if [ -d "$WALLPAPER_DIR" ] && command -v swww &> /dev/null; then
+if [ -d "$WALLPAPER_DIR" ] && command -v awww &> /dev/null; then
     # Get a random wallpaper from the theme directory
     WALLPAPER=$(find "$WALLPAPER_DIR" -type f \( -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" -o -iname "*.webp" \) | shuf -n 1)
     if [ -n "$WALLPAPER" ]; then
         echo "Updating wallpaper..."
-        swww img "$WALLPAPER" --transition-type fade --transition-fps 60 &
+        awww img "$WALLPAPER" --transition-type fade --transition-fps 60 &
         echo -e "${GREEN}✓ Wallpaper updated${NC}"
     fi
 fi

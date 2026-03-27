@@ -19,6 +19,7 @@ PanelWindow {
     property string currentTheme: ""
     property string wallpaperDir: ""
     property bool showAllWallpapers: false
+    property string pendingWallpaperPath: ""
     
     function show() {
         loadCurrentTheme()
@@ -34,18 +35,12 @@ PanelWindow {
         // Always reload theme from file when showing picker
         console.log("Loading current theme...")
         wallpaperModel.clear()  // Clear old wallpapers immediately
-        
-        // Load wallpaper settings
+        currentTheme = ""       // Reset to avoid stale value
+
+        // Load settings first; themeProcess is started from settingsLoader.onRunningChanged
+        // so that showAllWallpapers is always set before updateWallpaperDir() runs.
         settingsLoader.running = false
         settingsLoader.running = true
-        
-        // Read current theme from file
-        const themeFile = Quickshell.env("HOME") + "/.config/hypr/.current-theme"
-        currentTheme = "TokyoNight" // fallback
-        
-        // Force the process to restart
-        themeProcess.running = false
-        themeProcess.running = true
     }
     
     Process {
@@ -68,11 +63,17 @@ PanelWindow {
                     if (settings.wallpaper && settings.wallpaper.showAllWallpapers !== undefined) {
                         showAllWallpapers = settings.wallpaper.showAllWallpapers
                         console.log("Wallpaper filter mode:", showAllWallpapers ? "All wallpapers" : "Themed only")
+                    } else {
+                        showAllWallpapers = false
                     }
                 } catch (e) {
                     console.error("Failed to parse settings:", e)
+                    showAllWallpapers = false
                 }
                 buffer = ""
+                // Chain: now that settings are loaded, read the current theme
+                themeProcess.running = false
+                themeProcess.running = true
             } else if (running) {
                 buffer = ""
             }
@@ -83,14 +84,27 @@ PanelWindow {
         id: themeProcess
         running: false
         command: ["cat", Quickshell.env("HOME") + "/.config/hypr/.current-theme"]
-        
+
+        property string buffer: ""
+
         stdout: SplitParser {
             onRead: data => {
-                const theme = data.trim()
+                themeProcess.buffer += data
+            }
+        }
+
+        onRunningChanged: {
+            if (!running && buffer !== "") {
+                const theme = buffer.trim()
                 if (theme.length > 0) {
                     currentTheme = theme
+                } else {
+                    currentTheme = "TokyoNight" // fallback for empty file
                 }
+                buffer = ""
                 updateWallpaperDir()
+            } else if (running) {
+                buffer = ""
             }
         }
     }
@@ -397,31 +411,35 @@ PanelWindow {
 
     function setWallpaper(path) {
         console.log("Setting wallpaper:", path)
-        
-        // Check if swww-daemon is running
+        pendingWallpaperPath = path
+        // Check daemon status first; applyWallpaper() is called from swwwCheck.onExited
         swwwCheck.running = true
-        
-        // Set wallpaper
-        Qt.callLater(() => {
-            Quickshell.execDetached([
-                "swww", "img", path,
-                "--transition-type", "grow",
-                "--transition-pos", "0.5,0.5",
-                "--transition-duration", "2"
-            ])
-            
-            // Delay SDDM sync to ensure swww completes
-            sddmSyncTimer.start()
-            
-            // Show notification
-            Quickshell.execDetached([
-                "notify-send", "Wallpaper Changed", 
-                path.split('/').pop()
-            ])
-            
-            // Close picker
-            wallpaperWindow.hide()
-        })
+    }
+
+    function applyWallpaper() {
+        const path = pendingWallpaperPath
+        if (!path) return
+        pendingWallpaperPath = ""
+
+        Quickshell.execDetached([
+            "awww", "img", path,
+            "--transition-type", "grow",
+            "--transition-pos", "0.5,0.5",
+            "--transition-duration", "2"
+        ])
+
+        // Persist last wallpaper path so autostart can restore it on next login
+        Quickshell.execDetached(["bash", "-c",
+            'printf "%s" "$1" > ~/.config/quickshell/last-wallpaper', "--", path])
+
+        sddmSyncTimer.start()
+
+        Quickshell.execDetached([
+            "notify-send", "Wallpaper Changed",
+            path.split('/').pop()
+        ])
+
+        wallpaperWindow.hide()
     }
     
     Timer {
@@ -434,16 +452,28 @@ PanelWindow {
             Quickshell.execDetached(["sh", "-c", sddmSync])
         }
     }
-    
+
+    // If swww-daemon wasn't running, give it time to initialize before applying
+    Timer {
+        id: daemonStartTimer
+        interval: 800
+        repeat: false
+        onTriggered: applyWallpaper()
+    }
+
     Process {
         id: swwwCheck
         running: false
-        command: ["pgrep", "-x", "swww-daemon"]
+        command: ["pgrep", "-x", "awww-daemon"]
         
         onExited: (code, status) => {
             if (code !== 0) {
-                // Start swww-daemon if not running
-                Quickshell.execDetached(["swww-daemon"])
+                // Daemon not running — start it and wait for it to initialize
+                Quickshell.execDetached(["awww-daemon"])
+                daemonStartTimer.start()
+            } else {
+                // Daemon already running — safe to apply immediately
+                applyWallpaper()
             }
         }
     }

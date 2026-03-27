@@ -125,6 +125,9 @@ Rectangle {
                             useFahrenheit: true,
                             clockFormat24hr: true,
                             showSeconds: false,
+                            dateFormat: "MDY",
+                            dateLong: false,
+                            showDayOfWeek: false,
                             enableBlur: false
                         },
                         screenshot: {
@@ -223,6 +226,9 @@ SETTINGSEOF`
         useFahrenheit.checked = root.settings.general.useFahrenheit !== false
         clockFormat24hr.checked = root.settings.general.clockFormat24hr !== false
         showSeconds.checked = root.settings.general.showSeconds === true
+        dateFormatDMY.checked = root.settings.general.dateFormat === "DMY"
+        dateLong.checked = root.settings.general.dateLong === true
+        showDayOfWeek.checked = root.settings.general.showDayOfWeek === true
         
         // Calendar settings
         if (root.settings.calendar) {
@@ -558,6 +564,175 @@ SETTINGSEOF`
                                 
                                 QtObject {
                                     id: showSeconds
+                                    property bool checked: false
+                                }
+                            }
+
+                            // Date format (MM/DD/YYYY vs DD/MM/YYYY)
+                            Row {
+                                spacing: 12
+
+                                Rectangle {
+                                    width: 24
+                                    height: 24
+                                    radius: 4
+                                    color: dateFormatDMY.checked ? ThemeManager.accentBlue : Qt.rgba(1, 1, 1, 0.07)
+                                    border.width: 2
+                                    border.color: ThemeManager.accentBlue
+
+                                    Text {
+                                        anchors.centerIn: parent
+                                        text: "✓"
+                                        font.family: "Symbols Nerd Font"
+                                        font.pixelSize: 16
+                                        color: ThemeManager.fgPrimary
+                                        visible: dateFormatDMY.checked
+                                    }
+
+                                    MouseArea {
+                                        anchors.fill: parent
+                                        cursorShape: Qt.PointingHandCursor
+                                        onClicked: {
+                                            dateFormatDMY.checked = !dateFormatDMY.checked
+                                            root.settings.general.dateFormat = dateFormatDMY.checked ? "DMY" : "MDY"
+                                            saveSettings()
+                                        }
+                                    }
+                                }
+
+                                Column {
+                                    spacing: 2
+
+                                    Text {
+                                        text: "Use DD/MM/YYYY date format"
+                                        font.family: "Sen"
+                                        font.pixelSize: 12
+                                        color: ThemeManager.fgPrimary
+                                    }
+
+                                    Text {
+                                        text: dateFormatDMY.checked ? "Currently: DD/MM/YYYY" : "Currently: MM/DD/YYYY"
+                                        font.family: "Sen"
+                                        font.pixelSize: 10
+                                        color: ThemeManager.fgTertiary
+                                    }
+                                }
+
+                                QtObject {
+                                    id: dateFormatDMY
+                                    property bool checked: false
+                                }
+                            }
+
+                            // Long date format
+                            Row {
+                                spacing: 12
+
+                                Rectangle {
+                                    width: 24
+                                    height: 24
+                                    radius: 4
+                                    color: dateLong.checked ? ThemeManager.accentBlue : Qt.rgba(1, 1, 1, 0.07)
+                                    border.width: 2
+                                    border.color: ThemeManager.accentBlue
+
+                                    Text {
+                                        anchors.centerIn: parent
+                                        text: "✓"
+                                        font.family: "Symbols Nerd Font"
+                                        font.pixelSize: 16
+                                        color: ThemeManager.fgPrimary
+                                        visible: dateLong.checked
+                                    }
+
+                                    MouseArea {
+                                        anchors.fill: parent
+                                        cursorShape: Qt.PointingHandCursor
+                                        onClicked: {
+                                            dateLong.checked = !dateLong.checked
+                                            root.settings.general.dateLong = dateLong.checked
+                                            saveSettings()
+                                        }
+                                    }
+                                }
+
+                                Column {
+                                    spacing: 2
+
+                                    Text {
+                                        text: "Use long date format"
+                                        font.family: "Sen"
+                                        font.pixelSize: 12
+                                        color: ThemeManager.fgPrimary
+                                    }
+
+                                    Text {
+                                        text: dateFormatDMY.checked ? "e.g., 25 March 2026" : "e.g., March 25, 2026"
+                                        font.family: "Sen"
+                                        font.pixelSize: 10
+                                        color: ThemeManager.fgTertiary
+                                    }
+                                }
+
+                                QtObject {
+                                    id: dateLong
+                                    property bool checked: false
+                                }
+                            }
+
+                            // Show day of week (only visible when long date format is enabled)
+                            Row {
+                                spacing: 12
+                                visible: dateLong.checked
+
+                                Rectangle {
+                                    width: 24
+                                    height: 24
+                                    radius: 4
+                                    color: showDayOfWeek.checked ? ThemeManager.accentBlue : Qt.rgba(1, 1, 1, 0.07)
+                                    border.width: 2
+                                    border.color: ThemeManager.accentBlue
+
+                                    Text {
+                                        anchors.centerIn: parent
+                                        text: "✓"
+                                        font.family: "Symbols Nerd Font"
+                                        font.pixelSize: 16
+                                        color: ThemeManager.fgPrimary
+                                        visible: showDayOfWeek.checked
+                                    }
+
+                                    MouseArea {
+                                        anchors.fill: parent
+                                        cursorShape: Qt.PointingHandCursor
+                                        onClicked: {
+                                            showDayOfWeek.checked = !showDayOfWeek.checked
+                                            root.settings.general.showDayOfWeek = showDayOfWeek.checked
+                                            saveSettings()
+                                        }
+                                    }
+                                }
+
+                                Column {
+                                    spacing: 2
+
+                                    Text {
+                                        text: "Show day of week"
+                                        font.family: "Sen"
+                                        font.pixelSize: 12
+                                        color: ThemeManager.fgPrimary
+                                    }
+
+                                    Text {
+                                        text: dateFormatDMY.checked ? "e.g., Wednesday, 25 March 2026" : "e.g., Wednesday, March 25, 2026"
+                                        font.family: "Sen"
+                                        font.pixelSize: 10
+                                        color: ThemeManager.fgTertiary
+                                    }
+                                }
+
+                                QtObject {
+                                    id: showDayOfWeek
                                     property bool checked: false
                                 }
                             }

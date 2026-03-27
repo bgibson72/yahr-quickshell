@@ -112,8 +112,9 @@ Rectangle {
             width: 420
             height: column.height + 80
             radius: 28
-            color: bgSurface
-            opacity: 0.97
+            color: Qt.rgba(bgBase.r, bgBase.g, bgBase.b, 0.45)
+            border.width: 1
+            border.color: Qt.rgba(fgPrimary.r, fgPrimary.g, fgPrimary.b, 0.12)
             
             layer.enabled: true
             layer.effect: DropShadow {
@@ -196,13 +197,9 @@ Rectangle {
                     width: parent.width
                     height: 52
                     radius: 14
-                    color: Qt.lighter(bgSurface, 1.3)
-                    border.width: usernameField.activeFocus ? 2 : 1
-                    border.color: usernameField.activeFocus ? themeColor : Qt.rgba(fgSecondary.r, fgSecondary.g, fgSecondary.b, 0.2)
-                    
-                    Behavior on border.width {
-                        NumberAnimation { duration: 150 }
-                    }
+                    color: Qt.rgba(fgPrimary.r, fgPrimary.g, fgPrimary.b, 0.05)
+                    border.width: 1
+                    border.color: usernameField.activeFocus ? themeColor : Qt.rgba(fgPrimary.r, fgPrimary.g, fgPrimary.b, 0.18)
                     
                     Behavior on border.color {
                         ColorAnimation { duration: 150 }
@@ -234,13 +231,9 @@ Rectangle {
                     width: parent.width
                     height: 52
                     radius: 14
-                    color: Qt.lighter(bgSurface, 1.3)
-                    border.width: passwordField.activeFocus ? 2 : 1
-                    border.color: passwordField.activeFocus ? themeColor : Qt.rgba(fgSecondary.r, fgSecondary.g, fgSecondary.b, 0.2)
-                    
-                    Behavior on border.width {
-                        NumberAnimation { duration: 150 }
-                    }
+                    color: Qt.rgba(fgPrimary.r, fgPrimary.g, fgPrimary.b, 0.05)
+                    border.width: 1
+                    border.color: passwordField.activeFocus ? themeColor : Qt.rgba(fgPrimary.r, fgPrimary.g, fgPrimary.b, 0.18)
                     
                     Behavior on border.color {
                         ColorAnimation { duration: 150 }
@@ -299,19 +292,17 @@ Rectangle {
                     width: parent.width
                     height: 52
                     radius: 14
-                    color: loginMouseArea.containsPress ? Qt.darker(themeColor, 1.2) : 
-                           loginMouseArea.containsMouse ? Qt.lighter(themeColor, 1.15) : themeColor
-                    
-                    layer.enabled: true
-                    layer.effect: DropShadow {
-                        horizontalOffset: 0
-                        verticalOffset: 4
-                        radius: 12
-                        samples: 25
-                        color: Qt.rgba(themeColor.r, themeColor.g, themeColor.b, 0.4)
-                    }
+                    color: loginMouseArea.containsPress ? Qt.rgba(themeColor.r, themeColor.g, themeColor.b, 0.35) :
+                           loginMouseArea.containsMouse ? Qt.rgba(themeColor.r, themeColor.g, themeColor.b, 0.25) :
+                                                          Qt.rgba(themeColor.r, themeColor.g, themeColor.b, 0.15)
+                    border.width: 1
+                    border.color: Qt.rgba(themeColor.r, themeColor.g, themeColor.b, loginMouseArea.containsMouse ? 0.9 : 0.55)
                     
                     Behavior on color {
+                        ColorAnimation { duration: 150 }
+                    }
+                    
+                    Behavior on border.color {
                         ColorAnimation { duration: 150 }
                     }
                     
@@ -322,7 +313,7 @@ Rectangle {
                         font.pixelSize: fontSize + 3
                         font.weight: Font.Medium
                         font.capitalization: Font.AllUppercase
-                        color: bgBase
+                        color: themeColor
                     }
                     
                     MouseArea {

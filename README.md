@@ -15,6 +15,9 @@ Complete Arch Linux desktop environment featuring Hyprland + Quickshell with uni
 - 📦 **Complete Graphics Stack** - Wayland, Mesa, Vulkan, Qt5/Qt6 support
 - 🔧 **Two Installation Modes** - Full (all features) or Minimal (core only)
 - ⚙️ **YOLO Mode** - Completely unattended installation option
+- 🕐 **Flexible Date & Clock Formats** - Toggle 12/24hr, MM/DD/YYYY vs DD/MM/YYYY, numeric or long date, optional day-of-week
+- 🖼️ **Smart Wallpaper Picker** - Browse theme-matched or all wallpapers; persists across reboots
+- 🔒 **Synced Login Screen** - SDDM and Hyprlock date format follows your Settings choices automatically
 
 ## 📋 Prerequisites
 
@@ -223,7 +226,14 @@ Full-featured calendar with Google Calendar iCal URL support. Displays events, r
 <details>
 <summary><b>Settings</b> - Super + Shift + S - Quickshell configuration panel</summary>
 
-Configure weather, clock format, screenshots, system tray visibility, theme selection, bar transparency, bar position (top/bottom), and Sip-StartPage installation.
+Configure weather, clock format, date format, screenshots, system tray visibility, theme selection, bar transparency, bar position (top/bottom), and Sip-StartPage installation.
+
+**Widgets tab options:**
+- **Clock** — 12/24-hour format, show/hide seconds
+- **Date format** — MM/DD/YYYY or DD/MM/YYYY
+- **Long date** — numeric (`03/27/2026`) or long form (`March 27, 2026` / `27 March 2026`)
+- **Day of week** — prepend weekday when long date is enabled (e.g. `Wednesday, March 27, 2026`)
+- **Wallpaper picker** — show theme-only or all wallpapers
 
 ![settings.png](previews/settings.png)
 </details>
@@ -236,6 +246,8 @@ Configure weather, clock format, screenshots, system tray visibility, theme sele
 
 <details>
 <summary><b>Wallpaper Picker</b> - Super + Shift + W - Browse and select wallpapers</summary>
+
+Browse wallpapers for your current theme or toggle "Show all wallpapers" in Settings to see every wallpaper across all themes. Selected wallpaper persists across reboots and is automatically restored on login.
 
 ![wallpaper_picker.png](previews/wallpaper_picker.png)
 </details>
@@ -329,7 +341,19 @@ git push
 
 ### Key Features & Recent Improvements
 
-**Latest Updates (v1.4)**
+**Latest Updates (v1.5)**
+- **Flexible Date Format Controls** - New Widgets tab options in Settings:
+  - Toggle between MM/DD/YYYY and DD/MM/YYYY layouts
+  - Switch between numeric date (`03/27/2026`) and long-form (`March 27, 2026` or `27 March 2026`)
+  - Optional day-of-week prefix on long format (e.g. `Wednesday, March 27, 2026`)
+  - All three options dynamically update the bar clock in real time
+- **SDDM & Hyprlock Date Sync** - `sync-sddm-theme.sh` and `sync-hyprlock-theme.sh` now read date format settings and apply the matching Qt/strftime format strings to the login and lock screens automatically
+- **Wallpaper Picker Reliability** - Fixed race between daemon check and `awww img` call; wallpaper is now only applied after the daemon is confirmed running (or given 800 ms to start if it wasn't)
+- **Wallpaper Persistence** - Last chosen wallpaper is saved to `~/.config/quickshell/last-wallpaper` and automatically restored on every login via `autostart.conf`
+- **Correct Theme-Filtered Wallpapers** - Fixed a race condition where the picker could show wallpapers from a previous theme; settings and current-theme file are now loaded sequentially before the directory is resolved
+- **awww wallpaper daemon support** - All wallpaper calls updated from `swww` → `awww`/`awww-daemon` to match the installed binary
+
+**Previous Updates (v1.4)**
 - **Glass/Liquid Glass UI Overhaul** - Complete redesign of all widgets with glassmorphism aesthetics
   - Semi-transparent panel backgrounds (92% opacity) with 1px accent borders at 35% alpha
   - Frosted glass cards with subtle white fill and border throughout

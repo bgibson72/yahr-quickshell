@@ -4,6 +4,7 @@
 
 HYPRLOCK_CONF="$HOME/.config/hypr/hyprlock.conf"
 HYPRLAND_CONF="$HOME/.config/hypr/hyprland.conf"
+SETTINGS_JSON="$HOME/.config/quickshell/settings.json"
 
 # Get current theme from Hyprland config (most reliable source during theme switches)
 THEME_FILE=$(grep "^source.*themes.*\.conf" "$HYPRLAND_CONF" | sed 's/.*= *//')
@@ -68,8 +69,41 @@ sed -i "s/placeholder_text = .*/placeholder_text = Enter Password.../" "$HYPRLOC
 # Update fail text color in span
 sed -i "s/fail_text = <span foreground=\"#[0-9a-fA-F]\{6\}\"><b>\$FAIL/fail_text = <span foreground=\"#$accent_red\"><b>\$FAIL/g" "$HYPRLOCK_CONF"
 
+# Update date format in the Date Display label
+# Read date format settings from quickshell settings.json
+DATE_FORMAT_DMY=false
+DATE_LONG=false
+SHOW_DAY_OF_WEEK=false
+if [ -f "$SETTINGS_JSON" ] && command -v python3 &>/dev/null; then
+    DATE_FORMAT_DMY=$(python3 -c "import json; d=json.load(open('$SETTINGS_JSON')); print(str(d.get('general',{}).get('dateFormat','MDY')=='DMY').lower())" 2>/dev/null || echo false)
+    DATE_LONG=$(python3 -c "import json; d=json.load(open('$SETTINGS_JSON')); print(str(d.get('general',{}).get('dateLong',False)).lower())" 2>/dev/null || echo false)
+    SHOW_DAY_OF_WEEK=$(python3 -c "import json; d=json.load(open('$SETTINGS_JSON')); print(str(d.get('general',{}).get('showDayOfWeek',False)).lower())" 2>/dev/null || echo false)
+fi
+
+# Build date shell format string for hyprlock's date +... command
+if [ "$DATE_LONG" = "true" ]; then
+    if [ "$DATE_FORMAT_DMY" = "true" ]; then
+        DATE_CMD_FMT="%-d %B %Y"       # e.g. 25 March 2026
+    else
+        DATE_CMD_FMT="%B %-d, %Y"      # e.g. March 25, 2026
+    fi
+    if [ "$SHOW_DAY_OF_WEEK" = "true" ]; then
+        DATE_CMD_FMT="%A, $DATE_CMD_FMT"  # e.g. Wednesday, March 25, 2026
+    fi
+else
+    if [ "$DATE_FORMAT_DMY" = "true" ]; then
+        DATE_CMD_FMT="%d/%m/%Y"        # e.g. 25/03/2026
+    else
+        DATE_CMD_FMT="%m/%d/%Y"        # e.g. 03/25/2026
+    fi
+fi
+
+# Replace the date format inside the Date Display label's text line
+sed -i "/# Date Display/,/position = 0, 120/ s|text = cmd\[update:[0-9]*\] date +\"[^\"]*\"|text = cmd[update:60000] date +\"$DATE_CMD_FMT\"|" "$HYPRLOCK_CONF"
+
 echo "✓ Hyprlock colors updated for $theme_name theme"
 echo "  Inner: $inner_color"
 echo "  Outer: $outer_color"
 echo "  Check: $check_color"
 echo "  Fail: $fail_color"
+echo "  Date format: $DATE_CMD_FMT"

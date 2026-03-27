@@ -6,9 +6,11 @@ Rectangle {
     width: 64
     height: 64
     radius: 32
-    color: mouseArea.containsPress ? Qt.lighter(buttonBg, 1.3) :
-           mouseArea.containsMouse ? Qt.lighter(buttonBg, 1.2) : buttonBg
-    opacity: 0.95
+    color: mouseArea.containsPress ? Qt.rgba(buttonFg.r, buttonFg.g, buttonFg.b, 0.25) :
+           mouseArea.containsMouse ? Qt.rgba(buttonFg.r, buttonFg.g, buttonFg.b, 0.15) :
+                                     Qt.rgba(buttonBg.r, buttonBg.g, buttonBg.b, 0.35)
+    border.width: 1
+    border.color: Qt.rgba(buttonFg.r, buttonFg.g, buttonFg.b, mouseArea.containsMouse ? 0.35 : 0.18)
 
     property string icon: ""
     property alias text: toolTip.text
@@ -17,6 +19,10 @@ Rectangle {
     signal clicked()
     
     Behavior on color {
+        ColorAnimation { duration: 150 }
+    }
+    
+    Behavior on border.color {
         ColorAnimation { duration: 150 }
     }
     
