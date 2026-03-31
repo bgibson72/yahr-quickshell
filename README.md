@@ -114,6 +114,8 @@ cd yahr-quickshell
 ## 🎨 Included Themes
 Switch themes instantly with Super + T. All themes include matching wallpapers and synchronized colors across all applications.
 
+![yahr_quickshell.png](previews/yahr_quickshell.png)
+
 <details>
 <summary><b>Catppuccin (Mocha) - Default Theme</b></summary>
 
@@ -129,13 +131,13 @@ Switch themes instantly with Super + T. All themes include matching wallpapers a
 <details>
 <summary><b>Dracula</b></summary>
 
-*(preview coming soon)*
+![dracula.png](previews/dracula.png)
 </details>
 
 <details>
 <summary><b>Eldritch</b></summary>
 
-*(preview coming soon)*
+![eldritch.png](previews/eldritch.png)
 </details>
 
 <details>
@@ -199,6 +201,12 @@ Switch themes instantly with Super + T. All themes include matching wallpapers a
 <summary><b>App Launcher</b> - Super + A - Fuzzy search application launcher</summary>
 
 ![app_launcher.png](previews/app_launcher.png)
+</details>
+
+<details>
+<summary><b>Control Center</b> - Quick access panel for system controls</summary>
+
+![control_center.png](previews/control_center.png)
 </details>
 
 <details>
