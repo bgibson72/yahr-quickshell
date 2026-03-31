@@ -2,6 +2,8 @@
 
 Complete Arch Linux desktop environment featuring Hyprland + Quickshell with unified theme system and comprehensive automated installation.
 
+![yahr_quickshell.png](previews/yahr_quickshell.png)
+
 ## ✨ Features
 - 🎨 **13 Beautiful Themes** - Instant switching across all applications
 - 🖥️ **Quickshell Desktop** - Modern QML-based desktop environment with glass/liquid glass UI
@@ -113,8 +115,6 @@ cd yahr-quickshell
 
 ## 🎨 Included Themes
 Switch themes instantly with Super + T. All themes include matching wallpapers and synchronized colors across all applications.
-
-![yahr_quickshell.png](previews/yahr_quickshell.png)
 
 <details>
 <summary><b>Catppuccin (Mocha) - Default Theme</b></summary>
