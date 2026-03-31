@@ -63,7 +63,7 @@ case "$theme_name" in
         folder_color="black"  # Monochrome black/white aesthetic
         ;;
     "solarized"|"Solarized")
-        folder_color="yaru"  # Solarized balanced colors
+        folder_color="cyan"  # Closest match to Solarized cyan (#2aa198)
         ;;
     *)
         folder_color="blue"  # Default fallback
