@@ -196,10 +196,39 @@ update_gtk_theme() {
             ;;
     esac
     
-        # Apply the themes
+    # Apply the themes
     if [[ -n "$gtk_theme" && -n "$icon_theme" ]]; then
-        gsettings set org.gnome.desktop.interface gtk-theme "$gtk_theme"
-        gsettings set org.gnome.desktop.interface icon-theme "$icon_theme"
+        # Write settings.ini directly (works even when gsettings/dconf is unavailable)
+        mkdir -p "$HOME/.config/gtk-3.0" "$HOME/.config/gtk-4.0"
+        local gtk3_settings="$HOME/.config/gtk-3.0/settings.ini"
+        local gtk4_settings="$HOME/.config/gtk-4.0/settings.ini"
+
+        cat > "$gtk3_settings" << EOF
+[Settings]
+gtk-theme-name=$gtk_theme
+gtk-icon-theme-name=$icon_theme
+gtk-font-name=Maple Mono NF 10
+gtk-cursor-theme-name=default
+gtk-cursor-theme-size=24
+gtk-application-prefer-dark-theme=1
+EOF
+        cat > "$gtk4_settings" << EOF
+[Settings]
+gtk-theme-name=$gtk_theme
+gtk-icon-theme-name=$icon_theme
+gtk-application-prefer-dark-theme=1
+EOF
+
+        # Also update via gsettings (higher priority for running GTK3 apps)
+        gsettings set org.gnome.desktop.interface gtk-theme "$gtk_theme" 2>/dev/null || true
+        gsettings set org.gnome.desktop.interface icon-theme "$icon_theme" 2>/dev/null || true
+        gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark' 2>/dev/null || true
+
+        # Restart Thunar so it picks up the new theme immediately
+        pkill thunar 2>/dev/null || true
+        sleep 0.3
+        thunar --daemon 2>/dev/null &
+
         echo "Updated GTK theme to: $gtk_theme"
         echo "Updated icon theme to: $icon_theme"
     else
