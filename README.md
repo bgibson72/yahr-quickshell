@@ -2,8 +2,6 @@
 
 Complete Arch Linux desktop environment featuring Hyprland + Quickshell with unified theme system and comprehensive automated installation.
 
-![yahr_home.png](previews/yahr_home.png)
-
 ## ✨ Features
 - 🎨 **13 Beautiful Themes** - Instant switching across all applications
 - 🖥️ **Quickshell Desktop** - Modern QML-based desktop environment with glass/liquid glass UI
@@ -131,13 +129,13 @@ Switch themes instantly with Super + T. All themes include matching wallpapers a
 <details>
 <summary><b>Dracula</b></summary>
 
-![dracula.png](previews/dracula.png)
+*(preview coming soon)*
 </details>
 
 <details>
 <summary><b>Eldritch</b></summary>
 
-![eldritch.png](previews/eldritch.png)
+*(preview coming soon)*
 </details>
 
 <details>
@@ -185,13 +183,13 @@ Switch themes instantly with Super + T. All themes include matching wallpapers a
 <details>
 <summary><b>Monochrome</b></summary>
 
-*(preview coming soon)*
+![monochrome.png](previews/monochrome.png)
 </details>
 
 <details>
 <summary><b>Solarized</b></summary>
 
-*(preview coming soon)*
+![solarized.png](previews/solarized.png)
 </details>
 
 
@@ -208,7 +206,7 @@ Switch themes instantly with Super + T. All themes include matching wallpapers a
 
 Full-featured calendar with Google Calendar iCal URL support. Displays events, recurring events (daily, weekly, monthly, yearly), all-day events, and timezone-aware events. Click any day to view its events. Event indicators show which days have scheduled events. Auto-refreshes every 15 minutes.
 
-![calendar.png](previews/calendar.png)
+![calendar_widgets.png](previews/calendar_widgets.png)
 </details>
 
 <details>
@@ -257,7 +255,7 @@ Browse wallpapers for your current theme or toggle "Show all wallpapers" in Sett
 
 Custom SDDM theme that automatically syncs colors and wallpaper with your selected theme. Test without logging out using: `sddm-greeter-qt6 --test-mode --theme /usr/share/sddm/themes/yahr-theme`
 
-![sddm_preview.png](previews/sddm_preview.png)
+![sddm_screenshot.png](previews/sddm_screenshot.png)
 </details>
 
 
