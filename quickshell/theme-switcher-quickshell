@@ -189,6 +189,10 @@ update_gtk_theme() {
             gtk_theme="Graphite-Dark"
             icon_theme="Papirus-Dark"
             ;;
+        "Solarized")
+            gtk_theme="Osaka-BL-LB-Dark-Solarized"
+            icon_theme="Papirus-Dark"
+            ;;
         *)
             # Default fallback
             gtk_theme="Adwaita-dark"

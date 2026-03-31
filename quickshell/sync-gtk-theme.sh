@@ -55,8 +55,8 @@ case "$theme_name" in
         gtk_theme="Rose-Pine"
         icon_theme="Papirus-Dark"
         ;;
-    "solarized-dark"|"Solarized Dark")
-        gtk_theme="Solarized-Dark"
+    "solarized-dark"|"Solarized Dark"|"Solarized")
+        gtk_theme="Osaka-BL-LB-Dark-Solarized"
         icon_theme="Papirus-Dark"
         ;;
     "material"|"Material"|"Material Palenight")
@@ -80,7 +80,7 @@ case "$theme_name" in
         icon_theme="Papirus-Dark"
         ;;
     "solarized"|"Solarized"|"Solarized Dark")
-        gtk_theme="Solarized-Dark"
+        gtk_theme="Osaka-BL-LB-Dark-Solarized"
         icon_theme="Papirus-Dark"
         ;;
     *)
