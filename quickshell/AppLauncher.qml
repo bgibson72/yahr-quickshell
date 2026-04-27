@@ -10,12 +10,14 @@ Rectangle {
     height: 600
     color: Qt.rgba(ThemeManager.bgBase.r, ThemeManager.bgBase.g, ThemeManager.bgBase.b, 0.92)
     radius: 20
-    border.width: 1
+    border.width: showWidgetBorders ? widgetBorderWidth : 0
     border.color: Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.35)
     antialiasing: true
 
     property bool isVisible: false
     property bool enableBlur: false
+    property bool showWidgetBorders: true
+    property int widgetBorderWidth: 1
 
     property int selectedIndex: -1
     property int hoverIndex: -1
@@ -110,6 +112,12 @@ Rectangle {
                     const settings = JSON.parse(buffer)
                     if (settings.general && settings.general.enableBlur !== undefined) {
                         root.enableBlur = settings.general.enableBlur
+                    }
+                    if (settings.general && settings.general.showWidgetBorders !== undefined) {
+                        root.showWidgetBorders = settings.general.showWidgetBorders !== false
+                    }
+                    if (settings.general && settings.general.widgetBorderWidth !== undefined) {
+                        root.widgetBorderWidth = settings.general.widgetBorderWidth
                     }
                 } catch (e) {}
                 buffer = ""

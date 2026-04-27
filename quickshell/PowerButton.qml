@@ -4,8 +4,8 @@ import Quickshell
 Rectangle {
     id: powerButton
 
-    width: 40
-    height: 35
+    width: 34
+    height: 34
 
     signal togglePowerMenu()
 
@@ -21,10 +21,12 @@ Rectangle {
     border.color: Qt.rgba(ThemeManager.accentRed.r, ThemeManager.accentRed.g, ThemeManager.accentRed.b, 0.55)
 
     Text {
-        anchors.centerIn: parent
+        anchors.fill: parent
         text: "󰐥"
         font.family: "Symbols Nerd Font"
         font.pixelSize: 18
+        horizontalAlignment: Text.AlignHCenter
+        verticalAlignment: Text.AlignVCenter
         color: mouseArea.containsMouse || mouseArea.pressed ? ThemeManager.fgPrimary : ThemeManager.accentRed
     }
 

@@ -14,6 +14,8 @@ PanelWindow {
     visible: false
     
     property bool enableBlur: false
+    property bool showWidgetBorders: true
+    property int widgetBorderWidth: 1
     
     anchors {
         top: true
@@ -77,6 +79,12 @@ PanelWindow {
                     }
                     if (settings.general && settings.general.enableBlur !== undefined) {
                         screenshotWindow.enableBlur = settings.general.enableBlur
+                    }
+                    if (settings.general && settings.general.showWidgetBorders !== undefined) {
+                        screenshotWindow.showWidgetBorders = settings.general.showWidgetBorders !== false
+                    }
+                    if (settings.general && settings.general.widgetBorderWidth !== undefined) {
+                        screenshotWindow.widgetBorderWidth = settings.general.widgetBorderWidth
                     }
                 } catch (e) {
                     console.error("Failed to load screenshot settings:", e)
@@ -161,7 +169,7 @@ PanelWindow {
         anchors.fill: parent
         color: Qt.rgba(ThemeManager.bgBase.r, ThemeManager.bgBase.g, ThemeManager.bgBase.b, 0.92)
         radius: 16
-        border.width: 1
+        border.width: screenshotWindow.showWidgetBorders ? screenshotWindow.widgetBorderWidth : 0
         border.color: Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.35)
         antialiasing: true
         

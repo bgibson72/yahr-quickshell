@@ -580,6 +580,7 @@ ShellRoot {
             property bool barAutoHide: false
             property bool barHovered: false
             property bool barFloating: false
+            property string barSize: "small"
             
             // Load bar position and auto-hide settings
             Process {
@@ -609,6 +610,9 @@ ShellRoot {
                                 if (settings.bar.floating !== undefined) {
                                     barFloating = settings.bar.floating
                                 }
+                                if (settings.bar.barSize !== undefined) {
+                                    barSize = settings.bar.barSize
+                                }
                             }
                         } catch (e) {}
                         buffer = ""
@@ -632,7 +636,7 @@ ShellRoot {
                 right: true
             }
             
-            implicitHeight: 42
+            implicitHeight: barSize === "large" ? 53 : 42
             color: "transparent"
             
             margins {

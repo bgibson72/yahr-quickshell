@@ -11,7 +11,7 @@ Rectangle {
     height: 600
     color: Qt.rgba(ThemeManager.bgBase.r, ThemeManager.bgBase.g, ThemeManager.bgBase.b, 0.92)
     radius: 16
-    border.width: 1
+    border.width: showWidgetBorders ? widgetBorderWidth : 0
     border.color: Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.35)
     antialiasing: true
     
@@ -21,6 +21,17 @@ Rectangle {
     property var themes: []
     property bool applyButtonSuccess: false
     property bool enableBlur: false
+    property bool showWidgetBorders: true
+    property int widgetBorderWidth: 1
+
+    // Hyprland live-settings
+    property int hyprBorderSize: 1
+    property int hyprGapsIn: 5
+    property int hyprGapsOut: 10
+    property int hyprRounding: 12
+    property bool hyprAnimations: true
+    property bool hyprShadow: true
+    property bool hyprBlur: true
     
     signal closeRequested()
     signal settingsUpdated()  // Signal to notify when settings change
@@ -32,6 +43,7 @@ Rectangle {
         if (isVisible) {
             loadSettings()
             loadThemes()
+            loadHyprlandSettings()
             root.forceActiveFocus()
         }
     }
@@ -71,7 +83,8 @@ Rectangle {
                             useFahrenheit: true,
                             clockFormat24hr: true,
                             showSeconds: false,
-                            enableBlur: false
+                            enableBlur: false,
+                            showWidgetBorders: true
                         }
                     }
                     if (!root.settings.calendar) {
@@ -96,7 +109,9 @@ Rectangle {
                     }
                     if (!root.settings.bar) {
                         root.settings.bar = {
-                            transparentBackground: false
+                            transparentBackground: false,
+                            showQuickLaunch: true,
+                            showSystemTray: true
                         }
                     }
                     if (!root.settings.theme) {
@@ -268,8 +283,16 @@ SETTINGSEOF`
             barAutoHideCheck.checked = root.settings.bar.autoHide === true
             showBorderCheck.checked = root.settings.bar.showBorder === true
             floatingBarCheck.checked = root.settings.bar.floating === true
+            showQuickLaunchCheck.checked = root.settings.bar.showQuickLaunch !== false
+            showSystemTrayCheck.checked = root.settings.bar.showSystemTray !== false
+            barSizeLargeCheck.checked = root.settings.bar.barSize === "large"
         }
         
+        // Widget borders
+        root.showWidgetBorders = root.settings.general ? root.settings.general.showWidgetBorders !== false : true
+        root.widgetBorderWidth = (root.settings.general && root.settings.general.widgetBorderWidth !== undefined)
+            ? root.settings.general.widgetBorderWidth : 1
+
         // Wallpaper settings
         if (root.settings.wallpaper) {
             showAllWallpapers.checked = root.settings.wallpaper.showAllWallpapers === true
@@ -299,6 +322,67 @@ SETTINGSEOF`
     
     ListModel {
         id: themeModel
+    }
+
+    // Load Hyprland settings from look-and-feel.conf
+    function loadHyprlandSettings() {
+        hyprlandLoader.running = true
+    }
+
+    Process {
+        id: hyprlandLoader
+        running: false
+        command: ["sh", "-c", `
+            CONFIG="$HOME/.config/hypr/look-and-feel.conf"
+            border=$(grep 'border_size = ' "$CONFIG" 2>/dev/null | grep -oE '[0-9]+' | head -1)
+            gaps_in=$(grep 'gaps_in = ' "$CONFIG" 2>/dev/null | grep -oE '[0-9]+' | head -1)
+            gaps_out=$(grep 'gaps_out = ' "$CONFIG" 2>/dev/null | grep -oE '[0-9]+' | head -1)
+            rounding=$(grep 'rounding = ' "$CONFIG" 2>/dev/null | grep -oE '[0-9]+' | head -1)
+            shadow=$(grep -A 10 'shadow {' "$CONFIG" 2>/dev/null | grep 'enabled' | grep -c 'true' || echo 0)
+            blur=$(grep -A 10 'blur {' "$CONFIG" 2>/dev/null | grep 'enabled' | grep -c 'true' || echo 0)
+            anim=$(grep -A 5 'animations {' "$CONFIG" 2>/dev/null | grep 'enabled' | grep -c 'yes' || echo 0)
+            echo "$border $gaps_in $gaps_out $rounding $shadow $blur $anim"
+        `]
+
+        property string buffer: ""
+
+        stdout: SplitParser {
+            onRead: data => { hyprlandLoader.buffer += data }
+        }
+
+        onRunningChanged: {
+            if (!running && buffer !== "") {
+                const parts = buffer.trim().split(" ")
+                if (parts.length >= 7) {
+                    const bs = parseInt(parts[0]) || 1
+                    root.hyprBorderSize = bs
+                    root.hyprGapsIn = parseInt(parts[1]) || 5
+                    root.hyprGapsOut = parseInt(parts[2]) || 10
+                    root.hyprRounding = parseInt(parts[3]) || 12
+                    root.hyprShadow = parts[4] === "1"
+                    root.hyprBlur = parts[5] === "1"
+                    root.hyprAnimations = parts[6] === "1"
+
+                    hyprBorderEnabledCheck.checked = bs > 0
+                    hyprBorderThicknessObj.value = bs > 0 ? bs : 1
+                    hyprGapsInObj.value = root.hyprGapsIn
+                    hyprGapsOutObj.value = root.hyprGapsOut
+                    hyprRoundingObj.value = root.hyprRounding
+                    hyprAnimationsCheck.checked = root.hyprAnimations
+                    hyprShadowCheck.checked = root.hyprShadow
+                    hyprBlurCheck.checked = root.hyprBlur
+                }
+                buffer = ""
+            } else if (running) {
+                buffer = ""
+            }
+        }
+    }
+
+    // Apply a Hyprland keyword live and persist to conf
+    function applyHypr(hyprKey, value, sedExpr) {
+        Quickshell.execDetached(["hyprctl", "keyword", hyprKey, String(value)])
+        Quickshell.execDetached(["sh", "-c", sedExpr + ' "$HOME/.config/hypr/look-and-feel.conf"'])
     }
     
     function applyTheme(themeName) {
@@ -394,10 +478,10 @@ SETTINGSEOF`
                 spacing: 8
 
                 Repeater {
-                    model: ["Widgets", "Screenshots", "Bar", "Theme"]
+                    model: ["Widgets", "Screenshots", "Bar", "Hyprland", "Theme"]
 
                     Rectangle {
-                        width: (parent.width - 24) / 4
+                        width: (parent.width - 30) / 5
                         height: parent.height
                         radius: 8
                         color: tabBar.currentIndex === index ? Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.30) : "transparent"
@@ -1923,7 +2007,7 @@ SETTINGSEOF`
 
                                 Text {
                                     anchors.verticalCenter: parent.verticalCenter
-                                    text: "Show 1px border around the bar"
+                                    text: "Show border around bar"
                                     font.family: "Sen"
                                     font.pixelSize: 12
                                     color: ThemeManager.fgPrimary
@@ -1989,6 +2073,64 @@ SETTINGSEOF`
 
                                 QtObject {
                                     id: floatingBarCheck
+                                    property bool checked: false
+                                }
+                            }
+
+                            // Bar Size Toggle
+                            Row {
+                                spacing: 12
+
+                                Rectangle {
+                                    width: 24
+                                    height: 24
+                                    radius: 4
+                                    color: barSizeLargeCheck.checked ? ThemeManager.accentBlue : Qt.rgba(1, 1, 1, 0.07)
+                                    border.width: 2
+                                    border.color: ThemeManager.accentBlue
+
+                                    Text {
+                                        anchors.centerIn: parent
+                                        text: "✓"
+                                        font.family: "Symbols Nerd Font"
+                                        font.pixelSize: 16
+                                        color: ThemeManager.fgPrimary
+                                        visible: barSizeLargeCheck.checked
+                                    }
+
+                                    MouseArea {
+                                        anchors.fill: parent
+                                        cursorShape: Qt.PointingHandCursor
+                                        onClicked: {
+                                            barSizeLargeCheck.checked = !barSizeLargeCheck.checked
+                                            if (!root.settings.bar) root.settings.bar = {}
+                                            root.settings.bar.barSize = barSizeLargeCheck.checked ? "large" : "small"
+                                            saveSettings()
+                                        }
+                                    }
+                                }
+
+                                Column {
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    spacing: 2
+
+                                    Text {
+                                        text: "Use chonky bar"
+                                        font.family: "Sen"
+                                        font.pixelSize: 12
+                                        color: ThemeManager.fgPrimary
+                                    }
+
+                                    Text {
+                                        text: "Increases bar height by 25% (53px vs 42px)"
+                                        font.family: "Sen"
+                                        font.pixelSize: 10
+                                        color: ThemeManager.fgSecondary
+                                    }
+                                }
+
+                                QtObject {
+                                    id: barSizeLargeCheck
                                     property bool checked: false
                                 }
                             }
@@ -2097,7 +2239,123 @@ SETTINGSEOF`
                                     property bool checked: false
                                 }
                             }
-                            
+
+                            // Show Quick Launch Drawer Toggle
+                            Row {
+                                spacing: 12
+
+                                Rectangle {
+                                    width: 24
+                                    height: 24
+                                    radius: 4
+                                    color: showQuickLaunchCheck.checked ? ThemeManager.accentBlue : Qt.rgba(1, 1, 1, 0.07)
+                                    border.width: 2
+                                    border.color: ThemeManager.accentBlue
+
+                                    Text {
+                                        anchors.centerIn: parent
+                                        text: "✓"
+                                        font.family: "Symbols Nerd Font"
+                                        font.pixelSize: 16
+                                        color: ThemeManager.fgPrimary
+                                        visible: showQuickLaunchCheck.checked
+                                    }
+
+                                    MouseArea {
+                                        anchors.fill: parent
+                                        cursorShape: Qt.PointingHandCursor
+                                        onClicked: {
+                                            showQuickLaunchCheck.checked = !showQuickLaunchCheck.checked
+                                            if (!root.settings.bar) root.settings.bar = {}
+                                            root.settings.bar.showQuickLaunch = showQuickLaunchCheck.checked
+                                            saveSettings()
+                                        }
+                                    }
+                                }
+
+                                Column {
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    spacing: 2
+
+                                    Text {
+                                        text: "Show quick launch drawer"
+                                        font.family: "Sen"
+                                        font.pixelSize: 12
+                                        color: ThemeManager.fgPrimary
+                                    }
+
+                                    Text {
+                                        text: "Chevron button and quick launch icons on the left"
+                                        font.family: "Sen"
+                                        font.pixelSize: 10
+                                        color: ThemeManager.fgSecondary
+                                    }
+                                }
+
+                                QtObject {
+                                    id: showQuickLaunchCheck
+                                    property bool checked: true
+                                }
+                            }
+
+                            // Show System Tray Toggle
+                            Row {
+                                spacing: 12
+
+                                Rectangle {
+                                    width: 24
+                                    height: 24
+                                    radius: 4
+                                    color: showSystemTrayCheck.checked ? ThemeManager.accentBlue : Qt.rgba(1, 1, 1, 0.07)
+                                    border.width: 2
+                                    border.color: ThemeManager.accentBlue
+
+                                    Text {
+                                        anchors.centerIn: parent
+                                        text: "✓"
+                                        font.family: "Symbols Nerd Font"
+                                        font.pixelSize: 16
+                                        color: ThemeManager.fgPrimary
+                                        visible: showSystemTrayCheck.checked
+                                    }
+
+                                    MouseArea {
+                                        anchors.fill: parent
+                                        cursorShape: Qt.PointingHandCursor
+                                        onClicked: {
+                                            showSystemTrayCheck.checked = !showSystemTrayCheck.checked
+                                            if (!root.settings.bar) root.settings.bar = {}
+                                            root.settings.bar.showSystemTray = showSystemTrayCheck.checked
+                                            saveSettings()
+                                        }
+                                    }
+                                }
+
+                                Column {
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    spacing: 2
+
+                                    Text {
+                                        text: "Show system tray icons"
+                                        font.family: "Sen"
+                                        font.pixelSize: 12
+                                        color: ThemeManager.fgPrimary
+                                    }
+
+                                    Text {
+                                        text: "Clipboard, updates, and status icons on the right"
+                                        font.family: "Sen"
+                                        font.pixelSize: 10
+                                        color: ThemeManager.fgSecondary
+                                    }
+                                }
+
+                                QtObject {
+                                    id: showSystemTrayCheck
+                                    property bool checked: true
+                                }
+                            }
+
                             // Show Battery Details
                             Row {
                                 spacing: 12
@@ -2242,6 +2500,617 @@ SETTINGSEOF`
                     }
                 }
                 
+                // Hyprland Tab
+                ScrollView {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    clip: true
+
+                    ColumnLayout {
+                        width: parent.parent.width - 32
+                        spacing: 32
+
+                        // ========== WINDOW DECORATIONS ==========
+                        Column {
+                            Layout.fillWidth: true
+                            spacing: 16
+
+                            Rectangle {
+                                width: parent.width
+                                height: 2
+                                color: ThemeManager.accentBlue
+                                opacity: 0.3
+                            }
+
+                            Text {
+                                text: "🪟 Window Decorations"
+                                font.family: "Sen"
+                                font.pixelSize: 18
+                                font.weight: Font.Bold
+                                color: ThemeManager.accentBlue
+                            }
+
+                            Text {
+                                text: "Changes apply live via Hyprland and are saved to look-and-feel.conf."
+                                font.family: "Sen"
+                                font.pixelSize: 11
+                                color: ThemeManager.fgSecondary
+                                wrapMode: Text.WordWrap
+                                width: parent.width
+                            }
+
+                            // Border Enabled
+                            Row {
+                                spacing: 12
+
+                                Rectangle {
+                                    width: 24
+                                    height: 24
+                                    radius: 4
+                                    color: hyprBorderEnabledCheck.checked ? ThemeManager.accentBlue : Qt.rgba(1, 1, 1, 0.07)
+                                    border.width: 2
+                                    border.color: ThemeManager.accentBlue
+
+                                    Text {
+                                        anchors.centerIn: parent
+                                        text: "✓"
+                                        font.family: "Symbols Nerd Font"
+                                        font.pixelSize: 16
+                                        color: ThemeManager.fgPrimary
+                                        visible: hyprBorderEnabledCheck.checked
+                                    }
+
+                                    MouseArea {
+                                        anchors.fill: parent
+                                        cursorShape: Qt.PointingHandCursor
+                                        onClicked: {
+                                            hyprBorderEnabledCheck.checked = !hyprBorderEnabledCheck.checked
+                                            const sz = hyprBorderEnabledCheck.checked ? hyprBorderThicknessObj.value : 0
+                                            root.applyHypr("general:border_size", sz,
+                                                `sed -i -E 's/border_size = [0-9]+/border_size = ${sz}/'`)
+                                            // Sync widget borders setting
+                                            if (!root.settings.general) root.settings.general = {}
+                                            if (!root.settings.bar) root.settings.bar = {}
+                                            root.settings.general.showWidgetBorders = hyprBorderEnabledCheck.checked
+                                            root.settings.bar.showBorder = hyprBorderEnabledCheck.checked
+                                            root.showWidgetBorders = hyprBorderEnabledCheck.checked
+                                            saveSettings()
+                                            // Sync mako border thickness (0 when borders disabled)
+                                            Quickshell.execDetached(["sh", "-c",
+                                                `sed -i 's/^border-size=.*/border-size=${sz}/' "$HOME/.config/mako/config" && makoctl reload 2>/dev/null`])
+                                        }
+                                    }
+                                }
+
+                                Text {
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    text: "Enable window borders"
+                                    font.family: "Sen"
+                                    font.pixelSize: 12
+                                    color: ThemeManager.fgPrimary
+                                }
+
+                                QtObject {
+                                    id: hyprBorderEnabledCheck
+                                    property bool checked: true
+                                }
+                            }
+
+                            // Border Thickness
+                            Column {
+                                spacing: 8
+                                width: parent.width - 40
+                                leftPadding: 20
+                                opacity: hyprBorderEnabledCheck.checked ? 1.0 : 0.5
+
+                                Text {
+                                    text: "Border thickness: " + hyprBorderThicknessObj.value + "px"
+                                    font.family: "Sen"
+                                    font.pixelSize: 12
+                                    color: ThemeManager.fgPrimary
+                                }
+
+                                Item {
+                                    width: parent.width - 40
+                                    height: 32
+
+                                    Rectangle {
+                                        id: borderThickTrack
+                                        anchors.centerIn: parent
+                                        width: parent.width
+                                        height: 6
+                                        radius: 3
+                                        color: Qt.rgba(1, 1, 1, 0.07)
+
+                                        Rectangle {
+                                            width: borderThickHandle.x + borderThickHandle.width / 2
+                                            height: parent.height
+                                            radius: parent.radius
+                                            color: ThemeManager.accentBlue
+                                        }
+                                    }
+
+                                    Rectangle {
+                                        id: borderThickHandle
+                                        width: 20
+                                        height: 20
+                                        radius: 10
+                                        color: borderThickMA.containsMouse || borderThickMA.pressed ? ThemeManager.accentBlue : ThemeManager.fgPrimary
+                                        border.width: 2
+                                        border.color: ThemeManager.accentBlue
+                                        y: (parent.height - height) / 2
+                                        x: (borderThickTrack.width - width) * ((hyprBorderThicknessObj.value - 1) / 4.0)
+                                        Behavior on color { ColorAnimation { duration: 150 } }
+                                    }
+
+                                    MouseArea {
+                                        id: borderThickMA
+                                        anchors.fill: parent
+                                        hoverEnabled: true
+                                        cursorShape: Qt.PointingHandCursor
+                                        enabled: hyprBorderEnabledCheck.checked
+
+                                        function updateVal(mouse) {
+                                            const norm = Math.max(0, Math.min(1, mouse.x / width))
+                                            const val = Math.max(1, Math.round(1 + norm * 4))
+                                            hyprBorderThicknessObj.value = val
+                                            root.applyHypr("general:border_size", val,
+                                                `sed -i -E 's/border_size = [0-9]+/border_size = ${val}/'`)
+                                            if (!root.settings.general) root.settings.general = {}
+                                            root.settings.general.widgetBorderWidth = val
+                                            root.widgetBorderWidth = val
+                                            saveSettings()
+                                            // Sync mako border thickness
+                                            Quickshell.execDetached(["sh", "-c",
+                                                `sed -i 's/^border-size=.*/border-size=${val}/' "$HOME/.config/mako/config" && makoctl reload 2>/dev/null`])
+                                        }
+
+                                        onPressed: updateVal(mouse)
+                                        onPositionChanged: if (pressed) updateVal(mouse)
+                                    }
+                                }
+
+                                Text {
+                                    text: "Range: 1–5px"
+                                    font.family: "Sen"
+                                    font.pixelSize: 10
+                                    color: ThemeManager.fgTertiary
+                                }
+
+                                QtObject {
+                                    id: hyprBorderThicknessObj
+                                    property int value: 1
+                                }
+                            }
+
+                            // Window Rounding
+                            Column {
+                                spacing: 8
+                                width: parent.width - 20
+
+                                Text {
+                                    text: "Window rounding: " + hyprRoundingObj.value + "px"
+                                    font.family: "Sen"
+                                    font.pixelSize: 12
+                                    color: ThemeManager.fgPrimary
+                                }
+
+                                Item {
+                                    width: parent.width - 40
+                                    height: 32
+
+                                    Rectangle {
+                                        id: roundingTrack
+                                        anchors.centerIn: parent
+                                        width: parent.width
+                                        height: 6
+                                        radius: 3
+                                        color: Qt.rgba(1, 1, 1, 0.07)
+
+                                        Rectangle {
+                                            width: roundingHandle.x + roundingHandle.width / 2
+                                            height: parent.height
+                                            radius: parent.radius
+                                            color: ThemeManager.accentBlue
+                                        }
+                                    }
+
+                                    Rectangle {
+                                        id: roundingHandle
+                                        width: 20
+                                        height: 20
+                                        radius: 10
+                                        color: roundingMA.containsMouse || roundingMA.pressed ? ThemeManager.accentBlue : ThemeManager.fgPrimary
+                                        border.width: 2
+                                        border.color: ThemeManager.accentBlue
+                                        y: (parent.height - height) / 2
+                                        x: (roundingTrack.width - width) * (hyprRoundingObj.value / 20.0)
+                                        Behavior on color { ColorAnimation { duration: 150 } }
+                                    }
+
+                                    MouseArea {
+                                        id: roundingMA
+                                        anchors.fill: parent
+                                        hoverEnabled: true
+                                        cursorShape: Qt.PointingHandCursor
+
+                                        function updateVal(mouse) {
+                                            const norm = Math.max(0, Math.min(1, mouse.x / width))
+                                            const val = Math.round(norm * 20)
+                                            hyprRoundingObj.value = val
+                                            root.applyHypr("decoration:rounding", val,
+                                                `sed -i -E 's/rounding = [0-9]+/rounding = ${val}/'`)
+                                        }
+
+                                        onPressed: updateVal(mouse)
+                                        onPositionChanged: if (pressed) updateVal(mouse)
+                                    }
+                                }
+
+                                Text {
+                                    text: "Range: 0–20px"
+                                    font.family: "Sen"
+                                    font.pixelSize: 10
+                                    color: ThemeManager.fgTertiary
+                                }
+
+                                QtObject {
+                                    id: hyprRoundingObj
+                                    property int value: 12
+                                }
+                            }
+                        }
+
+                        // ========== WINDOW GAPS ==========
+                        Column {
+                            Layout.fillWidth: true
+                            spacing: 16
+
+                            Rectangle {
+                                width: parent.width
+                                height: 2
+                                color: ThemeManager.accentBlue
+                                opacity: 0.3
+                            }
+
+                            Text {
+                                text: "↔ Window Gaps"
+                                font.family: "Sen"
+                                font.pixelSize: 18
+                                font.weight: Font.Bold
+                                color: ThemeManager.accentBlue
+                            }
+
+                            // Gaps In
+                            Column {
+                                spacing: 8
+                                width: parent.width - 20
+
+                                Text {
+                                    text: "Inner gaps (between windows): " + hyprGapsInObj.value + "px"
+                                    font.family: "Sen"
+                                    font.pixelSize: 12
+                                    color: ThemeManager.fgPrimary
+                                }
+
+                                Item {
+                                    width: parent.width - 40
+                                    height: 32
+
+                                    Rectangle {
+                                        id: gapsInTrack
+                                        anchors.centerIn: parent
+                                        width: parent.width
+                                        height: 6
+                                        radius: 3
+                                        color: Qt.rgba(1, 1, 1, 0.07)
+
+                                        Rectangle {
+                                            width: gapsInHandle.x + gapsInHandle.width / 2
+                                            height: parent.height
+                                            radius: parent.radius
+                                            color: ThemeManager.accentBlue
+                                        }
+                                    }
+
+                                    Rectangle {
+                                        id: gapsInHandle
+                                        width: 20
+                                        height: 20
+                                        radius: 10
+                                        color: gapsInMA.containsMouse || gapsInMA.pressed ? ThemeManager.accentBlue : ThemeManager.fgPrimary
+                                        border.width: 2
+                                        border.color: ThemeManager.accentBlue
+                                        y: (parent.height - height) / 2
+                                        x: (gapsInTrack.width - width) * (hyprGapsInObj.value / 20.0)
+                                        Behavior on color { ColorAnimation { duration: 150 } }
+                                    }
+
+                                    MouseArea {
+                                        id: gapsInMA
+                                        anchors.fill: parent
+                                        hoverEnabled: true
+                                        cursorShape: Qt.PointingHandCursor
+
+                                        function updateVal(mouse) {
+                                            const norm = Math.max(0, Math.min(1, mouse.x / width))
+                                            const val = Math.round(norm * 20)
+                                            hyprGapsInObj.value = val
+                                            root.applyHypr("general:gaps_in", val,
+                                                `sed -i -E 's/gaps_in = [0-9]+/gaps_in = ${val}/'`)
+                                        }
+
+                                        onPressed: updateVal(mouse)
+                                        onPositionChanged: if (pressed) updateVal(mouse)
+                                    }
+                                }
+
+                                Text {
+                                    text: "Range: 0–20px"
+                                    font.family: "Sen"
+                                    font.pixelSize: 10
+                                    color: ThemeManager.fgTertiary
+                                }
+
+                                QtObject {
+                                    id: hyprGapsInObj
+                                    property int value: 5
+                                }
+                            }
+
+                            // Gaps Out
+                            Column {
+                                spacing: 8
+                                width: parent.width - 20
+
+                                Text {
+                                    text: "Outer gaps (screen edge): " + hyprGapsOutObj.value + "px"
+                                    font.family: "Sen"
+                                    font.pixelSize: 12
+                                    color: ThemeManager.fgPrimary
+                                }
+
+                                Item {
+                                    width: parent.width - 40
+                                    height: 32
+
+                                    Rectangle {
+                                        id: gapsOutTrack
+                                        anchors.centerIn: parent
+                                        width: parent.width
+                                        height: 6
+                                        radius: 3
+                                        color: Qt.rgba(1, 1, 1, 0.07)
+
+                                        Rectangle {
+                                            width: gapsOutHandle.x + gapsOutHandle.width / 2
+                                            height: parent.height
+                                            radius: parent.radius
+                                            color: ThemeManager.accentBlue
+                                        }
+                                    }
+
+                                    Rectangle {
+                                        id: gapsOutHandle
+                                        width: 20
+                                        height: 20
+                                        radius: 10
+                                        color: gapsOutMA.containsMouse || gapsOutMA.pressed ? ThemeManager.accentBlue : ThemeManager.fgPrimary
+                                        border.width: 2
+                                        border.color: ThemeManager.accentBlue
+                                        y: (parent.height - height) / 2
+                                        x: (gapsOutTrack.width - width) * (hyprGapsOutObj.value / 40.0)
+                                        Behavior on color { ColorAnimation { duration: 150 } }
+                                    }
+
+                                    MouseArea {
+                                        id: gapsOutMA
+                                        anchors.fill: parent
+                                        hoverEnabled: true
+                                        cursorShape: Qt.PointingHandCursor
+
+                                        function updateVal(mouse) {
+                                            const norm = Math.max(0, Math.min(1, mouse.x / width))
+                                            const val = Math.round(norm * 40)
+                                            hyprGapsOutObj.value = val
+                                            root.applyHypr("general:gaps_out", val,
+                                                `sed -i -E 's/gaps_out = [0-9]+/gaps_out = ${val}/'`)
+                                        }
+
+                                        onPressed: updateVal(mouse)
+                                        onPositionChanged: if (pressed) updateVal(mouse)
+                                    }
+                                }
+
+                                Text {
+                                    text: "Range: 0–40px"
+                                    font.family: "Sen"
+                                    font.pixelSize: 10
+                                    color: ThemeManager.fgTertiary
+                                }
+
+                                QtObject {
+                                    id: hyprGapsOutObj
+                                    property int value: 10
+                                }
+                            }
+                        }
+
+                        // ========== EFFECTS ==========
+                        Column {
+                            Layout.fillWidth: true
+                            spacing: 16
+
+                            Rectangle {
+                                width: parent.width
+                                height: 2
+                                color: ThemeManager.accentBlue
+                                opacity: 0.3
+                            }
+
+                            Text {
+                                text: "✨ Effects"
+                                font.family: "Sen"
+                                font.pixelSize: 18
+                                font.weight: Font.Bold
+                                color: ThemeManager.accentBlue
+                            }
+
+                            // Animations
+                            Row {
+                                spacing: 12
+
+                                Rectangle {
+                                    width: 24
+                                    height: 24
+                                    radius: 4
+                                    color: hyprAnimationsCheck.checked ? ThemeManager.accentBlue : Qt.rgba(1, 1, 1, 0.07)
+                                    border.width: 2
+                                    border.color: ThemeManager.accentBlue
+
+                                    Text {
+                                        anchors.centerIn: parent
+                                        text: "✓"
+                                        font.family: "Symbols Nerd Font"
+                                        font.pixelSize: 16
+                                        color: ThemeManager.fgPrimary
+                                        visible: hyprAnimationsCheck.checked
+                                    }
+
+                                    MouseArea {
+                                        anchors.fill: parent
+                                        cursorShape: Qt.PointingHandCursor
+                                        onClicked: {
+                                            hyprAnimationsCheck.checked = !hyprAnimationsCheck.checked
+                                            const en = hyprAnimationsCheck.checked
+                                            Quickshell.execDetached(["hyprctl", "keyword", "animations:enabled", en ? "true" : "false"])
+                                            const sedCmd = en
+                                                ? `sed -i '/^animations/,/^}/ s/enabled = .*/enabled = yes, please :)/'`
+                                                : `sed -i '/^animations/,/^}/ s/enabled = .*/enabled = no/'`
+                                            Quickshell.execDetached(["sh", "-c", sedCmd + ' "$HOME/.config/hypr/look-and-feel.conf"'])
+                                        }
+                                    }
+                                }
+
+                                Text {
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    text: "Enable window animations"
+                                    font.family: "Sen"
+                                    font.pixelSize: 12
+                                    color: ThemeManager.fgPrimary
+                                }
+
+                                QtObject {
+                                    id: hyprAnimationsCheck
+                                    property bool checked: true
+                                }
+                            }
+
+                            // Shadows
+                            Row {
+                                spacing: 12
+
+                                Rectangle {
+                                    width: 24
+                                    height: 24
+                                    radius: 4
+                                    color: hyprShadowCheck.checked ? ThemeManager.accentBlue : Qt.rgba(1, 1, 1, 0.07)
+                                    border.width: 2
+                                    border.color: ThemeManager.accentBlue
+
+                                    Text {
+                                        anchors.centerIn: parent
+                                        text: "✓"
+                                        font.family: "Symbols Nerd Font"
+                                        font.pixelSize: 16
+                                        color: ThemeManager.fgPrimary
+                                        visible: hyprShadowCheck.checked
+                                    }
+
+                                    MouseArea {
+                                        anchors.fill: parent
+                                        cursorShape: Qt.PointingHandCursor
+                                        onClicked: {
+                                            hyprShadowCheck.checked = !hyprShadowCheck.checked
+                                            const en = hyprShadowCheck.checked
+                                            Quickshell.execDetached(["hyprctl", "keyword", "decoration:shadow:enabled", en ? "true" : "false"])
+                                            const sedCmd = en
+                                                ? `sed -i '/shadow {/,/}/ s/enabled = false/enabled = true/'`
+                                                : `sed -i '/shadow {/,/}/ s/enabled = true/enabled = false/'`
+                                            Quickshell.execDetached(["sh", "-c", sedCmd + ' "$HOME/.config/hypr/look-and-feel.conf"'])
+                                        }
+                                    }
+                                }
+
+                                Text {
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    text: "Enable window shadows"
+                                    font.family: "Sen"
+                                    font.pixelSize: 12
+                                    color: ThemeManager.fgPrimary
+                                }
+
+                                QtObject {
+                                    id: hyprShadowCheck
+                                    property bool checked: true
+                                }
+                            }
+
+                            // Blur
+                            Row {
+                                spacing: 12
+
+                                Rectangle {
+                                    width: 24
+                                    height: 24
+                                    radius: 4
+                                    color: hyprBlurCheck.checked ? ThemeManager.accentBlue : Qt.rgba(1, 1, 1, 0.07)
+                                    border.width: 2
+                                    border.color: ThemeManager.accentBlue
+
+                                    Text {
+                                        anchors.centerIn: parent
+                                        text: "✓"
+                                        font.family: "Symbols Nerd Font"
+                                        font.pixelSize: 16
+                                        color: ThemeManager.fgPrimary
+                                        visible: hyprBlurCheck.checked
+                                    }
+
+                                    MouseArea {
+                                        anchors.fill: parent
+                                        cursorShape: Qt.PointingHandCursor
+                                        onClicked: {
+                                            hyprBlurCheck.checked = !hyprBlurCheck.checked
+                                            const en = hyprBlurCheck.checked
+                                            Quickshell.execDetached(["hyprctl", "keyword", "decoration:blur:enabled", en ? "true" : "false"])
+                                            const sedCmd = en
+                                                ? `sed -i '/blur {/,/}/ s/enabled = false/enabled = true/'`
+                                                : `sed -i '/blur {/,/}/ s/enabled = true/enabled = false/'`
+                                            Quickshell.execDetached(["sh", "-c", sedCmd + ' "$HOME/.config/hypr/look-and-feel.conf"'])
+                                        }
+                                    }
+                                }
+
+                                Text {
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    text: "Enable background blur"
+                                    font.family: "Sen"
+                                    font.pixelSize: 12
+                                    color: ThemeManager.fgPrimary
+                                }
+
+                                QtObject {
+                                    id: hyprBlurCheck
+                                    property bool checked: true
+                                }
+                            }
+
+                            Item { height: 16; width: 1 }
+                        }
+                    }
+                }
+
                 // Theme Tab
                 ScrollView {
                     Layout.fillWidth: true
@@ -2401,8 +3270,7 @@ SETTINGSEOF`
                 width: 120
                 height: 40
                 radius: 8
-                color: applyButtonSuccess ? ThemeManager.accentGreen :
-                       (applyButtonMouseArea.containsMouse ? Qt.rgba(ThemeManager.accentGreen.r, ThemeManager.accentGreen.g, ThemeManager.accentGreen.b, 0.25) : "transparent")
+                color: applyButtonMouseArea.containsMouse && !applyButtonSuccess ? Qt.rgba(ThemeManager.accentGreen.r, ThemeManager.accentGreen.g, ThemeManager.accentGreen.b, 0.25) : "transparent"
                 border.width: 1
                 border.color: Qt.rgba(ThemeManager.accentGreen.r, ThemeManager.accentGreen.g, ThemeManager.accentGreen.b, 0.55)
                 visible: tabBar.currentIndex === 0 || tabBar.currentIndex === 1  // Show on Widgets and Screenshots tabs
@@ -2414,7 +3282,7 @@ SETTINGSEOF`
                 
                 Text {
                     anchors.centerIn: parent
-                    text: applyButtonSuccess ? "✓ Applied!" : "Apply"
+                    text: applyButtonSuccess ? "Applying..." : "Apply"
                     font.family: "Sen"
                     font.pixelSize: 14
                     font.weight: Font.Bold

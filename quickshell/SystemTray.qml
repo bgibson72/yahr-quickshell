@@ -118,6 +118,27 @@ Rectangle {
         anchors.centerIn: parent
         spacing: 0
         
+        // Bluetooth Icon
+        Item {
+            width: 35
+            height: 32
+            visible: bluetoothAvailable
+            
+            property bool bluetoothAvailable: false
+            
+            Component.onCompleted: {
+                checkBluetoothProcess.running = true
+            }
+            
+            Text {
+                anchors.centerIn: parent
+                text: "󰂯"  // Bluetooth icon
+                font.family: "Symbols Nerd Font"
+                font.pixelSize: 16
+                color: ThemeManager.accentGreen
+            }
+        }
+
         // Network Icon
         Item {
             width: systemTray.showNetworkDetails ? 105 : 35
@@ -167,28 +188,7 @@ Rectangle {
                 }
             }
         }
-        
-        // Bluetooth Icon
-        Item {
-            width: 35
-            height: 32
-            visible: bluetoothAvailable
-            
-            property bool bluetoothAvailable: false
-            
-            Component.onCompleted: {
-                checkBluetoothProcess.running = true
-            }
-            
-            Text {
-                anchors.centerIn: parent
-                text: "󰂯"  // Bluetooth icon
-                font.family: "Symbols Nerd Font"
-                font.pixelSize: 16
-                color: ThemeManager.accentGreen
-            }
-        }
-        
+
         // Audio Icon
         Item {
             width: systemTray.showVolumeDetails ? 70 : 35

@@ -10,11 +10,13 @@ Rectangle {
     height: 820
     color: Qt.rgba(ThemeManager.bgBase.r, ThemeManager.bgBase.g, ThemeManager.bgBase.b, 0.92)
     radius: 16
-    border.width: 1
+    border.width: showWidgetBorders ? widgetBorderWidth : 0
     border.color: Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.35)
     clip: true
     
     property bool isVisible: false
+    property bool showWidgetBorders: true
+    property int widgetBorderWidth: 1
     signal requestClose()
     
     // Properties from system
@@ -43,7 +45,33 @@ Rectangle {
     Keys.onEscapePressed: {
         root.requestClose()
     }
-    
+
+    onIsVisibleChanged: {
+        if (isVisible) borderSettingsLoader.running = true
+    }
+
+    Process {
+        id: borderSettingsLoader
+        running: false
+        command: ["cat", Quickshell.env("HOME") + "/.config/quickshell/settings.json"]
+        property string buffer: ""
+        stdout: SplitParser {
+            onRead: data => { borderSettingsLoader.buffer += data }
+        }
+        onRunningChanged: {
+            if (!running && buffer !== "") {
+                try {
+                    const s = JSON.parse(buffer)
+                    if (s.general && s.general.showWidgetBorders !== undefined)
+                        root.showWidgetBorders = s.general.showWidgetBorders !== false
+                    if (s.general && s.general.widgetBorderWidth !== undefined)
+                        root.widgetBorderWidth = s.general.widgetBorderWidth
+                } catch (e) {}
+                buffer = ""
+            } else if (running) { buffer = "" }
+        }
+    }
+
     Column {
         anchors.fill: parent
         anchors.margins: 16

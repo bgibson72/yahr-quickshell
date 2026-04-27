@@ -4,7 +4,9 @@
     "weatherLongitude": "",
     "useFahrenheit": true,
     "clockFormat24hr": false,
-    "showSeconds": true
+    "showSeconds": true,
+    "showWidgetBorders": true,
+    "widgetBorderWidth": 1
   },
   "screenshot": {
     "defaultDelay": 0,
@@ -21,6 +23,9 @@
     "showNetworkDetails": false
   },
   "bar": {
-    "transparentBackground": false
+    "transparentBackground": false,
+    "showQuickLaunch": true,
+    "showSystemTray": true,
+    "barSize": "small"
   }
 }

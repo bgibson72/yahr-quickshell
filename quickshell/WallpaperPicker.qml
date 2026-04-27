@@ -20,6 +20,8 @@ PanelWindow {
     property string wallpaperDir: ""
     property bool showAllWallpapers: false
     property string pendingWallpaperPath: ""
+    property bool showWidgetBorders: true
+    property int widgetBorderWidth: 1
     
     function show() {
         loadCurrentTheme()
@@ -65,6 +67,12 @@ PanelWindow {
                         console.log("Wallpaper filter mode:", showAllWallpapers ? "All wallpapers" : "Themed only")
                     } else {
                         showAllWallpapers = false
+                    }
+                    if (settings.general && settings.general.showWidgetBorders !== undefined) {
+                        wallpaperWindow.showWidgetBorders = settings.general.showWidgetBorders !== false
+                    }
+                    if (settings.general && settings.general.widgetBorderWidth !== undefined) {
+                        wallpaperWindow.widgetBorderWidth = settings.general.widgetBorderWidth
                     }
                 } catch (e) {
                     console.error("Failed to parse settings:", e)
@@ -158,7 +166,7 @@ PanelWindow {
         anchors.fill: parent
         color: Qt.rgba(ThemeManager.bgBase.r, ThemeManager.bgBase.g, ThemeManager.bgBase.b, 0.92)
         radius: 24
-        border.width: 1
+        border.width: wallpaperWindow.showWidgetBorders ? wallpaperWindow.widgetBorderWidth : 0
         border.color: Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.35)
         clip: true
         focus: true
