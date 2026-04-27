@@ -3270,14 +3270,40 @@ SETTINGSEOF`
                 width: 120
                 height: 40
                 radius: 8
+                clip: true
                 color: applyButtonMouseArea.containsMouse && !applyButtonSuccess ? Qt.rgba(ThemeManager.accentGreen.r, ThemeManager.accentGreen.g, ThemeManager.accentGreen.b, 0.25) : "transparent"
                 border.width: 1
                 border.color: Qt.rgba(ThemeManager.accentGreen.r, ThemeManager.accentGreen.g, ThemeManager.accentGreen.b, 0.55)
                 visible: tabBar.currentIndex === 0 || tabBar.currentIndex === 1  // Show on Widgets and Screenshots tabs
                 z: 100  // Ensure it's on top
-                
-                Behavior on color {
-                    ColorAnimation { duration: 200 }
+
+                // Progress fill — animates left-to-right while applying
+                Rectangle {
+                    id: applyProgressFill
+                    anchors.left: parent.left
+                    anchors.top: parent.top
+                    anchors.bottom: parent.bottom
+                    width: 0
+                    color: Qt.rgba(ThemeManager.accentGreen.r, ThemeManager.accentGreen.g, ThemeManager.accentGreen.b, 0.3)
+
+                    states: State {
+                        name: "filling"
+                        when: applyButtonSuccess
+                        PropertyChanges { target: applyProgressFill; width: 120 }
+                    }
+
+                    transitions: [
+                        Transition {
+                            from: ""
+                            to: "filling"
+                            NumberAnimation { property: "width"; duration: 1500; easing.type: Easing.Linear }
+                        },
+                        Transition {
+                            from: "filling"
+                            to: ""
+                            NumberAnimation { property: "width"; duration: 0 }
+                        }
+                    ]
                 }
                 
                 Text {
@@ -3287,12 +3313,7 @@ SETTINGSEOF`
                     font.pixelSize: 14
                     font.weight: Font.Bold
                     color: ThemeManager.accentGreen
-                    
-                    Behavior on text {
-                        SequentialAnimation {
-                            PropertyAnimation { duration: 100 }
-                        }
-                    }
+                    z: 1
                 }
                 
                 MouseArea {
