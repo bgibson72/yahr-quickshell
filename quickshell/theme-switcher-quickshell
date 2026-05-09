@@ -649,6 +649,11 @@ QtObject {
     property int fontSizeNormal: 13
     property int fontSizeLarge: 15
     property int fontSizeIcon: 14
+
+    // Persistent user preferences (preserved across theme switches)
+    property real widgetOpacity: WIDGET_OPACITY_PLACEHOLDER
+    property bool barLarge: BAR_LARGE_PLACEHOLDER
+    property string uiFont: "UI_FONT_PLACEHOLDER"
 }
 EOF
 
@@ -718,7 +723,27 @@ EOF
     sed -i "s/BG_BASE_PLACEHOLDER/#$bg_base/g" "$QUICKSHELL_DIR/ThemeManager.qml.tmp"
     sed -i "s/BG_MANTLE_PLACEHOLDER/#$bg_mantle/g" "$QUICKSHELL_DIR/ThemeManager.qml.tmp"
     sed -i "s/BG_CRUST_PLACEHOLDER/#$bg_crust/g" "$QUICKSHELL_DIR/ThemeManager.qml.tmp"
-    
+
+    # Preserve user preferences from settings.json
+    local settings_file="$QUICKSHELL_DIR/settings.json"
+    local widget_opacity="0.75"
+    local bar_large="false"
+    local ui_font="Sen"
+    if [[ -f "$settings_file" ]]; then
+        local wo
+        wo=$(python3 -c "import sys,json; d=json.load(open('$settings_file')); print(d.get('general',{}).get('widgetTransparent', True) and 0.75 or 1.0)" 2>/dev/null)
+        [[ -n "$wo" ]] && widget_opacity="$wo"
+        local bl
+        bl=$(python3 -c "import sys,json; d=json.load(open('$settings_file')); print('true' if d.get('bar',{}).get('barSize','small')=='large' else 'false')" 2>/dev/null)
+        [[ -n "$bl" ]] && bar_large="$bl"
+        local uf
+        uf=$(python3 -c "import sys,json; d=json.load(open('$settings_file')); print(d.get('general',{}).get('uiFont','Sen'))" 2>/dev/null)
+        [[ -n "$uf" ]] && ui_font="$uf"
+    fi
+    sed -i "s/WIDGET_OPACITY_PLACEHOLDER/$widget_opacity/g" "$QUICKSHELL_DIR/ThemeManager.qml.tmp"
+    sed -i "s/BAR_LARGE_PLACEHOLDER/$bar_large/g" "$QUICKSHELL_DIR/ThemeManager.qml.tmp"
+    sed -i "s/UI_FONT_PLACEHOLDER/$ui_font/g" "$QUICKSHELL_DIR/ThemeManager.qml.tmp"
+
     # Move temp file to final location atomically
     mv "$QUICKSHELL_DIR/ThemeManager.qml.tmp" "$QUICKSHELL_DIR/ThemeManager.qml"
     
