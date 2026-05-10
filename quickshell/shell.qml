@@ -76,7 +76,7 @@ ShellRoot {
             console.log("Quickshell reloaded")
         }
     }
-    
+
     // Consolidated IPC watcher - single process for all keybinds (efficient!)
     Process {
         id: consolidatedIpcWatcher
@@ -612,6 +612,14 @@ ShellRoot {
                                 }
                                 if (settings.bar.barSize !== undefined) {
                                     barSize = settings.bar.barSize
+                                    ThemeManager.barLarge = (settings.bar.barSize === "large")
+                                }
+                            }
+                            if (settings.general !== undefined) {
+                                const transparent = settings.general.widgetTransparent !== false
+                                ThemeManager.widgetOpacity = transparent ? 0.75 : 1.0
+                                if (settings.general.uiFont !== undefined && settings.general.uiFont.length > 0) {
+                                    ThemeManager.uiFont = settings.general.uiFont
                                 }
                             }
                         } catch (e) {}

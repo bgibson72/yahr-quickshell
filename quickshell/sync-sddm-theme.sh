@@ -6,6 +6,7 @@ QS_DIR="$HOME/.config/quickshell"
 THEME_CONF="$SDDM_THEME_DIR/theme.conf"
 HYPRLAND_CONF="$HOME/.config/hypr/hyprland.conf"
 HYPR_THEMES_DIR="$HOME/.config/hypr/themes"
+CURRENT_THEME_FILE="$HOME/.config/hypr/.current-theme"
 SETTINGS_JSON="$QS_DIR/settings.json"
 
 # Read date format from quickshell settings.json
@@ -39,15 +40,22 @@ else
     fi
 fi
 
-# Get current theme from Hyprland config (most reliable source during theme switches)
-THEME_FILE=$(grep "^source.*themes.*\.conf" "$HYPRLAND_CONF" | sed 's/.*= *//')
-
-if [ -z "$THEME_FILE" ] || [ ! -f "$THEME_FILE" ]; then
-    echo "Error: Could not determine theme file from Hyprland config"
-    exit 1
+# Prefer .current-theme as the source of truth (set by the quickshell theme switcher),
+# fall back to parsing hyprland.conf's source line.
+if [ -f "$CURRENT_THEME_FILE" ]; then
+    current_theme=$(cat "$CURRENT_THEME_FILE" | tr -d '[:space:]')
+    THEME_FILE="$HYPR_THEMES_DIR/${current_theme}.conf"
 fi
 
-current_theme=$(basename "$THEME_FILE" .conf)
+if [ -z "$current_theme" ] || [ ! -f "$THEME_FILE" ]; then
+    THEME_FILE=$(grep "^source.*themes.*\.conf" "$HYPRLAND_CONF" | sed 's/.*= *//')
+    current_theme=$(basename "$THEME_FILE" .conf)
+fi
+
+if [ -z "$THEME_FILE" ] || [ ! -f "$THEME_FILE" ]; then
+    echo "Error: Could not determine theme file"
+    exit 1
+fi
 
 # Extract colors from Hyprland theme file
 get_color() {

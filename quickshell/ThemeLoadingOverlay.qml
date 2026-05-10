@@ -109,7 +109,7 @@ Scope {
                         Text {
                             anchors.horizontalCenter: parent.horizontalCenter
                             text: "Applying Theme"
-                            font.family: "Sen"
+                            font.family: ThemeManager.uiFont
                             font.pixelSize: 20
                             font.weight: Font.Bold
                             color: ThemeManager.fgPrimary
@@ -118,7 +118,7 @@ Scope {
                         Text {
                             anchors.horizontalCenter: parent.horizontalCenter
                             text: loadingScope.themeName
-                            font.family: "Sen"
+                            font.family: ThemeManager.uiFont
                             font.pixelSize: 16
                             color: ThemeManager.accentBlue
                         }
@@ -126,7 +126,7 @@ Scope {
                         Text {
                             anchors.horizontalCenter: parent.horizontalCenter
                             text: "Please wait..."
-                            font.family: "Sen"
+                            font.family: ThemeManager.uiFont
                             font.pixelSize: 14
                             color: ThemeManager.fgSecondary
                             opacity: 0.8

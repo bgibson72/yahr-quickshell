@@ -45,7 +45,7 @@ Rectangle {
                 
                 Text {
                     text: "Clipboard History"
-                    font.family: "Sen"
+                    font.family: ThemeManager.uiFont
                     font.pixelSize: 20
                     font.weight: Font.Bold
                     color: ThemeManager.fgPrimary
@@ -106,7 +106,7 @@ Rectangle {
                     id: searchInput
                     width: parent.width - 40
                     height: parent.height
-                    font.family: "Sen"
+                    font.family: ThemeManager.uiFont
                     font.pixelSize: 14
                     color: ThemeManager.fgPrimary
                     verticalAlignment: TextInput.AlignVCenter
@@ -182,7 +182,7 @@ Rectangle {
                             
                             Text {
                                 text: modelData.timestamp || "Unknown"
-                                font.family: "Sen"
+                                font.family: ThemeManager.uiFont
                                 font.pixelSize: 11
                                 color: ThemeManager.fgSecondary
                                 anchors.verticalCenter: parent.verticalCenter
@@ -193,7 +193,7 @@ Rectangle {
                             id: contentText
                             width: parent.width
                             text: modelData.content || ""
-                            font.family: "Sen"
+                            font.family: ThemeManager.uiFont
                             font.pixelSize: 13
                             color: ThemeManager.fgPrimary
                             wrapMode: Text.Wrap
@@ -206,7 +206,7 @@ Rectangle {
                 Text {
                     anchors.centerIn: parent
                     text: clipboardModel.items.length === 0 ? "No clipboard history" : "No results found"
-                    font.family: "Sen"
+                    font.family: ThemeManager.uiFont
                     font.pixelSize: 14
                     color: ThemeManager.fgTertiary
                     visible: clipboardListView.count === 0
@@ -222,7 +222,7 @@ Rectangle {
             Text {
                 anchors.fill: parent
                 text: `${clipboardListView.count} item${clipboardListView.count !== 1 ? 's' : ''}`
-                font.family: "Sen"
+                font.family: ThemeManager.uiFont
                 font.pixelSize: 12
                 color: ThemeManager.fgSecondary
                 horizontalAlignment: Text.AlignRight

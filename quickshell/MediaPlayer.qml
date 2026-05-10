@@ -76,7 +76,7 @@ Rectangle {
                         }
                         return "No media"
                     }
-                    font.family: "Sen"
+                    font.family: ThemeManager.uiFont
                     font.pixelSize: 11
                     color: ThemeManager.fgPrimary
                     anchors.verticalCenter: parent.verticalCenter

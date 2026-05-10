@@ -8,6 +8,12 @@ QtObject {
     
     // Bar opacity setting (0.0 - 1.0)
     property real barOpacity: 0.750495079212674
+
+    // Widget panel opacity (0.75 = translucent, 1.0 = fully opaque)
+    property real widgetOpacity: 0.75
+
+    // Bar size — true when "chonky bar" is selected
+    property bool barLarge: false
     
     // Accent colors
     property color accentRose: "#f265b5"
@@ -51,4 +57,9 @@ QtObject {
     property int fontSizeNormal: 13
     property int fontSizeLarge: 15
     property int fontSizeIcon: 14
+
+    // Persistent user preferences (preserved across theme switches)
+    property real widgetOpacity: 0.75
+    property bool barLarge: false
+    property string uiFont: "Sen"
 }

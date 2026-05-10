@@ -39,7 +39,7 @@ Item {
                     
                     Text {
                         text: "CPU Usage"
-                        font.family: "Sen"
+                        font.family: ThemeManager.uiFont
                         font.pixelSize: 16
                         font.weight: Font.Bold
                         color: ThemeManager.fgPrimary
@@ -51,7 +51,7 @@ Item {
                     Text {
                         id: cpuPercentText
                         text: "0%"
-                        font.family: "Sen"
+                        font.family: ThemeManager.uiFont
                         font.pixelSize: 24
                         font.weight: Font.Bold
                         color: cpuMonitor.currentValue > 80 ? ThemeManager.accentRed : ThemeManager.accentBlue
@@ -81,14 +81,14 @@ Item {
                     
                     Text {
                         text: "Cores: " + cpuMonitor.coreCount
-                        font.family: "Sen"
+                        font.family: ThemeManager.uiFont
                         font.pixelSize: 12
                         color: ThemeManager.fgSecondary
                     }
                     
                     Text {
                         text: "Avg: " + cpuMonitor.avgValue + "%"
-                        font.family: "Sen"
+                        font.family: ThemeManager.uiFont
                         font.pixelSize: 12
                         color: ThemeManager.fgSecondary
                     }
@@ -122,7 +122,7 @@ Item {
                     
                     Text {
                         text: "Memory Usage"
-                        font.family: "Sen"
+                        font.family: ThemeManager.uiFont
                         font.pixelSize: 16
                         font.weight: Font.Bold
                         color: ThemeManager.fgPrimary
@@ -134,7 +134,7 @@ Item {
                     Text {
                         id: memPercentText
                         text: "0%"
-                        font.family: "Sen"
+                        font.family: ThemeManager.uiFont
                         font.pixelSize: 24
                         font.weight: Font.Bold
                         color: memMonitor.currentValue > 80 ? ThemeManager.accentRed : ThemeManager.accentCyan
@@ -164,14 +164,14 @@ Item {
                     
                     Text {
                         text: "Used: " + memMonitor.usedGB + " GB"
-                        font.family: "Sen"
+                        font.family: ThemeManager.uiFont
                         font.pixelSize: 12
                         color: ThemeManager.fgSecondary
                     }
                     
                     Text {
                         text: "Total: " + memMonitor.totalGB + " GB"
-                        font.family: "Sen"
+                        font.family: ThemeManager.uiFont
                         font.pixelSize: 12
                         color: ThemeManager.fgSecondary
                     }
@@ -205,7 +205,7 @@ Item {
                     
                     Text {
                         text: "Disk Usage"
-                        font.family: "Sen"
+                        font.family: ThemeManager.uiFont
                         font.pixelSize: 16
                         font.weight: Font.Bold
                         color: ThemeManager.fgPrimary
@@ -217,7 +217,7 @@ Item {
                     Text {
                         id: diskPercentText
                         text: "0%"
-                        font.family: "Sen"
+                        font.family: ThemeManager.uiFont
                         font.pixelSize: 24
                         font.weight: Font.Bold
                         color: diskMonitor.currentValue > 80 ? ThemeManager.accentRed : ThemeManager.accentPurple
@@ -249,13 +249,13 @@ Item {
                                 Text {
                                     width: 60
                                     text: "Used:"
-                                    font.family: "Sen"
+                                    font.family: ThemeManager.uiFont
                                     font.pixelSize: 13
                                     color: ThemeManager.fgTertiary
                                 }
                                 Text {
                                     text: diskMonitor.usedGB + " GB"
-                                    font.family: "Sen"
+                                    font.family: ThemeManager.uiFont
                                     font.pixelSize: 14
                                     font.weight: Font.Bold
                                     color: ThemeManager.fgPrimary
@@ -269,13 +269,13 @@ Item {
                                 Text {
                                     width: 60
                                     text: "Free:"
-                                    font.family: "Sen"
+                                    font.family: ThemeManager.uiFont
                                     font.pixelSize: 13
                                     color: ThemeManager.fgTertiary
                                 }
                                 Text {
                                     text: diskMonitor.freeGB + " GB"
-                                    font.family: "Sen"
+                                    font.family: ThemeManager.uiFont
                                     font.pixelSize: 14
                                     font.weight: Font.Bold
                                     color: ThemeManager.accentGreen
@@ -289,13 +289,13 @@ Item {
                                 Text {
                                     width: 60
                                     text: "Total:"
-                                    font.family: "Sen"
+                                    font.family: ThemeManager.uiFont
                                     font.pixelSize: 13
                                     color: ThemeManager.fgTertiary
                                 }
                                 Text {
                                     text: diskMonitor.totalGB + " GB"
-                                    font.family: "Sen"
+                                    font.family: ThemeManager.uiFont
                                     font.pixelSize: 14
                                     font.weight: Font.Bold
                                     color: ThemeManager.fgPrimary
@@ -352,7 +352,7 @@ Item {
                     
                     Text {
                         text: "Temperature"
-                        font.family: "Sen"
+                        font.family: ThemeManager.uiFont
                         font.pixelSize: 16
                         font.weight: Font.Bold
                         color: ThemeManager.fgPrimary
@@ -367,7 +367,7 @@ Item {
                     Text {
                         id: tempText
                         text: "0°C"
-                        font.family: "Sen"
+                        font.family: ThemeManager.uiFont
                         font.pixelSize: 24
                         font.weight: Font.Bold
                         color: tempMonitor.currentValue > 70 ? ThemeManager.accentRed : ThemeManager.accentGreen
@@ -400,14 +400,14 @@ Item {
                     
                     Text {
                         text: "Min: " + tempMonitor.minValue + "°C"
-                        font.family: "Sen"
+                        font.family: ThemeManager.uiFont
                         font.pixelSize: 12
                         color: ThemeManager.fgSecondary
                     }
                     
                     Text {
                         text: "Max: " + tempMonitor.maxValue + "°C"
-                        font.family: "Sen"
+                        font.family: ThemeManager.uiFont
                         font.pixelSize: 12
                         color: ThemeManager.fgSecondary
                     }

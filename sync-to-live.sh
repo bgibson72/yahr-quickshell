@@ -23,7 +23,7 @@ fi
 # Hypr
 if [ -d "$REPO_DIR/hypr" ]; then
     echo "Syncing hypr..."
-    rsync -av --exclude='*.backup*' \
+    rsync -av --exclude='*.backup*' --exclude='hyprland.conf' \
         "$REPO_DIR/hypr/" "$CONFIG_DIR/hypr/" \
         || { echo "✗ Hypr sync failed"; exit 1; }
     echo "✓ Hypr synced"
@@ -32,18 +32,26 @@ fi
 # Kitty
 if [ -d "$REPO_DIR/kitty" ]; then
     echo "Syncing kitty..."
-    rsync -av --exclude='*.backup*' \
+    rsync -av --exclude='*.backup*' --exclude='current-theme.conf' --exclude='themes/current-theme.conf' \
         "$REPO_DIR/kitty/" "$CONFIG_DIR/kitty/" \
         || { echo "✗ Kitty sync failed"; exit 1; }
+    # Re-apply the current theme so the dynamic theme file matches the active theme
+    if [ -x "$CONFIG_DIR/quickshell/sync-kitty-theme.sh" ]; then
+        "$CONFIG_DIR/quickshell/sync-kitty-theme.sh" > /dev/null 2>&1 || true
+    fi
     echo "✓ Kitty synced"
 fi
 
 # Mako
 if [ -d "$REPO_DIR/mako" ]; then
     echo "Syncing mako..."
-    rsync -av --exclude='*.backup*' \
+    rsync -av --exclude='*.backup*' --exclude='config' \
         "$REPO_DIR/mako/" "$CONFIG_DIR/mako/" \
         || { echo "✗ Mako sync failed"; exit 1; }
+    # Re-apply the current theme so the dynamic config matches the active theme
+    if [ -x "$CONFIG_DIR/quickshell/sync-mako-theme.sh" ]; then
+        "$CONFIG_DIR/quickshell/sync-mako-theme.sh" > /dev/null 2>&1 || true
+    fi
     echo "✓ Mako synced"
 fi
 
@@ -86,6 +94,6 @@ echo ""
 echo "✓ All configs synced to live ~/.config/"
 echo ""
 echo "Restart affected applications to see changes:"
-echo "  • Quickshell: quickshell --replace &"
+echo "  • Quickshell: pkill quickshell && quickshell &"
 echo "  • Mako: makoctl reload"
-echo "  • Terminal: exec zsh (for starship)"
+echo "  • Terminal: exec bash (for starship)"

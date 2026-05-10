@@ -7,7 +7,7 @@ Rectangle {
 
     width: 540
     height: 432
-    color: Qt.rgba(ThemeManager.bgBase.r, ThemeManager.bgBase.g, ThemeManager.bgBase.b, 0.92)
+    color: Qt.rgba(ThemeManager.bgBase.r, ThemeManager.bgBase.g, ThemeManager.bgBase.b, ThemeManager.widgetOpacity)
     radius: 16
     border.width: 1
     border.color: Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.35)
@@ -97,7 +97,7 @@ Rectangle {
                                               "July", "August", "September", "October", "November", "December"]
                             return monthNames[now.getMonth()] + " " + now.getFullYear()
                         }
-                        font.family: "Sen"
+                        font.family: ThemeManager.uiFont
                         font.pixelSize: 18
                         font.weight: Font.Bold
                         color: ThemeManager.fgPrimary
@@ -117,7 +117,7 @@ Rectangle {
                             
                             Text {
                                 text: modelData
-                                font.family: "Sen"
+                                font.family: ThemeManager.uiFont
                                 font.pixelSize: 11
                                 font.weight: Font.Bold
                                 color: ThemeManager.accentBlue
@@ -157,7 +157,7 @@ Rectangle {
                                 Text {
                                     anchors.centerIn: parent
                                     text: parent.isValidDay ? parent.dayNumber : ""
-                                    font.family: "Sen"
+                                    font.family: ThemeManager.uiFont
                                     font.pixelSize: 13
                                     color: {
                                         if (parent.isValidDay && parent.isCurrentDay) return ThemeManager.bgBase
@@ -196,7 +196,7 @@ Rectangle {
                         
                         Text {
                             id: timeText
-                            font.family: "Sen"
+                            font.family: ThemeManager.uiFont
                             font.pixelSize: 32
                             font.weight: Font.Bold
                             color: ThemeManager.accentBlue
@@ -205,7 +205,7 @@ Rectangle {
                         
                         Text {
                             id: periodText
-                            font.family: "Sen"
+                            font.family: ThemeManager.uiFont
                             font.pixelSize: 16
                             font.weight: Font.Medium
                             color: ThemeManager.fgSecondary
@@ -318,7 +318,7 @@ Rectangle {
                         Text {
                             id: temperatureText
                             text: "..."
-                            font.family: "Sen"
+                            font.family: ThemeManager.uiFont
                             font.pixelSize: 36
                             font.weight: Font.Bold
                             color: ThemeManager.fgPrimary
@@ -331,7 +331,7 @@ Rectangle {
                         id: conditionText
                         anchors.horizontalCenter: parent.horizontalCenter
                         text: "Sunny"
-                        font.family: "Sen"
+                        font.family: ThemeManager.uiFont
                         font.pixelSize: 16
                         font.weight: Font.Medium
                         color: ThemeManager.fgPrimary
@@ -345,7 +345,7 @@ Rectangle {
                         Text {
                             id: humidityText
                             text: "💧 47%"
-                            font.family: "Sen"
+                            font.family: ThemeManager.uiFont
                             font.pixelSize: 14
                             color: ThemeManager.fgSecondary
                         }
@@ -353,7 +353,7 @@ Rectangle {
                         Text {
                             id: windText
                             text: "💨 4mph"
-                            font.family: "Sen"
+                            font.family: ThemeManager.uiFont
                             font.pixelSize: 14
                             color: ThemeManager.fgSecondary
                         }
@@ -421,7 +421,7 @@ Rectangle {
                             Text {
                                 anchors.centerIn: parent
                                 text: Math.round(cpuCanvas.percentage) + "%"
-                                font.family: "Sen"
+                                font.family: ThemeManager.uiFont
                                 font.pixelSize: 14
                                 font.weight: Font.Bold
                                 color: ThemeManager.fgPrimary
@@ -431,7 +431,7 @@ Rectangle {
                         Text {
                             anchors.horizontalCenter: parent.horizontalCenter
                             text: "CPU"
-                            font.family: "Sen"
+                            font.family: ThemeManager.uiFont
                             font.pixelSize: 11
                             color: ThemeManager.fgSecondary
                         }
@@ -481,7 +481,7 @@ Rectangle {
                             Text {
                                 anchors.centerIn: parent
                                 text: Math.round(ramCanvas.percentage) + "%"
-                                font.family: "Sen"
+                                font.family: ThemeManager.uiFont
                                 font.pixelSize: 14
                                 font.weight: Font.Bold
                                 color: ThemeManager.fgPrimary
@@ -491,7 +491,7 @@ Rectangle {
                         Text {
                             anchors.horizontalCenter: parent.horizontalCenter
                             text: "RAM"
-                            font.family: "Sen"
+                            font.family: ThemeManager.uiFont
                             font.pixelSize: 11
                             color: ThemeManager.fgSecondary
                         }
@@ -541,7 +541,7 @@ Rectangle {
                             Text {
                                 anchors.centerIn: parent
                                 text: Math.round(diskCanvas.percentage) + "%"
-                                font.family: "Sen"
+                                font.family: ThemeManager.uiFont
                                 font.pixelSize: 14
                                 font.weight: Font.Bold
                                 color: ThemeManager.fgPrimary
@@ -551,7 +551,7 @@ Rectangle {
                         Text {
                             anchors.horizontalCenter: parent.horizontalCenter
                             text: "Disk"
-                            font.family: "Sen"
+                            font.family: ThemeManager.uiFont
                             font.pixelSize: 11
                             color: ThemeManager.fgSecondary
                         }

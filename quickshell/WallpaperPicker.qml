@@ -9,7 +9,7 @@ PanelWindow {
     id: wallpaperWindow
     
     width: 1080
-    height: 760
+    height: 820
     
     visible: false
     color: "transparent"
@@ -17,8 +17,7 @@ PanelWindow {
     exclusiveZone: 0
     
     property string currentTheme: ""
-    property string wallpaperDir: ""
-    property bool showAllWallpapers: false
+    property string selectedTab: ""
     property string pendingWallpaperPath: ""
     property bool showWidgetBorders: true
     property int widgetBorderWidth: 1
@@ -34,13 +33,10 @@ PanelWindow {
     }
     
     function loadCurrentTheme() {
-        // Always reload theme from file when showing picker
-        console.log("Loading current theme...")
-        wallpaperModel.clear()  // Clear old wallpapers immediately
-        currentTheme = ""       // Reset to avoid stale value
-
-        // Load settings first; themeProcess is started from settingsLoader.onRunningChanged
-        // so that showAllWallpapers is always set before updateWallpaperDir() runs.
+        wallpaperModel.clear()
+        themeModel.clear()
+        currentTheme = ""
+        selectedTab = ""
         settingsLoader.running = false
         settingsLoader.running = true
     }
@@ -62,12 +58,6 @@ PanelWindow {
             if (!running && buffer !== "") {
                 try {
                     const settings = JSON.parse(buffer)
-                    if (settings.wallpaper && settings.wallpaper.showAllWallpapers !== undefined) {
-                        showAllWallpapers = settings.wallpaper.showAllWallpapers
-                        console.log("Wallpaper filter mode:", showAllWallpapers ? "All wallpapers" : "Themed only")
-                    } else {
-                        showAllWallpapers = false
-                    }
                     if (settings.general && settings.general.showWidgetBorders !== undefined) {
                         wallpaperWindow.showWidgetBorders = settings.general.showWidgetBorders !== false
                     }
@@ -76,10 +66,8 @@ PanelWindow {
                     }
                 } catch (e) {
                     console.error("Failed to parse settings:", e)
-                    showAllWallpapers = false
                 }
                 buffer = ""
-                // Chain: now that settings are loaded, read the current theme
                 themeProcess.running = false
                 themeProcess.running = true
             } else if (running) {
@@ -107,40 +95,69 @@ PanelWindow {
                 if (theme.length > 0) {
                     currentTheme = theme
                 } else {
-                    currentTheme = "TokyoNight" // fallback for empty file
+                    currentTheme = "TokyoNight"
                 }
                 buffer = ""
-                updateWallpaperDir()
+                themeListProcess.running = false
+                themeListProcess.running = true
+            } else if (running) {
+                buffer = ""
+            }
+        }
+    }
+
+    Process {
+        id: themeListProcess
+        running: false
+        command: ["sh", "-c", "find '" + Quickshell.env("HOME") + "/Pictures/Wallpapers' -maxdepth 1 -mindepth 1 -type d -exec basename {} \\; | sort"]
+
+        property string buffer: ""
+
+        stdout: SplitParser {
+            onRead: data => {
+                themeListProcess.buffer += data + "\n"
+            }
+        }
+
+        onRunningChanged: {
+            if (!running && buffer !== "") {
+                const lines = buffer.trim().split("\n")
+                for (const line of lines) {
+                    const name = line.trim()
+                    if (name.length > 0) {
+                        themeModel.append({ name: name })
+                    }
+                }
+                buffer = ""
+                let found = false
+                for (let i = 0; i < themeModel.count; i++) {
+                    if (themeModel.get(i).name === currentTheme) {
+                        selectedTab = currentTheme
+                        found = true
+                        break
+                    }
+                }
+                if (!found && themeModel.count > 0) {
+                    selectedTab = themeModel.get(0).name
+                }
+                loadWallpapers()
             } else if (running) {
                 buffer = ""
             }
         }
     }
     
-    function updateWallpaperDir() {
-        const base = Quickshell.env("HOME") + "/Pictures/Wallpapers/"
-        if (showAllWallpapers) {
-            wallpaperDir = base
-            console.log("Updated wallpaper directory to:", wallpaperDir, "(all wallpapers)")
-        } else {
-            wallpaperDir = base + currentTheme
-            console.log("Updated wallpaper directory to:", wallpaperDir, "(themed only)")
-        }
-        loadWallpapers()
-    }
-    
     function loadWallpapers() {
-        console.log("Loading wallpapers from:", wallpaperDir)
+        console.log("Loading wallpapers for theme:", selectedTab)
         wallpaperModel.clear()
-        // Stop any previously running wallpaper loader
         wallpaperLoader.running = false
         wallpaperLoader.running = true
     }
-    
+
     Process {
         id: wallpaperLoader
         running: false
-        command: ["sh", "-c", "find '" + wallpaperDir + "' " + (showAllWallpapers ? "" : "-maxdepth 1 ") + "-type f \\( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' -o -iname '*.webp' \\) -print0"]
+        command: ["sh", "-c", "find '" + Quickshell.env("HOME") + "/Pictures/Wallpapers/" + selectedTab + "' -maxdepth 1 -type f \\( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' -o -iname '*.webp' \\) -print0"]
         
         stdout: SplitParser {
             splitMarker: "\0"
@@ -158,13 +175,17 @@ PanelWindow {
     }
     
     ListModel {
+        id: themeModel
+    }
+
+    ListModel {
         id: wallpaperModel
     }
     
     Rectangle {
         id: bgRect
         anchors.fill: parent
-        color: Qt.rgba(ThemeManager.bgBase.r, ThemeManager.bgBase.g, ThemeManager.bgBase.b, 0.92)
+        color: Qt.rgba(ThemeManager.bgBase.r, ThemeManager.bgBase.g, ThemeManager.bgBase.b, ThemeManager.widgetOpacity)
         radius: 24
         border.width: wallpaperWindow.showWidgetBorders ? wallpaperWindow.widgetBorderWidth : 0
         border.color: Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.35)
@@ -209,8 +230,8 @@ PanelWindow {
                 }
                 
                 Text {
-                    text: "Wallpaper Picker - " + (showAllWallpapers ? "All Wallpapers" : currentTheme)
-                    font.family: "Sen"
+                    text: "Wallpaper Picker"
+                    font.family: ThemeManager.uiFont
                     font.pixelSize: 20
                     font.weight: Font.Bold
                     color: ThemeManager.fgPrimary
@@ -235,7 +256,7 @@ PanelWindow {
                     Text {
                         anchors.centerIn: parent
                         text: "✕"
-                        font.family: "Sen"
+                        font.family: ThemeManager.uiFont
                         font.pixelSize: 20
                         font.weight: Font.Bold
                         color: ThemeManager.fgPrimary
@@ -251,10 +272,90 @@ PanelWindow {
                 }
             }
             
+            // Theme Tab Bar
+            Rectangle {
+                width: parent.width
+                height: 44
+                color: Qt.rgba(1, 1, 1, 0.04)
+                radius: 10
+                border.width: wallpaperWindow.showWidgetBorders ? 1 : 0
+                border.color: Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.18)
+
+                ListView {
+                    id: tabBar
+                    anchors.fill: parent
+                    anchors.margins: 4
+                    orientation: ListView.Horizontal
+                    spacing: 4
+                    clip: true
+                    model: themeModel
+
+                    ScrollBar.horizontal: ScrollBar {
+                        policy: ScrollBar.AsNeeded
+                        contentItem: Rectangle {
+                            implicitHeight: 4
+                            radius: 2
+                            color: ThemeManager.accentBlue
+                        }
+                    }
+
+                    delegate: Rectangle {
+                        id: tabDelegate
+                        height: tabBar.height
+                        width: tabLabel.implicitWidth + 24
+                        radius: 8
+
+                        property bool isActive: model.name === wallpaperWindow.selectedTab
+
+                        color: isActive
+                            ? Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.22)
+                            : (tabMouse.containsMouse ? Qt.rgba(1, 1, 1, 0.08) : "transparent")
+
+                        Behavior on color { ColorAnimation { duration: 120 } }
+
+                        Rectangle {
+                            anchors.bottom: parent.bottom
+                            anchors.left: parent.left
+                            anchors.right: parent.right
+                            anchors.leftMargin: 6
+                            anchors.rightMargin: 6
+                            height: 2
+                            radius: 1
+                            color: ThemeManager.accentBlue
+                            visible: tabDelegate.isActive
+                        }
+
+                        Text {
+                            id: tabLabel
+                            anchors.centerIn: parent
+                            text: model.name
+                            font.family: ThemeManager.uiFont
+                            font.pixelSize: 12
+                            font.weight: tabDelegate.isActive ? Font.Bold : Font.Normal
+                            color: tabDelegate.isActive ? ThemeManager.accentBlue : ThemeManager.fgSecondary
+                            Behavior on color { ColorAnimation { duration: 120 } }
+                        }
+
+                        MouseArea {
+                            id: tabMouse
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: {
+                                if (wallpaperWindow.selectedTab !== model.name) {
+                                    wallpaperWindow.selectedTab = model.name
+                                    wallpaperWindow.loadWallpapers()
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
             // Wallpaper Grid
             Rectangle {
                 width: parent.width
-                height: 650  // Height for exactly 3 rows: 3 * 210 + 20px margins
+                height: 650
                 color: "transparent"
                 radius: 16
                 
@@ -328,7 +429,7 @@ PanelWindow {
                                 
                                 Text {
                                     text: "Failed to load"
-                                    font.family: "Sen"
+                                    font.family: ThemeManager.uiFont
                                     font.pixelSize: 10
                                     color: ThemeManager.fgSecondary
                                     anchors.horizontalCenter: parent.horizontalCenter

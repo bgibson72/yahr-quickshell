@@ -108,7 +108,7 @@ Rectangle {
             
             Text {
                 text: updatesArea.updateCount.toString()
-                font.family: "Sen"
+                font.family: ThemeManager.uiFont
                 font.pixelSize: 13
                 color: updatesArea.updateCount > 0 ? ThemeManager.accentYellow : ThemeManager.accentBlue
                 anchors.verticalCenter: parent.verticalCenter

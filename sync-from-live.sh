@@ -22,7 +22,7 @@ fi
 # Hypr
 if [ -d "$CONFIG_DIR/hypr" ]; then
     echo "Syncing hypr..."
-    rsync -av --exclude='*.backup*' \
+    rsync -av --exclude='*.backup*' --exclude='hyprland.conf' \
         "$CONFIG_DIR/hypr/" "$REPO_DIR/hypr/"
     echo "✓ Hypr synced"
 fi
@@ -30,7 +30,7 @@ fi
 # Kitty
 if [ -d "$CONFIG_DIR/kitty" ]; then
     echo "Syncing kitty..."
-    rsync -av --exclude='*.backup*' \
+    rsync -av --exclude='*.backup*' --exclude='current-theme.conf' --exclude='themes/current-theme.conf' \
         "$CONFIG_DIR/kitty/" "$REPO_DIR/kitty/"
     echo "✓ Kitty synced"
 fi
@@ -38,7 +38,7 @@ fi
 # Mako
 if [ -d "$CONFIG_DIR/mako" ]; then
     echo "Syncing mako..."
-    rsync -av --exclude='*.backup*' \
+    rsync -av --exclude='*.backup*' --exclude='config' \
         "$CONFIG_DIR/mako/" "$REPO_DIR/mako/"
     echo "✓ Mako synced"
 fi

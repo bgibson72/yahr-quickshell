@@ -36,7 +36,7 @@ MouseArea {
                 else return "󰕿"
             }
             font.family: "Symbols Nerd Font"
-            font.pixelSize: 16
+            font.pixelSize: ThemeManager.barLarge ? 20 : 16
             color: audioArea.muted ? ThemeManager.border0 : ThemeManager.accentYellow
             
             Behavior on color {

@@ -70,7 +70,7 @@ RowLayout {
                 id: workspaceText
                 anchors.centerIn: workspaceRect
                 text: staticWorkspaceButton.workspaceId.toString()
-                font.family: "Sen"
+                font.family: ThemeManager.uiFont
                 font.pixelSize: 13
                 font.bold: staticWorkspaceButton.isCurrentWorkspace
                 textFormat: Text.PlainText
@@ -153,7 +153,7 @@ RowLayout {
                 id: dynamicWorkspaceText
                 anchors.centerIn: dynamicWorkspaceRect
                 text: dynamicWorkspaceButton.modelData.id.toString()
-                font.family: "Sen"
+                font.family: ThemeManager.uiFont
                 font.pixelSize: 13
                 font.bold: dynamicWorkspaceButton.isCurrentWorkspace
                 textFormat: Text.PlainText

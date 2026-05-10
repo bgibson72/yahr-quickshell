@@ -8,7 +8,7 @@ Rectangle {
     
     width: 420
     height: 820
-    color: Qt.rgba(ThemeManager.bgBase.r, ThemeManager.bgBase.g, ThemeManager.bgBase.b, 0.92)
+    color: Qt.rgba(ThemeManager.bgBase.r, ThemeManager.bgBase.g, ThemeManager.bgBase.b, ThemeManager.widgetOpacity)
     radius: 16
     border.width: showWidgetBorders ? widgetBorderWidth : 0
     border.color: Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.35)
@@ -87,7 +87,7 @@ Rectangle {
                 anchors.left: parent.left
                 anchors.verticalCenter: parent.verticalCenter
                 text: "Control Center"
-                font.family: "Sen"
+                font.family: ThemeManager.uiFont
                 font.pixelSize: 20
                 font.weight: Font.Bold
                 color: ThemeManager.fgPrimary
@@ -110,7 +110,7 @@ Rectangle {
                 Text {
                     anchors.centerIn: parent
                     text: "✕"
-                    font.family: "Sen"
+                    font.family: ThemeManager.uiFont
                     font.pixelSize: 18
                     font.weight: Font.Bold
                     color: ThemeManager.fgSecondary
@@ -178,7 +178,7 @@ Rectangle {
                             
                             Text {
                                 text: root.networkType === "wifi" ? "Wi-Fi" : root.networkType === "ethernet" ? "Ethernet" : "Disconnected"
-                                font.family: "Sen"
+                                font.family: ThemeManager.uiFont
                                 font.pixelSize: 16
                                 font.weight: Font.Bold
                                 color: ThemeManager.fgPrimary
@@ -186,7 +186,7 @@ Rectangle {
                             
                             Text {
                                 text: root.networkName
-                                font.family: "Sen"
+                                font.family: ThemeManager.uiFont
                                 font.pixelSize: 13
                                 color: ThemeManager.fgSecondary
                             }
@@ -234,7 +234,7 @@ Rectangle {
                     
                     Text {
                         text: root.networkType === "wifi" ? root.signalStrength + "%" : ""
-                        font.family: "Sen"
+                        font.family: ThemeManager.uiFont
                         font.pixelSize: 14
                         font.weight: Font.Bold
                         color: ThemeManager.accentBlue
@@ -243,14 +243,14 @@ Rectangle {
                     
                     Text {
                         text: "↓ " + root.downloadRate
-                        font.family: "Sen"
+                        font.family: ThemeManager.uiFont
                         font.pixelSize: 11
                         color: ThemeManager.fgSecondary
                     }
                     
                     Text {
                         text: "↑ " + root.uploadRate
-                        font.family: "Sen"
+                        font.family: ThemeManager.uiFont
                         font.pixelSize: 11
                         color: ThemeManager.fgSecondary
                     }
@@ -279,7 +279,7 @@ Rectangle {
                     Text {
                         anchors.centerIn: parent
                         text: "Network Settings"
-                        font.family: "Sen"
+                        font.family: ThemeManager.uiFont
                         font.pixelSize: 13
                         color: ThemeManager.fgPrimary
                     }
@@ -319,7 +319,7 @@ Rectangle {
                         
                         Text {
                             text: "Volume"
-                            font.family: "Sen"
+                            font.family: ThemeManager.uiFont
                             font.pixelSize: 16
                             font.weight: Font.Bold
                             color: ThemeManager.fgPrimary
@@ -327,7 +327,7 @@ Rectangle {
                         
                         Text {
                             text: root.muted ? "Muted" : root.volume + "%"
-                            font.family: "Sen"
+                            font.family: ThemeManager.uiFont
                             font.pixelSize: 13
                             color: ThemeManager.fgSecondary
                         }
@@ -466,7 +466,7 @@ Rectangle {
                             
                             Text {
                                 text: "Bluetooth"
-                                font.family: "Sen"
+                                font.family: ThemeManager.uiFont
                                 font.pixelSize: 16
                                 font.weight: Font.Bold
                                 color: ThemeManager.fgPrimary
@@ -474,7 +474,7 @@ Rectangle {
                             
                             Text {
                                 text: root.bluetoothEnabled ? (root.bluetoothDevices.length > 0 ? root.bluetoothDevices.length + " device(s) connected" : "No devices connected") : "Off"
-                                font.family: "Sen"
+                                font.family: ThemeManager.uiFont
                                 font.pixelSize: 13
                                 color: ThemeManager.fgSecondary
                             }
@@ -526,7 +526,7 @@ Rectangle {
                         model: root.bluetoothDevices
                         delegate: Text {
                             text: "  • " + modelData
-                            font.family: "Sen"
+                            font.family: ThemeManager.uiFont
                             font.pixelSize: 12
                             color: ThemeManager.fgSecondary
                         }
@@ -555,7 +555,7 @@ Rectangle {
                     Text {
                         anchors.centerIn: parent
                         text: "Bluetooth Settings"
-                        font.family: "Sen"
+                        font.family: ThemeManager.uiFont
                         font.pixelSize: 13
                         color: ThemeManager.fgPrimary
                     }
@@ -595,7 +595,7 @@ Rectangle {
                         
                         Text {
                             text: "Brightness"
-                            font.family: "Sen"
+                            font.family: ThemeManager.uiFont
                             font.pixelSize: 16
                             font.weight: Font.Bold
                             color: ThemeManager.fgPrimary
@@ -603,7 +603,7 @@ Rectangle {
                         
                         Text {
                             text: root.brightness + "%"
-                            font.family: "Sen"
+                            font.family: ThemeManager.uiFont
                             font.pixelSize: 13
                             color: ThemeManager.fgSecondary
                         }
@@ -735,7 +735,7 @@ Rectangle {
                                     if (root.charging) return "Charging"
                                     return "Battery"
                                 }
-                                font.family: "Sen"
+                                font.family: ThemeManager.uiFont
                                 font.pixelSize: 16
                                 font.weight: Font.Bold
                                 color: ThemeManager.fgPrimary
@@ -744,7 +744,7 @@ Rectangle {
                             
                             Text {
                                 text: root.batteryLevel + "%"
-                                font.family: "Sen"
+                                font.family: ThemeManager.uiFont
                                 font.pixelSize: 16
                                 font.weight: Font.Bold
                                 color: ThemeManager.accentBlue
@@ -755,7 +755,7 @@ Rectangle {
                         // Battery time info
                         Text {
                             text: root.batteryTimeRemaining
-                            font.family: "Sen"
+                            font.family: ThemeManager.uiFont
                             font.pixelSize: 12
                             color: ThemeManager.fgSecondary
                             visible: root.batteryTimeRemaining !== ""

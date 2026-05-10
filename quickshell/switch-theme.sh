@@ -50,6 +50,36 @@ fi
 # Copy new theme
 cp "$THEME_FILE" "$TARGET"
 
+# Inject persistent user preferences (widgetOpacity, barLarge) from settings.json
+SETTINGS_FILE="$HOME/.config/quickshell/settings.json"
+WIDGET_OPACITY="0.75"
+BAR_LARGE="false"
+UI_FONT="Sen"
+if [[ -f "$SETTINGS_FILE" ]]; then
+    wo=$(python3 -c "import json; d=json.load(open('$SETTINGS_FILE')); print(d.get('general',{}).get('widgetTransparent', True) and 0.75 or 1.0)" 2>/dev/null)
+    [[ -n "$wo" ]] && WIDGET_OPACITY="$wo"
+    bl=$(python3 -c "import json; d=json.load(open('$SETTINGS_FILE')); print('true' if d.get('bar',{}).get('barSize','small')=='large' else 'false')" 2>/dev/null)
+    [[ -n "$bl" ]] && BAR_LARGE="$bl"
+    uf=$(python3 -c "import json; d=json.load(open('$SETTINGS_FILE')); print(d.get('general',{}).get('uiFont','Sen'))" 2>/dev/null)
+    [[ -n "$uf" ]] && UI_FONT="$uf"
+fi
+# Append properties if not already present, or update them
+if grep -q "widgetOpacity" "$TARGET"; then
+    sed -i "s/property real widgetOpacity:.*/property real widgetOpacity: $WIDGET_OPACITY/" "$TARGET"
+else
+    sed -i "/^}$/i\\    property real widgetOpacity: $WIDGET_OPACITY" "$TARGET"
+fi
+if grep -q "barLarge" "$TARGET"; then
+    sed -i "s/property bool barLarge:.*/property bool barLarge: $BAR_LARGE/" "$TARGET"
+else
+    sed -i "/^}$/i\\    property bool barLarge: $BAR_LARGE" "$TARGET"
+fi
+if grep -q "uiFont" "$TARGET"; then
+    sed -i "s/property string uiFont:.*/property string uiFont: \"$UI_FONT\"/" "$TARGET"
+else
+    sed -i "/^}$/i\\    property string uiFont: \"$UI_FONT\"" "$TARGET"
+fi
+
 echo -e "${GREEN}✓ Theme switched to: $THEME${NC}"
 echo ""
 
@@ -103,14 +133,18 @@ if [ -d "$WALLPAPER_DIR" ] && command -v awww &> /dev/null; then
     if [ -n "$WALLPAPER" ]; then
         echo "Updating wallpaper..."
         awww img "$WALLPAPER" --transition-type fade --transition-fps 60 &
+        # Persist wallpaper so autostart restores the correct one on next login
+        printf "%s" "$WALLPAPER" > "$HOME/.config/quickshell/last-wallpaper"
         echo -e "${GREEN}✓ Wallpaper updated${NC}"
     fi
 fi
 
 # Sync SDDM theme first (synchronously for reliability)
+# Wait 500ms for awww to finish applying the wallpaper before querying it
 SDDM_SYNC="$HOME/.config/quickshell/sync-sddm-theme.sh"
 if [ -f "$SDDM_SYNC" ]; then
     echo "Syncing SDDM theme..."
+    sleep 0.5
     "$SDDM_SYNC"
     echo ""
 fi
@@ -143,9 +177,9 @@ fi
 fi
 
 # Update fastfetch logo
-if [ -x "$HOME/.config/quickshell/update-theme-logo.sh" ]; then
+if [ -x "$HOME/.config/fastfetch/update-theme-logo.sh" ]; then
     echo "Updating fastfetch logo..."
-    "$HOME/.config/quickshell/update-theme-logo.sh" > /dev/null 2>&1
+    "$HOME/.config/fastfetch/update-theme-logo.sh" > /dev/null 2>&1
 fi
 
 # Sync Starship prompt colors

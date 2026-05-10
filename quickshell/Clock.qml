@@ -31,8 +31,8 @@ Rectangle {
     Text {
         id: clockText
         anchors.centerIn: parent
-        font.family: "Sen"
-        font.pixelSize: 13
+        font.family: ThemeManager.uiFont
+        font.pixelSize: ThemeManager.barLarge ? 16 : 13
         color: ThemeManager.fgPrimary
     }
     

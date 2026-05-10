@@ -4,10 +4,14 @@
 # Uses Firefox CSS to apply theme colors
 
 HYPRLAND_CONF="$HOME/.config/hypr/hyprland.conf"
+CURRENT_THEME_FILE="$HOME/.config/hypr/.current-theme"
+HYPR_THEMES_DIR="$HOME/.config/hypr/themes"
 
-# Auto-detect Firefox profile
-FIREFOX_BASE="$HOME/.mozilla/firefox"
-FIREFOX_PROFILE=$(find "$FIREFOX_BASE" -maxdepth 1 -name "*.default-release" -type d | head -1)
+# Auto-detect Firefox profile (check both standard and XDG config locations)
+FIREFOX_PROFILE=$(find "$HOME/.mozilla/firefox" -maxdepth 1 -name "*.default-release" -type d 2>/dev/null | head -1)
+if [[ -z "$FIREFOX_PROFILE" ]]; then
+    FIREFOX_PROFILE=$(find "$HOME/.config/mozilla/firefox" -maxdepth 1 -name "*.default-release" -type d 2>/dev/null | head -1)
+fi
 
 if [[ -z "$FIREFOX_PROFILE" ]]; then
     echo "Error: Firefox profile not found"
@@ -17,16 +21,22 @@ fi
 CHROME_DIR="$FIREFOX_PROFILE/chrome"
 USER_CSS="$CHROME_DIR/userChrome.css"
 
-# Get current theme from Hyprland config
-THEME_FILE=$(grep "^source.*themes.*\.conf" "$HYPRLAND_CONF" | sed 's/.*= *//')
-
-if [ -z "$THEME_FILE" ] || [ ! -f "$THEME_FILE" ]; then
-    echo "Error: Could not determine theme file from Hyprland config"
-    exit 1
+# Prefer .current-theme as the source of truth (set by the quickshell theme switcher),
+# fall back to parsing hyprland.conf's source line.
+if [ -f "$CURRENT_THEME_FILE" ]; then
+    theme_name=$(cat "$CURRENT_THEME_FILE" | tr -d '[:space:]')
+    THEME_FILE="$HYPR_THEMES_DIR/${theme_name}.conf"
 fi
 
-theme_name=$(basename "$THEME_FILE" .conf)
-theme_name=$(basename "$THEME_FILE" .conf)
+if [ -z "$theme_name" ] || [ ! -f "$THEME_FILE" ]; then
+    THEME_FILE=$(grep "^source.*themes.*\.conf" "$HYPRLAND_CONF" | sed 's/.*= *//')
+    theme_name=$(basename "$THEME_FILE" .conf)
+fi
+
+if [ -z "$THEME_FILE" ] || [ ! -f "$THEME_FILE" ]; then
+    echo "Error: Could not determine theme file"
+    exit 1
+fi
 
 # Create chrome directory if it doesn't exist
 mkdir -p "$CHROME_DIR"
@@ -363,7 +373,7 @@ echo "  userChrome.css: $USER_CSS"
 echo ""
 
 if pgrep -x firefox > /dev/null; then
-    echo "⚠ Firefox is running - restart Firefox to apply the theme"
+    echo "⚠ Firefox is running — restart Firefox to apply the new theme"
 else
     echo "✓ Launch Firefox to see the new theme"
 fi

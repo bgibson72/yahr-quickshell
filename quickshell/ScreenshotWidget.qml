@@ -167,7 +167,7 @@ PanelWindow {
     Rectangle {
         id: background
         anchors.fill: parent
-        color: Qt.rgba(ThemeManager.bgBase.r, ThemeManager.bgBase.g, ThemeManager.bgBase.b, 0.92)
+        color: Qt.rgba(ThemeManager.bgBase.r, ThemeManager.bgBase.g, ThemeManager.bgBase.b, ThemeManager.widgetOpacity)
         radius: 16
         border.width: screenshotWindow.showWidgetBorders ? screenshotWindow.widgetBorderWidth : 0
         border.color: Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.35)
@@ -187,7 +187,7 @@ PanelWindow {
                 Text {
                     anchors.centerIn: parent
                     text: "Screenshot"
-                    font.family: "Sen"
+                    font.family: ThemeManager.uiFont
                     font.pixelSize: 16
                     font.weight: Font.DemiBold
                     color: ThemeManager.fgPrimary
@@ -209,7 +209,7 @@ PanelWindow {
                     Text {
                         anchors.centerIn: parent
                         text: "✕"
-                        font.family: "Sen"
+                        font.family: ThemeManager.uiFont
                         font.pixelSize: 18
                         font.weight: Font.Bold
                         color: ThemeManager.fgSecondary
@@ -247,7 +247,7 @@ PanelWindow {
                         Text {
                             anchors.horizontalCenter: parent.horizontalCenter
                             text: "Select Capture Mode"
-                            font.family: "Sen"
+                            font.family: ThemeManager.uiFont
                             font.pixelSize: 14
                             font.weight: Font.Medium
                             color: ThemeManager.fgSecondary
@@ -285,7 +285,7 @@ PanelWindow {
                                     Text {
                                         anchors.horizontalCenter: parent.horizontalCenter
                                         text: "Workspace"
-                                        font.family: "Sen"
+                                        font.family: ThemeManager.uiFont
                                         font.pixelSize: 12
                                         font.weight: Font.Medium
                                         color: ThemeManager.fgPrimary
@@ -329,7 +329,7 @@ PanelWindow {
                                     Text {
                                         anchors.horizontalCenter: parent.horizontalCenter
                                         text: "Window"
-                                        font.family: "Sen"
+                                        font.family: ThemeManager.uiFont
                                         font.pixelSize: 12
                                         font.weight: Font.Medium
                                         color: ThemeManager.fgPrimary
@@ -373,7 +373,7 @@ PanelWindow {
                                     Text {
                                         anchors.horizontalCenter: parent.horizontalCenter
                                         text: "Selection"
-                                        font.family: "Sen"
+                                        font.family: ThemeManager.uiFont
                                         font.pixelSize: 12
                                         font.weight: Font.Medium
                                         color: ThemeManager.fgPrimary

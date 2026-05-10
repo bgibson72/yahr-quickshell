@@ -134,7 +134,7 @@ Rectangle {
                 anchors.centerIn: parent
                 text: "󰂯"  // Bluetooth icon
                 font.family: "Symbols Nerd Font"
-                font.pixelSize: 16
+                font.pixelSize: ThemeManager.barLarge ? 20 : 16
                 color: ThemeManager.accentGreen
             }
         }
@@ -165,7 +165,7 @@ Rectangle {
                         else return "󰌙"  // Disconnected
                     }
                     font.family: "Symbols Nerd Font"
-                    font.pixelSize: 16
+                    font.pixelSize: ThemeManager.barLarge ? 20 : 16
                     color: ThemeManager.accentGreen
                 }
                 
@@ -173,8 +173,8 @@ Rectangle {
                     id: networkDetailsText
                     anchors.verticalCenter: parent.verticalCenter
                     text: "↓" + systemTray.downloadSpeed.toFixed(1) + " ↑" + systemTray.uploadSpeed.toFixed(1)
-                    font.family: "Sen"
-                    font.pixelSize: 10
+                    font.family: ThemeManager.uiFont
+                    font.pixelSize: ThemeManager.barLarge ? 12 : 10
                     color: ThemeManager.fgPrimary
                     visible: systemTray.showNetworkDetails
                     opacity: systemTray.showNetworkDetails ? 1.0 : 0.0
@@ -209,7 +209,7 @@ Rectangle {
                         else return "󰕿"
                     }
                     font.family: "Symbols Nerd Font"
-                    font.pixelSize: 16
+                    font.pixelSize: ThemeManager.barLarge ? 20 : 16
                     color: ThemeManager.accentGreen
                 }
                 
@@ -217,8 +217,8 @@ Rectangle {
                     id: volumeDetailsText
                     anchors.verticalCenter: parent.verticalCenter
                     text: systemTray.muted ? "Muted" : systemTray.volume + "%"
-                    font.family: "Sen"
-                    font.pixelSize: 11
+                    font.family: ThemeManager.uiFont
+                    font.pixelSize: ThemeManager.barLarge ? 13 : 11
                     color: ThemeManager.fgPrimary
                     visible: systemTray.showVolumeDetails
                     opacity: systemTray.showVolumeDetails ? 1.0 : 0.0
@@ -284,7 +284,7 @@ Rectangle {
                         else return "󰂃"  // Low battery icon
                     }
                     font.family: "Symbols Nerd Font"
-                    font.pixelSize: 16
+                    font.pixelSize: ThemeManager.barLarge ? 20 : 16
                     color: systemTray.acOnline ? ThemeManager.accentGreen :
                            systemTray.charging ? ThemeManager.accentGreen :
                            systemTray.batteryLevel <= 20 ? ThemeManager.accentRed : ThemeManager.accentGreen
@@ -294,8 +294,8 @@ Rectangle {
                 Text {
                     id: batteryDetailsText
                     text: systemTray.batteryLevel + "%"
-                    font.family: "Sen"
-                    font.pixelSize: 12
+                    font.family: ThemeManager.uiFont
+                    font.pixelSize: ThemeManager.barLarge ? 14 : 12
                     color: ThemeManager.fgPrimary
                     anchors.verticalCenter: parent.verticalCenter
                     visible: systemTray.showBatteryDetails

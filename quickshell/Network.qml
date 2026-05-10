@@ -35,7 +35,7 @@ MouseArea {
                 else return "󰌙"
             }
             font.family: "Symbols Nerd Font"
-            font.pixelSize: 16
+            font.pixelSize: ThemeManager.barLarge ? 20 : 16
             color: {
                 if (networkArea.connectionType === "wifi") return ThemeManager.accentGreen
                 else if (networkArea.connectionType === "ethernet") return ThemeManager.accentBlue

@@ -165,7 +165,7 @@ Rectangle {
                 Text {
                     anchors.centerIn: parent
                     text: "Background"
-                    font.family: "Sen"
+                    font.family: ThemeManager.uiFont
                     font.pixelSize: 9
                     color: themePreview.themeColors["fg-primary"] || "#cdd6f4"
                     opacity: 0.4
@@ -260,7 +260,7 @@ Rectangle {
     Text {
         anchors.centerIn: parent
         text: loaded ? "" : "Loading..."
-        font.family: "Sen"
+        font.family: ThemeManager.uiFont
         font.pixelSize: 10
         color: themePreview.themeColors.fgTertiary || "#a6adc8"
         visible: !loaded

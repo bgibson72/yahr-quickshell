@@ -7,7 +7,7 @@ Item {
     Text {
         anchors.centerIn: parent
         text: "|"
-        font.family: "Sen"
+        font.family: ThemeManager.uiFont
         font.pixelSize: 13
         color: Qt.rgba(1, 1, 1, 0.18)
     }

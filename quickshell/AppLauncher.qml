@@ -8,7 +8,7 @@ Rectangle {
 
     width: 1000
     height: 600
-    color: Qt.rgba(ThemeManager.bgBase.r, ThemeManager.bgBase.g, ThemeManager.bgBase.b, 0.92)
+    color: Qt.rgba(ThemeManager.bgBase.r, ThemeManager.bgBase.g, ThemeManager.bgBase.b, ThemeManager.widgetOpacity)
     radius: 20
     border.width: showWidgetBorders ? widgetBorderWidth : 0
     border.color: Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.35)
@@ -239,7 +239,7 @@ Rectangle {
                     id: searchField
                     width: parent.width - 40
                     anchors.verticalCenter: parent.verticalCenter
-                    font.family: "Sen"
+                    font.family: ThemeManager.uiFont
                     font.pixelSize: 13
                     color: ThemeManager.fgPrimary
                     selectionColor: Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.45)
@@ -345,7 +345,7 @@ Rectangle {
                             width: parent.width
                             horizontalAlignment: Text.AlignHCenter
                             text: model.appName
-                            font.family: "Sen"
+                            font.family: ThemeManager.uiFont
                             font.pixelSize: 11
                             font.weight: Font.Medium
                             color: ThemeManager.fgPrimary
@@ -443,7 +443,7 @@ Rectangle {
                             width: parent.width
                             horizontalAlignment: Text.AlignHCenter
                             text: model.appName
-                            font.family: "Sen"
+                            font.family: ThemeManager.uiFont
                             font.pixelSize: 11
                             font.weight: Font.Medium
                             color: ThemeManager.fgPrimary

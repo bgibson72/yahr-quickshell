@@ -7,7 +7,7 @@ Rectangle {
 
     width: 800
     height: 600
-    color: Qt.rgba(ThemeManager.bgBase.r, ThemeManager.bgBase.g, ThemeManager.bgBase.b, 0.92)
+    color: Qt.rgba(ThemeManager.bgBase.r, ThemeManager.bgBase.g, ThemeManager.bgBase.b, ThemeManager.widgetOpacity)
     radius: 16
     border.width: showWidgetBorders ? widgetBorderWidth : 0
     border.color: Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.35)
@@ -115,7 +115,7 @@ Rectangle {
 
                         Text {
                             text: "Calendar"
-                            font.family: "Sen"
+                            font.family: ThemeManager.uiFont
                             font.pixelSize: 14
                             font.weight: Font.Medium
                             color: ThemeManager.fgPrimary
@@ -153,7 +153,7 @@ Rectangle {
 
                         Text {
                             text: "Weather"
-                            font.family: "Sen"
+                            font.family: ThemeManager.uiFont
                             font.pixelSize: 14
                             font.weight: Font.Medium
                             color: ThemeManager.fgPrimary
@@ -191,7 +191,7 @@ Rectangle {
 
                         Text {
                             text: "System"
-                            font.family: "Sen"
+                            font.family: ThemeManager.uiFont
                             font.pixelSize: 14
                             font.weight: Font.Medium
                             color: ThemeManager.fgPrimary

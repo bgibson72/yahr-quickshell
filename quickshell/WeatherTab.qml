@@ -57,7 +57,7 @@ Item {
                         id: currentTemp
                         anchors.horizontalCenter: parent.horizontalCenter
                         text: "..."
-                        font.family: "Sen"
+                        font.family: ThemeManager.uiFont
                         font.pixelSize: 48
                         font.weight: Font.Bold
                         color: ThemeManager.fgPrimary
@@ -67,7 +67,7 @@ Item {
                         id: currentCondition
                         anchors.horizontalCenter: parent.horizontalCenter
                         text: "Loading..."
-                        font.family: "Sen"
+                        font.family: ThemeManager.uiFont
                         font.pixelSize: 18
                         color: ThemeManager.fgSecondary
                     }
@@ -84,7 +84,7 @@ Item {
                     Text {
                         id: cityName
                         text: ""
-                        font.family: "Sen"
+                        font.family: ThemeManager.uiFont
                         font.pixelSize: 16
                         font.weight: Font.Bold
                         color: ThemeManager.accentBlue
@@ -96,7 +96,7 @@ Item {
                     Text {
                         id: locationText
                         text: "📍 Loading location..."
-                        font.family: "Sen"
+                        font.family: ThemeManager.uiFont
                         font.pixelSize: 14
                         color: ThemeManager.fgSecondary
                         width: parent.width
@@ -113,14 +113,14 @@ Item {
                             spacing: 4
                             Text {
                                 text: "Feels Like"
-                                font.family: "Sen"
+                                font.family: ThemeManager.uiFont
                                 font.pixelSize: 12
                                 color: ThemeManager.fgTertiary
                             }
                             Text {
                                 id: feelsLike
                                 text: "--"
-                                font.family: "Sen"
+                                font.family: ThemeManager.uiFont
                                 font.pixelSize: 16
                                 font.weight: Font.Bold
                                 color: ThemeManager.fgPrimary
@@ -132,14 +132,14 @@ Item {
                             spacing: 4
                             Text {
                                 text: "Humidity"
-                                font.family: "Sen"
+                                font.family: ThemeManager.uiFont
                                 font.pixelSize: 12
                                 color: ThemeManager.fgTertiary
                             }
                             Text {
                                 id: humidity
                                 text: "--"
-                                font.family: "Sen"
+                                font.family: ThemeManager.uiFont
                                 font.pixelSize: 16
                                 font.weight: Font.Bold
                                 color: ThemeManager.accentCyan
@@ -151,14 +151,14 @@ Item {
                             spacing: 4
                             Text {
                                 text: "Wind Speed"
-                                font.family: "Sen"
+                                font.family: ThemeManager.uiFont
                                 font.pixelSize: 12
                                 color: ThemeManager.fgTertiary
                             }
                             Text {
                                 id: windSpeed
                                 text: "--"
-                                font.family: "Sen"
+                                font.family: ThemeManager.uiFont
                                 font.pixelSize: 16
                                 font.weight: Font.Bold
                                 color: ThemeManager.accentGreen
@@ -170,14 +170,14 @@ Item {
                             spacing: 4
                             Text {
                                 text: "Pressure"
-                                font.family: "Sen"
+                                font.family: ThemeManager.uiFont
                                 font.pixelSize: 12
                                 color: ThemeManager.fgTertiary
                             }
                             Text {
                                 id: pressure
                                 text: "--"
-                                font.family: "Sen"
+                                font.family: ThemeManager.uiFont
                                 font.pixelSize: 16
                                 font.weight: Font.Bold
                                 color: ThemeManager.fgPrimary
@@ -215,7 +215,7 @@ Item {
                     
                     Text {
                         text: "3-Day Forecast"
-                        font.family: "Sen"
+                        font.family: ThemeManager.uiFont
                         font.pixelSize: 18
                         font.weight: Font.Bold
                         color: ThemeManager.fgPrimary
@@ -257,7 +257,7 @@ Item {
                                     id: dayLabel
                                     anchors.horizontalCenter: parent.horizontalCenter
                                     text: forecastModel.getDayLabel(index)
-                                    font.family: "Sen"
+                                    font.family: ThemeManager.uiFont
                                     font.pixelSize: 14
                                     font.weight: Font.Bold
                                     color: ThemeManager.fgPrimary
@@ -278,7 +278,7 @@ Item {
                                     Text {
                                         anchors.horizontalCenter: parent.horizontalCenter
                                         text: forecastModel.getHighTemp(index)
-                                        font.family: "Sen"
+                                        font.family: ThemeManager.uiFont
                                         font.pixelSize: 16
                                         font.weight: Font.Bold
                                         color: ThemeManager.accentRed
@@ -287,7 +287,7 @@ Item {
                                     Text {
                                         anchors.horizontalCenter: parent.horizontalCenter
                                         text: forecastModel.getLowTemp(index)
-                                        font.family: "Sen"
+                                        font.family: ThemeManager.uiFont
                                         font.pixelSize: 14
                                         color: ThemeManager.accentCyan
                                     }
@@ -296,7 +296,7 @@ Item {
                                 Text {
                                     anchors.horizontalCenter: parent.horizontalCenter
                                     text: forecastModel.getCondition(index)
-                                    font.family: "Sen"
+                                    font.family: ThemeManager.uiFont
                                     font.pixelSize: 11
                                     color: ThemeManager.fgSecondary
                                     width: parent.parent.width - 16

@@ -47,7 +47,7 @@ MouseArea {
                     else return "󰂃"
                 }
                 font.family: "Symbols Nerd Font"
-                font.pixelSize: 16
+                font.pixelSize: ThemeManager.barLarge ? 20 : 16
                 color: {
                     if (batteryArea.charging) return ThemeManager.accentGreen
                     else if (batteryArea.batteryLevel <= 15) return ThemeManager.accentRed
@@ -63,8 +63,8 @@ MouseArea {
             
             Text {
                 text: batteryArea.charging ? batteryArea.batteryLevel + "%" : ""
-                font.family: "Sen"
-                font.pixelSize: 13
+                font.family: ThemeManager.uiFont
+                font.pixelSize: ThemeManager.barLarge ? 16 : 13
                 color: ThemeManager.accentGreen
                 anchors.verticalCenter: parent.verticalCenter
                 visible: batteryArea.charging

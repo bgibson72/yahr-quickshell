@@ -9,16 +9,24 @@ QUICKSHELL_SETTINGS="$HOME/.config/quickshell/settings.json"
 HYPR_THEMES_DIR="$HOME/.config/hypr/themes"
 VENCORD_CSS="$HOME/.config/vesktop/settings/settings.json"
 HYPRLAND_CONF="$HOME/.config/hypr/hyprland.conf"
+CURRENT_THEME_FILE="$HOME/.config/hypr/.current-theme"
 
-# Get current theme from Hyprland config (most reliable source during theme switches)
-THEME_FILE=$(grep "^source.*themes.*\.conf" "$HYPRLAND_CONF" | sed 's/.*= *//')
-
-if [ -z "$THEME_FILE" ] || [ ! -f "$THEME_FILE" ]; then
-    echo "Error: Could not determine theme file from Hyprland config"
-    exit 1
+# Prefer .current-theme as the source of truth (set by the quickshell theme switcher),
+# fall back to parsing hyprland.conf's source line.
+if [ -f "$CURRENT_THEME_FILE" ]; then
+    CURRENT_THEME=$(cat "$CURRENT_THEME_FILE" | tr -d '[:space:]')
+    THEME_FILE="$HYPR_THEMES_DIR/${CURRENT_THEME}.conf"
 fi
 
-CURRENT_THEME=$(basename "$THEME_FILE" .conf)
+if [ -z "$CURRENT_THEME" ] || [ ! -f "$THEME_FILE" ]; then
+    THEME_FILE=$(grep "^source.*themes.*\.conf" "$HYPRLAND_CONF" | sed 's/.*= *//')
+    CURRENT_THEME=$(basename "$THEME_FILE" .conf)
+fi
+
+if [ -z "$THEME_FILE" ] || [ ! -f "$THEME_FILE" ]; then
+    echo "Error: Could not determine theme file"
+    exit 1
+fi
 
 echo "Syncing theme: $CURRENT_THEME"
 echo "Reading colors from: $THEME_FILE"

@@ -3,18 +3,27 @@
 # Sync Neovim/AstroVim theme with Quickshell theme
 
 HYPRLAND_CONF="$HOME/.config/hypr/hyprland.conf"
+CURRENT_THEME_FILE="$HOME/.config/hypr/.current-theme"
+HYPR_THEMES_DIR="$HOME/.config/hypr/themes"
 NVIM_THEME_SWITCHER="$HOME/.config/nvim/lua/theme-switcher.lua"
 NVIM_CONFIG="$HOME/.config/nvim/lua/plugins/astroui.lua"
 
-# Get current theme from Hyprland config
-THEME_FILE=$(grep "^source.*themes.*\.conf" "$HYPRLAND_CONF" | sed 's/.*= *//')
-
-if [ -z "$THEME_FILE" ] || [ ! -f "$THEME_FILE" ]; then
-    echo "Error: Could not determine theme file from Hyprland config"
-    exit 1
+# Prefer .current-theme as the source of truth (set by the quickshell theme switcher),
+# fall back to parsing hyprland.conf's source line.
+if [ -f "$CURRENT_THEME_FILE" ]; then
+    theme_name=$(cat "$CURRENT_THEME_FILE" | tr -d '[:space:]')
+    THEME_FILE="$HYPR_THEMES_DIR/${theme_name}.conf"
 fi
 
-theme_name=$(basename "$THEME_FILE" .conf)
+if [ -z "$theme_name" ] || [ ! -f "$THEME_FILE" ]; then
+    THEME_FILE=$(grep "^source.*themes.*\.conf" "$HYPRLAND_CONF" | sed 's/.*= *//')
+    theme_name=$(basename "$THEME_FILE" .conf)
+fi
+
+if [ -z "$THEME_FILE" ] || [ ! -f "$THEME_FILE" ]; then
+    echo "Error: Could not determine theme file"
+    exit 1
+fi
 
 # Map Hyprland theme names to Neovim colorscheme names
 # These match the themes in ~/.config/hypr/themes/

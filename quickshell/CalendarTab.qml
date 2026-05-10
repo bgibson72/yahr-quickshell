@@ -121,7 +121,7 @@ Item {
                     
                     Text {
                         id: timeText
-                        font.family: "Sen"
+                        font.family: ThemeManager.uiFont
                         font.pixelSize: 40
                         font.weight: Font.Bold
                         color: ThemeManager.accentBlue
@@ -131,7 +131,7 @@ Item {
                     
                     Text {
                         id: periodText
-                        font.family: "Sen"
+                        font.family: ThemeManager.uiFont
                         font.pixelSize: 18
                         font.weight: Font.Medium
                         color: ThemeManager.fgSecondary
@@ -156,7 +156,7 @@ Item {
                     
                     Text {
                         id: dateText
-                        font.family: "Sen"
+                        font.family: ThemeManager.uiFont
                         font.pixelSize: 18
                         font.weight: Font.Bold
                         color: ThemeManager.fgPrimary
@@ -165,7 +165,7 @@ Item {
                     
                     Text {
                         id: yearText
-                        font.family: "Sen"
+                        font.family: ThemeManager.uiFont
                         font.pixelSize: 14
                         color: ThemeManager.fgSecondary
                         text: "2026"
@@ -250,7 +250,7 @@ Item {
                         width: parent.width - 80
                         height: parent.height
                         text: calendarModel.monthYearText
-                        font.family: "Sen"
+                        font.family: ThemeManager.uiFont
                         font.pixelSize: 20
                         font.weight: Font.Bold
                         color: ThemeManager.fgPrimary
@@ -298,7 +298,7 @@ Item {
                         
                         Text {
                             text: modelData
-                            font.family: "Sen"
+                            font.family: ThemeManager.uiFont
                             font.pixelSize: 12
                             font.weight: Font.Bold
                             color: ThemeManager.accentBlue
@@ -355,7 +355,7 @@ Item {
                                 Text {
                                     anchors.horizontalCenter: parent.horizontalCenter
                                     text: parent.parent.isValidDay ? parent.parent.dayNumber : ""
-                                    font.family: "Sen"
+                                    font.family: ThemeManager.uiFont
                                     font.pixelSize: 14
                                     color: {
                                         if (parent.parent.isValidDay && parent.parent.isCurrentDay) return ThemeManager.accentBlue
@@ -414,7 +414,7 @@ Item {
                                     
                                     Text {
                                         text: calendarModel.moonPhaseName
-                                        font.family: "Sen"
+                                        font.family: ThemeManager.uiFont
                                         font.pixelSize: 13
                                         font.weight: Font.Bold
                                         color: ThemeManager.fgPrimary
@@ -422,7 +422,7 @@ Item {
                                     
                                     Text {
                                         text: calendarModel.moonIllumination
-                                        font.family: "Sen"
+                                        font.family: ThemeManager.uiFont
                                         font.pixelSize: 11
                                         color: ThemeManager.fgSecondary
                                     }
@@ -460,7 +460,7 @@ Item {
                                     
                                     Text {
                                         text: calendarModel.sunriseTime
-                                        font.family: "Sen"
+                                        font.family: ThemeManager.uiFont
                                         font.pixelSize: 12
                                         color: ThemeManager.accentYellow
                                         anchors.verticalCenter: parent.verticalCenter
@@ -480,7 +480,7 @@ Item {
                                     
                                     Text {
                                         text: calendarModel.sunsetTime
-                                        font.family: "Sen"
+                                        font.family: ThemeManager.uiFont
                                         font.pixelSize: 12
                                         color: ThemeManager.accentOrange
                                         anchors.verticalCenter: parent.verticalCenter
@@ -519,7 +519,7 @@ Item {
                         
                         Text {
                             text: calendarModel.selectedDateText
-                            font.family: "Sen"
+                            font.family: ThemeManager.uiFont
                             font.pixelSize: 16
                             font.weight: Font.Bold
                             color: ThemeManager.fgPrimary
@@ -568,7 +568,7 @@ Item {
                                     Text {
                                         width: parent.width
                                         text: modelData.title || "Event"
-                                        font.family: "Sen"
+                                        font.family: ThemeManager.uiFont
                                         font.pixelSize: 14
                                         font.weight: Font.Bold
                                         color: ThemeManager.fgPrimary
@@ -577,7 +577,7 @@ Item {
                                     
                                     Text {
                                         text: modelData.time || "All day"
-                                        font.family: "Sen"
+                                        font.family: ThemeManager.uiFont
                                         font.pixelSize: 12
                                         color: ThemeManager.fgSecondary
                                     }
@@ -588,7 +588,7 @@ Item {
                         Text {
                             anchors.centerIn: parent
                             text: "No events for this day"
-                            font.family: "Sen"
+                            font.family: ThemeManager.uiFont
                             font.pixelSize: 13
                             color: ThemeManager.fgTertiary
                             visible: eventsListView.count === 0
