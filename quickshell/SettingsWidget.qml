@@ -9,7 +9,7 @@ Rectangle {
 
     width: 800
     height: 600
-    color: Qt.rgba(ThemeManager.bgBase.r, ThemeManager.bgBase.g, ThemeManager.bgBase.b, 0.92)
+    color: Qt.rgba(ThemeManager.bgBase.r, ThemeManager.bgBase.g, ThemeManager.bgBase.b, ThemeManager.widgetOpacity)
     radius: 16
     border.width: showWidgetBorders ? widgetBorderWidth : 0
     border.color: Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.35)
@@ -32,6 +32,7 @@ Rectangle {
     property bool hyprAnimations: true
     property bool hyprShadow: true
     property bool hyprBlur: true
+    property int hyprBlurSize: 10
     
     signal closeRequested()
     signal settingsUpdated()  // Signal to notify when settings change
@@ -43,6 +44,7 @@ Rectangle {
         if (isVisible) {
             loadSettings()
             loadThemes()
+            loadFonts()
             loadHyprlandSettings()
             root.forceActiveFocus()
         }
@@ -84,7 +86,8 @@ Rectangle {
                             clockFormat24hr: true,
                             showSeconds: false,
                             enableBlur: false,
-                            showWidgetBorders: true
+                            showWidgetBorders: true,
+                            widgetTransparent: true
                         }
                     }
                     if (!root.settings.calendar) {
@@ -119,11 +122,6 @@ Rectangle {
                             current: "TokyoNight"
                         }
                     }
-                    if (!root.settings.wallpaper) {
-                        root.settings.wallpaper = {
-                            showAllWallpapers: false
-                        }
-                    }
                     
                     // Update the reactive currentTheme property
                     root.currentTheme = root.settings.theme.current || "TokyoNight"
@@ -143,7 +141,8 @@ Rectangle {
                             dateFormat: "MDY",
                             dateLong: false,
                             showDayOfWeek: false,
-                            enableBlur: false
+                            enableBlur: false,
+                            widgetTransparent: true
                         },
                         screenshot: {
                             defaultDelay: 0,
@@ -293,10 +292,15 @@ SETTINGSEOF`
         root.widgetBorderWidth = (root.settings.general && root.settings.general.widgetBorderWidth !== undefined)
             ? root.settings.general.widgetBorderWidth : 1
 
-        // Wallpaper settings
-        if (root.settings.wallpaper) {
-            showAllWallpapers.checked = root.settings.wallpaper.showAllWallpapers === true
-        }
+        // Widget transparency
+        const transparent = root.settings.general ? root.settings.general.widgetTransparent !== false : true
+        widgetTransparentCheck.checked = transparent
+        ThemeManager.widgetOpacity = transparent ? 0.75 : 1.0
+
+        // UI Font
+        const savedFont = (root.settings.general && root.settings.general.uiFont) ? root.settings.general.uiFont : "Sen"
+        root.currentFontSelection = savedFont
+        ThemeManager.uiFont = savedFont
     }
     
     // Load available themes
@@ -324,6 +328,32 @@ SETTINGSEOF`
         id: themeModel
     }
 
+    ListModel {
+        id: fontModel
+    }
+
+    property string currentFontSelection: ThemeManager.uiFont
+
+    Process {
+        id: fontLoader
+        running: false
+        command: ["sh", "-c", "fc-list : family | tr ',' '\\n' | sed 's/^ *//' | grep -ivE '^symbols |emoji|noto color emoji|^font awesome|weather icon' | sort -uf"]
+
+        stdout: SplitParser {
+            onRead: data => {
+                const name = data.trim()
+                if (name.length > 0) {
+                    fontModel.append({name: name})
+                }
+            }
+        }
+    }
+
+    function loadFonts() {
+        fontModel.clear()
+        fontLoader.running = true
+    }
+
     // Load Hyprland settings from look-and-feel.conf
     function loadHyprlandSettings() {
         hyprlandLoader.running = true
@@ -340,8 +370,10 @@ SETTINGSEOF`
             rounding=$(grep 'rounding = ' "$CONFIG" 2>/dev/null | grep -oE '[0-9]+' | head -1)
             shadow=$(grep -A 10 'shadow {' "$CONFIG" 2>/dev/null | grep 'enabled' | grep -c 'true' || echo 0)
             blur=$(grep -A 10 'blur {' "$CONFIG" 2>/dev/null | grep 'enabled' | grep -c 'true' || echo 0)
+            blur_size=$(grep -A 10 'blur {' "$CONFIG" 2>/dev/null | grep 'size = ' | grep -oE '[0-9]+' | head -1)
+            [ -z "$blur_size" ] && blur_size=10
             anim=$(grep -A 5 'animations {' "$CONFIG" 2>/dev/null | grep 'enabled' | grep -c 'yes' || echo 0)
-            echo "$border $gaps_in $gaps_out $rounding $shadow $blur $anim"
+            echo "$border $gaps_in $gaps_out $rounding $shadow $blur $anim $blur_size"
         `]
 
         property string buffer: ""
@@ -362,6 +394,7 @@ SETTINGSEOF`
                     root.hyprShadow = parts[4] === "1"
                     root.hyprBlur = parts[5] === "1"
                     root.hyprAnimations = parts[6] === "1"
+                    root.hyprBlurSize = parseInt(parts[7]) || 10
 
                     hyprBorderEnabledCheck.checked = bs > 0
                     hyprBorderThicknessObj.value = bs > 0 ? bs : 1
@@ -371,6 +404,7 @@ SETTINGSEOF`
                     hyprAnimationsCheck.checked = root.hyprAnimations
                     hyprShadowCheck.checked = root.hyprShadow
                     hyprBlurCheck.checked = root.hyprBlur
+                    hyprBlurSizeObj.value = root.hyprBlurSize
                 }
                 buffer = ""
             } else if (running) {
@@ -425,7 +459,7 @@ SETTINGSEOF`
             Text {
                 anchors.centerIn: parent
                 text: "YahrShell Settings"
-                font.family: "Sen"
+                font.family: ThemeManager.uiFont
                 font.pixelSize: 18
                 font.weight: Font.Bold
                 color: ThemeManager.fgPrimary
@@ -447,7 +481,7 @@ SETTINGSEOF`
                 Text {
                     anchors.centerIn: parent
                     text: "✕"
-                    font.family: "Sen"
+                    font.family: ThemeManager.uiFont
                     font.pixelSize: 18
                     font.weight: Font.Bold
                     color: ThemeManager.fgSecondary
@@ -493,7 +527,7 @@ SETTINGSEOF`
                         Text {
                             anchors.centerIn: parent
                             text: modelData
-                            font.family: "Sen"
+                            font.family: ThemeManager.uiFont
                             font.pixelSize: 13
                             font.weight: Font.Medium
                             color: ThemeManager.fgPrimary
@@ -539,7 +573,208 @@ SETTINGSEOF`
                     ColumnLayout {
                         width: parent.width
                         spacing: 32
-                        
+
+                        // ========== WIDGET APPEARANCE ==========
+                        Column {
+                            Layout.fillWidth: true
+                            spacing: 16
+
+                            Rectangle {
+                                width: parent.width
+                                height: 2
+                                color: ThemeManager.accentBlue
+                                opacity: 0.3
+                            }
+
+                            Text {
+                                text: "🪟 Widget Appearance"
+                                font.family: ThemeManager.uiFont
+                                font.pixelSize: 18
+                                font.weight: Font.Bold
+                                color: ThemeManager.accentBlue
+                            }
+
+                            // Transparent background toggle
+                            Row {
+                                spacing: 12
+
+                                Rectangle {
+                                    width: 24
+                                    height: 24
+                                    radius: 4
+                                    color: widgetTransparentCheck.checked ? ThemeManager.accentBlue : Qt.rgba(1, 1, 1, 0.07)
+                                    border.width: 2
+                                    border.color: ThemeManager.accentBlue
+
+                                    Text {
+                                        anchors.centerIn: parent
+                                        text: "✓"
+                                        font.family: "Symbols Nerd Font"
+                                        font.pixelSize: 16
+                                        color: ThemeManager.fgPrimary
+                                        visible: widgetTransparentCheck.checked
+                                    }
+
+                                    MouseArea {
+                                        anchors.fill: parent
+                                        cursorShape: Qt.PointingHandCursor
+                                        onClicked: {
+                                            widgetTransparentCheck.checked = !widgetTransparentCheck.checked
+                                            ThemeManager.widgetOpacity = widgetTransparentCheck.checked ? 0.75 : 1.0
+                                            if (!root.settings.general) root.settings.general = {}
+                                            root.settings.general.widgetTransparent = widgetTransparentCheck.checked
+                                            saveSettings()
+                                        }
+                                    }
+                                }
+
+                                Column {
+                                    spacing: 2
+
+                                    Text {
+                                        text: "Transparent widget backgrounds"
+                                        font.family: ThemeManager.uiFont
+                                        font.pixelSize: 12
+                                        color: ThemeManager.fgPrimary
+                                    }
+
+                                    Text {
+                                        text: widgetTransparentCheck.checked ? "Widgets use semi-transparent backgrounds" : "Widgets use solid opaque backgrounds"
+                                        font.family: ThemeManager.uiFont
+                                        font.pixelSize: 10
+                                        color: ThemeManager.fgTertiary
+                                    }
+                                }
+
+                                QtObject {
+                                    id: widgetTransparentCheck
+                                    property bool checked: true
+                                }
+                            }
+
+                            // Font picker
+                            Column {
+                                width: parent.width
+                                spacing: 8
+
+                                Text {
+                                    text: "UI Font"
+                                    font.family: ThemeManager.uiFont
+                                    font.pixelSize: 12
+                                    font.weight: Font.Medium
+                                    color: ThemeManager.fgPrimary
+                                }
+
+                                Text {
+                                    text: "Current: " + root.currentFontSelection
+                                    font.family: ThemeManager.uiFont
+                                    font.pixelSize: 10
+                                    color: ThemeManager.fgTertiary
+                                }
+
+                                // Search field
+                                Rectangle {
+                                    width: parent.width
+                                    height: 30
+                                    radius: 6
+                                    color: Qt.rgba(1, 1, 1, 0.07)
+                                    border.width: 1
+                                    border.color: Qt.rgba(1, 1, 1, 0.12)
+
+                                    TextInput {
+                                        id: fontSearchField
+                                        anchors.fill: parent
+                                        anchors.margins: 8
+                                        color: ThemeManager.fgPrimary
+                                        font.family: ThemeManager.uiFont
+                                        font.pixelSize: 12
+                                        verticalAlignment: TextInput.AlignVCenter
+                                        clip: true
+
+                                        Text {
+                                            anchors.fill: parent
+                                            anchors.leftMargin: 0
+                                            text: "Search fonts..."
+                                            color: ThemeManager.fgTertiary
+                                            font.family: ThemeManager.uiFont
+                                            font.pixelSize: 12
+                                            verticalAlignment: Text.AlignVCenter
+                                            visible: fontSearchField.text.length === 0
+                                        }
+                                    }
+                                }
+
+                                // Font list
+                                Rectangle {
+                                    width: parent.width
+                                    height: 160
+                                    radius: 6
+                                    color: Qt.rgba(0, 0, 0, 0.2)
+                                    border.width: 1
+                                    border.color: Qt.rgba(1, 1, 1, 0.10)
+                                    clip: true
+
+                                    ListView {
+                                        id: fontListView
+                                        anchors.fill: parent
+                                        anchors.margins: 4
+                                        clip: true
+                                        model: fontModel
+                                        boundsBehavior: Flickable.StopAtBounds
+                                        ScrollBar.vertical: ScrollBar {}
+
+                                        // Filter via wrapper
+                                        property string filterText: fontSearchField.text.toLowerCase()
+
+                                        delegate: Item {
+                                            width: fontListView.width
+                                            height: visible ? 28 : 0
+                                            visible: model.name.toLowerCase().indexOf(fontListView.filterText) !== -1
+
+                                            Rectangle {
+                                                anchors.fill: parent
+                                                anchors.margins: 2
+                                                radius: 4
+                                                color: model.name === root.currentFontSelection
+                                                    ? Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.25)
+                                                    : (fontDelegateArea.containsMouse ? Qt.rgba(1, 1, 1, 0.07) : "transparent")
+
+                                                Text {
+                                                    anchors.verticalCenter: parent.verticalCenter
+                                                    anchors.left: parent.left
+                                                    anchors.leftMargin: 8
+                                                    anchors.right: parent.right
+                                                    anchors.rightMargin: 8
+                                                    text: model.name
+                                                    font.family: model.name
+                                                    font.pixelSize: 12
+                                                    color: model.name === root.currentFontSelection
+                                                        ? ThemeManager.accentBlue
+                                                        : ThemeManager.fgPrimary
+                                                    elide: Text.ElideRight
+                                                }
+
+                                                MouseArea {
+                                                    id: fontDelegateArea
+                                                    anchors.fill: parent
+                                                    hoverEnabled: true
+                                                    cursorShape: Qt.PointingHandCursor
+                                                    onClicked: {
+                                                        root.currentFontSelection = model.name
+                                                        ThemeManager.uiFont = model.name
+                                                        if (!root.settings.general) root.settings.general = {}
+                                                        root.settings.general.uiFont = model.name
+                                                        saveSettings()
+                                                        Quickshell.execDetached(["bash", Quickshell.env("HOME") + "/.config/quickshell/sync-font.sh", model.name])
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
                         // ========== CLOCK SETTINGS ==========
                         Column {
                             Layout.fillWidth: true
@@ -554,7 +789,7 @@ SETTINGSEOF`
                             
                             Text {
                                 text: "⏰ Clock Settings"
-                                font.family: "Sen"
+                                font.family: ThemeManager.uiFont
                                 font.pixelSize: 18
                                 font.weight: Font.Bold
                                 color: ThemeManager.accentBlue
@@ -595,7 +830,7 @@ SETTINGSEOF`
                                 Text {
                                     anchors.verticalCenter: parent.verticalCenter
                                     text: "Use 24-hour format"
-                                    font.family: "Sen"
+                                    font.family: ThemeManager.uiFont
                                     font.pixelSize: 12
                                     color: ThemeManager.fgPrimary
                                 }
@@ -641,7 +876,7 @@ SETTINGSEOF`
                                 Text {
                                     anchors.verticalCenter: parent.verticalCenter
                                     text: "Show seconds"
-                                    font.family: "Sen"
+                                    font.family: ThemeManager.uiFont
                                     font.pixelSize: 12
                                     color: ThemeManager.fgPrimary
                                 }
@@ -689,14 +924,14 @@ SETTINGSEOF`
 
                                     Text {
                                         text: "Use DD/MM/YYYY date format"
-                                        font.family: "Sen"
+                                        font.family: ThemeManager.uiFont
                                         font.pixelSize: 12
                                         color: ThemeManager.fgPrimary
                                     }
 
                                     Text {
                                         text: dateFormatDMY.checked ? "Currently: DD/MM/YYYY" : "Currently: MM/DD/YYYY"
-                                        font.family: "Sen"
+                                        font.family: ThemeManager.uiFont
                                         font.pixelSize: 10
                                         color: ThemeManager.fgTertiary
                                     }
@@ -745,14 +980,14 @@ SETTINGSEOF`
 
                                     Text {
                                         text: "Use long date format"
-                                        font.family: "Sen"
+                                        font.family: ThemeManager.uiFont
                                         font.pixelSize: 12
                                         color: ThemeManager.fgPrimary
                                     }
 
                                     Text {
                                         text: dateFormatDMY.checked ? "e.g., 25 March 2026" : "e.g., March 25, 2026"
-                                        font.family: "Sen"
+                                        font.family: ThemeManager.uiFont
                                         font.pixelSize: 10
                                         color: ThemeManager.fgTertiary
                                     }
@@ -802,14 +1037,14 @@ SETTINGSEOF`
 
                                     Text {
                                         text: "Show day of week"
-                                        font.family: "Sen"
+                                        font.family: ThemeManager.uiFont
                                         font.pixelSize: 12
                                         color: ThemeManager.fgPrimary
                                     }
 
                                     Text {
                                         text: dateFormatDMY.checked ? "e.g., Wednesday, 25 March 2026" : "e.g., Wednesday, March 25, 2026"
-                                        font.family: "Sen"
+                                        font.family: ThemeManager.uiFont
                                         font.pixelSize: 10
                                         color: ThemeManager.fgTertiary
                                     }
@@ -836,7 +1071,7 @@ SETTINGSEOF`
                             
                             Text {
                                 text: "📅 Calendar Settings"
-                                font.family: "Sen"
+                                font.family: ThemeManager.uiFont
                                 font.pixelSize: 18
                                 font.weight: Font.Bold
                                 color: ThemeManager.accentBlue
@@ -845,7 +1080,7 @@ SETTINGSEOF`
                             Text {
                                 width: parent.width
                                 text: "Configure your calendar integration (supports multiple files):"
-                                font.family: "Sen"
+                                font.family: ThemeManager.uiFont
                                 font.pixelSize: 11
                                 color: ThemeManager.fgSecondary
                                 wrapMode: Text.WordWrap
@@ -857,7 +1092,7 @@ SETTINGSEOF`
                                 
                                 Text {
                                     text: "Calendar File(s)"
-                                    font.family: "Sen"
+                                    font.family: ThemeManager.uiFont
                                     font.pixelSize: 11
                                     color: ThemeManager.fgSecondary
                                 }
@@ -880,7 +1115,7 @@ SETTINGSEOF`
                                             anchors.leftMargin: 12
                                             anchors.rightMargin: 12
                                             text: "~/.config/quickshell/calendar.ics"
-                                            font.family: "Sen"
+                                            font.family: ThemeManager.uiFont
                                             font.pixelSize: 11
                                             color: ThemeManager.fgPrimary
                                             verticalAlignment: TextInput.AlignVCenter
@@ -910,7 +1145,7 @@ SETTINGSEOF`
                                         Text {
                                             anchors.centerIn: parent
                                             text: "Browse..."
-                                            font.family: "Sen"
+                                            font.family: ThemeManager.uiFont
                                             font.pixelSize: 12
                                             font.weight: Font.Medium
                                             color: ThemeManager.accentBlue
@@ -966,7 +1201,7 @@ SETTINGSEOF`
                             Text {
                                 width: parent.width
                                 text: "Supports iCal format (.ics files) or URLs. You can use:\n• Local file: ~/.config/quickshell/calendar.ics\n• Google Calendar URL: https://calendar.google.com/calendar/ical/...\n• Multiple sources (separate with commas or spaces)"
-                                font.family: "Sen"
+                                font.family: ThemeManager.uiFont
                                 font.pixelSize: 10
                                 color: ThemeManager.fgTertiary
                                 wrapMode: Text.WordWrap
@@ -979,7 +1214,7 @@ SETTINGSEOF`
                                 
                                 Text {
                                     text: "Auto-Refresh Interval (minutes)"
-                                    font.family: "Sen"
+                                    font.family: ThemeManager.uiFont
                                     font.pixelSize: 12
                                     font.weight: Font.Medium
                                     color: ThemeManager.fgPrimary
@@ -1001,7 +1236,7 @@ SETTINGSEOF`
                                             anchors.fill: parent
                                             anchors.margins: 8
                                             text: root.settings.calendar?.refreshInterval ?? "15"
-                                            font.family: "Sen"
+                                            font.family: ThemeManager.uiFont
                                             font.pixelSize: 12
                                             color: ThemeManager.fgPrimary
                                             verticalAlignment: TextInput.AlignVCenter
@@ -1025,7 +1260,7 @@ SETTINGSEOF`
                                     Text {
                                         anchors.verticalCenter: parent.verticalCenter
                                         text: "minutes (0 = disabled)"
-                                        font.family: "Sen"
+                                        font.family: ThemeManager.uiFont
                                         font.pixelSize: 11
                                         color: ThemeManager.fgSecondary
                                     }
@@ -1034,101 +1269,10 @@ SETTINGSEOF`
                                 Text {
                                     width: parent.width
                                     text: "How often to refresh calendar data from URLs. Set to 0 to disable auto-refresh."
-                                    font.family: "Sen"
+                                    font.family: ThemeManager.uiFont
                                     font.pixelSize: 10
                                     color: ThemeManager.fgTertiary
                                     wrapMode: Text.WordWrap
-                                }
-                            }
-                        }
-                        
-                        // ========== WALLPAPER SETTINGS ==========
-                        Column {
-                            Layout.fillWidth: true
-                            spacing: 16
-                            
-                            Rectangle {
-                                width: parent.width
-                                height: 2
-                                color: ThemeManager.accentBlue
-                                opacity: 0.3
-                            }
-                            
-                            Text {
-                                text: "🖼️ Wallpaper Settings"
-                                font.family: "Sen"
-                                font.pixelSize: 18
-                                font.weight: Font.Bold
-                                color: ThemeManager.accentBlue
-                            }
-                            
-                            Text {
-                                width: parent.width
-                                text: "Configure wallpaper picker behavior:"
-                                font.family: "Sen"
-                                font.pixelSize: 11
-                                color: ThemeManager.fgSecondary
-                                wrapMode: Text.WordWrap
-                            }
-                            
-                            // Show all wallpapers toggle
-                            Row {
-                                spacing: 12
-                                
-                                Rectangle {
-                                    width: 24
-                                    height: 24
-                                    radius: 4
-                                    color: showAllWallpapers.checked ? ThemeManager.accentBlue : Qt.rgba(1, 1, 1, 0.07)
-                                    border.width: 2
-                                    border.color: ThemeManager.accentBlue
-                                    
-                                    Text {
-                                        anchors.centerIn: parent
-                                        text: "✓"
-                                        font.family: "Symbols Nerd Font"
-                                        font.pixelSize: 16
-                                        color: ThemeManager.fgPrimary
-                                        visible: showAllWallpapers.checked
-                                    }
-                                    
-                                    MouseArea {
-                                        anchors.fill: parent
-                                        cursorShape: Qt.PointingHandCursor
-                                        onClicked: {
-                                            showAllWallpapers.checked = !showAllWallpapers.checked
-                                            if (!root.settings.wallpaper) {
-                                                root.settings.wallpaper = {}
-                                            }
-                                            root.settings.wallpaper.showAllWallpapers = showAllWallpapers.checked
-                                            saveSettings()
-                                        }
-                                    }
-                                }
-                                
-                                Column {
-                                    spacing: 4
-                                    
-                                    Text {
-                                        text: "Show all wallpapers"
-                                        font.family: "Sen"
-                                        font.pixelSize: 12
-                                        color: ThemeManager.fgPrimary
-                                    }
-                                    
-                                    Text {
-                                        width: 600
-                                        text: "When enabled, wallpaper picker shows all images from ~/Pictures/Wallpapers (including subfolders). When disabled, shows only theme-specific wallpapers."
-                                        font.family: "Sen"
-                                        font.pixelSize: 10
-                                        color: ThemeManager.fgTertiary
-                                        wrapMode: Text.WordWrap
-                                    }
-                                }
-                                
-                                QtObject {
-                                    id: showAllWallpapers
-                                    property bool checked: false
                                 }
                             }
                         }
@@ -1147,7 +1291,7 @@ SETTINGSEOF`
                             
                             Text {
                                 text: "🌤️ Weather Settings"
-                                font.family: "Sen"
+                                font.family: ThemeManager.uiFont
                                 font.pixelSize: 18
                                 font.weight: Font.Bold
                                 color: ThemeManager.accentBlue
@@ -1187,7 +1331,7 @@ SETTINGSEOF`
                                 Text {
                                     anchors.verticalCenter: parent.verticalCenter
                                     text: "Use Fahrenheit (uncheck for Celsius)"
-                                    font.family: "Sen"
+                                    font.family: ThemeManager.uiFont
                                     font.pixelSize: 12
                                     color: ThemeManager.fgPrimary
                                 }
@@ -1207,7 +1351,7 @@ SETTINGSEOF`
                             Text {
                                 width: parent.width
                                 text: "Location (leave empty to auto-detect, or enter coordinates for accuracy):"
-                                font.family: "Sen"
+                                font.family: ThemeManager.uiFont
                                 font.pixelSize: 11
                                 color: ThemeManager.fgSecondary
                                 wrapMode: Text.WordWrap
@@ -1221,7 +1365,7 @@ SETTINGSEOF`
                                     
                                     Text {
                                         text: "Latitude"
-                                        font.family: "Sen"
+                                        font.family: ThemeManager.uiFont
                                         font.pixelSize: 11
                                         color: ThemeManager.fgSecondary
                                     }
@@ -1238,7 +1382,7 @@ SETTINGSEOF`
                                             id: latitudeField
                                             anchors.fill: parent
                                             anchors.margins: 8
-                                            font.family: "Sen"
+                                            font.family: ThemeManager.uiFont
                                             font.pixelSize: 12
                                             color: ThemeManager.fgPrimary
                                             verticalAlignment: TextInput.AlignVCenter
@@ -1257,7 +1401,7 @@ SETTINGSEOF`
                                     
                                     Text {
                                         text: "Longitude"
-                                        font.family: "Sen"
+                                        font.family: ThemeManager.uiFont
                                         font.pixelSize: 11
                                         color: ThemeManager.fgSecondary
                                     }
@@ -1274,7 +1418,7 @@ SETTINGSEOF`
                                             id: longitudeField
                                             anchors.fill: parent
                                             anchors.margins: 8
-                                            font.family: "Sen"
+                                            font.family: ThemeManager.uiFont
                                             font.pixelSize: 12
                                             color: ThemeManager.fgPrimary
                                             verticalAlignment: TextInput.AlignVCenter
@@ -1291,7 +1435,7 @@ SETTINGSEOF`
                             
                             Text {
                                 text: "Location Name (optional)"
-                                font.family: "Sen"
+                                font.family: ThemeManager.uiFont
                                 font.pixelSize: 12
                                 color: ThemeManager.fgTertiary
                                 topPadding: 8
@@ -1305,7 +1449,7 @@ SETTINGSEOF`
                                     
                                     Text {
                                         text: "City"
-                                        font.family: "Sen"
+                                        font.family: ThemeManager.uiFont
                                         font.pixelSize: 11
                                         color: ThemeManager.fgSecondary
                                     }
@@ -1322,7 +1466,7 @@ SETTINGSEOF`
                                             id: cityField
                                             anchors.fill: parent
                                             anchors.margins: 8
-                                            font.family: "Sen"
+                                            font.family: ThemeManager.uiFont
                                             font.pixelSize: 12
                                             color: ThemeManager.fgPrimary
                                             verticalAlignment: TextInput.AlignVCenter
@@ -1340,7 +1484,7 @@ SETTINGSEOF`
                                     
                                     Text {
                                         text: "State/Region"
-                                        font.family: "Sen"
+                                        font.family: ThemeManager.uiFont
                                         font.pixelSize: 11
                                         color: ThemeManager.fgSecondary
                                     }
@@ -1357,7 +1501,7 @@ SETTINGSEOF`
                                             id: stateField
                                             anchors.fill: parent
                                             anchors.margins: 8
-                                            font.family: "Sen"
+                                            font.family: ThemeManager.uiFont
                                             font.pixelSize: 12
                                             color: ThemeManager.fgPrimary
                                             verticalAlignment: TextInput.AlignVCenter
@@ -1375,7 +1519,7 @@ SETTINGSEOF`
                                     
                                     Text {
                                         text: "Country"
-                                        font.family: "Sen"
+                                        font.family: ThemeManager.uiFont
                                         font.pixelSize: 11
                                         color: ThemeManager.fgSecondary
                                     }
@@ -1392,7 +1536,7 @@ SETTINGSEOF`
                                             id: countryField
                                             anchors.fill: parent
                                             anchors.margins: 8
-                                            font.family: "Sen"
+                                            font.family: ThemeManager.uiFont
                                             font.pixelSize: 12
                                             color: ThemeManager.fgPrimary
                                             verticalAlignment: TextInput.AlignVCenter
@@ -1415,7 +1559,7 @@ SETTINGSEOF`
                             
                             Text {
                                 text: "OpenWeather API Key (optional, for 5-day forecast)"
-                                font.family: "Sen"
+                                font.family: ThemeManager.uiFont
                                 font.pixelSize: 12
                                 color: ThemeManager.fgTertiary
                             }
@@ -1432,7 +1576,7 @@ SETTINGSEOF`
                                     id: apiKeyField
                                     anchors.fill: parent
                                     anchors.margins: 8
-                                    font.family: "Sen"
+                                    font.family: ThemeManager.uiFont
                                     font.pixelSize: 11
                                     color: ThemeManager.fgPrimary
                                     verticalAlignment: TextInput.AlignVCenter
@@ -1447,11 +1591,12 @@ SETTINGSEOF`
                             
                             Text {
                                 text: "Get a free API key at openweathermap.org/api"
-                                font.family: "Sen"
+                                font.family: ThemeManager.uiFont
                                 font.pixelSize: 10
                                 color: ThemeManager.fgTertiary
                             }
                         }
+
                     }
                 }
                 
@@ -1472,7 +1617,7 @@ SETTINGSEOF`
                             
                             Text {
                                 text: "Default Delay"
-                                font.family: "Sen"
+                                font.family: ThemeManager.uiFont
                                 font.pixelSize: 14
                                 font.weight: Font.DemiBold
                                 color: ThemeManager.accentBlue
@@ -1496,7 +1641,7 @@ SETTINGSEOF`
                                         Text {
                                             anchors.centerIn: parent
                                             text: "−"
-                                            font.family: "Sen"
+                                            font.family: ThemeManager.uiFont
                                             font.pixelSize: 20
                                             font.bold: true
                                             color: ThemeManager.fgPrimary
@@ -1541,7 +1686,7 @@ SETTINGSEOF`
                                             id: delayText
                                             anchors.centerIn: parent
                                             text: "0"
-                                            font.family: "Sen"
+                                            font.family: ThemeManager.uiFont
                                             font.pixelSize: 14
                                             font.weight: Font.Medium
                                             color: ThemeManager.fgPrimary
@@ -1560,7 +1705,7 @@ SETTINGSEOF`
                                         Text {
                                             anchors.centerIn: parent
                                             text: "+"
-                                            font.family: "Sen"
+                                            font.family: ThemeManager.uiFont
                                             font.pixelSize: 20
                                             font.bold: true
                                             color: ThemeManager.fgPrimary
@@ -1584,7 +1729,7 @@ SETTINGSEOF`
                                 Text {
                                     anchors.verticalCenter: parent.verticalCenter
                                     text: "seconds"
-                                    font.family: "Sen"
+                                    font.family: ThemeManager.uiFont
                                     font.pixelSize: 12
                                     color: ThemeManager.fgSecondary
                                 }
@@ -1598,7 +1743,7 @@ SETTINGSEOF`
                             
                             Text {
                                 text: "Output Options"
-                                font.family: "Sen"
+                                font.family: ThemeManager.uiFont
                                 font.pixelSize: 14
                                 font.weight: Font.DemiBold
                                 color: ThemeManager.accentBlue
@@ -1638,7 +1783,7 @@ SETTINGSEOF`
                                 Text {
                                     anchors.verticalCenter: parent.verticalCenter
                                     text: "Save to disk"
-                                    font.family: "Sen"
+                                    font.family: ThemeManager.uiFont
                                     font.pixelSize: 12
                                     color: ThemeManager.fgPrimary
                                 }
@@ -1683,7 +1828,7 @@ SETTINGSEOF`
                                 Text {
                                     anchors.verticalCenter: parent.verticalCenter
                                     text: "Copy to clipboard"
-                                    font.family: "Sen"
+                                    font.family: ThemeManager.uiFont
                                     font.pixelSize: 12
                                     color: ThemeManager.fgPrimary
                                 }
@@ -1702,7 +1847,7 @@ SETTINGSEOF`
                             
                             Text {
                                 text: "Save Location"
-                                font.family: "Sen"
+                                font.family: ThemeManager.uiFont
                                 font.pixelSize: 14
                                 font.weight: Font.DemiBold
                                 color: ThemeManager.accentBlue
@@ -1723,7 +1868,7 @@ SETTINGSEOF`
                                         id: saveLocationField
                                         anchors.fill: parent
                                         anchors.margins: 8
-                                        font.family: "Sen"
+                                        font.family: ThemeManager.uiFont
                                         font.pixelSize: 12
                                         color: ThemeManager.fgPrimary
                                         verticalAlignment: TextInput.AlignVCenter
@@ -1788,7 +1933,7 @@ SETTINGSEOF`
                             
                             Text {
                                 text: "Bar Appearance"
-                                font.family: "Sen"
+                                font.family: ThemeManager.uiFont
                                 font.pixelSize: 16
                                 font.weight: Font.Bold
                                 color: ThemeManager.accentBlue
@@ -1796,7 +1941,7 @@ SETTINGSEOF`
                             
                             Text {
                                 text: "Configure bar background and system tray details"
-                                font.family: "Sen"
+                                font.family: ThemeManager.uiFont
                                 font.pixelSize: 11
                                 color: ThemeManager.fgSecondary
                                 wrapMode: Text.WordWrap
@@ -1809,7 +1954,7 @@ SETTINGSEOF`
                                 
                                 Text {
                                     text: "Bar Background Style"
-                                    font.family: "Sen"
+                                    font.family: ThemeManager.uiFont
                                     font.pixelSize: 12
                                     font.bold: true
                                     color: ThemeManager.fgPrimary
@@ -1857,7 +2002,7 @@ SETTINGSEOF`
                                     Text {
                                         anchors.verticalCenter: parent.verticalCenter
                                         text: "Solid background (no transparency)"
-                                        font.family: "Sen"
+                                        font.family: ThemeManager.uiFont
                                         font.pixelSize: 12
                                         color: ThemeManager.fgPrimary
                                     }
@@ -1876,7 +2021,7 @@ SETTINGSEOF`
                                         
                                         Text {
                                             text: "Transparency: " + Math.round((1.0 - barOpacitySlider.value) * 100) + "%"
-                                            font.family: "Sen"
+                                            font.family: ThemeManager.uiFont
                                             font.pixelSize: 12
                                             color: ThemeManager.fgPrimary
                                             width: 180
@@ -1884,7 +2029,7 @@ SETTINGSEOF`
                                         
                                         Text {
                                             text: "(Opacity: " + Math.round(barOpacitySlider.value * 100) + "%)"
-                                            font.family: "Sen"
+                                            font.family: ThemeManager.uiFont
                                             font.pixelSize: 11
                                             color: ThemeManager.fgSecondary
                                         }
@@ -1953,7 +2098,7 @@ SETTINGSEOF`
                                     
                                     Text {
                                         text: "Drag slider: 0% = fully transparent, 100% = completely opaque"
-                                        font.family: "Sen"
+                                        font.family: ThemeManager.uiFont
                                         font.pixelSize: 10
                                         color: ThemeManager.fgTertiary
                                         wrapMode: Text.WordWrap
@@ -2008,7 +2153,7 @@ SETTINGSEOF`
                                 Text {
                                     anchors.verticalCenter: parent.verticalCenter
                                     text: "Show border around bar"
-                                    font.family: "Sen"
+                                    font.family: ThemeManager.uiFont
                                     font.pixelSize: 12
                                     color: ThemeManager.fgPrimary
                                 }
@@ -2058,14 +2203,14 @@ SETTINGSEOF`
 
                                     Text {
                                         text: "Floating bar"
-                                        font.family: "Sen"
+                                        font.family: ThemeManager.uiFont
                                         font.pixelSize: 12
                                         color: ThemeManager.fgPrimary
                                     }
 
                                     Text {
                                         text: "Adds padding around the bar with rounded corners"
-                                        font.family: "Sen"
+                                        font.family: ThemeManager.uiFont
                                         font.pixelSize: 10
                                         color: ThemeManager.fgSecondary
                                     }
@@ -2116,14 +2261,14 @@ SETTINGSEOF`
 
                                     Text {
                                         text: "Use chonky bar"
-                                        font.family: "Sen"
+                                        font.family: ThemeManager.uiFont
                                         font.pixelSize: 12
                                         color: ThemeManager.fgPrimary
                                     }
 
                                     Text {
                                         text: "Increases bar height by 25% (53px vs 42px)"
-                                        font.family: "Sen"
+                                        font.family: ThemeManager.uiFont
                                         font.pixelSize: 10
                                         color: ThemeManager.fgSecondary
                                     }
@@ -2171,7 +2316,7 @@ SETTINGSEOF`
                                 Text {
                                     anchors.verticalCenter: parent.verticalCenter
                                     text: "Position bar at bottom"
-                                    font.family: "Sen"
+                                    font.family: ThemeManager.uiFont
                                     font.pixelSize: 12
                                     color: ThemeManager.fgPrimary
                                 }
@@ -2221,14 +2366,14 @@ SETTINGSEOF`
                                     
                                     Text {
                                         text: "Auto-hide bar"
-                                        font.family: "Sen"
+                                        font.family: ThemeManager.uiFont
                                         font.pixelSize: 12
                                         color: ThemeManager.fgPrimary
                                     }
                                     
                                     Text {
                                         text: "Bar slides out when mouse approaches edge"
-                                        font.family: "Sen"
+                                        font.family: ThemeManager.uiFont
                                         font.pixelSize: 10
                                         color: ThemeManager.fgSecondary
                                     }
@@ -2279,14 +2424,14 @@ SETTINGSEOF`
 
                                     Text {
                                         text: "Show quick launch drawer"
-                                        font.family: "Sen"
+                                        font.family: ThemeManager.uiFont
                                         font.pixelSize: 12
                                         color: ThemeManager.fgPrimary
                                     }
 
                                     Text {
                                         text: "Chevron button and quick launch icons on the left"
-                                        font.family: "Sen"
+                                        font.family: ThemeManager.uiFont
                                         font.pixelSize: 10
                                         color: ThemeManager.fgSecondary
                                     }
@@ -2337,14 +2482,14 @@ SETTINGSEOF`
 
                                     Text {
                                         text: "Show system tray icons"
-                                        font.family: "Sen"
+                                        font.family: ThemeManager.uiFont
                                         font.pixelSize: 12
                                         color: ThemeManager.fgPrimary
                                     }
 
                                     Text {
                                         text: "Clipboard, updates, and status icons on the right"
-                                        font.family: "Sen"
+                                        font.family: ThemeManager.uiFont
                                         font.pixelSize: 10
                                         color: ThemeManager.fgSecondary
                                     }
@@ -2392,7 +2537,7 @@ SETTINGSEOF`
                                 Text {
                                     anchors.verticalCenter: parent.verticalCenter
                                     text: "Show battery percentage (e.g., \"85%\")"
-                                    font.family: "Sen"
+                                    font.family: ThemeManager.uiFont
                                     font.pixelSize: 12
                                     color: ThemeManager.fgPrimary
                                 }
@@ -2439,7 +2584,7 @@ SETTINGSEOF`
                                 Text {
                                     anchors.verticalCenter: parent.verticalCenter
                                     text: "Show volume percentage (e.g., \"75%\")"
-                                    font.family: "Sen"
+                                    font.family: ThemeManager.uiFont
                                     font.pixelSize: 12
                                     color: ThemeManager.fgPrimary
                                 }
@@ -2486,7 +2631,7 @@ SETTINGSEOF`
                                 Text {
                                     anchors.verticalCenter: parent.verticalCenter
                                     text: "Show network upload/download speeds (e.g., \"↑ 2.5 Mb/s ↓ 10.3 Mb/s\")"
-                                    font.family: "Sen"
+                                    font.family: ThemeManager.uiFont
                                     font.pixelSize: 12
                                     color: ThemeManager.fgPrimary
                                 }
@@ -2524,7 +2669,7 @@ SETTINGSEOF`
 
                             Text {
                                 text: "🪟 Window Decorations"
-                                font.family: "Sen"
+                                font.family: ThemeManager.uiFont
                                 font.pixelSize: 18
                                 font.weight: Font.Bold
                                 color: ThemeManager.accentBlue
@@ -2532,7 +2677,7 @@ SETTINGSEOF`
 
                             Text {
                                 text: "Changes apply live via Hyprland and are saved to look-and-feel.conf."
-                                font.family: "Sen"
+                                font.family: ThemeManager.uiFont
                                 font.pixelSize: 11
                                 color: ThemeManager.fgSecondary
                                 wrapMode: Text.WordWrap
@@ -2585,7 +2730,7 @@ SETTINGSEOF`
                                 Text {
                                     anchors.verticalCenter: parent.verticalCenter
                                     text: "Enable window borders"
-                                    font.family: "Sen"
+                                    font.family: ThemeManager.uiFont
                                     font.pixelSize: 12
                                     color: ThemeManager.fgPrimary
                                 }
@@ -2605,7 +2750,7 @@ SETTINGSEOF`
 
                                 Text {
                                     text: "Border thickness: " + hyprBorderThicknessObj.value + "px"
-                                    font.family: "Sen"
+                                    font.family: ThemeManager.uiFont
                                     font.pixelSize: 12
                                     color: ThemeManager.fgPrimary
                                 }
@@ -2672,7 +2817,7 @@ SETTINGSEOF`
 
                                 Text {
                                     text: "Range: 1–5px"
-                                    font.family: "Sen"
+                                    font.family: ThemeManager.uiFont
                                     font.pixelSize: 10
                                     color: ThemeManager.fgTertiary
                                 }
@@ -2690,7 +2835,7 @@ SETTINGSEOF`
 
                                 Text {
                                     text: "Window rounding: " + hyprRoundingObj.value + "px"
-                                    font.family: "Sen"
+                                    font.family: ThemeManager.uiFont
                                     font.pixelSize: 12
                                     color: ThemeManager.fgPrimary
                                 }
@@ -2749,7 +2894,7 @@ SETTINGSEOF`
 
                                 Text {
                                     text: "Range: 0–20px"
-                                    font.family: "Sen"
+                                    font.family: ThemeManager.uiFont
                                     font.pixelSize: 10
                                     color: ThemeManager.fgTertiary
                                 }
@@ -2775,7 +2920,7 @@ SETTINGSEOF`
 
                             Text {
                                 text: "↔ Window Gaps"
-                                font.family: "Sen"
+                                font.family: ThemeManager.uiFont
                                 font.pixelSize: 18
                                 font.weight: Font.Bold
                                 color: ThemeManager.accentBlue
@@ -2788,7 +2933,7 @@ SETTINGSEOF`
 
                                 Text {
                                     text: "Inner gaps (between windows): " + hyprGapsInObj.value + "px"
-                                    font.family: "Sen"
+                                    font.family: ThemeManager.uiFont
                                     font.pixelSize: 12
                                     color: ThemeManager.fgPrimary
                                 }
@@ -2847,7 +2992,7 @@ SETTINGSEOF`
 
                                 Text {
                                     text: "Range: 0–20px"
-                                    font.family: "Sen"
+                                    font.family: ThemeManager.uiFont
                                     font.pixelSize: 10
                                     color: ThemeManager.fgTertiary
                                 }
@@ -2865,7 +3010,7 @@ SETTINGSEOF`
 
                                 Text {
                                     text: "Outer gaps (screen edge): " + hyprGapsOutObj.value + "px"
-                                    font.family: "Sen"
+                                    font.family: ThemeManager.uiFont
                                     font.pixelSize: 12
                                     color: ThemeManager.fgPrimary
                                 }
@@ -2924,7 +3069,7 @@ SETTINGSEOF`
 
                                 Text {
                                     text: "Range: 0–40px"
-                                    font.family: "Sen"
+                                    font.family: ThemeManager.uiFont
                                     font.pixelSize: 10
                                     color: ThemeManager.fgTertiary
                                 }
@@ -2950,7 +3095,7 @@ SETTINGSEOF`
 
                             Text {
                                 text: "✨ Effects"
-                                font.family: "Sen"
+                                font.family: ThemeManager.uiFont
                                 font.pixelSize: 18
                                 font.weight: Font.Bold
                                 color: ThemeManager.accentBlue
@@ -2995,7 +3140,7 @@ SETTINGSEOF`
                                 Text {
                                     anchors.verticalCenter: parent.verticalCenter
                                     text: "Enable window animations"
-                                    font.family: "Sen"
+                                    font.family: ThemeManager.uiFont
                                     font.pixelSize: 12
                                     color: ThemeManager.fgPrimary
                                 }
@@ -3045,7 +3190,7 @@ SETTINGSEOF`
                                 Text {
                                     anchors.verticalCenter: parent.verticalCenter
                                     text: "Enable window shadows"
-                                    font.family: "Sen"
+                                    font.family: ThemeManager.uiFont
                                     font.pixelSize: 12
                                     color: ThemeManager.fgPrimary
                                 }
@@ -3095,7 +3240,7 @@ SETTINGSEOF`
                                 Text {
                                     anchors.verticalCenter: parent.verticalCenter
                                     text: "Enable background blur"
-                                    font.family: "Sen"
+                                    font.family: ThemeManager.uiFont
                                     font.pixelSize: 12
                                     color: ThemeManager.fgPrimary
                                 }
@@ -3103,6 +3248,86 @@ SETTINGSEOF`
                                 QtObject {
                                     id: hyprBlurCheck
                                     property bool checked: true
+                                }
+                            }
+
+                            // Blur Size
+                            Column {
+                                spacing: 8
+                                width: parent.width - 40
+                                leftPadding: 20
+                                opacity: hyprBlurCheck.checked ? 1.0 : 0.5
+
+                                Text {
+                                    text: "Blur intensity: " + hyprBlurSizeObj.value
+                                    font.family: ThemeManager.uiFont
+                                    font.pixelSize: 12
+                                    color: ThemeManager.fgPrimary
+                                }
+
+                                Item {
+                                    width: parent.width - 40
+                                    height: 32
+
+                                    Rectangle {
+                                        id: blurSizeTrack
+                                        anchors.centerIn: parent
+                                        width: parent.width
+                                        height: 6
+                                        radius: 3
+                                        color: Qt.rgba(1, 1, 1, 0.07)
+
+                                        Rectangle {
+                                            width: blurSizeHandle.x + blurSizeHandle.width / 2
+                                            height: parent.height
+                                            radius: parent.radius
+                                            color: ThemeManager.accentBlue
+                                        }
+                                    }
+
+                                    Rectangle {
+                                        id: blurSizeHandle
+                                        width: 20
+                                        height: 20
+                                        radius: 10
+                                        color: blurSizeMA.containsMouse || blurSizeMA.pressed ? ThemeManager.accentBlue : ThemeManager.fgPrimary
+                                        border.width: 2
+                                        border.color: ThemeManager.accentBlue
+                                        y: (parent.height - height) / 2
+                                        x: (blurSizeTrack.width - width) * ((hyprBlurSizeObj.value - 1) / 19.0)
+                                        Behavior on color { ColorAnimation { duration: 150 } }
+                                    }
+
+                                    MouseArea {
+                                        id: blurSizeMA
+                                        anchors.fill: parent
+                                        hoverEnabled: true
+                                        cursorShape: Qt.PointingHandCursor
+                                        enabled: hyprBlurCheck.checked
+
+                                        function updateVal(mouse) {
+                                            const norm = Math.max(0, Math.min(1, mouse.x / width))
+                                            const val = Math.max(1, Math.round(1 + norm * 19))
+                                            hyprBlurSizeObj.value = val
+                                            root.applyHypr("decoration:blur:size", val,
+                                                `sed -i -E '/blur \\{/,/\\}/ s/size = [0-9]+/size = ${val}/'`)
+                                        }
+
+                                        onPressed: updateVal(mouse)
+                                        onPositionChanged: if (pressed) updateVal(mouse)
+                                    }
+                                }
+
+                                Text {
+                                    text: "Range: 1–20  (higher = more blur)"
+                                    font.family: ThemeManager.uiFont
+                                    font.pixelSize: 10
+                                    color: ThemeManager.fgTertiary
+                                }
+
+                                QtObject {
+                                    id: hyprBlurSizeObj
+                                    property int value: 10
                                 }
                             }
 
@@ -3130,7 +3355,7 @@ SETTINGSEOF`
                             Text {
                                 anchors.centerIn: parent
                                 text: "Please allow 30-45 seconds for the theme to propagate to all UI elements once selected"
-                                font.family: "Sen"
+                                font.family: ThemeManager.uiFont
                                 font.pixelSize: 11
                                 font.italic: true
                                 color: ThemeManager.fgSecondary
@@ -3171,7 +3396,7 @@ SETTINGSEOF`
                                         
                                         Text {
                                             text: model.name
-                                            font.family: "Sen"
+                                            font.family: ThemeManager.uiFont
                                             font.pixelSize: 15
                                             font.weight: Font.Medium
                                             color: ThemeManager.fgPrimary
@@ -3183,7 +3408,7 @@ SETTINGSEOF`
                                         
                                         Text {
                                             text: model.name === root.currentTheme ? "● Current" : ""
-                                            font.family: "Sen"
+                                            font.family: ThemeManager.uiFont
                                             font.pixelSize: 10
                                             color: ThemeManager.accentGreen
                                             visible: model.name === root.currentTheme
@@ -3309,7 +3534,7 @@ SETTINGSEOF`
                 Text {
                     anchors.centerIn: parent
                     text: applyButtonSuccess ? "Applying..." : "Apply"
-                    font.family: "Sen"
+                    font.family: ThemeManager.uiFont
                     font.pixelSize: 14
                     font.weight: Font.Bold
                     color: ThemeManager.accentGreen
