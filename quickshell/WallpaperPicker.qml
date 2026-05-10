@@ -8,7 +8,7 @@ import Quickshell.Io
 PanelWindow {
     id: wallpaperWindow
     
-    width: 1080
+    width: 1280
     height: 820
     
     visible: false
@@ -364,8 +364,8 @@ PanelWindow {
                     anchors.fill: parent
                     anchors.margins: 10
                     
-                    cellWidth: 250
-                    cellHeight: 210
+                    cellWidth: 300
+                    cellHeight: 220
                     
                     clip: true
                     
@@ -387,8 +387,8 @@ PanelWindow {
                             smooth: true
                             cache: true
                             asynchronous: true
-                            sourceSize.width: 240
-                            sourceSize.height: 200
+                            sourceSize.width: 290
+                            sourceSize.height: 210
                             
                             layer.enabled: true
                             layer.effect: OpacityMask {
