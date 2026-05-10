@@ -290,14 +290,7 @@ PanelWindow {
                     clip: true
                     model: themeModel
 
-                    ScrollBar.horizontal: ScrollBar {
-                        policy: ScrollBar.AsNeeded
-                        contentItem: Rectangle {
-                            implicitHeight: 4
-                            radius: 2
-                            color: ThemeManager.accentBlue
-                        }
-                    }
+                    ScrollBar.horizontal: ScrollBar { policy: ScrollBar.AlwaysOff }
 
                     delegate: Rectangle {
                         id: tabDelegate
