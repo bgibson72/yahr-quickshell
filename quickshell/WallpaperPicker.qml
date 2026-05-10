@@ -286,7 +286,7 @@ PanelWindow {
                     anchors.fill: parent
                     anchors.margins: 4
                     orientation: ListView.Horizontal
-                    spacing: 4
+                    spacing: 0
                     clip: true
                     model: themeModel
 
@@ -295,7 +295,7 @@ PanelWindow {
                     delegate: Rectangle {
                         id: tabDelegate
                         height: tabBar.height
-                        width: tabLabel.implicitWidth + 24
+                        width: tabBar.width / tabBar.count
                         radius: 8
 
                         property bool isActive: model.name === wallpaperWindow.selectedTab
