@@ -23,7 +23,7 @@ fi
 # Hypr
 if [ -d "$REPO_DIR/hypr" ]; then
     echo "Syncing hypr..."
-    rsync -av --exclude='*.backup*' --exclude='hyprland.conf' \
+    rsync -av --exclude='*.backup*' --exclude='hyprland.conf' --exclude='look-and-feel.conf' \
         "$REPO_DIR/hypr/" "$CONFIG_DIR/hypr/" \
         || { echo "✗ Hypr sync failed"; exit 1; }
     echo "✓ Hypr synced"

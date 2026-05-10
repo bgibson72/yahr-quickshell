@@ -478,6 +478,15 @@ update_mako_theme() {
     local fg_primary=$(grep '\$fg-primary = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
     local bg_base=$(grep '\$bg-base = rgb(' "$theme_file" | sed 's/.*rgb(\([^)]*\)).*/\1/')
 
+    # Read user's preferred border size from settings.json
+    local settings_file="$HOME/.config/quickshell/settings.json"
+    local border_size=1
+    if [[ -f "$settings_file" ]]; then
+        local bs
+        bs=$(python3 -c "import json; d=json.load(open('$settings_file')); print(d.get('general',{}).get('widgetBorderWidth', 1))" 2>/dev/null)
+        [[ -n "$bs" ]] && border_size="$bs"
+    fi
+
     # Update mako config
     local mako_config="$HOME/.config/mako/config"
 
@@ -494,7 +503,7 @@ layer=overlay
 anchor=top-right
 margin=8
 padding=14
-border-size=1
+border-size=${border_size}
 border-radius=16
 background-color=#${bg_base}E8
 text-color=#$fg_primary

@@ -47,9 +47,9 @@ if [ -z "$glass_accent" ]; then
     glass_accent="${accent_purple}59"
 fi
 
-# Read border_size from look-and-feel.conf (same source as Settings > Hyprland)
-HYPR_LAF="$HOME/.config/hypr/look-and-feel.conf"
-border_size=$(grep 'border_size = ' "$HYPR_LAF" 2>/dev/null | grep -oE '[0-9]+' | head -1)
+# Read border_size from settings.json (user preference, persists across theme switches)
+SETTINGS_FILE="$HOME/.config/quickshell/settings.json"
+border_size=$(python3 -c "import json; d=json.load(open('$SETTINGS_FILE')); print(d.get('general',{}).get('widgetBorderWidth', 1))" 2>/dev/null)
 border_size="${border_size:-1}"
 
 echo "Syncing Mako theme for: $theme_name (border-size: ${border_size}px)"
