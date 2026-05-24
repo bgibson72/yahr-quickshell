@@ -204,7 +204,7 @@ Rectangle {
                     }
                 }
 
-                // Settings Tab
+                // Wallpaper Tab
                 Rectangle {
                     width: tabBarRow.tabWidth
                     height: parent.height
@@ -226,13 +226,13 @@ Rectangle {
                         spacing: 8
 
                         Text {
-                            text: "⚙️"
+                            text: "🖼️"
                             font.pixelSize: 18
                             anchors.verticalCenter: parent.verticalCenter
                         }
 
                         Text {
-                            text: "Settings"
+                            text: "Wallpaper"
                             font.family: ThemeManager.uiFont
                             font.pixelSize: 14
                             font.weight: Font.Medium
@@ -242,7 +242,7 @@ Rectangle {
                     }
                 }
 
-                // Wallpaper Tab
+                // Settings Tab
                 Rectangle {
                     width: tabBarRow.tabWidth
                     height: parent.height
@@ -264,13 +264,13 @@ Rectangle {
                         spacing: 8
 
                         Text {
-                            text: "🖼️"
+                            text: "⚙️"
                             font.pixelSize: 18
                             anchors.verticalCenter: parent.verticalCenter
                         }
 
                         Text {
-                            text: "Wallpaper"
+                            text: "Settings"
                             font.family: ThemeManager.uiFont
                             font.pixelSize: 14
                             font.weight: Font.Medium
@@ -312,24 +312,24 @@ Rectangle {
                 active: root.isVisible && root.currentTab === 2
             }
 
-            // Settings Tab Content
-            SettingsWidget {
-                id: settingsTab
-                anchors.fill: parent
-                visible: root.currentTab === 3
-                isVisible: root.isVisible && root.currentTab === 3
-                embedded: true
-
-                onCloseRequested: root.currentTab = 0
-            }
-
             // Wallpaper Tab Content
             WallpaperPickerContent {
                 id: wallpaperTab
                 anchors.fill: parent
-                visible: root.currentTab === 4
+                visible: root.currentTab === 3
                 showWidgetBorders: root.showWidgetBorders
                 widgetBorderWidth: root.widgetBorderWidth
+            }
+
+            // Settings Tab Content
+            SettingsWidget {
+                id: settingsTab
+                anchors.fill: parent
+                visible: root.currentTab === 4
+                isVisible: root.isVisible && root.currentTab === 4
+                embedded: true
+
+                onCloseRequested: root.currentTab = 0
             }
         }
     }
