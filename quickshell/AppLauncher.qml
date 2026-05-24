@@ -184,21 +184,19 @@ Rectangle {
     }
 
     // ══════════════════════════════════════════════════════
-    //  LEFT: Power sidebar
+    //  RIGHT: Power sidebar
     // ══════════════════════════════════════════════════════
 
     Item {
         id: sidebar
-        anchors.left: parent.left
+        anchors.right: parent.right
         anchors.top: parent.top
         anchors.bottom: parent.bottom
         width: 72
 
-        // Top group: Lock, Logout, Suspend
+        // All power actions grouped together, vertically centered
         Column {
-            anchors.top: parent.top
-            anchors.topMargin: 18
-            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.centerIn: parent
             spacing: 6
 
             // Lock
@@ -284,14 +282,14 @@ Rectangle {
                     onClicked: root.executePowerAction("suspend")
                 }
             }
-        }
 
-        // Bottom group: Reboot, Shutdown
-        Column {
-            anchors.bottom: parent.bottom
-            anchors.bottomMargin: 18
-            anchors.horizontalCenter: parent.horizontalCenter
-            spacing: 6
+            // Divider between session and system actions
+            Rectangle {
+                width: 36
+                height: 1
+                anchors.horizontalCenter: parent.horizontalCenter
+                color: Qt.rgba(1, 1, 1, 0.12)
+            }
 
             // Reboot
             Rectangle {
@@ -350,9 +348,9 @@ Rectangle {
             }
         }
 
-        // Vertical separator on right edge of sidebar
+        // Vertical separator on left edge of sidebar
         Rectangle {
-            anchors.right: parent.right
+            anchors.left: parent.left
             anchors.top: parent.top
             anchors.bottom: parent.bottom
             anchors.topMargin: 20
@@ -363,13 +361,13 @@ Rectangle {
     }
 
     // ══════════════════════════════════════════════════════
-    //  RIGHT: Search bar + App grid/list
+    //  LEFT: Search bar + App grid/list
     // ══════════════════════════════════════════════════════
 
     Item {
         id: mainContent
-        anchors.left: sidebar.right
-        anchors.right: parent.right
+        anchors.left: parent.left
+        anchors.right: sidebar.left
         anchors.top: parent.top
         anchors.bottom: parent.bottom
 
@@ -625,15 +623,15 @@ Rectangle {
                 }
             }
 
-            // ── View toggle buttons (bottom-right) ──
+            // ── View toggle buttons (bottom-left) ──
             Row {
-                anchors.right: parent.right
+                anchors.left: parent.left
                 anchors.bottom: parent.bottom
                 spacing: 4
 
-                // Grid view button
+                // Grid view button (Font Awesome table-cells)
                 Rectangle {
-                    width: 30; height: 30; radius: 8
+                    width: 36; height: 36; radius: 8
                     color: root.isGridView
                         ? Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.28)
                         : (gridToggleHover.containsMouse ? Qt.rgba(1, 1, 1, 0.08) : "transparent")
@@ -643,9 +641,9 @@ Rectangle {
 
                     Text {
                         anchors.centerIn: parent
-                        text: "󰕴"
+                        text: "\uf00a"
                         font.family: "Symbols Nerd Font"
-                        font.pixelSize: 15
+                        font.pixelSize: 19
                         color: root.isGridView
                             ? ThemeManager.accentBlue
                             : Qt.rgba(ThemeManager.fgPrimary.r, ThemeManager.fgPrimary.g, ThemeManager.fgPrimary.b, 0.45)
@@ -661,9 +659,9 @@ Rectangle {
                     }
                 }
 
-                // List view button
+                // List view button (Font Awesome table-list)
                 Rectangle {
-                    width: 30; height: 30; radius: 8
+                    width: 36; height: 36; radius: 8
                     color: !root.isGridView
                         ? Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.28)
                         : (listToggleHover.containsMouse ? Qt.rgba(1, 1, 1, 0.08) : "transparent")
@@ -673,9 +671,9 @@ Rectangle {
 
                     Text {
                         anchors.centerIn: parent
-                        text: "󰋰"
+                        text: "\uf00b"
                         font.family: "Symbols Nerd Font"
-                        font.pixelSize: 15
+                        font.pixelSize: 19
                         color: !root.isGridView
                             ? ThemeManager.accentBlue
                             : Qt.rgba(ThemeManager.fgPrimary.r, ThemeManager.fgPrimary.g, ThemeManager.fgPrimary.b, 0.45)
