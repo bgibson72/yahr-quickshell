@@ -94,8 +94,7 @@ Item {
         const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
         const months = ["January", "February", "March", "April", "May", "June",
                       "July", "August", "September", "October", "November", "December"]
-        dateText.text = `${days[now.getDay()]}, ${months[now.getMonth()]} ${now.getDate()}`
-        yearText.text = now.getFullYear().toString()
+        dateText.text = `${days[now.getDay()]}, ${months[now.getMonth()]} ${now.getDate()}, ${now.getFullYear()}`
     }
     
     Column {
@@ -111,36 +110,32 @@ Item {
             border.width: 1
             border.color: Qt.rgba(1, 1, 1, 0.10)
             
+            // Measure the widest possible time string so the clock width never changes
+            TextMetrics {
+                id: maxTimeMetrics
+                font.family: ThemeManager.uiFont
+                font.pixelSize: 48
+                font.weight: Font.Bold
+                text: "00:00:00"
+            }
+
             Row {
                 anchors.fill: parent
 
-                // Date - left half, centered
+                // Date - left half, centered, single line
                 Item {
                     width: (parent.width - 2) / 2
                     height: parent.height
 
-                    Column {
+                    Text {
+                        id: dateText
                         anchors.centerIn: parent
-                        spacing: 4
-
-                        Text {
-                            id: dateText
-                            font.family: ThemeManager.uiFont
-                            font.pixelSize: 20
-                            font.weight: Font.Bold
-                            color: ThemeManager.fgPrimary
-                            text: "Sunday, January 19"
-                            horizontalAlignment: Text.AlignHCenter
-                        }
-
-                        Text {
-                            id: yearText
-                            font.family: ThemeManager.uiFont
-                            font.pixelSize: 15
-                            color: ThemeManager.fgSecondary
-                            text: "2026"
-                            horizontalAlignment: Text.AlignHCenter
-                        }
+                        font.family: ThemeManager.uiFont
+                        font.pixelSize: 20
+                        font.weight: Font.Bold
+                        color: ThemeManager.fgPrimary
+                        text: "Sunday, May 24, 2026"
+                        horizontalAlignment: Text.AlignHCenter
                     }
                 }
 
@@ -157,7 +152,7 @@ Item {
                     }
                 }
 
-                // Clock - right half, centered
+                // Clock - right half, fixed-width so layout never shifts
                 Item {
                     width: (parent.width - 2) / 2
                     height: parent.height
@@ -165,15 +160,17 @@ Item {
                     Row {
                         anchors.centerIn: parent
                         spacing: 8
+                        verticalItemAlignment: Qt.AlignVCenter
 
                         Text {
                             id: timeText
+                            width: maxTimeMetrics.width
                             font.family: ThemeManager.uiFont
                             font.pixelSize: 48
                             font.weight: Font.Bold
                             color: ThemeManager.accentBlue
                             text: "10:42:18"
-                            anchors.verticalCenter: parent.verticalCenter
+                            horizontalAlignment: Text.AlignHCenter
                         }
 
                         Text {
@@ -183,8 +180,6 @@ Item {
                             font.weight: Font.Medium
                             color: ThemeManager.fgSecondary
                             text: "AM"
-                            anchors.verticalCenter: parent.verticalCenter
-                            anchors.verticalCenterOffset: -8
                             visible: text !== ""
                         }
                     }
