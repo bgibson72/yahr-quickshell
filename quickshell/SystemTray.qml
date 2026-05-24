@@ -30,10 +30,17 @@ Rectangle {
     width: trayRow.width + 20
     height: 35
     
-    color: "transparent"
-    
+    color: trayMouseArea.containsMouse ? Qt.rgba(1, 1, 1, 0.10) : "transparent"
+    radius: 6
+    border.width: trayMouseArea.containsMouse ? 1 : 0
+    border.color: Qt.rgba(1, 1, 1, 0.18)
+
+    Behavior on color { ColorAnimation { duration: 200 } }
+    Behavior on border.width { NumberAnimation { duration: 200 } }
+
     // Clickable overlay on top of everything
     MouseArea {
+        id: trayMouseArea
         anchors.fill: parent
         hoverEnabled: true
         cursorShape: Qt.PointingHandCursor

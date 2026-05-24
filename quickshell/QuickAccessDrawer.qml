@@ -5,9 +5,8 @@ Item {
     id: drawer
     
     property bool expanded: false
-    property alias settingsButton: settingsButton
-    
-    implicitWidth: expanded ? 276 : 32
+
+    implicitWidth: expanded ? 176 : 32
     implicitHeight: 35
     
     // Container for the drawer content
@@ -60,7 +59,7 @@ Item {
             
             // Quick access buttons - only visible when expanded
             Item {
-                Layout.preferredWidth: drawer.expanded ? 236 : 0
+                Layout.preferredWidth: drawer.expanded ? 140 : 0
                 Layout.preferredHeight: 32
                 clip: true
                 visible: drawer.expanded
@@ -73,11 +72,7 @@ Item {
                     KittyButton {}
                     FilesButton {}
                     FirefoxButton {}
-                    WallpaperButton {}
                     ScreenshotButton {}
-                    SettingsButton {
-                        id: settingsButton
-                    }
                 }
             }
         }

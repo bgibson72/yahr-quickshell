@@ -32,6 +32,7 @@ Rectangle {
     property bool showPowerButtons: config.boolValue("ShowPowerButtons") !== false
     property string timeFormat: config.stringValue("TimeFormat") || "h:mm AP"
     property string dateFormat: config.stringValue("DateFormat") || "dddd, MMMM d"
+    property real widgetOpacity: parseFloat(config.stringValue("WidgetOpacity") || "0.75")
     
     // Translations
     property string translateLogin: config.stringValue("TranslateLogin") || textConstants.login
@@ -112,7 +113,7 @@ Rectangle {
             width: 420
             height: column.height + 80
             radius: 28
-            color: Qt.rgba(bgBase.r, bgBase.g, bgBase.b, 0.45)
+            color: Qt.rgba(bgBase.r, bgBase.g, bgBase.b, widgetOpacity)
             border.width: 1
             border.color: Qt.rgba(fgPrimary.r, fgPrimary.g, fgPrimary.b, 0.12)
             

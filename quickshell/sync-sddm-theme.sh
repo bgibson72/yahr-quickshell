@@ -78,6 +78,12 @@ fg_secondary="#$fg_secondary"
 bg_base="#$bg_base"
 surface0="#$surface0"
 
+# Read widgetOpacity and uiFont from live ThemeManager.qml
+widget_opacity=$(grep 'property real widgetOpacity' "$HOME/.config/quickshell/ThemeManager.qml" 2>/dev/null | head -1 | grep -oP '[0-9]+\.?[0-9]*$')
+widget_opacity="${widget_opacity:-0.75}"
+ui_font=$(grep 'property string uiFont' "$HOME/.config/quickshell/ThemeManager.qml" 2>/dev/null | head -1 | sed -E 's/.*"([^"]+)".*/\1/')
+ui_font="${ui_font:-Sen}"
+
 # Get current wallpaper from awww
 current_wallpaper=""
 if command -v awww &> /dev/null; then
@@ -124,8 +130,11 @@ BgSurface="$surface0"
 FgPrimary="$fg_primary"
 FgSecondary="$fg_secondary"
 
+# Widget opacity (synced from quickshell)
+WidgetOpacity=$widget_opacity
+
 # Typography
-Font="MapleMono NF"
+Font="$ui_font"
 FontSize=12
 TitleFontSize=36
 
@@ -151,5 +160,14 @@ TranslateShutdown=
 EOF
 
 echo "✓ SDDM theme synced successfully!"
+
+# Also copy Main.qml so QML logic (e.g. widgetOpacity) stays up to date
+QS_SDDM_DIR="$(cd "$(dirname "$0")/../sddm/yahr-theme" 2>/dev/null && pwd)"
+if [[ -f "$QS_SDDM_DIR/Main.qml" ]]; then
+    sudo cp "$QS_SDDM_DIR/Main.qml" "$SDDM_THEME_DIR/Main.qml" 2>/dev/null && \
+        echo "✓ Main.qml updated" || \
+        echo "⚠ Could not copy Main.qml (check sudo access)"
+fi
+
 echo ""
 echo "Test with: sddm-greeter-qt6 --test-mode --theme $SDDM_THEME_DIR"

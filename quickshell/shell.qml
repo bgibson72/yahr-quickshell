@@ -68,7 +68,18 @@ ShellRoot {
             WallpaperPickerBridge.pickerWindow = wallpaperPickerWindow
         }
     }
-    
+
+    // On every quickshell startup, sync .current-theme to the active theme in ThemeManager.qml.
+    // This prevents a stale .current-theme from causing theme reversions on restart.
+    Process {
+        id: themeFileSync
+        running: true
+        // Pass ThemeManager.themeName as $1 so no shell-injection risk from theme name
+        command: ["bash", "-c",
+            "printf '%s' \"$1\" > \"$HOME/.config/hypr/.current-theme\"",
+            "--", ThemeManager.themeName]
+    }
+
     // Listen for calendar toggle requests
     Connections {
         target: Quickshell
@@ -169,11 +180,11 @@ ShellRoot {
             
             // Panel positioned at top-center, slides down
             Item {
-                width: 800
-                height: 600
+                width: 900
+                height: 700
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.top: parent.top
-                anchors.topMargin: shellRoot.calendarVisible ? 6 : -700
+                anchors.topMargin: shellRoot.calendarVisible ? 6 : -800
                 
                 Behavior on anchors.topMargin {
                     NumberAnimation { duration: 300; easing.type: Easing.OutCubic }
@@ -717,15 +728,6 @@ ShellRoot {
                     function onTogglePowerMenu() {
                         shellRoot.powerMenuVisible = !shellRoot.powerMenuVisible
                         console.log("PowerMenu toggled:", shellRoot.powerMenuVisible)
-                    }
-                }
-                
-                // Connect settings button click signal
-                Connections {
-                    target: bar.settingsButtonComponent
-                    function onClicked() {
-                        shellRoot.settingsVisible = !shellRoot.settingsVisible
-                        console.log("Settings toggled:", shellRoot.settingsVisible)
                     }
                 }
                 

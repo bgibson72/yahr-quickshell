@@ -166,7 +166,6 @@ Item {
     property alias clockComponent: clockComponent
     property alias archComponent: archComponent
     property alias powerComponent: powerComponent
-    property alias settingsButtonComponent: quickAccessDrawer.settingsButton
     
     // LEFT SECTION
     RowLayout {

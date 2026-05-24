@@ -9,9 +9,11 @@ Rectangle {
 
     width: 800
     height: 600
-    color: Qt.rgba(ThemeManager.bgBase.r, ThemeManager.bgBase.g, ThemeManager.bgBase.b, ThemeManager.widgetOpacity)
-    radius: 16
-    border.width: showWidgetBorders ? widgetBorderWidth : 0
+    // When embedded as a tab inside another widget, suppress the background
+    property bool embedded: false
+    color: embedded ? "transparent" : Qt.rgba(ThemeManager.bgBase.r, ThemeManager.bgBase.g, ThemeManager.bgBase.b, ThemeManager.widgetOpacity)
+    radius: embedded ? 0 : 16
+    border.width: embedded ? 0 : (showWidgetBorders ? widgetBorderWidth : 0)
     border.color: Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.35)
     antialiasing: true
     
@@ -465,13 +467,14 @@ SETTINGSEOF`
                 color: ThemeManager.fgPrimary
             }
             
-            // Close button
+            // Close button (hidden when embedded as a tab inside another widget)
             Rectangle {
                 width: 32
                 height: 32
                 anchors.right: parent.right
                 anchors.verticalCenter: parent.verticalCenter
                 radius: 6
+                visible: !root.embedded
                 color: closeMouseArea.containsMouse ? Qt.rgba(ThemeManager.accentRed.r, ThemeManager.accentRed.g, ThemeManager.accentRed.b, 0.30) : "transparent"
                 border.width: closeMouseArea.containsMouse ? 1 : 0
                 border.color: Qt.rgba(ThemeManager.accentRed.r, ThemeManager.accentRed.g, ThemeManager.accentRed.b, 0.5)
