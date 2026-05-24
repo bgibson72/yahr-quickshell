@@ -160,7 +160,6 @@ Item {
                     Row {
                         anchors.centerIn: parent
                         spacing: 8
-                        verticalItemAlignment: Qt.AlignVCenter
 
                         Text {
                             id: timeText
@@ -173,14 +172,22 @@ Item {
                             horizontalAlignment: Text.AlignHCenter
                         }
 
-                        Text {
-                            id: periodText
-                            font.family: ThemeManager.uiFont
-                            font.pixelSize: 22
-                            font.weight: Font.Medium
-                            color: ThemeManager.fgSecondary
-                            text: "AM"
-                            visible: text !== ""
+                        // Wrap in Item so periodText can be vertically centered
+                        // against the taller timeText without using Row anchors
+                        Item {
+                            width: periodText.implicitWidth
+                            height: timeText.implicitHeight
+                            visible: periodText.text !== ""
+
+                            Text {
+                                id: periodText
+                                anchors.verticalCenter: parent.verticalCenter
+                                font.family: ThemeManager.uiFont
+                                font.pixelSize: 22
+                                font.weight: Font.Medium
+                                color: ThemeManager.fgSecondary
+                                text: "AM"
+                            }
                         }
                     }
                 }
