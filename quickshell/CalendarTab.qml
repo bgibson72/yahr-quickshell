@@ -112,63 +112,81 @@ Item {
             border.color: Qt.rgba(1, 1, 1, 0.10)
             
             Row {
-                anchors.centerIn: parent
-                spacing: 24
-                
-                // Time
-                Row {
-                    spacing: 8
-                    
-                    Text {
-                        id: timeText
-                        font.family: ThemeManager.uiFont
-                        font.pixelSize: 48
-                        font.weight: Font.Bold
-                        color: ThemeManager.accentBlue
-                        text: "10:42:18"
-                        anchors.verticalCenter: parent.verticalCenter
-                    }
-                    
-                    Text {
-                        id: periodText
-                        font.family: ThemeManager.uiFont
-                        font.pixelSize: 22
-                        font.weight: Font.Medium
-                        color: ThemeManager.fgSecondary
-                        text: "AM"
-                        anchors.verticalCenter: parent.verticalCenter
-                        anchors.verticalCenterOffset: -8
-                        visible: text !== ""
+                anchors.fill: parent
+
+                // Date - left half, centered
+                Item {
+                    width: (parent.width - 2) / 2
+                    height: parent.height
+
+                    Column {
+                        anchors.centerIn: parent
+                        spacing: 4
+
+                        Text {
+                            id: dateText
+                            font.family: ThemeManager.uiFont
+                            font.pixelSize: 20
+                            font.weight: Font.Bold
+                            color: ThemeManager.fgPrimary
+                            text: "Sunday, January 19"
+                            horizontalAlignment: Text.AlignHCenter
+                        }
+
+                        Text {
+                            id: yearText
+                            font.family: ThemeManager.uiFont
+                            font.pixelSize: 15
+                            color: ThemeManager.fgSecondary
+                            text: "2026"
+                            horizontalAlignment: Text.AlignHCenter
+                        }
                     }
                 }
-                
+
                 // Separator
-                Rectangle {
+                Item {
                     width: 2
-                    height: 66
-                    color: Qt.rgba(1, 1, 1, 0.10)
-                }
-                
-                // Date
-                Column {
-                    spacing: 2
-                    anchors.verticalCenter: parent.verticalCenter
-                    
-                    Text {
-                        id: dateText
-                        font.family: ThemeManager.uiFont
-                        font.pixelSize: 20
-                        font.weight: Font.Bold
-                        color: ThemeManager.fgPrimary
-                        text: "Sunday, January 19"
+                    height: parent.height
+
+                    Rectangle {
+                        anchors.centerIn: parent
+                        width: 2
+                        height: 66
+                        color: Qt.rgba(1, 1, 1, 0.10)
                     }
-                    
-                    Text {
-                        id: yearText
-                        font.family: ThemeManager.uiFont
-                        font.pixelSize: 15
-                        color: ThemeManager.fgSecondary
-                        text: "2026"
+                }
+
+                // Clock - right half, centered
+                Item {
+                    width: (parent.width - 2) / 2
+                    height: parent.height
+
+                    Row {
+                        anchors.centerIn: parent
+                        spacing: 8
+
+                        Text {
+                            id: timeText
+                            font.family: ThemeManager.uiFont
+                            font.pixelSize: 48
+                            font.weight: Font.Bold
+                            color: ThemeManager.accentBlue
+                            text: "10:42:18"
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        Text {
+                            id: periodText
+                            font.family: ThemeManager.uiFont
+                            font.pixelSize: 22
+                            font.weight: Font.Medium
+                            color: ThemeManager.fgSecondary
+                            text: "AM"
+                            anchors.verticalCenter: parent.verticalCenter
+                            anchors.verticalCenterOffset: -8
+                            visible: text !== ""
+                        }
                     }
                 }
             }
