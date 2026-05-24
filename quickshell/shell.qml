@@ -74,9 +74,13 @@ ShellRoot {
     Process {
         id: themeFileSync
         running: true
-        // Pass ThemeManager.themeName as $1 so no shell-injection risk from theme name
+        // Pass ThemeManager.themeName as $1 so no shell-injection risk from theme name.
+        // Also re-applies kitty and mako themes so they match the active quickshell theme
+        // on every startup (not just when switch-theme.sh is run).
         command: ["bash", "-c",
-            "printf '%s' \"$1\" > \"$HOME/.config/hypr/.current-theme\"",
+            "printf '%s' \"$1\" > \"$HOME/.config/hypr/.current-theme\"; " +
+            "\"$HOME/.config/quickshell/sync-kitty-theme.sh\" >/dev/null 2>&1; " +
+            "\"$HOME/.config/quickshell/sync-mako-theme.sh\" >/dev/null 2>&1",
             "--", ThemeManager.themeName]
     }
 

@@ -16,6 +16,14 @@ if [ -n "$THEME_NAME" ]; then
     printf '%s' "$THEME_NAME" > "$HOME/.config/hypr/.current-theme"
 fi
 
+# Re-apply kitty and mako themes to ensure they match the active quickshell theme
+if [ -x "$HOME/.config/quickshell/sync-kitty-theme.sh" ]; then
+    "$HOME/.config/quickshell/sync-kitty-theme.sh" > /dev/null 2>&1
+fi
+if [ -x "$HOME/.config/quickshell/sync-mako-theme.sh" ]; then
+    "$HOME/.config/quickshell/sync-mako-theme.sh" > /dev/null 2>&1
+fi
+
 killall quickshell
 sleep 0.5
 quickshell &
