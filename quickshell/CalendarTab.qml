@@ -105,7 +105,7 @@ Item {
         // Top: Clock Banner (full width)
         Rectangle {
             width: parent.width
-            height: 80
+            height: 100
             color: Qt.rgba(1, 1, 1, 0.07)
             radius: 12
             border.width: 1
@@ -122,7 +122,7 @@ Item {
                     Text {
                         id: timeText
                         font.family: ThemeManager.uiFont
-                        font.pixelSize: 40
+                        font.pixelSize: 48
                         font.weight: Font.Bold
                         color: ThemeManager.accentBlue
                         text: "10:42:18"
@@ -132,7 +132,7 @@ Item {
                     Text {
                         id: periodText
                         font.family: ThemeManager.uiFont
-                        font.pixelSize: 18
+                        font.pixelSize: 22
                         font.weight: Font.Medium
                         color: ThemeManager.fgSecondary
                         text: "AM"
@@ -145,7 +145,7 @@ Item {
                 // Separator
                 Rectangle {
                     width: 2
-                    height: 50
+                    height: 66
                     color: Qt.rgba(1, 1, 1, 0.10)
                 }
                 
@@ -157,7 +157,7 @@ Item {
                     Text {
                         id: dateText
                         font.family: ThemeManager.uiFont
-                        font.pixelSize: 18
+                        font.pixelSize: 20
                         font.weight: Font.Bold
                         color: ThemeManager.fgPrimary
                         text: "Sunday, January 19"
@@ -166,7 +166,7 @@ Item {
                     Text {
                         id: yearText
                         font.family: ThemeManager.uiFont
-                        font.pixelSize: 14
+                        font.pixelSize: 15
                         color: ThemeManager.fgSecondary
                         text: "2026"
                     }
@@ -198,7 +198,7 @@ Item {
         // Bottom: Calendar and Events Row
         Row {
             width: parent.width
-            height: parent.height - 96
+            height: parent.height - 116
             spacing: 16
         
         // Left: Calendar
@@ -210,22 +210,23 @@ Item {
             border.width: 1
             border.color: Qt.rgba(1, 1, 1, 0.10)
             
-            Column {
+            Item {
                 anchors.fill: parent
                 anchors.margins: 16
-                spacing: 8
-                
-                // Month/Year Header with Navigation
+
+                // Month/Year Header with Navigation - anchored to top
                 Row {
+                    id: calHeader
                     width: parent.width
                     height: 40
-                    
+                    anchors.top: parent.top
+
                     Rectangle {
                         width: 32
                         height: 32
                         radius: 6
                         color: prevMouseArea.containsMouse ? Qt.rgba(1, 1, 1, 0.16) : "transparent"
-                        
+
                         MouseArea {
                             id: prevMouseArea
                             anchors.fill: parent
@@ -235,7 +236,7 @@ Item {
                                 calendarModel.changeMonth(-1)
                             }
                         }
-                        
+
                         Text {
                             anchors.centerIn: parent
                             text: "◀"
@@ -243,9 +244,9 @@ Item {
                             color: ThemeManager.fgPrimary
                         }
                     }
-                    
+
                     Item { width: 1; height: 1 }
-                    
+
                     Text {
                         width: parent.width - 80
                         height: parent.height
@@ -257,15 +258,15 @@ Item {
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
                     }
-                    
+
                     Item { width: 1; height: 1 }
-                    
+
                     Rectangle {
                         width: 32
                         height: 32
                         radius: 6
                         color: nextMouseArea.containsMouse ? Qt.rgba(1, 1, 1, 0.16) : "transparent"
-                        
+
                         MouseArea {
                             id: nextMouseArea
                             anchors.fill: parent
@@ -275,7 +276,7 @@ Item {
                                 calendarModel.changeMonth(1)
                             }
                         }
-                        
+
                         Text {
                             anchors.centerIn: parent
                             text: "▶"
@@ -284,49 +285,172 @@ Item {
                         }
                     }
                 }
-                
-                // Calendar Grid
-                Grid {
+
+                // Moon Phase and Sun Times - anchored to bottom
+                Rectangle {
+                    id: moonPhaseSection
                     width: parent.width
+                    height: 62
+                    anchors.bottom: parent.bottom
+                    color: Qt.rgba(1, 1, 1, 0.07)
+                    radius: 8
+                    border.width: 1
+                    border.color: Qt.rgba(1, 1, 1, 0.10)
+
+                    Row {
+                        anchors.fill: parent
+                        spacing: 0
+
+                        // Moon Phase - left side
+                        Item {
+                            width: (parent.width - 2) / 2
+                            height: parent.height
+
+                            Row {
+                                anchors.centerIn: parent
+                                spacing: 8
+
+                                Text {
+                                    text: calendarModel.moonPhaseEmoji
+                                    font.family: "Noto Color Emoji"
+                                    font.pixelSize: 26
+                                    anchors.verticalCenter: parent.verticalCenter
+                                }
+
+                                Column {
+                                    spacing: 2
+                                    anchors.verticalCenter: parent.verticalCenter
+
+                                    Text {
+                                        text: calendarModel.moonPhaseName
+                                        font.family: ThemeManager.uiFont
+                                        font.pixelSize: 13
+                                        font.weight: Font.Bold
+                                        color: ThemeManager.fgPrimary
+                                    }
+
+                                    Text {
+                                        text: calendarModel.moonIllumination
+                                        font.family: ThemeManager.uiFont
+                                        font.pixelSize: 11
+                                        color: ThemeManager.fgSecondary
+                                    }
+                                }
+                            }
+                        }
+
+                        // Separator
+                        Rectangle {
+                            width: 2
+                            height: 38
+                            color: Qt.rgba(1, 1, 1, 0.10)
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        // Sunrise/Sunset - right side
+                        Item {
+                            width: (parent.width - 2) / 2
+                            height: parent.height
+
+                            Column {
+                                anchors.centerIn: parent
+                                spacing: 6
+
+                                Row {
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                    spacing: 8
+
+                                    Text {
+                                        text: "🌅"
+                                        font.family: "Noto Color Emoji"
+                                        font.pixelSize: 16
+                                        anchors.verticalCenter: parent.verticalCenter
+                                    }
+
+                                    Text {
+                                        text: calendarModel.sunriseTime
+                                        font.family: ThemeManager.uiFont
+                                        font.pixelSize: 12
+                                        color: ThemeManager.accentYellow
+                                        anchors.verticalCenter: parent.verticalCenter
+                                    }
+                                }
+
+                                Row {
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                    spacing: 8
+
+                                    Text {
+                                        text: "🌇"
+                                        font.family: "Noto Color Emoji"
+                                        font.pixelSize: 16
+                                        anchors.verticalCenter: parent.verticalCenter
+                                    }
+
+                                    Text {
+                                        text: calendarModel.sunsetTime
+                                        font.family: ThemeManager.uiFont
+                                        font.pixelSize: 12
+                                        color: ThemeManager.accentOrange
+                                        anchors.verticalCenter: parent.verticalCenter
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // Calendar Grid - anchored between header and moon phase, cells auto-size
+                Grid {
+                    id: calGrid
+                    width: parent.width
+                    anchors.top: calHeader.bottom
+                    anchors.topMargin: 10
+                    anchors.bottom: moonPhaseSection.top
+                    anchors.bottomMargin: 10
                     columns: 7
                     columnSpacing: 4
                     rowSpacing: 4
-                    
+
+                    // Computed cell heights to fill available vertical space
+                    property int dayHeaderH: 24
+                    property int dayH: Math.max(28, Math.floor((height - dayHeaderH - 6 * rowSpacing) / 6))
+
                     // Day headers
                     Repeater {
                         model: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
-                        
+
                         Text {
                             text: modelData
                             font.family: ThemeManager.uiFont
                             font.pixelSize: 12
                             font.weight: Font.Bold
                             color: ThemeManager.accentBlue
-                            width: (parent.parent.width - 24) / 7
-                            height: 20
+                            width: (calGrid.width - 24) / 7
+                            height: calGrid.dayHeaderH
                             horizontalAlignment: Text.AlignHCenter
                             verticalAlignment: Text.AlignVCenter
                         }
                     }
-                    
+
                     // Calendar days
                     Repeater {
                         id: calendarRepeater
                         model: 42
-                        
+
                         Rectangle {
-                            width: (parent.parent.width - 24) / 7
-                            height: 35
+                            width: (calGrid.width - 24) / 7
+                            height: calGrid.dayH
                             radius: 8
                             objectName: "calendarDay_" + index
-                            
+
                             property int dayNumber: calendarModel.getDayNumber(index)
                             property bool isCurrentDay: calendarModel.isToday(index)
                             property bool isSelectedDay: calendarModel.isSelected(index)
                             property bool isValidDay: dayNumber > 0
                             property string dateKey: isValidDay ? `${calendarModel.currentYear}-${(calendarModel.currentMonth + 1).toString().padStart(2, '0')}-${dayNumber.toString().padStart(2, '0')}` : ""
                             property bool hasEvents: false
-                            
+
                             color: {
                                 if (isValidDay && isCurrentDay) return Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.30)
                                 if (isValidDay && isSelectedDay && !isCurrentDay) return Qt.rgba(1, 1, 1, 0.16)
@@ -335,7 +459,7 @@ Item {
                             }
                             border.width: isValidDay && isCurrentDay ? 1 : 0
                             border.color: Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.55)
-                            
+
                             MouseArea {
                                 id: dayMouseArea
                                 anchors.fill: parent
@@ -347,11 +471,11 @@ Item {
                                     }
                                 }
                             }
-                            
+
                             Column {
                                 anchors.centerIn: parent
                                 spacing: 2
-                                
+
                                 Text {
                                     anchors.horizontalCenter: parent.horizontalCenter
                                     text: parent.parent.isValidDay ? parent.parent.dayNumber : ""
@@ -364,7 +488,7 @@ Item {
                                     }
                                     font.weight: parent.parent.isValidDay && parent.parent.isCurrentDay ? Font.Bold : Font.Normal
                                 }
-                                
+
                                 Rectangle {
                                     id: eventDot
                                     width: 6
@@ -378,121 +502,9 @@ Item {
                         }
                     }
                 }
-                
-                // Moon Phase and Sun Times
-                Rectangle {
-                    width: parent.width
-                    height: 55
-                    color: Qt.rgba(1, 1, 1, 0.07)
-                    radius: 8
-                    border.width: 1
-                    border.color: Qt.rgba(1, 1, 1, 0.10)
-                    
-                    Row {
-                        anchors.fill: parent
-                        spacing: 0
-                        
-                        // Moon Phase - left side
-                        Item {
-                            width: (parent.width - 2) / 2
-                            height: parent.height
-                            
-                            Row {
-                                anchors.centerIn: parent
-                                spacing: 8
-                                
-                                Text {
-                                    text: calendarModel.moonPhaseEmoji
-                                    font.family: "Noto Color Emoji"
-                                    font.pixelSize: 24
-                                    anchors.verticalCenter: parent.verticalCenter
-                                }
-                                
-                                Column {
-                                    spacing: 2
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    
-                                    Text {
-                                        text: calendarModel.moonPhaseName
-                                        font.family: ThemeManager.uiFont
-                                        font.pixelSize: 13
-                                        font.weight: Font.Bold
-                                        color: ThemeManager.fgPrimary
-                                    }
-                                    
-                                    Text {
-                                        text: calendarModel.moonIllumination
-                                        font.family: ThemeManager.uiFont
-                                        font.pixelSize: 11
-                                        color: ThemeManager.fgSecondary
-                                    }
-                                }
-                            }
-                        }
-                        
-                        // Separator
-                        Rectangle {
-                            width: 2
-                            height: 36
-                            color: Qt.rgba(1, 1, 1, 0.10)
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-                        
-                        // Sunrise/Sunset - right side
-                        Item {
-                            width: (parent.width - 2) / 2
-                            height: parent.height
-                            
-                            Column {
-                                anchors.centerIn: parent
-                                spacing: 6
-                                
-                                Row {
-                                    anchors.horizontalCenter: parent.horizontalCenter
-                                    spacing: 8
-                                    
-                                    Text {
-                                        text: "🌅"
-                                        font.family: "Noto Color Emoji"
-                                        font.pixelSize: 16
-                                        anchors.verticalCenter: parent.verticalCenter
-                                    }
-                                    
-                                    Text {
-                                        text: calendarModel.sunriseTime
-                                        font.family: ThemeManager.uiFont
-                                        font.pixelSize: 12
-                                        color: ThemeManager.accentYellow
-                                        anchors.verticalCenter: parent.verticalCenter
-                                    }
-                                }
-                                
-                                Row {
-                                    anchors.horizontalCenter: parent.horizontalCenter
-                                    spacing: 8
-                                    
-                                    Text {
-                                        text: "🌇"
-                                        font.family: "Noto Color Emoji"
-                                        font.pixelSize: 16
-                                        anchors.verticalCenter: parent.verticalCenter
-                                    }
-                                    
-                                    Text {
-                                        text: calendarModel.sunsetTime
-                                        font.family: ThemeManager.uiFont
-                                        font.pixelSize: 12
-                                        color: ThemeManager.accentOrange
-                                        anchors.verticalCenter: parent.verticalCenter
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
             }
         }
-        
+
         // Right: Events List
         Rectangle {
             width: (parent.width - 16) * 0.45
