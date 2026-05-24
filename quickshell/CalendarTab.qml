@@ -152,24 +152,27 @@ Item {
                     }
                 }
 
-                // Clock - right half, fixed-width so layout never shifts
+                // Clock - right half, left-anchored so AM/PM tracks the digits
+                // and seconds expanding rightward is less noticeable
                 Item {
                     width: (parent.width - 2) / 2
                     height: parent.height
 
                     Row {
-                        anchors.centerIn: parent
+                        // Pin the left edge so the clock reads from a fixed position;
+                        // leftMargin centers the widest-case time string ("00:00:00")
+                        anchors.left: parent.left
+                        anchors.leftMargin: Math.max(8, (parent.width - maxTimeMetrics.width) / 2)
+                        anchors.verticalCenter: parent.verticalCenter
                         spacing: 8
 
                         Text {
                             id: timeText
-                            width: maxTimeMetrics.width
                             font.family: ThemeManager.uiFont
                             font.pixelSize: 48
                             font.weight: Font.Bold
                             color: ThemeManager.accentBlue
                             text: "10:42:18"
-                            horizontalAlignment: Text.AlignHCenter
                         }
 
                         // Wrap in Item so periodText can be vertically centered
