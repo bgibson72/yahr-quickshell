@@ -165,7 +165,6 @@ Item {
     
     property alias clockComponent: clockComponent
     property alias archComponent: archComponent
-    property alias powerComponent: powerComponent
     
     // LEFT SECTION
     RowLayout {
@@ -221,9 +220,6 @@ Item {
                 showTray: bar.showSystemTray
                 onToggleClipboard: bar.toggleClipboard()
                 onToggleControlCenter: bar.toggleControlCenter()
-            }
-            PowerButton {
-                id: powerComponent
             }
         }
     }

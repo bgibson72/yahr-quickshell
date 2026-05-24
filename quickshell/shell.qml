@@ -726,15 +726,6 @@ ShellRoot {
                     }
                 }
                 
-                // Connect power menu toggle signal
-                Connections {
-                    target: bar.powerComponent
-                    function onTogglePowerMenu() {
-                        shellRoot.powerMenuVisible = !shellRoot.powerMenuVisible
-                        console.log("PowerMenu toggled:", shellRoot.powerMenuVisible)
-                    }
-                }
-                
                 // Connect clipboard toggle signal
                 Connections {
                     target: bar
