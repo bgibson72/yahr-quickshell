@@ -57,10 +57,6 @@ print_step() {
     echo -e "${CYAN}→${NC} $1"
 }
 
-print_step() {
-    echo -e "${CYAN}→${NC} $1"
-}
-
 # Function to check if a command exists
 command_exists() {
     command -v "$1" >/dev/null 2>&1
@@ -720,6 +716,11 @@ check_dependencies() {
     # Check for pacseek
     if ! command_exists "pacseek"; then
         missing_critical+=("pacseek")
+    fi
+
+    # Check for hyprpolkitagent (polkit authentication agent for Hyprland)
+    if ! command_exists "hyprpolkitagent"; then
+        missing_critical+=("hyprpolkitagent")
     fi
     
     # Recommended dependencies
