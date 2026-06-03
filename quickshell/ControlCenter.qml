@@ -271,7 +271,7 @@ Rectangle {
                         onClicked: {
                             console.log("Opening network settings")
                             // Add window rule for centering, then launch
-                            Quickshell.execDetached(["hyprctl", "dispatch", "exec", "[float;center;size 800 600] nm-connection-editor"])
+                            Quickshell.execDetached(["hyprctl", "dispatch", "hl.dsp.exec_cmd('[float;center;size 800 600] nm-connection-editor')"])
                             root.requestClose()
                         }
                     }

@@ -177,9 +177,9 @@ Rectangle {
         root.requestClose()
         Qt.callLater(() => {
             if (needsTerminal)
-                Quickshell.execDetached(["hyprctl", "dispatch", "exec", "kitty -e sh -c '" + command + "'"])
+                Quickshell.execDetached(["kitty", "-e", "sh", "-c", command])
             else
-                Quickshell.execDetached(["hyprctl", "dispatch", "exec", command])
+                Quickshell.execDetached(["sh", "-c", command])
         })
     }
 

@@ -416,8 +416,23 @@ SETTINGSEOF`
     }
 
     // Apply a Hyprland keyword live and persist to conf
+    function buildLuaConfig(hyprKey, value) {
+        var parts = hyprKey.split(":")
+        var v = value
+        var luaVal
+        if (v === true || v === "true") luaVal = "true"
+        else if (v === false || v === "false") luaVal = "false"
+        else if (String(v).trim() !== "" && !isNaN(Number(v))) luaVal = String(v)
+        else luaVal = '"' + String(v).replace(/\\/g, '\\\\').replace(/"/g, '\\"') + '"'
+        var lua = luaVal
+        for (var i = parts.length - 1; i >= 0; i--) {
+            lua = "{" + parts[i] + "=" + lua + "}"
+        }
+        return "hl.config(" + lua + ")"
+    }
+
     function applyHypr(hyprKey, value, sedExpr) {
-        Quickshell.execDetached(["hyprctl", "keyword", hyprKey, String(value)])
+        Quickshell.execDetached(["hyprctl", "eval", buildLuaConfig(hyprKey, value)])
         Quickshell.execDetached(["sh", "-c", sedExpr + ' "$HOME/.config/hypr/look-and-feel.conf"'])
     }
     
@@ -3131,7 +3146,7 @@ SETTINGSEOF`
                                         onClicked: {
                                             hyprAnimationsCheck.checked = !hyprAnimationsCheck.checked
                                             const en = hyprAnimationsCheck.checked
-                                            Quickshell.execDetached(["hyprctl", "keyword", "animations:enabled", en ? "true" : "false"])
+                                            Quickshell.execDetached(["hyprctl", "eval", "hl.config({animations={enabled=" + (en ? "true" : "false") + "}})"])
                                             const sedCmd = en
                                                 ? `sed -i '/^animations/,/^}/ s/enabled = .*/enabled = yes, please :)/'`
                                                 : `sed -i '/^animations/,/^}/ s/enabled = .*/enabled = no/'`
@@ -3181,7 +3196,7 @@ SETTINGSEOF`
                                         onClicked: {
                                             hyprShadowCheck.checked = !hyprShadowCheck.checked
                                             const en = hyprShadowCheck.checked
-                                            Quickshell.execDetached(["hyprctl", "keyword", "decoration:shadow:enabled", en ? "true" : "false"])
+                                            Quickshell.execDetached(["hyprctl", "eval", "hl.config({decoration={shadow={enabled=" + (en ? "true" : "false") + "}}})"])
                                             const sedCmd = en
                                                 ? `sed -i '/shadow {/,/}/ s/enabled = false/enabled = true/'`
                                                 : `sed -i '/shadow {/,/}/ s/enabled = true/enabled = false/'`
@@ -3231,7 +3246,7 @@ SETTINGSEOF`
                                         onClicked: {
                                             hyprBlurCheck.checked = !hyprBlurCheck.checked
                                             const en = hyprBlurCheck.checked
-                                            Quickshell.execDetached(["hyprctl", "keyword", "decoration:blur:enabled", en ? "true" : "false"])
+                                            Quickshell.execDetached(["hyprctl", "eval", "hl.config({decoration={blur={enabled=" + (en ? "true" : "false") + "}}})"])
                                             const sedCmd = en
                                                 ? `sed -i '/blur {/,/}/ s/enabled = false/enabled = true/'`
                                                 : `sed -i '/blur {/,/}/ s/enabled = true/enabled = false/'`

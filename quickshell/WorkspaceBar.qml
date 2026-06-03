@@ -90,7 +90,7 @@ RowLayout {
 
             onClicked: {
                 console.log("Workspace", staticWorkspaceButton.workspaceId, "clicked")
-                Quickshell.execDetached(["hyprctl", "dispatch", "workspace", staticWorkspaceButton.workspaceId.toString()])
+                Quickshell.execDetached(["hyprctl", "dispatch", "hl.dsp.focus({workspace=" + staticWorkspaceButton.workspaceId + "})"])
             }
         }
     }
@@ -172,7 +172,7 @@ RowLayout {
 
             onClicked: {
                 console.log("Workspace", dynamicWorkspaceButton.modelData.id, "clicked")
-                Quickshell.execDetached(["hyprctl", "dispatch", "workspace", dynamicWorkspaceButton.modelData.name])
+                Quickshell.execDetached(["hyprctl", "dispatch", "hl.dsp.focus({workspace=" + dynamicWorkspaceButton.modelData.id + "})"])
             }
         }
     }
