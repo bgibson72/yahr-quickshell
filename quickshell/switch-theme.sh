@@ -103,13 +103,11 @@ declare -A HYPR_THEME_MAP=(
 
 HYPR_THEME="${HYPR_THEME_MAP[$THEME]}"
 if [ -n "$HYPR_THEME" ]; then
-    HYPR_THEME_FILE="$HOME/.config/hypr/themes/${HYPR_THEME}.conf"
-    if [ -f "$HYPR_THEME_FILE" ]; then
-        sed -i "s|^source = .*/themes/.*\.conf|source = $HYPR_THEME_FILE|" "$HOME/.config/hypr/hyprland.conf"
-        echo -e "${GREEN}✓ Hyprland theme updated to: $HYPR_THEME${NC}"
-        # Reload Hyprland config
-        hyprctl reload 2>/dev/null
-    fi
+    # Write theme name before reload so hyprland.lua picks it up immediately
+    echo "$HYPR_THEME" > "$HOME/.config/hypr/.current-theme"
+    echo -e "${GREEN}✓ Hyprland theme set to: $HYPR_THEME${NC}"
+    # Reload Hyprland config (hyprland.lua reads .current-theme on every reload)
+    hyprctl reload 2>/dev/null
 fi
 
 # Export theme file path for sync scripts to use
