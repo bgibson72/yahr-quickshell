@@ -29,8 +29,8 @@ hl.window_rule({ match = { title = "^(HyprEmoji)$"                   }, float = 
 hl.window_rule({ match = { title = "^(Pluck - Color Palette Extractor)$" }, float = true, center = true })
 
 -- ── Opacity ─────────────────────────────────────────────────────────
-hl.window_rule({ match = { class = "^thunar$" }, opacity = { active = 0.92, inactive = 0.88 } })
-hl.window_rule({ match = { class = "^code$"   }, opacity = { active = 0.92, inactive = 0.88 } })
+hl.window_rule({ match = { class = "^thunar$" }, opacity = "0.92 override 0.88 override" })
+hl.window_rule({ match = { class = "^code$"   }, opacity = "0.92 override 0.88 override" })
 
 -- ── Fullscreen / maximized ──────────────────────────────────────────
 hl.window_rule({ match = { class = "^(feh)$"              }, fullscreen = true })

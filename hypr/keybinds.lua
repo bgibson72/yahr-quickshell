@@ -27,9 +27,9 @@ hl.bind(MOD .. " + Escape",      hl.dsp.exec_cmd(powermenu))
 hl.bind(MOD .. " + T",           hl.dsp.exec_cmd(themeswitcher))
 
 -- Window management
-hl.bind(MOD .. " + Q",           hl.dsp.window.kill())
+hl.bind(MOD .. " + Q",           hl.dsp.window.close())
 hl.bind(MOD .. " + M",           hl.dsp.exit())
-hl.bind(MOD .. " + V",           hl.dsp.window.float())
+hl.bind(MOD .. " + V",           hl.dsp.window.float({ action = "toggle" }))
 hl.bind(MOD .. " + P",           hl.dsp.window.pseudo())
 
 -- Screenshots / UI toggles
@@ -48,17 +48,17 @@ hl.bind(MOD .. " + N",           hl.dsp.exec_cmd("makoctl restore"))
 hl.bind(MOD .. " + Z",           hl.dsp.exec_cmd("~/.config/quickshell/restart-quickshell.sh"))
 
 -- Focus movement
-hl.bind(MOD .. " + left",        hl.dsp.focus({ direction = "l" }))
-hl.bind(MOD .. " + right",       hl.dsp.focus({ direction = "r" }))
-hl.bind(MOD .. " + up",          hl.dsp.focus({ direction = "u" }))
-hl.bind(MOD .. " + down",        hl.dsp.focus({ direction = "d" }))
+hl.bind(MOD .. " + left",        hl.dsp.focus({ direction = "left" }))
+hl.bind(MOD .. " + right",       hl.dsp.focus({ direction = "right" }))
+hl.bind(MOD .. " + up",          hl.dsp.focus({ direction = "up" }))
+hl.bind(MOD .. " + down",        hl.dsp.focus({ direction = "down" }))
 
 -- Workspace switching (1–9 and 10)
 for i = 1, 9 do
-    hl.bind(MOD .. " + " .. i,              hl.dsp.workspace({ id = i }))
+    hl.bind(MOD .. " + " .. i,              hl.dsp.focus({ workspace = i }))
     hl.bind(MOD .. " + SHIFT + " .. i,      hl.dsp.window.move({ workspace = i }))
 end
-hl.bind(MOD .. " + 0",           hl.dsp.workspace({ id = 10 }))
+hl.bind(MOD .. " + 0",           hl.dsp.focus({ workspace = 10 }))
 hl.bind(MOD .. " + SHIFT + 0",   hl.dsp.window.move({ workspace = 10 }))
 
 -- Special workspace (scratchpad)
@@ -66,8 +66,8 @@ hl.bind(MOD .. " + S",           hl.dsp.workspace.toggle_special("magic"))
 hl.bind(MOD .. " + SHIFT + S",   hl.dsp.window.move({ workspace = "special:magic" }))
 
 -- Scroll through workspaces with mouse wheel
-hl.bind(MOD .. " + mouse_down",  hl.dsp.workspace("e+1"))
-hl.bind(MOD .. " + mouse_up",    hl.dsp.workspace("e-1"))
+hl.bind(MOD .. " + mouse_down",  hl.dsp.focus({ workspace = "e+1" }))
+hl.bind(MOD .. " + mouse_up",    hl.dsp.focus({ workspace = "e-1" }))
 
 -- Move/resize windows with mouse drag
 hl.bind(MOD .. " + mouse:272",   hl.dsp.window.drag(),   { mouse = true })
