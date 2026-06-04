@@ -29,6 +29,7 @@ hl.window_rule({ match = { title = "^(HyprEmoji)$"                   }, float = 
 hl.window_rule({ match = { title = "^(Pluck - Color Palette Extractor)$" }, float = true, center = true })
 
 -- ── Opacity ─────────────────────────────────────────────────────────
+hl.window_rule({ match = { class = "^kitty$" }, opacity = "0.92 override 0.88 override" })
 hl.window_rule({ match = { class = "^thunar$" }, opacity = "0.92 override 0.88 override" })
 hl.window_rule({ match = { class = "^code$"   }, opacity = "0.92 override 0.88 override" })
 
