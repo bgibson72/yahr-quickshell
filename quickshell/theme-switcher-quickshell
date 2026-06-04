@@ -765,6 +765,10 @@ EOF
     # Update other applications
     echo "Updating application themes..."
     update_hyprland_theme "$theme_file" "$theme_name"
+    # Re-apply user Hyprland appearance settings (blur, shadow, animations, gaps, etc.)
+    # after reload, since appearance.lua resets them to theme defaults on every reload
+    sleep 0.4
+    bash "$QUICKSHELL_DIR/apply-hypr-settings.sh" 2>/dev/null &
     update_wofi_theme "$theme_file" "$theme_name" 
     update_kitty_theme "$theme_file" "$theme_name"
     update_mako_theme "$theme_file" "$theme_name"
