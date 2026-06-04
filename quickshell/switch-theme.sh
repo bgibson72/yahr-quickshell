@@ -108,6 +108,9 @@ if [ -n "$HYPR_THEME" ]; then
     echo -e "${GREEN}✓ Hyprland theme set to: $HYPR_THEME${NC}"
     # Reload Hyprland config (hyprland.lua reads .current-theme on every reload)
     hyprctl reload 2>/dev/null
+    # Re-apply user appearance preferences that theme defaults would have reset
+    sleep 0.3
+    bash "$HOME/.config/quickshell/apply-hypr-settings.sh" 2>/dev/null &
 fi
 
 # Export theme file path for sync scripts to use

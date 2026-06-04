@@ -47,7 +47,6 @@ Rectangle {
             loadSettings()
             loadThemes()
             loadFonts()
-            loadHyprlandSettings()
             root.forceActiveFocus()
         }
     }
@@ -122,6 +121,18 @@ Rectangle {
                     if (!root.settings.theme) {
                         root.settings.theme = {
                             current: "TokyoNight"
+                        }
+                    }
+                    if (!root.settings.hypr) {
+                        root.settings.hypr = {
+                            borderSize: 1,
+                            rounding: 12,
+                            gapsIn: 5,
+                            gapsOut: 10,
+                            animations: true,
+                            shadow: true,
+                            blur: true,
+                            blurSize: 10
                         }
                     }
                     
@@ -303,6 +314,22 @@ SETTINGSEOF`
         const savedFont = (root.settings.general && root.settings.general.uiFont) ? root.settings.general.uiFont : "Sen"
         root.currentFontSelection = savedFont
         ThemeManager.uiFont = savedFont
+
+        // Hyprland appearance settings — restore from settings.json
+        if (root.settings.hypr) {
+            const h = root.settings.hypr
+            if (h.borderSize !== undefined) {
+                hyprBorderEnabledCheck.checked = h.borderSize > 0
+                hyprBorderThicknessObj.value = h.borderSize > 0 ? h.borderSize : 1
+            }
+            if (h.rounding   !== undefined) hyprRoundingObj.value    = h.rounding
+            if (h.gapsIn     !== undefined) hyprGapsInObj.value       = h.gapsIn
+            if (h.gapsOut    !== undefined) hyprGapsOutObj.value      = h.gapsOut
+            if (h.animations !== undefined) hyprAnimationsCheck.checked = h.animations
+            if (h.shadow     !== undefined) hyprShadowCheck.checked   = h.shadow
+            if (h.blur       !== undefined) hyprBlurCheck.checked     = h.blur
+            if (h.blurSize   !== undefined) hyprBlurSizeObj.value     = h.blurSize
+        }
     }
     
     // Load available themes
@@ -433,7 +460,20 @@ SETTINGSEOF`
 
     function applyHypr(hyprKey, value, sedExpr) {
         Quickshell.execDetached(["hyprctl", "eval", buildLuaConfig(hyprKey, value)])
-        Quickshell.execDetached(["sh", "-c", sedExpr + ' "$HOME/.config/hypr/look-and-feel.conf"'])
+        // Persist to settings.json so changes survive theme changes and reboots
+        if (!root.settings.hypr) root.settings.hypr = {}
+        var keyMap = {
+            "general:border_size":   "borderSize",
+            "decoration:rounding":   "rounding",
+            "general:gaps_in":       "gapsIn",
+            "general:gaps_out":      "gapsOut",
+            "decoration:blur:size":  "blurSize"
+        }
+        var field = keyMap[hyprKey]
+        if (field !== undefined) {
+            root.settings.hypr[field] = value
+            saveSettings()
+        }
     }
     
     function applyTheme(themeName) {
@@ -3147,10 +3187,9 @@ SETTINGSEOF`
                                             hyprAnimationsCheck.checked = !hyprAnimationsCheck.checked
                                             const en = hyprAnimationsCheck.checked
                                             Quickshell.execDetached(["hyprctl", "eval", "hl.config({animations={enabled=" + (en ? "true" : "false") + "}})"])
-                                            const sedCmd = en
-                                                ? `sed -i '/^animations/,/^}/ s/enabled = .*/enabled = yes, please :)/'`
-                                                : `sed -i '/^animations/,/^}/ s/enabled = .*/enabled = no/'`
-                                            Quickshell.execDetached(["sh", "-c", sedCmd + ' "$HOME/.config/hypr/look-and-feel.conf"'])
+                                            if (!root.settings.hypr) root.settings.hypr = {}
+                                            root.settings.hypr.animations = en
+                                            saveSettings()
                                         }
                                     }
                                 }
@@ -3197,10 +3236,9 @@ SETTINGSEOF`
                                             hyprShadowCheck.checked = !hyprShadowCheck.checked
                                             const en = hyprShadowCheck.checked
                                             Quickshell.execDetached(["hyprctl", "eval", "hl.config({decoration={shadow={enabled=" + (en ? "true" : "false") + "}}})"])
-                                            const sedCmd = en
-                                                ? `sed -i '/shadow {/,/}/ s/enabled = false/enabled = true/'`
-                                                : `sed -i '/shadow {/,/}/ s/enabled = true/enabled = false/'`
-                                            Quickshell.execDetached(["sh", "-c", sedCmd + ' "$HOME/.config/hypr/look-and-feel.conf"'])
+                                            if (!root.settings.hypr) root.settings.hypr = {}
+                                            root.settings.hypr.shadow = en
+                                            saveSettings()
                                         }
                                     }
                                 }
@@ -3247,10 +3285,9 @@ SETTINGSEOF`
                                             hyprBlurCheck.checked = !hyprBlurCheck.checked
                                             const en = hyprBlurCheck.checked
                                             Quickshell.execDetached(["hyprctl", "eval", "hl.config({decoration={blur={enabled=" + (en ? "true" : "false") + "}}})"])
-                                            const sedCmd = en
-                                                ? `sed -i '/blur {/,/}/ s/enabled = false/enabled = true/'`
-                                                : `sed -i '/blur {/,/}/ s/enabled = true/enabled = false/'`
-                                            Quickshell.execDetached(["sh", "-c", sedCmd + ' "$HOME/.config/hypr/look-and-feel.conf"'])
+                                            if (!root.settings.hypr) root.settings.hypr = {}
+                                            root.settings.hypr.blur = en
+                                            saveSettings()
                                         }
                                     }
                                 }
