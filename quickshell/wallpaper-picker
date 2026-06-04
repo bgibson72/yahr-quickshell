@@ -92,14 +92,14 @@ if [[ -n "$selected" ]]; then
     wallpaper_path="${wallpaper_paths[$selected]}"
     
     if [[ -f "$wallpaper_path" ]]; then
-        # Check if swww-daemon is running
-        if ! pgrep -x swww-daemon > /dev/null; then
-            swww-daemon &
+        # Check if awww-daemon is running
+        if ! pgrep -x awww-daemon > /dev/null; then
+            awww-daemon &
             sleep 1
         fi
         
         # Set wallpaper with grow animation
-        swww img "$wallpaper_path" --transition-type grow --transition-pos 0.5,0.5 --transition-duration 2
+        awww img "$wallpaper_path" --transition-type grow --transition-pos 0.5,0.5 --transition-duration 2
         
         # Sync SDDM theme with new wallpaper
         SDDM_SYNC="$HOME/Dev/yahr-quickshell/sddm/sync-sddm-theme.sh"

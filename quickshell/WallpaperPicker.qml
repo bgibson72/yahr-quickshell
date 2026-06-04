@@ -555,7 +555,7 @@ PanelWindow {
         }
     }
 
-    // If swww-daemon wasn't running, give it time to initialize before applying
+    // If awww-daemon wasn't running, give it time to initialize before applying
     Timer {
         id: daemonStartTimer
         interval: 800
