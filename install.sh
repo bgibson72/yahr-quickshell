@@ -52,6 +52,8 @@ SELECT_CONFIG_THUNAR=false
 # Optional package selections
 SELECT_EXTRA_NEOVIM=false
 SELECT_EXTRA_VESKTOP=false
+SELECT_EXTRA_FIREFOX=false
+SELECT_EXTRA_ZEN=false
 SELECT_EXTRA_CODE_OSS=false
 SELECT_EXTRA_VSCODIUM=false
 SELECT_EXTRA_VSCODE=false
@@ -121,7 +123,7 @@ ensure_installer_ui_tools() {
         return 0
     fi
 
-    print_warning "Could not install all TUI dependencies; falling back to classic prompts"
+    print_error "Could not install required TUI dependencies (dialog/figlet)"
     return 1
 }
 
@@ -143,8 +145,21 @@ show_figlet_banner() {
 configure_install_profile_tui() {
     local raw
     local selection_list=()
+    local gpu_info
+    local has_nvidia=false
+    local has_amd=false
+    local has_intel=false
+    local nvim_cfg_default="OFF"
+    local vesktop_cfg_default="OFF"
+    local vscodium_cfg_default="OFF"
+    local firefox_cfg_default="OFF"
 
     dialog --stdout --clear --title "YAHR Installer" --colors --msgbox "\n\ZbWelcome to the YAHR Quickshell installer\Zn\n\nUse arrow keys to navigate, space to toggle checkboxes, and Enter to continue.\n\nRequired/base packages are always installed automatically." 14 78 || return 1
+
+    gpu_info=$(lspci 2>/dev/null | grep -Ei "VGA|3D|Display" || true)
+    echo "$gpu_info" | grep -qi "nvidia" && has_nvidia=true
+    echo "$gpu_info" | grep -Eqi "amd|radeon" && has_amd=true
+    echo "$gpu_info" | grep -qi "intel" && has_intel=true
 
     INSTALL_MODE=$(dialog --stdout --title "Install Mode" --radiolist "Select installation mode:" 13 78 2 \
         "full" "Full install (recommended)" ON \
@@ -153,10 +168,6 @@ configure_install_profile_tui() {
     SELECT_AUR_HELPER=$(dialog --stdout --title "AUR Helper" --radiolist "Select AUR helper:" 13 78 2 \
         "yay" "Popular and feature-rich" ON \
         "paru" "Modern rust-based helper" OFF) || return 1
-
-    SELECT_NVIDIA_DRIVER=$(dialog --stdout --title "NVIDIA Driver" --radiolist "If NVIDIA is detected, choose driver family:" 14 78 2 \
-        "proprietary" "nvidia-dkms (recommended for Wayland)" ON \
-        "nouveau" "Open source nouveau" OFF) || return 1
 
     dialog --stdout --title "Required Base Packages" --checklist "These are required and always installed:" 18 92 10 \
         "REQ_QS" "quickshell-git" ON \
@@ -169,12 +180,44 @@ configure_install_profile_tui() {
         "REQ_PAPIRUS" "papirus-icon-theme + papirus-folders-git" ON \
         "REQ_FONTS" "nerd fonts symbols + emoji" ON >/dev/null || return 1
 
+    raw=$(dialog --stdout --title "Optional App Packages" --checklist "Select additional packages to install:" 20 92 12 \
+        "NEOVIM_APP" "neovim" OFF \
+        "VESKTOP_APP" "vesktop-bin" OFF \
+        "FIREFOX_APP" "firefox" OFF \
+        "ZEN_APP" "zen-browser" OFF \
+        "CODE_OSS_APP" "code (Code OSS)" OFF \
+        "VSCODIUM_APP" "vscodium-bin" OFF \
+        "VSCODE_APP" "visual-studio-code-bin" OFF) || return 1
+    raw=${raw//\"/}
+    read -r -a selection_list <<< "$raw"
+
+    SELECT_EXTRA_NEOVIM=false
+    SELECT_EXTRA_VESKTOP=false
+    SELECT_EXTRA_FIREFOX=false
+    SELECT_EXTRA_ZEN=false
+    SELECT_EXTRA_CODE_OSS=false
+    SELECT_EXTRA_VSCODIUM=false
+    SELECT_EXTRA_VSCODE=false
+
+    has_selection "NEOVIM_APP" "${selection_list[@]}" && SELECT_EXTRA_NEOVIM=true
+    has_selection "VESKTOP_APP" "${selection_list[@]}" && SELECT_EXTRA_VESKTOP=true
+    has_selection "FIREFOX_APP" "${selection_list[@]}" && SELECT_EXTRA_FIREFOX=true
+    has_selection "ZEN_APP" "${selection_list[@]}" && SELECT_EXTRA_ZEN=true
+    has_selection "CODE_OSS_APP" "${selection_list[@]}" && SELECT_EXTRA_CODE_OSS=true
+    has_selection "VSCODIUM_APP" "${selection_list[@]}" && SELECT_EXTRA_VSCODIUM=true
+    has_selection "VSCODE_APP" "${selection_list[@]}" && SELECT_EXTRA_VSCODE=true
+
+    [ "$SELECT_EXTRA_NEOVIM" = true ] && nvim_cfg_default="ON"
+    [ "$SELECT_EXTRA_VESKTOP" = true ] && vesktop_cfg_default="ON"
+    [ "$SELECT_EXTRA_VSCODIUM" = true ] && vscodium_cfg_default="ON"
+    [ "$SELECT_EXTRA_FIREFOX" = true ] && firefox_cfg_default="ON"
+
     raw=$(dialog --stdout --title "Optional Config Components" --checklist "Toggle configuration folders to install:" 18 92 10 \
-        "NVIM_CFG" "Neovim config" OFF \
-        "VESKTOP_CFG" "Vesktop config" OFF \
-        "VSCODIUM_CFG" "VSCodium config" OFF \
+        "NVIM_CFG" "Neovim config" "$nvim_cfg_default" \
+        "VESKTOP_CFG" "Vesktop config" "$vesktop_cfg_default" \
+        "VSCODIUM_CFG" "VSCodium config" "$vscodium_cfg_default" \
         "THUNAR_CFG" "Thunar config" OFF \
-        "FIREFOX_CFG" "Firefox userChrome theme" OFF \
+        "FIREFOX_CFG" "Firefox userChrome theme" "$firefox_cfg_default" \
         "SDDM_CFG" "SDDM setup and login theme" OFF \
         "SIP_CFG" "Sip StartPage install/update" OFF) || return 1
     raw=${raw//\"/}
@@ -196,32 +239,26 @@ configure_install_profile_tui() {
     has_selection "SDDM_CFG" "${selection_list[@]}" && SELECT_INSTALL_SDDM=true
     has_selection "SIP_CFG" "${selection_list[@]}" && SELECT_INSTALL_SIP_STARTPAGE=true
 
-    raw=$(dialog --stdout --title "Optional App Packages" --checklist "Select additional packages to install:" 18 92 10 \
-        "NEOVIM_APP" "neovim" OFF \
-        "VESKTOP_APP" "vesktop-bin" OFF \
-        "CODE_OSS_APP" "code (Code OSS)" OFF \
-        "VSCODIUM_APP" "vscodium-bin" OFF \
-        "VSCODE_APP" "visual-studio-code-bin" OFF) || return 1
-    raw=${raw//\"/}
-    read -r -a selection_list <<< "$raw"
+    if [ "$has_nvidia" = true ]; then
+        SELECT_NVIDIA_DRIVER=$(dialog --stdout --title "Graphics Driver Preference" --radiolist "NVIDIA detected: choose preferred NVIDIA driver family." 14 88 2 \
+            "proprietary" "nvidia-dkms (recommended for Wayland)" ON \
+            "nouveau" "Open source nouveau" OFF) || return 1
+    else
+        SELECT_NVIDIA_DRIVER="proprietary"
+    fi
 
-    SELECT_EXTRA_NEOVIM=false
-    SELECT_EXTRA_VESKTOP=false
-    SELECT_EXTRA_CODE_OSS=false
-    SELECT_EXTRA_VSCODIUM=false
-    SELECT_EXTRA_VSCODE=false
-
-    has_selection "NEOVIM_APP" "${selection_list[@]}" && SELECT_EXTRA_NEOVIM=true
-    has_selection "VESKTOP_APP" "${selection_list[@]}" && SELECT_EXTRA_VESKTOP=true
-    has_selection "CODE_OSS_APP" "${selection_list[@]}" && SELECT_EXTRA_CODE_OSS=true
-    has_selection "VSCODIUM_APP" "${selection_list[@]}" && SELECT_EXTRA_VSCODIUM=true
-    has_selection "VSCODE_APP" "${selection_list[@]}" && SELECT_EXTRA_VSCODE=true
-
-    raw=$(dialog --stdout --title "Installer Behavior" --checklist "Select installer behavior:" 14 92 6 \
-        "RECOMMENDED" "Install missing recommended dependencies" ON \
-        "ENVYCONTROL" "Install envycontrol on hybrid NVIDIA systems" ON \
-        "HYPR_SOURCE" "Auto-add autostart.conf source if missing" ON \
-        "AUTO_REBOOT" "Reboot automatically when install completes" OFF) || return 1
+    if [ "$has_nvidia" = true ] && { [ "$has_amd" = true ] || [ "$has_intel" = true ]; }; then
+        raw=$(dialog --stdout --title "Installer Behavior" --checklist "Select installer behavior:" 15 92 7 \
+            "RECOMMENDED" "Install missing recommended dependencies" ON \
+            "ENVYCONTROL" "Install envycontrol on hybrid NVIDIA systems" ON \
+            "HYPR_SOURCE" "Auto-add autostart.conf source if missing" ON \
+            "AUTO_REBOOT" "Reboot automatically when install completes" OFF) || return 1
+    else
+        raw=$(dialog --stdout --title "Installer Behavior" --checklist "Select installer behavior:" 15 92 7 \
+            "RECOMMENDED" "Install missing recommended dependencies" ON \
+            "HYPR_SOURCE" "Auto-add autostart.conf source if missing" ON \
+            "AUTO_REBOOT" "Reboot automatically when install completes" OFF) || return 1
+    fi
     raw=${raw//\"/}
     read -r -a selection_list <<< "$raw"
 
@@ -957,10 +994,6 @@ check_dependencies() {
     
     if ! command_exists "thunar"; then
         missing_recommended+=("thunar" "tumbler" "ffmpegthumbnailer" "thunar-archive-plugin" "thunar-media-tags-plugin" "thunar-volman" "file-roller")
-    fi
-    
-    if ! command_exists "firefox"; then
-        missing_recommended+=("firefox")
     fi
     
     if ! command_exists "brightnessctl"; then
@@ -1774,6 +1807,23 @@ verify_installation() {
     return 0
 }
 
+install_aur_package() {
+    local package_name="$1"
+
+    if command_exists "paru"; then
+        paru -S --needed "$package_name"
+        return $?
+    fi
+
+    if command_exists "yay"; then
+        yay -S --needed "$package_name"
+        return $?
+    fi
+
+    print_warning "AUR helper not available; cannot install $package_name"
+    return 1
+}
+
 # Install optional extras
 install_extras() {
     print_header "Optional Extras Installation"
@@ -1792,16 +1842,10 @@ install_extras() {
         else
             read -p "$(echo -e ${CYAN}?${NC}) Install Neovim (AstroVim config included)? (y/n): " neovim_choice
         fi
-        
+
         if [[ "$neovim_choice" =~ ^[Yy]$ ]]; then
             print_step "Installing Neovim..."
-            if command_exists "paru"; then
-                paru -S --needed neovim
-            elif command_exists "yay"; then
-                yay -S --needed neovim
-            else
-                sudo pacman -S --needed neovim
-            fi
+            sudo pacman -S --needed neovim
             print_success "Neovim installed"
             INSTALLED_COMPONENTS+=("Neovim")
         else
@@ -1810,7 +1854,7 @@ install_extras() {
     else
         print_info "Neovim already installed"
     fi
-    
+
     # Vesktop (Discord)
     if ! command_exists "vesktop"; then
         local vesktop_choice="n"
@@ -1821,37 +1865,106 @@ install_extras() {
         else
             read -p "$(echo -e ${CYAN}?${NC}) Install Vesktop (Discord client with Vencord)? (y/n): " vesktop_choice
         fi
-        
+
         if [[ "$vesktop_choice" =~ ^[Yy]$ ]]; then
             print_step "Installing Vesktop..."
-            if command_exists "paru"; then
-                paru -S --needed vesktop-bin
-            elif command_exists "yay"; then
-                yay -S --needed vesktop-bin
+            if install_aur_package "vesktop-bin"; then
+                print_success "Vesktop installed"
+                INSTALLED_COMPONENTS+=("Vesktop")
+            else
+                SKIPPED_COMPONENTS+=("Vesktop")
             fi
-            print_success "Vesktop installed"
-            INSTALLED_COMPONENTS+=("Vesktop")
         else
             SKIPPED_COMPONENTS+=("Vesktop")
         fi
     else
         print_info "Vesktop already installed"
     fi
-    
-    # VS Code variants
-    if ! command_exists "code" && ! command_exists "codium"; then
-        local vscode_choice="4"
+
+    # Firefox
+    if ! command_exists "firefox"; then
+        local firefox_choice="n"
         if [ "$SELECTIONS_CONFIGURED" = true ]; then
-            if [ "$SELECT_EXTRA_CODE_OSS" = true ]; then
-                vscode_choice="1"
-            elif [ "$SELECT_EXTRA_VSCODIUM" = true ]; then
-                vscode_choice="2"
-            elif [ "$SELECT_EXTRA_VSCODE" = true ]; then
-                vscode_choice="3"
-            else
-                vscode_choice="4"
-            fi
+            [ "$SELECT_EXTRA_FIREFOX" = true ] && firefox_choice="y"
         elif [ "$YOLO_MODE" = true ]; then
+            firefox_choice="n"
+        else
+            read -p "$(echo -e ${CYAN}?${NC}) Install Firefox? (y/n): " firefox_choice
+        fi
+
+        if [[ "$firefox_choice" =~ ^[Yy]$ ]]; then
+            print_step "Installing Firefox..."
+            sudo pacman -S --needed firefox
+            print_success "Firefox installed"
+            INSTALLED_COMPONENTS+=("Firefox")
+        else
+            SKIPPED_COMPONENTS+=("Firefox")
+        fi
+    else
+        print_info "Firefox already installed"
+    fi
+
+    # Zen Browser
+    if ! command_exists "zen-browser"; then
+        local zen_choice="n"
+        if [ "$SELECTIONS_CONFIGURED" = true ]; then
+            [ "$SELECT_EXTRA_ZEN" = true ] && zen_choice="y"
+        elif [ "$YOLO_MODE" = true ]; then
+            zen_choice="n"
+        else
+            read -p "$(echo -e ${CYAN}?${NC}) Install Zen Browser? (y/n): " zen_choice
+        fi
+
+        if [[ "$zen_choice" =~ ^[Yy]$ ]]; then
+            print_step "Installing Zen Browser..."
+            if install_aur_package "zen-browser-bin"; then
+                print_success "Zen Browser installed"
+                INSTALLED_COMPONENTS+=("Zen Browser")
+            else
+                SKIPPED_COMPONENTS+=("Zen Browser")
+            fi
+        else
+            SKIPPED_COMPONENTS+=("Zen Browser")
+        fi
+    else
+        print_info "Zen Browser already installed"
+    fi
+
+    # VS Code variants
+    if [ "$SELECTIONS_CONFIGURED" = true ]; then
+        if [ "$SELECT_EXTRA_CODE_OSS" = true ]; then
+            print_step "Installing Code OSS..."
+            sudo pacman -S --needed code
+            print_success "Code OSS installed"
+            INSTALLED_COMPONENTS+=("Code OSS")
+        fi
+
+        if [ "$SELECT_EXTRA_VSCODIUM" = true ]; then
+            print_step "Installing VSCodium..."
+            if install_aur_package "vscodium-bin"; then
+                print_success "VSCodium installed"
+                INSTALLED_COMPONENTS+=("VSCodium")
+            else
+                SKIPPED_COMPONENTS+=("VSCodium")
+            fi
+        fi
+
+        if [ "$SELECT_EXTRA_VSCODE" = true ]; then
+            print_step "Installing Visual Studio Code..."
+            if install_aur_package "visual-studio-code-bin"; then
+                print_success "Visual Studio Code installed"
+                INSTALLED_COMPONENTS+=("VS Code")
+            else
+                SKIPPED_COMPONENTS+=("VS Code")
+            fi
+        fi
+
+        if [ "$SELECT_EXTRA_CODE_OSS" = false ] && [ "$SELECT_EXTRA_VSCODIUM" = false ] && [ "$SELECT_EXTRA_VSCODE" = false ]; then
+            SKIPPED_COMPONENTS+=("VS Code")
+        fi
+    elif ! command_exists "code" && ! command_exists "codium"; then
+        local vscode_choice="4"
+        if [ "$YOLO_MODE" = true ]; then
             vscode_choice="2"  # Default to VSCodium in YOLO mode
         else
             echo ""
@@ -1862,7 +1975,7 @@ install_extras() {
             echo "  4) None - Skip installation"
             read -p "$(echo -e ${CYAN}?${NC}) Enter choice (1-4): " vscode_choice
         fi
-        
+
         case "$vscode_choice" in
             1)
                 print_step "Installing Code OSS..."
@@ -1872,23 +1985,21 @@ install_extras() {
                 ;;
             2)
                 print_step "Installing VSCodium..."
-                if command_exists "paru"; then
-                    paru -S --needed vscodium-bin
-                elif command_exists "yay"; then
-                    yay -S --needed vscodium-bin
+                if install_aur_package "vscodium-bin"; then
+                    print_success "VSCodium installed"
+                    INSTALLED_COMPONENTS+=("VSCodium")
+                else
+                    SKIPPED_COMPONENTS+=("VSCodium")
                 fi
-                print_success "VSCodium installed"
-                INSTALLED_COMPONENTS+=("VSCodium")
                 ;;
             3)
                 print_step "Installing Visual Studio Code..."
-                if command_exists "paru"; then
-                    paru -S --needed visual-studio-code-bin
-                elif command_exists "yay"; then
-                    yay -S --needed visual-studio-code-bin
+                if install_aur_package "visual-studio-code-bin"; then
+                    print_success "Visual Studio Code installed"
+                    INSTALLED_COMPONENTS+=("VS Code")
+                else
+                    SKIPPED_COMPONENTS+=("VS Code")
                 fi
-                print_success "Visual Studio Code installed"
-                INSTALLED_COMPONENTS+=("VS Code")
                 ;;
             *)
                 print_info "Skipping VS Code installation"
@@ -2127,56 +2238,20 @@ main() {
     echo "with unified theme system and modern aesthetics"
     echo ""
 
-    if ensure_installer_ui_tools && configure_install_profile_tui; then
-        USE_TUI=true
-        YOLO_MODE=false
-        show_figlet_banner
-        print_success "Installer selections captured from TUI"
-    else
-        print_warning "Falling back to classic prompt mode"
-
-        # YOLO mode prompt
-        print_info "Installation mode:"
-        echo "  [Y] YOLO mode - Fully unattended installation (auto-skips optional prompts)"
-        echo "  [N] Normal mode - Interactive prompts for optional components"
-        echo ""
-        read -p "Enable YOLO mode? (y/N) [N]: " yolo_choice
-
-        case $yolo_choice in
-            [Yy]*)
-                YOLO_MODE=true
-                print_success "YOLO mode enabled - buckle up!"
-                ;;
-            *)
-                YOLO_MODE=false
-                print_info "Normal mode selected"
-                ;;
-        esac
-
-        echo ""
-
-        # Select installation mode
-        print_info "Select installation mode:"
-        echo "  [1] Full - All configs and optional components (recommended)"
-        echo "  [2] Minimal - Core components only (Quickshell, Hyprland, Kitty, Mako)"
-        echo ""
-        read -p "Choose mode (1/2) [1]: " mode_choice
-
-        case $mode_choice in
-            2)
-                INSTALL_MODE="minimal"
-                print_info "Minimal installation selected"
-                ;;
-            1|"")
-                INSTALL_MODE="full"
-                print_info "Full installation selected"
-                ;;
-            *)
-                print_error "Invalid choice. Using full installation."
-                INSTALL_MODE="full"
-                ;;
-        esac
+    if ! ensure_installer_ui_tools; then
+        print_error "Installer requires dialog and figlet; cannot continue."
+        exit 1
     fi
+
+    if ! configure_install_profile_tui; then
+        print_info "Installation cancelled from TUI."
+        exit 0
+    fi
+
+    USE_TUI=true
+    YOLO_MODE=false
+    show_figlet_banner
+    print_success "Installer selections captured from TUI"
     
     echo ""
     
