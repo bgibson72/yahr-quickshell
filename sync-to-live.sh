@@ -6,6 +6,17 @@
 REPO_DIR="$HOME/yahr-quickshell"
 CONFIG_DIR="$HOME/.config"
 
+REQUIRED_QUICKSHELL_QML=(
+    "shell.qml"
+    "SystemInfoWidget.qml"
+    "CalendarTab.qml"
+    "WeatherTab.qml"
+    "SystemTab.qml"
+    "WallpaperPickerContent.qml"
+    "SettingsWidget.qml"
+    "ThemeManager.qml"
+)
+
 command_exists() {
     command -v "$1" >/dev/null 2>&1
 }
@@ -44,6 +55,29 @@ sync_tree() {
     )
 }
 
+validate_quickshell_qml_set() {
+    local base_dir="$1"
+    local label="$2"
+    local missing=()
+    local file
+
+    for file in "${REQUIRED_QUICKSHELL_QML[@]}"; do
+        if [ ! -f "$base_dir/$file" ]; then
+            missing+=("$file")
+        fi
+    done
+
+    if [ ${#missing[@]} -gt 0 ]; then
+        echo "✗ Missing required Quickshell QML files in $label:"
+        for file in "${missing[@]}"; do
+            echo "  - $file"
+        done
+        return 1
+    fi
+
+    return 0
+}
+
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "  Sync Repo → Live Config"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
@@ -51,9 +85,16 @@ echo ""
 
 # Quickshell
 if [ -d "$REPO_DIR/quickshell" ]; then
+    validate_quickshell_qml_set "$REPO_DIR/quickshell" "repo" \
+        || { echo "✗ Quickshell preflight validation failed"; exit 1; }
+
     echo "Syncing quickshell..."
     sync_tree "$REPO_DIR/quickshell" "$CONFIG_DIR/quickshell" '*.backup*' 'settings.json' 'ThemeManager.qml' \
         || { echo "✗ Quickshell sync failed"; exit 1; }
+
+    validate_quickshell_qml_set "$CONFIG_DIR/quickshell" "live config" \
+        || { echo "✗ Quickshell post-sync validation failed"; exit 1; }
+
     echo "✓ Quickshell synced"
 fi
 
