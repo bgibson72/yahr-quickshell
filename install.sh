@@ -28,36 +28,6 @@ YOLO_MODE=false
 declare -a INSTALLED_COMPONENTS=()
 declare -a SKIPPED_COMPONENTS=()
 
-# Selection state (configured via TUI in normal mode)
-SELECTIONS_CONFIGURED=false
-USE_TUI=false
-AUTO_REBOOT=false
-
-# Install choices
-SELECT_AUR_HELPER="yay"
-SELECT_NVIDIA_DRIVER="proprietary"
-SELECT_INSTALL_RECOMMENDED=true
-SELECT_INSTALL_ENVYCONTROL=true
-SELECT_ADD_HYPR_AUTOSTART_SOURCE=true
-SELECT_INSTALL_FIREFOX=false
-SELECT_INSTALL_SDDM=false
-SELECT_INSTALL_SIP_STARTPAGE=false
-
-# Optional config selections
-SELECT_CONFIG_NVIM=false
-SELECT_CONFIG_VESKTOP=false
-SELECT_CONFIG_VSCODIUM=false
-SELECT_CONFIG_THUNAR=false
-
-# Optional package selections
-SELECT_EXTRA_NEOVIM=false
-SELECT_EXTRA_VESKTOP=false
-SELECT_EXTRA_CODE_OSS=false
-SELECT_EXTRA_VSCODIUM=false
-SELECT_EXTRA_VSCODE=false
-
-# Function to print colored messages
-
 # Function to print colored messages
 print_info() {
     echo -e "${BLUE}ℹ${NC} $1"
@@ -85,160 +55,6 @@ print_header() {
 
 print_step() {
     echo -e "${CYAN}→${NC} $1"
-}
-
-has_selection() {
-    local needle="$1"
-    shift
-    local item
-    for item in "$@"; do
-        if [ "$item" = "$needle" ]; then
-            return 0
-        fi
-    done
-    return 1
-}
-
-ensure_installer_ui_tools() {
-    local missing=()
-
-    if ! command_exists "dialog"; then
-        missing+=("dialog")
-    fi
-
-    if ! command_exists "figlet"; then
-        missing+=("figlet")
-    fi
-
-    if [ ${#missing[@]} -eq 0 ]; then
-        return 0
-    fi
-
-    print_info "Installing installer UI tools: ${missing[*]}"
-    sudo pacman -S --needed --noconfirm "${missing[@]}"
-
-    if command_exists "dialog" && command_exists "figlet"; then
-        return 0
-    fi
-
-    print_warning "Could not install all TUI dependencies; falling back to classic prompts"
-    return 1
-}
-
-show_figlet_banner() {
-    clear
-    echo ""
-    if command_exists "figlet"; then
-        echo -e "${MAGENTA}"
-        figlet -f slant "YAHR"
-        figlet -f small "Quickshell Installer"
-        echo -e "${NC}"
-    else
-        echo -e "${MAGENTA}YAHR Quickshell Installer${NC}"
-    fi
-    echo -e "${CYAN}════════════════════════════════════════════════════════════${NC}"
-    echo ""
-}
-
-configure_install_profile_tui() {
-    local raw
-    local selection_list=()
-
-    dialog --stdout --clear --title "YAHR Installer" --colors --msgbox "\n\ZbWelcome to the YAHR Quickshell installer\Zn\n\nUse arrow keys to navigate, space to toggle checkboxes, and Enter to continue.\n\nRequired/base packages are always installed automatically." 14 78 || return 1
-
-    INSTALL_MODE=$(dialog --stdout --title "Install Mode" --radiolist "Select installation mode:" 13 78 2 \
-        "full" "Full install (recommended)" ON \
-        "minimal" "Minimal (core components only)" OFF) || return 1
-
-    SELECT_AUR_HELPER=$(dialog --stdout --title "AUR Helper" --radiolist "Select AUR helper:" 13 78 2 \
-        "yay" "Popular and feature-rich" ON \
-        "paru" "Modern rust-based helper" OFF) || return 1
-
-    SELECT_NVIDIA_DRIVER=$(dialog --stdout --title "NVIDIA Driver" --radiolist "If NVIDIA is detected, choose driver family:" 14 78 2 \
-        "proprietary" "nvidia-dkms (recommended for Wayland)" ON \
-        "nouveau" "Open source nouveau" OFF) || return 1
-
-    dialog --stdout --title "Required Base Packages" --checklist "These are required and always installed:" 18 92 10 \
-        "REQ_QS" "quickshell-git" ON \
-        "REQ_HYPR" "hyprland" ON \
-        "REQ_KITTY" "kitty" ON \
-        "REQ_MAKO" "mako" ON \
-        "REQ_SWWW" "swww" ON \
-        "REQ_WOFI" "wofi" ON \
-        "REQ_CLIP" "cliphist" ON \
-        "REQ_PAPIRUS" "papirus-icon-theme + papirus-folders-git" ON \
-        "REQ_FONTS" "nerd fonts symbols + emoji" ON >/dev/null || return 1
-
-    raw=$(dialog --stdout --title "Optional Config Components" --checklist "Toggle configuration folders to install:" 18 92 10 \
-        "NVIM_CFG" "Neovim config" OFF \
-        "VESKTOP_CFG" "Vesktop config" OFF \
-        "VSCODIUM_CFG" "VSCodium config" OFF \
-        "THUNAR_CFG" "Thunar config" OFF \
-        "FIREFOX_CFG" "Firefox userChrome theme" OFF \
-        "SDDM_CFG" "SDDM setup and login theme" OFF \
-        "SIP_CFG" "Sip StartPage install/update" OFF) || return 1
-    raw=${raw//\"/}
-    read -r -a selection_list <<< "$raw"
-
-    SELECT_CONFIG_NVIM=false
-    SELECT_CONFIG_VESKTOP=false
-    SELECT_CONFIG_VSCODIUM=false
-    SELECT_CONFIG_THUNAR=false
-    SELECT_INSTALL_FIREFOX=false
-    SELECT_INSTALL_SDDM=false
-    SELECT_INSTALL_SIP_STARTPAGE=false
-
-    has_selection "NVIM_CFG" "${selection_list[@]}" && SELECT_CONFIG_NVIM=true
-    has_selection "VESKTOP_CFG" "${selection_list[@]}" && SELECT_CONFIG_VESKTOP=true
-    has_selection "VSCODIUM_CFG" "${selection_list[@]}" && SELECT_CONFIG_VSCODIUM=true
-    has_selection "THUNAR_CFG" "${selection_list[@]}" && SELECT_CONFIG_THUNAR=true
-    has_selection "FIREFOX_CFG" "${selection_list[@]}" && SELECT_INSTALL_FIREFOX=true
-    has_selection "SDDM_CFG" "${selection_list[@]}" && SELECT_INSTALL_SDDM=true
-    has_selection "SIP_CFG" "${selection_list[@]}" && SELECT_INSTALL_SIP_STARTPAGE=true
-
-    raw=$(dialog --stdout --title "Optional App Packages" --checklist "Select additional packages to install:" 18 92 10 \
-        "NEOVIM_APP" "neovim" OFF \
-        "VESKTOP_APP" "vesktop-bin" OFF \
-        "CODE_OSS_APP" "code (Code OSS)" OFF \
-        "VSCODIUM_APP" "vscodium-bin" OFF \
-        "VSCODE_APP" "visual-studio-code-bin" OFF) || return 1
-    raw=${raw//\"/}
-    read -r -a selection_list <<< "$raw"
-
-    SELECT_EXTRA_NEOVIM=false
-    SELECT_EXTRA_VESKTOP=false
-    SELECT_EXTRA_CODE_OSS=false
-    SELECT_EXTRA_VSCODIUM=false
-    SELECT_EXTRA_VSCODE=false
-
-    has_selection "NEOVIM_APP" "${selection_list[@]}" && SELECT_EXTRA_NEOVIM=true
-    has_selection "VESKTOP_APP" "${selection_list[@]}" && SELECT_EXTRA_VESKTOP=true
-    has_selection "CODE_OSS_APP" "${selection_list[@]}" && SELECT_EXTRA_CODE_OSS=true
-    has_selection "VSCODIUM_APP" "${selection_list[@]}" && SELECT_EXTRA_VSCODIUM=true
-    has_selection "VSCODE_APP" "${selection_list[@]}" && SELECT_EXTRA_VSCODE=true
-
-    raw=$(dialog --stdout --title "Installer Behavior" --checklist "Select installer behavior:" 14 92 6 \
-        "RECOMMENDED" "Install missing recommended dependencies" ON \
-        "ENVYCONTROL" "Install envycontrol on hybrid NVIDIA systems" ON \
-        "HYPR_SOURCE" "Auto-add autostart.conf source if missing" ON \
-        "AUTO_REBOOT" "Reboot automatically when install completes" OFF) || return 1
-    raw=${raw//\"/}
-    read -r -a selection_list <<< "$raw"
-
-    SELECT_INSTALL_RECOMMENDED=false
-    SELECT_INSTALL_ENVYCONTROL=false
-    SELECT_ADD_HYPR_AUTOSTART_SOURCE=false
-    AUTO_REBOOT=false
-
-    has_selection "RECOMMENDED" "${selection_list[@]}" && SELECT_INSTALL_RECOMMENDED=true
-    has_selection "ENVYCONTROL" "${selection_list[@]}" && SELECT_INSTALL_ENVYCONTROL=true
-    has_selection "HYPR_SOURCE" "${selection_list[@]}" && SELECT_ADD_HYPR_AUTOSTART_SOURCE=true
-    has_selection "AUTO_REBOOT" "${selection_list[@]}" && AUTO_REBOOT=true
-
-    dialog --stdout --title "Confirm Installation" --yesno "Proceed with installation using selected options?" 8 66 || return 1
-
-    SELECTIONS_CONFIGURED=true
-    return 0
 }
 
 # Function to check if a command exists
@@ -369,10 +185,7 @@ install_aur_helper() {
     echo ""
     
     local helper_name=""
-    if [ "$SELECTIONS_CONFIGURED" = true ]; then
-        helper_name="$SELECT_AUR_HELPER"
-        print_info "Using selected AUR helper: $helper_name"
-    elif [ "$YOLO_MODE" = true ]; then
+    if [ "$YOLO_MODE" = true ]; then
         print_info "YOLO mode: Auto-selecting yay as AUR helper"
         helper_name="yay"
     else
@@ -563,14 +376,7 @@ install_nvidia_drivers() {
     echo ""
     
     local driver_choice=""
-    if [ "$SELECTIONS_CONFIGURED" = true ]; then
-        if [ "$SELECT_NVIDIA_DRIVER" = "nouveau" ]; then
-            driver_choice="2"
-        else
-            driver_choice="1"
-        fi
-        print_info "Using selected NVIDIA driver mode: $SELECT_NVIDIA_DRIVER"
-    elif [ "$YOLO_MODE" = true ]; then
+    if [ "$YOLO_MODE" = true ]; then
         print_info "YOLO mode: Auto-selecting proprietary NVIDIA drivers"
         driver_choice="1"
     else
@@ -725,14 +531,7 @@ install_hybrid_drivers() {
         echo ""
         
         local install_envycontrol=false
-        if [ "$SELECTIONS_CONFIGURED" = true ]; then
-            if [ "$SELECT_INSTALL_ENVYCONTROL" = true ]; then
-                print_info "Selection mode: installing envycontrol and NVIDIA drivers"
-                install_envycontrol=true
-            else
-                print_info "Selection mode: skipping envycontrol"
-            fi
-        elif [ "$YOLO_MODE" = true ]; then
+        if [ "$YOLO_MODE" = true ]; then
             print_info "YOLO mode: Installing envycontrol and NVIDIA drivers"
             install_envycontrol=true
         else
@@ -800,16 +599,6 @@ check_dependencies() {
                 aur_helper="yay"
             else
                 print_error "Failed to install yay"
-                exit 1
-            fi
-        elif [ "$SELECTIONS_CONFIGURED" = true ]; then
-            install_aur_helper
-            if command_exists "paru"; then
-                aur_helper="paru"
-            elif command_exists "yay"; then
-                aur_helper="yay"
-            else
-                print_error "AUR helper installation failed"
                 exit 1
             fi
         else
@@ -1029,14 +818,7 @@ check_dependencies() {
         echo ""
         
         local install_recommended=false
-        if [ "$SELECTIONS_CONFIGURED" = true ]; then
-            if [ "$SELECT_INSTALL_RECOMMENDED" = true ]; then
-                print_info "Selection mode: installing recommended dependencies"
-                install_recommended=true
-            else
-                print_info "Selection mode: skipping recommended dependencies"
-            fi
-        elif [ "$YOLO_MODE" = true ]; then
+        if [ "$YOLO_MODE" = true ]; then
             print_info "YOLO mode: Auto-installing recommended dependencies"
             install_recommended=true
         else
@@ -1131,9 +913,7 @@ install_configs() {
         # Install Nvim configs (optional)
         if [ -d "$SCRIPT_DIR/nvim" ]; then
             local install_nvim=false
-            if [ "$SELECTIONS_CONFIGURED" = true ]; then
-                install_nvim="$SELECT_CONFIG_NVIM"
-            elif [ "$YOLO_MODE" = true ]; then
+            if [ "$YOLO_MODE" = true ]; then
                 print_info "YOLO mode: Skipping optional Neovim config"
             else
                 read -p "Install Neovim configuration? (y/n) " -n 1 -r
@@ -1151,9 +931,7 @@ install_configs() {
         # Install Vesktop configs (optional)
         if [ -d "$SCRIPT_DIR/vesktop" ]; then
             local install_vesktop=false
-            if [ "$SELECTIONS_CONFIGURED" = true ]; then
-                install_vesktop="$SELECT_CONFIG_VESKTOP"
-            elif [ "$YOLO_MODE" = true ]; then
+            if [ "$YOLO_MODE" = true ]; then
                 print_info "YOLO mode: Skipping optional Vesktop config"
             else
                 read -p "Install Vesktop (Discord) configuration? (y/n) " -n 1 -r
@@ -1171,9 +949,7 @@ install_configs() {
         # Install VSCodium configs (optional)
         if [ -d "$SCRIPT_DIR/VSCodium" ]; then
             local install_vscodium=false
-            if [ "$SELECTIONS_CONFIGURED" = true ]; then
-                install_vscodium="$SELECT_CONFIG_VSCODIUM"
-            elif [ "$YOLO_MODE" = true ]; then
+            if [ "$YOLO_MODE" = true ]; then
                 print_info "YOLO mode: Skipping optional VSCodium config"
             else
                 read -p "Install VSCodium configuration? (y/n) " -n 1 -r
@@ -1191,9 +967,7 @@ install_configs() {
         # Install Thunar configs (optional)
         if [ -d "$SCRIPT_DIR/thunar" ]; then
             local install_thunar=false
-            if [ "$SELECTIONS_CONFIGURED" = true ]; then
-                install_thunar="$SELECT_CONFIG_THUNAR"
-            elif [ "$YOLO_MODE" = true ]; then
+            if [ "$YOLO_MODE" = true ]; then
                 print_info "YOLO mode: Skipping optional Thunar config"
             else
                 read -p "Install Thunar configuration? (y/n) " -n 1 -r
@@ -1333,9 +1107,7 @@ install_firefox() {
     fi
     
     local install_firefox=false
-    if [ "$SELECTIONS_CONFIGURED" = true ]; then
-        install_firefox="$SELECT_INSTALL_FIREFOX"
-    elif [ "$YOLO_MODE" = true ]; then
+    if [ "$YOLO_MODE" = true ]; then
         print_info "YOLO mode: Skipping optional Firefox userChrome"
         return
     else
@@ -1392,9 +1164,7 @@ install_sddm() {
     fi
     
     local install_sddm=false
-    if [ "$SELECTIONS_CONFIGURED" = true ]; then
-        install_sddm="$SELECT_INSTALL_SDDM"
-    elif [ "$YOLO_MODE" = true ]; then
+    if [ "$YOLO_MODE" = true ]; then
         print_info "YOLO mode: Skipping optional SDDM installation"
         return
     else
@@ -1752,9 +1522,7 @@ install_extras() {
     # Neovim
     if ! command_exists "nvim"; then
         local neovim_choice="n"
-        if [ "$SELECTIONS_CONFIGURED" = true ]; then
-            [ "$SELECT_EXTRA_NEOVIM" = true ] && neovim_choice="y"
-        elif [ "$YOLO_MODE" = true ]; then
+        if [ "$YOLO_MODE" = true ]; then
             neovim_choice="y"
         else
             read -p "$(echo -e ${CYAN}?${NC}) Install Neovim (AstroVim config included)? (y/n): " neovim_choice
@@ -1781,9 +1549,7 @@ install_extras() {
     # Vesktop (Discord)
     if ! command_exists "vesktop"; then
         local vesktop_choice="n"
-        if [ "$SELECTIONS_CONFIGURED" = true ]; then
-            [ "$SELECT_EXTRA_VESKTOP" = true ] && vesktop_choice="y"
-        elif [ "$YOLO_MODE" = true ]; then
+        if [ "$YOLO_MODE" = true ]; then
             vesktop_choice="y"
         else
             read -p "$(echo -e ${CYAN}?${NC}) Install Vesktop (Discord client with Vencord)? (y/n): " vesktop_choice
@@ -1808,17 +1574,7 @@ install_extras() {
     # VS Code variants
     if ! command_exists "code" && ! command_exists "codium"; then
         local vscode_choice="4"
-        if [ "$SELECTIONS_CONFIGURED" = true ]; then
-            if [ "$SELECT_EXTRA_CODE_OSS" = true ]; then
-                vscode_choice="1"
-            elif [ "$SELECT_EXTRA_VSCODIUM" = true ]; then
-                vscode_choice="2"
-            elif [ "$SELECT_EXTRA_VSCODE" = true ]; then
-                vscode_choice="3"
-            else
-                vscode_choice="4"
-            fi
-        elif [ "$YOLO_MODE" = true ]; then
+        if [ "$YOLO_MODE" = true ]; then
             vscode_choice="2"  # Default to VSCodium in YOLO mode
         else
             echo ""
@@ -1878,9 +1634,7 @@ install_sip_startpage() {
 
     # Ask if user wants to install Sip StartPage
     local install_choice="n"
-    if [ "$SELECTIONS_CONFIGURED" = true ]; then
-        [ "$SELECT_INSTALL_SIP_STARTPAGE" = true ] && install_choice="y"
-    elif [ "$YOLO_MODE" = true ]; then
+    if [ "$YOLO_MODE" = true ]; then
         install_choice="y"
     else
         echo ""
@@ -1905,9 +1659,7 @@ install_sip_startpage() {
     if [ -d "$sip_dir" ]; then
         print_warning "Sip StartPage directory already exists at $sip_dir"
         local overwrite="n"
-        if [ "$SELECTIONS_CONFIGURED" = true ]; then
-            [ "$SELECT_INSTALL_SIP_STARTPAGE" = true ] && overwrite="y"
-        elif [ "$YOLO_MODE" = true ]; then
+        if [ "$YOLO_MODE" = true ]; then
             print_info "YOLO mode: Pulling latest changes"
             overwrite="y"
         else
@@ -2000,9 +1752,7 @@ configure_hyprland() {
         print_warning "autostart.conf is not sourced in hyprland.conf"
         
         local add_source=false
-        if [ "$SELECTIONS_CONFIGURED" = true ]; then
-            add_source="$SELECT_ADD_HYPR_AUTOSTART_SOURCE"
-        elif [ "$YOLO_MODE" = true ]; then
+        if [ "$YOLO_MODE" = true ]; then
             print_info "YOLO mode: Auto-adding autostart.conf source"
             add_source=true
         else
@@ -2082,8 +1832,7 @@ rollback_installation() {
 main() {
     # Set up error handling
     trap rollback_installation ERR
-
-    show_figlet_banner
+    
     print_header "YAHR Quickshell Installation"
     
     # Check we're not running as root
@@ -2093,57 +1842,48 @@ main() {
     echo "Complete Hyprland + Quickshell desktop environment"
     echo "with unified theme system and modern aesthetics"
     echo ""
-
-    if ensure_installer_ui_tools && configure_install_profile_tui; then
-        USE_TUI=true
-        YOLO_MODE=false
-        show_figlet_banner
-        print_success "Installer selections captured from TUI"
-    else
-        print_warning "Falling back to classic prompt mode"
-
-        # YOLO mode prompt
-        print_info "Installation mode:"
-        echo "  [Y] YOLO mode - Fully unattended installation (auto-skips optional prompts)"
-        echo "  [N] Normal mode - Interactive prompts for optional components"
-        echo ""
-        read -p "Enable YOLO mode? (y/N) [N]: " yolo_choice
-
-        case $yolo_choice in
-            [Yy]*)
-                YOLO_MODE=true
-                print_success "YOLO mode enabled - buckle up!"
-                ;;
-            *)
-                YOLO_MODE=false
-                print_info "Normal mode selected"
-                ;;
-        esac
-
-        echo ""
-
-        # Select installation mode
-        print_info "Select installation mode:"
-        echo "  [1] Full - All configs and optional components (recommended)"
-        echo "  [2] Minimal - Core components only (Quickshell, Hyprland, Kitty, Mako)"
-        echo ""
-        read -p "Choose mode (1/2) [1]: " mode_choice
-
-        case $mode_choice in
-            2)
-                INSTALL_MODE="minimal"
-                print_info "Minimal installation selected"
-                ;;
-            1|"")
-                INSTALL_MODE="full"
-                print_info "Full installation selected"
-                ;;
-            *)
-                print_error "Invalid choice. Using full installation."
-                INSTALL_MODE="full"
-                ;;
-        esac
-    fi
+    
+    # YOLO mode prompt
+    print_info "Installation mode:"
+    echo "  [Y] YOLO mode - Fully unattended installation (auto-skips optional prompts)"
+    echo "  [N] Normal mode - Interactive prompts for optional components"
+    echo ""
+    read -p "Enable YOLO mode? (y/N) [N]: " yolo_choice
+    
+    case $yolo_choice in
+        [Yy]*)
+            YOLO_MODE=true
+            print_success "YOLO mode enabled - buckle up!"
+            ;;
+        *)
+            YOLO_MODE=false
+            print_info "Normal mode selected"
+            ;;
+    esac
+    
+    echo ""
+    
+    # Select installation mode
+    print_info "Select installation mode:"
+    echo "  [1] Full - All configs and optional components (recommended)"
+    echo "  [2] Minimal - Core components only (Quickshell, Hyprland, Kitty, Mako)"
+    echo ""
+    read -p "Choose mode (1/2) [1]: " mode_choice
+    
+    case $mode_choice in
+        2)
+            INSTALL_MODE="minimal"
+            print_info "Minimal installation selected"
+            ;;
+        1|"")
+            INSTALL_MODE="full"
+            print_info "Full installation selected"
+            ;;
+        *)
+            print_error "Invalid choice. Using full installation."
+            INSTALL_MODE="full"
+            ;;
+    esac
     
     echo ""
     
@@ -2167,9 +1907,7 @@ main() {
     print_warning "If you have custom configs, back them up NOW!"
     echo ""
     
-    if [ "$SELECTIONS_CONFIGURED" = true ]; then
-        print_info "Selection mode: Proceeding with confirmed options"
-    elif [ "$YOLO_MODE" = false ]; then
+    if [ "$YOLO_MODE" = false ]; then
         read -p "Continue with installation? (y/n) " -n 1 -r
         echo
         if [[ ! $REPLY =~ ^[Yy]$ ]]; then
@@ -2243,15 +1981,7 @@ main() {
     echo ""
     
     # Prompt for reboot
-    if [ "$SELECTIONS_CONFIGURED" = true ]; then
-        if [ "$AUTO_REBOOT" = true ]; then
-            print_info "Selection mode: rebooting system now..."
-            sudo reboot
-        else
-            print_info "Selection mode: reboot skipped"
-            print_info "Remember to reboot to complete setup"
-        fi
-    elif [ "$YOLO_MODE" = false ]; then
+    if [ "$YOLO_MODE" = false ]; then
         read -p "Would you like to reboot now? (y/N) " -n 1 -r
         echo
         if [[ $REPLY =~ ^[Yy]$ ]]; then
