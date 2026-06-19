@@ -10,6 +10,8 @@ Item {
 
     readonly property bool isExpanded: forceExpanded || expanded
 
+    width: implicitWidth
+    height: implicitHeight
     implicitWidth: isExpanded ? (hideChevron ? 140 : 176) : 32
     implicitHeight: 35
     
