@@ -24,13 +24,16 @@ INSTALL_MODE="full"
 # YOLO mode - unattended installation (auto-answer all prompts)
 YOLO_MODE=false
 
+# Dry-run mode - preview prompts and preflight without making changes
+DRY_RUN=false
+
 # Track what gets installed for summary
 declare -a INSTALLED_COMPONENTS=()
 declare -a SKIPPED_COMPONENTS=()
 
 # Function to print colored messages
 print_info() {
-    echo -e "${BLUE}ℹ${NC} $1"
+    echo -e "${BLUE}[*]${NC} $1"
 }
 
 print_success() {
@@ -55,6 +58,36 @@ print_header() {
 
 print_step() {
     echo -e "${CYAN}→${NC} $1"
+}
+
+show_usage() {
+    cat << 'EOF'
+Usage: ./install.sh [--dry-run] [--help]
+
+Options:
+  --dry-run  Run prompts and preflight, then exit before making changes
+  --help     Show this help message
+EOF
+}
+
+parse_args() {
+    while [ $# -gt 0 ]; do
+        case "$1" in
+            --dry-run)
+                DRY_RUN=true
+                ;;
+            --help|-h)
+                show_usage
+                exit 0
+                ;;
+            *)
+                print_error "Unknown option: $1"
+                show_usage
+                exit 1
+                ;;
+        esac
+        shift
+    done
 }
 
 # Function to check if a command exists
@@ -94,6 +127,9 @@ preflight_check() {
     print_header "Pre-Flight Check"
     
     print_info "Installation mode: $INSTALL_MODE"
+    if [ "$DRY_RUN" = true ]; then
+        print_info "Dry-run mode: changes will not be applied"
+    fi
     echo ""
     
     # Detect and show GPU info
@@ -884,7 +920,7 @@ install_configs() {
                 echo "" >> "$HOME/.bashrc"
                 echo "# Display system info with fastfetch" >> "$HOME/.bashrc"
                 echo "fastfetch" >> "$HOME/.bashrc"
-                log_message "Added fastfetch to .bashrc"
+                print_info "Added fastfetch to .bashrc"
             fi
         fi
     fi
@@ -1830,6 +1866,8 @@ rollback_installation() {
 
 # Main installation flow
 main() {
+    parse_args "$@"
+
     # Set up error handling
     trap rollback_installation ERR
     
@@ -1921,6 +1959,12 @@ main() {
     echo ""
     print_info "Starting installation..."
     echo ""
+
+    if [ "$DRY_RUN" = true ]; then
+        print_success "Dry run complete"
+        print_info "Reviewed prompts and pre-flight checks without making changes"
+        return 0
+    fi
     
     # Run installation steps in order
     # Note: check_dependencies must come before install_gpu_drivers (needs AUR helper)
@@ -1999,4 +2043,4 @@ main() {
 }
 
 # Run main function
-main
+main "$@"

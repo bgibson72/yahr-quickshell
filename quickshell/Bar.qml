@@ -16,6 +16,7 @@ Item {
     property bool floating: false
     property bool showQuickLaunch: true
     property bool showSystemTray: true
+    property string layoutPreset: "default"
     property int widgetBorderWidth: 1
     property int hyprRounding: 12  // Mirrors decoration:rounding from look-and-feel.conf
     
@@ -61,6 +62,9 @@ Item {
                         }
                         if (settings.bar.showSystemTray !== undefined) {
                             bar.showSystemTray = settings.bar.showSystemTray
+                        }
+                        if (settings.bar.layoutPreset !== undefined) {
+                            bar.layoutPreset = settings.bar.layoutPreset
                         }
                     }
                     if (settings.general && settings.general.enableBlur !== undefined) {
@@ -163,18 +167,19 @@ Item {
         }
     }
     
-    property alias clockComponent: clockComponent
-    property alias archComponent: archComponent
+    property var clockComponent: bar.layoutPreset === "center-menu" ? altClockComponent : defaultClockComponent
+    property var archComponent: bar.layoutPreset === "center-menu" ? altArchComponent : defaultArchComponent
     
-    // LEFT SECTION
+    // LEFT SECTION - default layout
     RowLayout {
+        visible: bar.layoutPreset === "default"
         anchors.left: parent.left
         anchors.leftMargin: 8
         anchors.verticalCenter: parent.verticalCenter
         spacing: 8
         
         ArchButton {
-            id: archComponent
+            id: defaultArchComponent
         }
         WorkspaceBar {}
         Separator {
@@ -186,16 +191,43 @@ Item {
         }
     }
     
-    // CENTER SECTION - Absolutely centered
+    // LEFT SECTION - centered menu layout
+    RowLayout {
+        visible: bar.layoutPreset === "center-menu"
+        anchors.left: parent.left
+        anchors.leftMargin: 8
+        anchors.verticalCenter: parent.verticalCenter
+        spacing: 8
+
+        WorkspaceBar {}
+        Separator {
+            visible: bar.showQuickLaunch
+        }
+        QuickAccessDrawer {
+            visible: bar.showQuickLaunch
+        }
+    }
+
+    // CENTER SECTION - default layout
     Clock {
-        id: clockComponent
+        id: defaultClockComponent
+        visible: bar.layoutPreset === "default"
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.verticalCenter: parent.verticalCenter
+    }
+
+    // CENTER SECTION - centered menu layout
+    ArchButton {
+        id: altArchComponent
+        visible: bar.layoutPreset === "center-menu"
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.verticalCenter: parent.verticalCenter
     }
 
     // CENTER-RIGHT SECTION - Media Player
     MediaPlayer {
-        anchors.left: clockComponent.right
+        visible: bar.layoutPreset === "default"
+        anchors.left: defaultClockComponent.right
         anchors.leftMargin: 16
         anchors.verticalCenter: parent.verticalCenter
     }
@@ -220,6 +252,12 @@ Item {
                 showTray: bar.showSystemTray
                 onToggleClipboard: bar.toggleClipboard()
                 onToggleControlCenter: bar.toggleControlCenter()
+            }
+
+            Clock {
+                id: altClockComponent
+                visible: bar.layoutPreset === "center-menu"
+                anchors.verticalCenter: parent.verticalCenter
             }
         }
     }

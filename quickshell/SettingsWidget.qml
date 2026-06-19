@@ -115,7 +115,8 @@ Rectangle {
                         root.settings.bar = {
                             transparentBackground: false,
                             showQuickLaunch: true,
-                            showSystemTray: true
+                            showSystemTray: true,
+                            layoutPreset: "default"
                         }
                     }
                     if (!root.settings.theme) {
@@ -169,7 +170,8 @@ Rectangle {
                             showNetworkDetails: false
                         },
                         bar: {
-                            transparentBackground: false
+                            transparentBackground: false,
+                            layoutPreset: "default"
                         },
                         theme: {
                             current: "TokyoNight"
@@ -298,6 +300,7 @@ SETTINGSEOF`
             showQuickLaunchCheck.checked = root.settings.bar.showQuickLaunch !== false
             showSystemTrayCheck.checked = root.settings.bar.showSystemTray !== false
             barSizeLargeCheck.checked = root.settings.bar.barSize === "large"
+            barLayoutPreset.value = root.settings.bar.layoutPreset || "default"
         }
         
         // Widget borders
@@ -2004,6 +2007,104 @@ SETTINGSEOF`
                                 color: ThemeManager.fgSecondary
                                 wrapMode: Text.WordWrap
                                 Layout.fillWidth: true
+                            }
+
+                            Column {
+                                spacing: 12
+
+                                Text {
+                                    text: "Bar Item Layout"
+                                    font.family: ThemeManager.uiFont
+                                    font.pixelSize: 12
+                                    font.bold: true
+                                    color: ThemeManager.fgPrimary
+                                }
+
+                                Text {
+                                    text: barLayoutPreset.value === "center-menu"
+                                        ? "Left: workspaces and quick launch. Center: app menu. Right: clipboard, updates, system tray, and date/time."
+                                        : "Default layout keeps the app menu on the left, the clock in the center, and the utility tray on the right."
+                                    font.family: ThemeManager.uiFont
+                                    font.pixelSize: 10
+                                    color: ThemeManager.fgSecondary
+                                    wrapMode: Text.WordWrap
+                                    width: parent.width
+                                }
+
+                                Row {
+                                    spacing: 10
+
+                                    Rectangle {
+                                        width: 170
+                                        height: 34
+                                        radius: 8
+                                        color: barLayoutPreset.value === "default"
+                                            ? Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.30)
+                                            : Qt.rgba(1, 1, 1, 0.07)
+                                        border.width: 1
+                                        border.color: barLayoutPreset.value === "default"
+                                            ? Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.55)
+                                            : Qt.rgba(1, 1, 1, 0.12)
+
+                                        Text {
+                                            anchors.centerIn: parent
+                                            text: "Default Layout"
+                                            font.family: ThemeManager.uiFont
+                                            font.pixelSize: 12
+                                            font.weight: Font.Medium
+                                            color: ThemeManager.fgPrimary
+                                        }
+
+                                        MouseArea {
+                                            anchors.fill: parent
+                                            cursorShape: Qt.PointingHandCursor
+                                            onClicked: {
+                                                if (!root.settings.bar) root.settings.bar = {}
+                                                barLayoutPreset.value = "default"
+                                                root.settings.bar.layoutPreset = "default"
+                                                saveSettings()
+                                            }
+                                        }
+                                    }
+
+                                    Rectangle {
+                                        width: 190
+                                        height: 34
+                                        radius: 8
+                                        color: barLayoutPreset.value === "center-menu"
+                                            ? Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.30)
+                                            : Qt.rgba(1, 1, 1, 0.07)
+                                        border.width: 1
+                                        border.color: barLayoutPreset.value === "center-menu"
+                                            ? Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.55)
+                                            : Qt.rgba(1, 1, 1, 0.12)
+
+                                        Text {
+                                            anchors.centerIn: parent
+                                            text: "Centered App Menu"
+                                            font.family: ThemeManager.uiFont
+                                            font.pixelSize: 12
+                                            font.weight: Font.Medium
+                                            color: ThemeManager.fgPrimary
+                                        }
+
+                                        MouseArea {
+                                            anchors.fill: parent
+                                            cursorShape: Qt.PointingHandCursor
+                                            onClicked: {
+                                                if (!root.settings.bar) root.settings.bar = {}
+                                                barLayoutPreset.value = "center-menu"
+                                                root.settings.bar.layoutPreset = "center-menu"
+                                                saveSettings()
+                                            }
+                                        }
+                                    }
+                                }
+
+                                QtObject {
+                                    id: barLayoutPreset
+                                    property string value: "default"
+                                }
                             }
                             
                             // Bar Background Style
