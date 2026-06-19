@@ -59,5 +59,7 @@ QtObject {
     property int fontSizeIcon: 14
 
     // Persistent user preferences (preserved across theme switches)
+    property real widgetOpacity: 0.75
+    property bool barLarge: false
     property string uiFont: "Sen"
 }
