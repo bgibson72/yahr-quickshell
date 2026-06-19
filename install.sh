@@ -1570,9 +1570,6 @@ initialize_wallpaper() {
                 sed -i "s|\"currentWallpaper\": \".*\"|\"currentWallpaper\": \"$random_wallpaper\"|" "$settings_file"
                 print_success "Default wallpaper configured: $(basename "$random_wallpaper")"
             fi
-
-            # Seed last-wallpaper so Hyprland autostart can restore it on first login
-            printf '%s' "$random_wallpaper" > "$HOME/.config/quickshell/last-wallpaper"
         fi
         
         # Initialize Catppuccin theme as default
@@ -1619,9 +1616,6 @@ initialize_wallpaper() {
         if [ -f "$settings_file" ]; then
             sed -i "s|\"currentWallpaper\": \".*\"|\"currentWallpaper\": \"$random_wallpaper\"|" "$settings_file"
         fi
-
-        # Persist wallpaper for next login restore path
-        printf '%s' "$random_wallpaper" > "$HOME/.config/quickshell/last-wallpaper"
         
         print_success "Wallpaper applied: $(basename "$random_wallpaper")"
     else
@@ -1640,38 +1634,11 @@ initialize_wallpaper() {
 # Apply default theme
 apply_default_theme() {
     print_header "Applying Default Theme"
-
-    local catppuccin_theme="$HOME/.config/quickshell/themes/catppuccin-mocha.qml"
-    local theme_manager="$HOME/.config/quickshell/ThemeManager.qml"
-    local settings_file="$HOME/.config/quickshell/settings.json"
-
-    # Force Quickshell default theme file to Catppuccin regardless of repo snapshot.
-    if [ -f "$catppuccin_theme" ]; then
-        cp "$catppuccin_theme" "$theme_manager"
-        print_success "Quickshell default theme set to Catppuccin"
-    else
-        print_warning "Catppuccin theme preset not found: $catppuccin_theme"
-    fi
-
-    # Keep Hyprland theme source aligned with installer default.
-    mkdir -p "$HOME/.config/hypr"
-    printf '%s' "Catppuccin" > "$HOME/.config/hypr/.current-theme"
-    print_success "Hyprland default theme set to Catppuccin"
-
-    # Keep settings.json theme value in sync for widgets that read it.
-    if [ -f "$settings_file" ]; then
-        if grep -q '"current"' "$settings_file"; then
-            sed -i 's|"current"[[:space:]]*:[[:space:]]*"[^"]*"|"current": "Catppuccin"|' "$settings_file"
-        elif grep -q '"currentTheme"' "$settings_file"; then
-            sed -i 's|"currentTheme"[[:space:]]*:[[:space:]]*"[^"]*"|"currentTheme": "Catppuccin"|' "$settings_file"
-        fi
-    fi
-
-    # Apply non-interactive theme sync scripts where possible; runtime-only scripts are left for first login.
-    [ -x "$HOME/.config/quickshell/sync-kitty-theme.sh" ] && "$HOME/.config/quickshell/sync-kitty-theme.sh" >/dev/null 2>&1
-    [ -x "$HOME/.config/quickshell/sync-mako-theme.sh" ] && "$HOME/.config/quickshell/sync-mako-theme.sh" >/dev/null 2>&1
-
-    print_info "Default theme enforced: Catppuccin"
+    
+    # Skip theme application during installation to avoid Papirus async issues
+    # Theme will be applied automatically on first Quickshell launch
+    print_info "Theme will be applied on first Quickshell launch"
+    print_info "Default theme: Catppuccin"
 }
 
 # Test theme switching functionality
