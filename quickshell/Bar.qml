@@ -263,7 +263,7 @@ Item {
         }
 
         Item {
-            width: islandWorkspaceDefault.width + 12
+            width: islandWorkspaceDefault.implicitWidth + 12
             height: bar.islandHeight
 
             Rectangle {
@@ -282,7 +282,7 @@ Item {
 
         Item {
             visible: bar.showQuickLaunch
-            width: visible ? islandQuickLaunchDefault.width + 12 : 0
+            width: visible ? islandQuickLaunchDefault.implicitWidth + 12 : 0
             height: bar.islandHeight
 
             Rectangle {
@@ -312,7 +312,7 @@ Item {
         spacing: 8
 
         Item {
-            width: islandWorkspaceCentered.width + 12
+            width: islandWorkspaceCentered.implicitWidth + 12
             height: bar.islandHeight
 
             Rectangle {
@@ -331,7 +331,7 @@ Item {
 
         Item {
             visible: bar.showQuickLaunch
-            width: visible ? islandQuickLaunchCentered.width + 12 : 0
+            width: visible ? islandQuickLaunchCentered.implicitWidth + 12 : 0
             height: bar.islandHeight
 
             Rectangle {
@@ -468,7 +468,7 @@ Item {
 
             Item {
                 visible: bar.showSystemTray
-                width: visible ? islandTrayComponent.width + 12 : 0
+                width: visible ? islandTrayComponent.implicitWidth + 12 : 0
                 height: bar.islandHeight
 
                 Rectangle {

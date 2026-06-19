@@ -38,6 +38,30 @@ sync_dir() {
     (cd "$src_dir" && tar "${tar_excludes[@]}" -cf - .) | (cd "$dest_dir" && tar -xf -)
 }
 
+sync_hypr_dir() {
+    local src_dir="$1"
+    local dest_dir="$2"
+
+    mkdir -p "$dest_dir"
+
+    sync_dir "$src_dir" "$dest_dir" '*.backup*' 'hyprland.conf' 'look-and-feel.conf' '.current-theme' '*.lua' \
+        || return 1
+
+    local lua_file
+    while IFS= read -r -d '' lua_file; do
+        local rel_path="${lua_file#$src_dir/}"
+        local dest_path="$dest_dir/$rel_path"
+        local dest_parent
+        dest_parent="$(dirname "$dest_path")"
+        mkdir -p "$dest_parent"
+
+        local tmp_path
+        tmp_path="$dest_path.tmp-sync"
+        cp "$lua_file" "$tmp_path" || return 1
+        mv "$tmp_path" "$dest_path" || return 1
+    done < <(find "$src_dir" -type f -name '*.lua' -print0)
+}
+
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "  Sync Repo → Live Config"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
@@ -59,7 +83,7 @@ fi
 # Hypr
 if [ -d "$REPO_DIR/hypr" ]; then
     echo "Syncing hypr..."
-    sync_dir "$REPO_DIR/hypr" "$CONFIG_DIR/hypr" '*.backup*' 'hyprland.conf' 'look-and-feel.conf' '.current-theme' \
+    sync_hypr_dir "$REPO_DIR/hypr" "$CONFIG_DIR/hypr" \
         || { echo "✗ Hypr sync failed"; exit 1; }
     echo "✓ Hypr synced"
 fi
