@@ -47,7 +47,7 @@ hl.window_rule({ match = { class = "^(quickshell)$", float = true }, animation =
 
 -- ── Layer rules ──────────────────────────────────────────────────────
 -- Background blur for shell and notification layers
-hl.layer_rule({ match = { namespace = "^yahr%-bar$" }, blur = false })
+hl.layer_rule({ match = { namespace = "^yahr%-bar" }, blur = false })
 hl.layer_rule({ match = { namespace = "^quickshell" }, blur = true })
 hl.layer_rule({ match = { namespace = "^mako"       }, blur = true })
 

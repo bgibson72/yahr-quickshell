@@ -7,6 +7,7 @@ import QtQuick.Effects
 
 Item {
     id: bar
+    property string section: "full"
     
     property string backgroundStyle: "translucent"  // "opaque", "translucent", or "transparent"
     property bool enableBlur: false
@@ -22,6 +23,22 @@ Item {
     property int hyprRounding: 12  // Mirrors decoration:rounding from look-and-feel.conf
     property bool useIslands: bar.barStyle === "islands"
     property int islandHeight: ThemeManager.barLarge ? 43 : 36
+    visible: section === "full" ? !bar.useIslands : bar.useIslands
+    implicitWidth: {
+        if (section === "left") {
+            return (layoutPreset === "default" ? defaultIslandLeftRow.implicitWidth : centeredIslandLeftRow.implicitWidth) + 16
+        }
+        if (section === "center") {
+            return layoutPreset === "default"
+                ? islandDefaultClockComponent.width + 12
+                : islandAltArchComponent.width + 12
+        }
+        if (section === "right") {
+            return islandsRightRow.implicitWidth + 8
+        }
+        return 0
+    }
+    implicitHeight: section === "full" ? 0 : (ThemeManager.barLarge ? 53 : 42)
     
     signal toggleClipboard()
     signal toggleControlCenter()
@@ -138,7 +155,7 @@ Item {
     // Background rectangle – glass style
     Rectangle {
         id: background
-        visible: !bar.useIslands
+        visible: section === "full" && !bar.useIslands
         anchors.fill: parent
         color: {
             if (bar.backgroundStyle === "transparent") return "transparent"
@@ -186,21 +203,25 @@ Item {
     }
     
     property var clockComponent: {
-        if (bar.useIslands) {
-            return bar.layoutPreset === "center-menu" ? islandAltClockComponent : islandDefaultClockComponent
+        if (!bar.useIslands || section === "full") {
+            return bar.layoutPreset === "center-menu" ? singleAltClockComponent : singleDefaultClockComponent
         }
-        return bar.layoutPreset === "center-menu" ? singleAltClockComponent : singleDefaultClockComponent
+        if (section === "center" && bar.layoutPreset === "default") return islandDefaultClockComponent
+        if (section === "right" && bar.layoutPreset === "center-menu") return islandAltClockComponent
+        return null
     }
     property var archComponent: {
-        if (bar.useIslands) {
-            return bar.layoutPreset === "center-menu" ? islandAltArchComponent : islandDefaultArchComponent
+        if (!bar.useIslands || section === "full") {
+            return bar.layoutPreset === "center-menu" ? singleAltArchComponent : singleDefaultArchComponent
         }
-        return bar.layoutPreset === "center-menu" ? singleAltArchComponent : singleDefaultArchComponent
+        if (section === "left" && bar.layoutPreset === "default") return islandDefaultArchComponent
+        if (section === "center" && bar.layoutPreset === "center-menu") return islandAltArchComponent
+        return null
     }
     
     // LEFT SECTION - default layout (single)
     RowLayout {
-        visible: !bar.useIslands && bar.layoutPreset === "default"
+        visible: section === "full" && !bar.useIslands && bar.layoutPreset === "default"
         anchors.left: parent.left
         anchors.leftMargin: 8
         anchors.verticalCenter: parent.verticalCenter
@@ -221,7 +242,7 @@ Item {
 
     // LEFT SECTION - centered menu layout (single)
     RowLayout {
-        visible: !bar.useIslands && bar.layoutPreset === "center-menu"
+        visible: section === "full" && !bar.useIslands && bar.layoutPreset === "center-menu"
         anchors.left: parent.left
         anchors.leftMargin: 8
         anchors.verticalCenter: parent.verticalCenter
@@ -238,7 +259,8 @@ Item {
 
     // LEFT SECTION - default layout (islands)
     RowLayout {
-        visible: bar.useIslands && bar.layoutPreset === "default"
+        id: defaultIslandLeftRow
+        visible: bar.useIslands && section === "left" && bar.layoutPreset === "default"
         anchors.left: parent.left
         anchors.leftMargin: 8
         anchors.verticalCenter: parent.verticalCenter
@@ -305,7 +327,8 @@ Item {
 
     // LEFT SECTION - centered menu layout (islands)
     RowLayout {
-        visible: bar.useIslands && bar.layoutPreset === "center-menu"
+        id: centeredIslandLeftRow
+        visible: bar.useIslands && section === "left" && bar.layoutPreset === "center-menu"
         anchors.left: parent.left
         anchors.leftMargin: 8
         anchors.verticalCenter: parent.verticalCenter
@@ -355,14 +378,14 @@ Item {
     // CENTER SECTION - default layout (single)
     Clock {
         id: singleDefaultClockComponent
-        visible: !bar.useIslands && bar.layoutPreset === "default"
+        visible: section === "full" && !bar.useIslands && bar.layoutPreset === "default"
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.verticalCenter: parent.verticalCenter
     }
 
     // CENTER SECTION - default layout (islands)
     Item {
-        visible: bar.useIslands && bar.layoutPreset === "default"
+        visible: bar.useIslands && section === "center" && bar.layoutPreset === "default"
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.verticalCenter: parent.verticalCenter
         width: islandDefaultClockComponent.width + 12
@@ -385,14 +408,14 @@ Item {
     // CENTER SECTION - centered menu layout (single)
     ArchButton {
         id: singleAltArchComponent
-        visible: !bar.useIslands && bar.layoutPreset === "center-menu"
+        visible: section === "full" && !bar.useIslands && bar.layoutPreset === "center-menu"
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.verticalCenter: parent.verticalCenter
     }
 
     // CENTER SECTION - centered menu layout (islands)
     Item {
-        visible: bar.useIslands && bar.layoutPreset === "center-menu"
+        visible: bar.useIslands && section === "center" && bar.layoutPreset === "center-menu"
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.verticalCenter: parent.verticalCenter
         width: islandAltArchComponent.width + 12
@@ -414,8 +437,8 @@ Item {
 
     // CENTER-RIGHT SECTION - Media Player
     MediaPlayer {
-        visible: bar.layoutPreset === "default"
-        anchors.left: bar.clockComponent.right
+        visible: section === "full" && !bar.useIslands && bar.layoutPreset === "default"
+        anchors.left: singleDefaultClockComponent.right
         anchors.leftMargin: 16
         anchors.verticalCenter: parent.verticalCenter
     }
@@ -423,7 +446,7 @@ Item {
     
     // RIGHT SECTION (single)
     Item {
-        visible: !bar.useIslands
+        visible: section === "full" && !bar.useIslands
         anchors.right: parent.right
         anchors.rightMargin: bar.floating ? 8 : 4
         anchors.verticalCenter: parent.verticalCenter
@@ -453,7 +476,7 @@ Item {
 
     // RIGHT SECTION (islands)
     Item {
-        visible: bar.useIslands
+        visible: bar.useIslands && section === "right"
         anchors.right: parent.right
         anchors.rightMargin: bar.floating ? 8 : 4
         anchors.verticalCenter: parent.verticalCenter

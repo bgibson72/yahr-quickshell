@@ -15,9 +15,81 @@ ShellRoot {
     property bool clipboardVisible: false
     property bool controlCenterVisible: false
     property var wallpaperPicker: wallpaperPickerWindow
+    property bool barAtBottom: false
+    property bool barAutoHide: false
+    property bool barFloating: false
+    property string barSize: "small"
+    property string barStyle: "single"
+    property string barLayoutPreset: "default"
+    property bool barShowQuickLaunch: true
+    property bool barShowSystemTray: true
+    property bool barShowBorder: false
+    property string barBackgroundStyle: "opaque"
+    property real barOpacity: 0.70
+    property int barWidgetBorderWidth: 1
+    property int barHyprRounding: 12
     
     // Make shellRoot globally accessible via objectName
     objectName: "shellRoot"
+
+    Process {
+        id: shellBarSettingsLoader
+        running: true
+        command: ["sh", "-c", "cat ~/.config/quickshell/settings.json 2>/dev/null || echo '{}' "]
+
+        property string buffer: ""
+
+        stdout: SplitParser {
+            onRead: data => {
+                shellBarSettingsLoader.buffer += data
+            }
+        }
+
+        onRunningChanged: {
+            if (!running && buffer !== "") {
+                try {
+                    const settings = JSON.parse(buffer)
+                    if (settings.bar) {
+                        if (settings.bar.position) shellRoot.barAtBottom = settings.bar.position === "bottom"
+                        if (settings.bar.autoHide !== undefined) shellRoot.barAutoHide = settings.bar.autoHide
+                        if (settings.bar.floating !== undefined) shellRoot.barFloating = settings.bar.floating
+                        if (settings.bar.barSize !== undefined) shellRoot.barSize = settings.bar.barSize
+                        if (settings.bar.barStyle !== undefined) shellRoot.barStyle = settings.bar.barStyle
+                        if (settings.bar.layoutPreset !== undefined) shellRoot.barLayoutPreset = settings.bar.layoutPreset
+                        if (settings.bar.showQuickLaunch !== undefined) shellRoot.barShowQuickLaunch = settings.bar.showQuickLaunch
+                        if (settings.bar.showSystemTray !== undefined) shellRoot.barShowSystemTray = settings.bar.showSystemTray
+                        if (settings.bar.showBorder !== undefined) shellRoot.barShowBorder = settings.bar.showBorder
+                        if (settings.bar.backgroundStyle !== undefined) shellRoot.barBackgroundStyle = settings.bar.backgroundStyle
+                        if (settings.bar.barOpacity !== undefined) shellRoot.barOpacity = settings.bar.barOpacity
+                    }
+                    if (settings.general) {
+                        const transparent = settings.general.widgetTransparent !== false
+                        ThemeManager.widgetOpacity = transparent ? 0.75 : 1.0
+                        if (settings.general.uiFont !== undefined && settings.general.uiFont.length > 0) {
+                            ThemeManager.uiFont = settings.general.uiFont
+                        }
+                        if (settings.general.widgetBorderWidth !== undefined) {
+                            shellRoot.barWidgetBorderWidth = settings.general.widgetBorderWidth
+                        }
+                    }
+                    if (settings.hypr && settings.hypr.rounding !== undefined) {
+                        shellRoot.barHyprRounding = settings.hypr.rounding
+                    }
+                    ThemeManager.barLarge = shellRoot.barSize === "large"
+                } catch (e) {}
+                buffer = ""
+            } else if (running) {
+                buffer = ""
+            }
+        }
+    }
+
+    Timer {
+        interval: 1000
+        running: true
+        repeat: true
+        onTriggered: shellBarSettingsLoader.running = true
+    }
     
     // Public toggle functions for IPC
     function toggleAppLauncher() {
@@ -147,6 +219,7 @@ ShellRoot {
         model: Quickshell.screens
         
         PanelWindow {
+            id: leftBarWindow
             property var modelData
             screen: modelData
             
@@ -583,168 +656,315 @@ ShellRoot {
             }
         }
     }
-    
+
+    QtObject {
+        id: barSurfaceState
+        property bool barAtBottom: false
+        property bool barAutoHide: false
+        property bool barHovered: false
+        property bool barFloating: false
+        property string barSize: "small"
+        property string barStyle: "single"
+    }
+
+    Process {
+        id: barPositionLoader
+        running: true
+        command: ["sh", "-c", "cat ~/.config/quickshell/settings.json 2>/dev/null || echo '{}' "]
+
+        property string buffer: ""
+
+        stdout: SplitParser {
+            onRead: data => {
+                barPositionLoader.buffer += data
+            }
+        }
+
+        onRunningChanged: {
+            if (!running && buffer !== "") {
+                try {
+                    const settings = JSON.parse(buffer)
+                    if (settings.bar) {
+                        if (settings.bar.position) {
+                            barSurfaceState.barAtBottom = settings.bar.position === "bottom"
+                        }
+                        if (settings.bar.autoHide !== undefined) {
+                            barSurfaceState.barAutoHide = settings.bar.autoHide
+                        }
+                        if (settings.bar.floating !== undefined) {
+                            barSurfaceState.barFloating = settings.bar.floating
+                        }
+                        if (settings.bar.barSize !== undefined) {
+                            barSurfaceState.barSize = settings.bar.barSize
+                            ThemeManager.barLarge = (settings.bar.barSize === "large")
+                        }
+                        if (settings.bar.barStyle !== undefined) {
+                            barSurfaceState.barStyle = settings.bar.barStyle
+                        }
+                    }
+                    if (settings.general !== undefined) {
+                        const transparent = settings.general.widgetTransparent !== false
+                        ThemeManager.widgetOpacity = transparent ? 0.75 : 1.0
+                        if (settings.general.uiFont !== undefined && settings.general.uiFont.length > 0) {
+                            ThemeManager.uiFont = settings.general.uiFont
+                        }
+                    }
+                } catch (e) {}
+                buffer = ""
+            } else if (running) {
+                buffer = ""
+            }
+        }
+    }
+
+    Timer {
+        interval: 1000
+        running: true
+        repeat: true
+        onTriggered: barPositionLoader.running = true
+    }
+
     Variants {
         model: Quickshell.screens
-        
+
         PanelWindow {
             property var modelData
             screen: modelData
             WlrLayershell.namespace: "yahr-bar"
-            
-            property bool barAtBottom: false
-            property bool barAutoHide: false
-            property bool barHovered: false
-            property bool barFloating: false
-            property string barSize: "small"
-            
-            // Load bar position and auto-hide settings
-            Process {
-                id: barPositionLoader
-                running: true
-                command: ["sh", "-c", "cat ~/.config/quickshell/settings.json 2>/dev/null || echo '{}'"]
-                
-                property string buffer: ""
-                
-                stdout: SplitParser {
-                    onRead: data => {
-                        barPositionLoader.buffer += data
-                    }
-                }
-                
-                onRunningChanged: {
-                    if (!running && buffer !== "") {
-                        try {
-                            const settings = JSON.parse(buffer)
-                            if (settings.bar) {
-                                if (settings.bar.position) {
-                                    barAtBottom = settings.bar.position === "bottom"
-                                }
-                                if (settings.bar.autoHide !== undefined) {
-                                    barAutoHide = settings.bar.autoHide
-                                }
-                                if (settings.bar.floating !== undefined) {
-                                    barFloating = settings.bar.floating
-                                }
-                                if (settings.bar.barSize !== undefined) {
-                                    barSize = settings.bar.barSize
-                                    ThemeManager.barLarge = (settings.bar.barSize === "large")
-                                }
-                            }
-                            if (settings.general !== undefined) {
-                                const transparent = settings.general.widgetTransparent !== false
-                                ThemeManager.widgetOpacity = transparent ? 0.75 : 1.0
-                                if (settings.general.uiFont !== undefined && settings.general.uiFont.length > 0) {
-                                    ThemeManager.uiFont = settings.general.uiFont
-                                }
-                            }
-                        } catch (e) {}
-                        buffer = ""
-                    } else if (running) {
-                        buffer = ""
-                    }
-                }
-            }
-            
-            Timer {
-                interval: 1000
-                running: true
-                repeat: true
-                onTriggered: barPositionLoader.running = true
-            }
-            
+
+            visible: barSurfaceState.barStyle !== "islands"
+
             anchors {
-                top: !barAtBottom
-                bottom: barAtBottom
+                top: !barSurfaceState.barAtBottom
+                bottom: barSurfaceState.barAtBottom
                 left: true
                 right: true
             }
-            
-            implicitHeight: barSize === "large" ? 53 : 42
+
+            implicitHeight: barSurfaceState.barSize === "large" ? 53 : 42
             color: "transparent"
-            
+
             margins {
-                top: barAutoHide && !barHovered ? (barAtBottom ? 0 : -implicitHeight) : (barFloating && !barAtBottom ? 8 : 0)
-                bottom: barAutoHide && !barHovered ? (barAtBottom ? -implicitHeight : 0) : (barFloating && barAtBottom ? 8 : 0)
-                left: barFloating ? 8 : 0
-                right: barFloating ? 8 : 0
+                top: barSurfaceState.barAutoHide && !barSurfaceState.barHovered ? (barSurfaceState.barAtBottom ? 0 : implicitHeight * -1) : (barSurfaceState.barFloating && !barSurfaceState.barAtBottom ? 8 : 0)
+                bottom: barSurfaceState.barAutoHide && !barSurfaceState.barHovered ? (barSurfaceState.barAtBottom ? implicitHeight * -1 : 0) : (barSurfaceState.barFloating && barSurfaceState.barAtBottom ? 8 : 0)
+                left: barSurfaceState.barFloating ? 8 : 0
+                right: barSurfaceState.barFloating ? 8 : 0
             }
 
-            Behavior on margins.top {
-                NumberAnimation { duration: 200; easing.type: Easing.OutCubic }
-            }
+            Behavior on margins.top { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
+            Behavior on margins.bottom { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
+            Behavior on margins.left { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
+            Behavior on margins.right { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
 
-            Behavior on margins.bottom {
-                NumberAnimation { duration: 200; easing.type: Easing.OutCubic }
-            }
+            exclusiveZone: barSurfaceState.barAutoHide ? 0 : height
 
-            Behavior on margins.left {
-                NumberAnimation { duration: 200; easing.type: Easing.OutCubic }
-            }
-
-            Behavior on margins.right {
-                NumberAnimation { duration: 200; easing.type: Easing.OutCubic }
-            }
-            
-            // Explicitly enable interaction
-            visible: true
-            exclusiveZone: barAutoHide ? 0 : height
-            
-            // Mouse detection area for auto-hide
             MouseArea {
                 anchors.fill: parent
-                anchors.topMargin: barAtBottom ? 0 : -10
-                anchors.bottomMargin: barAtBottom ? -10 : 0
+                anchors.topMargin: barSurfaceState.barAtBottom ? 0 : -10
+                anchors.bottomMargin: barSurfaceState.barAtBottom ? -10 : 0
                 hoverEnabled: true
                 propagateComposedEvents: true
-                enabled: barAutoHide
+                enabled: barSurfaceState.barAutoHide
                 z: 100
-                
-                onEntered: barHovered = true
-                onExited: barHovered = false
+
+                onEntered: barSurfaceState.barHovered = true
+                onExited: barSurfaceState.barHovered = false
                 onClicked: function(mouse) { mouse.accepted = false }
             }
-            
+
             Bar {
-                id: bar
+                id: singleBar
                 anchors.fill: parent
-                
-                // Connect clock toggle signal to shellRoot
+                section: "full"
+
                 Connections {
-                    target: bar.clockComponent
+                    target: singleBar.clockComponent
                     function onToggleCalendar() {
                         shellRoot.calendarVisible = !shellRoot.calendarVisible
-                        console.log("Calendar toggled via Connections:", shellRoot.calendarVisible)
                     }
                 }
-                
-                // Connect launcher toggle signal (Arch button)
+
                 Connections {
-                    target: bar.archComponent
+                    target: singleBar.archComponent
                     function onToggleLauncher() {
                         shellRoot.appLauncherVisible = !shellRoot.appLauncherVisible
-                        console.log("AppLauncher toggled:", shellRoot.appLauncherVisible)
                     }
                 }
-                
-                // Connect clipboard toggle signal
+
                 Connections {
-                    target: bar
+                    target: singleBar
                     function onToggleClipboard() {
                         shellRoot.clipboardVisible = !shellRoot.clipboardVisible
-                        console.log("Clipboard toggled:", shellRoot.clipboardVisible)
                     }
                 }
-                
-                // Connect control center toggle signal
+
                 Connections {
-                    target: bar
+                    target: singleBar
                     function onToggleControlCenter() {
                         shellRoot.controlCenterVisible = !shellRoot.controlCenterVisible
-                        console.log("ControlCenter toggled:", shellRoot.controlCenterVisible)
                     }
                 }
             }
         }
     }
+
+    Variants {
+        model: Quickshell.screens
+
+        PanelWindow {
+            property var modelData
+            screen: modelData
+            WlrLayershell.namespace: "yahr-bar-left"
+
+            visible: barSurfaceState.barStyle === "islands"
+
+            anchors {
+                top: !barSurfaceState.barAtBottom
+                bottom: barSurfaceState.barAtBottom
+                left: true
+            }
+
+            implicitWidth: leftIslandBar.implicitWidth
+            implicitHeight: barSurfaceState.barSize === "large" ? 53 : 42
+            color: "transparent"
+            exclusiveZone: 0
+
+            margins {
+                top: barSurfaceState.barAutoHide && !barSurfaceState.barHovered ? (barSurfaceState.barAtBottom ? 0 : implicitHeight * -1) : (barSurfaceState.barFloating && !barSurfaceState.barAtBottom ? 8 : 0)
+                bottom: barSurfaceState.barAutoHide && !barSurfaceState.barHovered ? (barSurfaceState.barAtBottom ? implicitHeight * -1 : 0) : (barSurfaceState.barFloating && barSurfaceState.barAtBottom ? 8 : 0)
+                left: barSurfaceState.barFloating ? 8 : 0
+            }
+
+            Behavior on margins.top { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
+            Behavior on margins.bottom { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
+            Behavior on margins.left { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
+
+            Bar {
+                id: leftIslandBar
+                anchors.fill: parent
+                section: "left"
+
+                Connections {
+                    target: leftIslandBar.archComponent
+                    function onToggleLauncher() {
+                        shellRoot.appLauncherVisible = !shellRoot.appLauncherVisible
+                    }
+                }
+            }
+        }
+    }
+
+    Variants {
+        model: Quickshell.screens
+
+        PanelWindow {
+            property var modelData
+            screen: modelData
+            WlrLayershell.namespace: "yahr-bar-center"
+
+            visible: barSurfaceState.barStyle === "islands"
+
+            anchors {
+                top: !barSurfaceState.barAtBottom
+                bottom: barSurfaceState.barAtBottom
+                left: true
+            }
+
+            implicitWidth: centerIslandBar.implicitWidth
+            implicitHeight: barSurfaceState.barSize === "large" ? 53 : 42
+            color: "transparent"
+            exclusiveZone: 0
+
+            margins {
+                top: barSurfaceState.barAutoHide && !barSurfaceState.barHovered ? (barSurfaceState.barAtBottom ? 0 : implicitHeight * -1) : (barSurfaceState.barFloating && !barSurfaceState.barAtBottom ? 8 : 0)
+                bottom: barSurfaceState.barAutoHide && !barSurfaceState.barHovered ? (barSurfaceState.barAtBottom ? implicitHeight * -1 : 0) : (barSurfaceState.barFloating && barSurfaceState.barAtBottom ? 8 : 0)
+                left: Math.max(0, Math.round((screen.width - implicitWidth) / 2))
+            }
+
+            Behavior on margins.top { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
+            Behavior on margins.bottom { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
+            Behavior on margins.left { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
+
+            Bar {
+                id: centerIslandBar
+                anchors.fill: parent
+                section: "center"
+
+                Connections {
+                    target: centerIslandBar.clockComponent
+                    function onToggleCalendar() {
+                        shellRoot.calendarVisible = !shellRoot.calendarVisible
+                    }
+                }
+
+                Connections {
+                    target: centerIslandBar.archComponent
+                    function onToggleLauncher() {
+                        shellRoot.appLauncherVisible = !shellRoot.appLauncherVisible
+                    }
+                }
+            }
+        }
+    }
+
+    Variants {
+        model: Quickshell.screens
+
+        PanelWindow {
+            property var modelData
+            screen: modelData
+            WlrLayershell.namespace: "yahr-bar-right"
+
+            visible: barSurfaceState.barStyle === "islands"
+
+            anchors {
+                top: !barSurfaceState.barAtBottom
+                bottom: barSurfaceState.barAtBottom
+                right: true
+            }
+
+            implicitWidth: rightIslandBar.implicitWidth
+            implicitHeight: barSurfaceState.barSize === "large" ? 53 : 42
+            color: "transparent"
+            exclusiveZone: 0
+
+            margins {
+                top: barSurfaceState.barAutoHide && !barSurfaceState.barHovered ? (barSurfaceState.barAtBottom ? 0 : implicitHeight * -1) : (barSurfaceState.barFloating && !barSurfaceState.barAtBottom ? 8 : 0)
+                bottom: barSurfaceState.barAutoHide && !barSurfaceState.barHovered ? (barSurfaceState.barAtBottom ? implicitHeight * -1 : 0) : (barSurfaceState.barFloating && barSurfaceState.barAtBottom ? 8 : 0)
+                right: barSurfaceState.barFloating ? 8 : 0
+            }
+
+            Behavior on margins.top { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
+            Behavior on margins.bottom { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
+            Behavior on margins.right { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
+
+            Bar {
+                id: rightIslandBar
+                anchors.fill: parent
+                section: "right"
+
+                Connections {
+                    target: rightIslandBar.clockComponent
+                    function onToggleCalendar() {
+                        shellRoot.calendarVisible = !shellRoot.calendarVisible
+                    }
+                }
+
+                Connections {
+                    target: rightIslandBar
+                    function onToggleClipboard() {
+                        shellRoot.clipboardVisible = !shellRoot.clipboardVisible
+                    }
+                }
+
+                Connections {
+                    target: rightIslandBar
+                    function onToggleControlCenter() {
+                        shellRoot.controlCenterVisible = !shellRoot.controlCenterVisible
+                    }
+                }
+            }
+        }
+    }
+
 }
