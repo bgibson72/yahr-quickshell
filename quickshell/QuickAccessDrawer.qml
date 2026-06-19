@@ -5,8 +5,12 @@ Item {
     id: drawer
     
     property bool expanded: false
+    property bool forceExpanded: false
+    property bool hideChevron: false
 
-    implicitWidth: expanded ? 176 : 32
+    readonly property bool isExpanded: forceExpanded || expanded
+
+    implicitWidth: isExpanded ? (hideChevron ? 140 : 176) : 32
     implicitHeight: 35
     
     // Container for the drawer content
@@ -22,8 +26,9 @@ Item {
             // Chevron toggle button
             Rectangle {
                 id: chevronButton
-                width: 32
-                height: 32
+                visible: !drawer.hideChevron
+                width: visible ? 32 : 0
+                height: visible ? 32 : 0
                 radius: 6
                 color: chevronMouse.pressed
                     ? Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.45)
@@ -39,7 +44,7 @@ Item {
 
                 Text {
                     anchors.centerIn: parent
-                    text: drawer.expanded ? "\uf054" : "\uf077"
+                    text: drawer.isExpanded ? "\uf054" : "\uf077"
                     font.family: "Symbols Nerd Font"
                     font.pixelSize: 14
                     color: ThemeManager.fgPrimary
@@ -52,6 +57,7 @@ Item {
                     cursorShape: Qt.PointingHandCursor
                     
                     onClicked: {
+                        if (drawer.forceExpanded) return
                         drawer.expanded = !drawer.expanded
                     }
                 }
@@ -59,10 +65,10 @@ Item {
             
             // Quick access buttons - only visible when expanded
             Item {
-                Layout.preferredWidth: drawer.expanded ? 140 : 0
+                Layout.preferredWidth: drawer.isExpanded ? 140 : 0
                 Layout.preferredHeight: 32
                 clip: true
-                visible: drawer.expanded
+                visible: drawer.isExpanded
                 
                 RowLayout {
                     spacing: 4

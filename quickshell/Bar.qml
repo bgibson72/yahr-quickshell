@@ -21,6 +21,7 @@ Item {
     property int widgetBorderWidth: 1
     property int hyprRounding: 12  // Mirrors decoration:rounding from look-and-feel.conf
     property bool useIslands: bar.barStyle === "islands"
+    property int islandHeight: ThemeManager.barLarge ? 43 : 36
     
     signal toggleClipboard()
     signal toggleControlCenter()
@@ -245,7 +246,7 @@ Item {
 
         Item {
             width: islandDefaultArchComponent.width + 12
-            height: islandDefaultArchComponent.height + 4
+            height: bar.islandHeight
 
             Rectangle {
                 anchors.fill: parent
@@ -263,7 +264,7 @@ Item {
 
         Item {
             width: islandWorkspaceDefault.width + 12
-            height: islandWorkspaceDefault.height + 4
+            height: bar.islandHeight
 
             Rectangle {
                 anchors.fill: parent
@@ -282,7 +283,7 @@ Item {
         Item {
             visible: bar.showQuickLaunch
             width: visible ? islandQuickLaunchDefault.width + 12 : 0
-            height: islandQuickLaunchDefault.height + 4
+            height: bar.islandHeight
 
             Rectangle {
                 anchors.fill: parent
@@ -296,6 +297,8 @@ Item {
                 id: islandQuickLaunchDefault
                 anchors.centerIn: parent
                 visible: parent.visible
+                forceExpanded: true
+                hideChevron: true
             }
         }
     }
@@ -310,7 +313,7 @@ Item {
 
         Item {
             width: islandWorkspaceCentered.width + 12
-            height: islandWorkspaceCentered.height + 4
+            height: bar.islandHeight
 
             Rectangle {
                 anchors.fill: parent
@@ -329,7 +332,7 @@ Item {
         Item {
             visible: bar.showQuickLaunch
             width: visible ? islandQuickLaunchCentered.width + 12 : 0
-            height: islandQuickLaunchCentered.height + 4
+            height: bar.islandHeight
 
             Rectangle {
                 anchors.fill: parent
@@ -343,6 +346,8 @@ Item {
                 id: islandQuickLaunchCentered
                 anchors.centerIn: parent
                 visible: parent.visible
+                forceExpanded: true
+                hideChevron: true
             }
         }
     }
@@ -361,7 +366,7 @@ Item {
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.verticalCenter: parent.verticalCenter
         width: islandDefaultClockComponent.width + 12
-        height: islandDefaultClockComponent.height + 4
+        height: bar.islandHeight
 
         Rectangle {
             anchors.fill: parent
@@ -391,7 +396,7 @@ Item {
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.verticalCenter: parent.verticalCenter
         width: islandAltArchComponent.width + 12
-        height: islandAltArchComponent.height + 4
+        height: bar.islandHeight
 
         Rectangle {
             anchors.fill: parent
@@ -464,7 +469,7 @@ Item {
             Item {
                 visible: bar.showSystemTray
                 width: visible ? islandTrayComponent.width + 12 : 0
-                height: islandTrayComponent.height + 4
+                height: bar.islandHeight
 
                 Rectangle {
                     anchors.fill: parent
@@ -486,7 +491,7 @@ Item {
             Item {
                 visible: bar.layoutPreset === "center-menu"
                 width: visible ? islandAltClockComponent.width + 12 : 0
-                height: islandAltClockComponent.height + 4
+                height: bar.islandHeight
 
                 Rectangle {
                     anchors.fill: parent
