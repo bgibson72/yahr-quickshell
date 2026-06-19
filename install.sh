@@ -46,7 +46,7 @@ SELECT_INSTALL_SIP_STARTPAGE=false
 # Optional config selections
 SELECT_CONFIG_NVIM=false
 SELECT_CONFIG_VESKTOP=false
-SELECT_CONFIG_CODE_FAMILY=false
+SELECT_CONFIG_VSCODIUM=false
 SELECT_CONFIG_THUNAR=false
 
 # Optional package selections
@@ -151,7 +151,7 @@ configure_install_profile_tui() {
     local has_intel=false
     local nvim_cfg_default="OFF"
     local vesktop_cfg_default="OFF"
-    local code_family_cfg_default="OFF"
+    local vscodium_cfg_default="OFF"
     local firefox_cfg_default="OFF"
 
     dialog --stdout --clear --title "YAHR Installer" --colors --msgbox "\n\ZbWelcome to the YAHR Quickshell installer\Zn\n\nUse arrow keys to navigate, space to toggle checkboxes, and Enter to continue.\n\nRequired/base packages are always installed automatically." 14 78 || return 1
@@ -209,15 +209,13 @@ configure_install_profile_tui() {
 
     [ "$SELECT_EXTRA_NEOVIM" = true ] && nvim_cfg_default="ON"
     [ "$SELECT_EXTRA_VESKTOP" = true ] && vesktop_cfg_default="ON"
-    [ "$SELECT_EXTRA_CODE_OSS" = true ] && code_family_cfg_default="ON"
-    [ "$SELECT_EXTRA_VSCODIUM" = true ] && code_family_cfg_default="ON"
-    [ "$SELECT_EXTRA_VSCODE" = true ] && code_family_cfg_default="ON"
+    [ "$SELECT_EXTRA_VSCODIUM" = true ] && vscodium_cfg_default="ON"
     [ "$SELECT_EXTRA_FIREFOX" = true ] && firefox_cfg_default="ON"
 
     raw=$(dialog --stdout --title "Optional Config Components" --checklist "Toggle configuration folders to install:" 18 92 10 \
         "NVIM_CFG" "Neovim config" "$nvim_cfg_default" \
         "VESKTOP_CFG" "Vesktop config" "$vesktop_cfg_default" \
-        "CODE_FAMILY_CFG" "VS Code-family editor config" "$code_family_cfg_default" \
+        "VSCODIUM_CFG" "VSCodium config" "$vscodium_cfg_default" \
         "THUNAR_CFG" "Thunar config" OFF \
         "FIREFOX_CFG" "Firefox userChrome theme" "$firefox_cfg_default" \
         "SDDM_CFG" "SDDM setup and login theme" OFF \
@@ -227,7 +225,7 @@ configure_install_profile_tui() {
 
     SELECT_CONFIG_NVIM=false
     SELECT_CONFIG_VESKTOP=false
-    SELECT_CONFIG_CODE_FAMILY=false
+    SELECT_CONFIG_VSCODIUM=false
     SELECT_CONFIG_THUNAR=false
     SELECT_INSTALL_FIREFOX=false
     SELECT_INSTALL_SDDM=false
@@ -235,7 +233,7 @@ configure_install_profile_tui() {
 
     has_selection "NVIM_CFG" "${selection_list[@]}" && SELECT_CONFIG_NVIM=true
     has_selection "VESKTOP_CFG" "${selection_list[@]}" && SELECT_CONFIG_VESKTOP=true
-    has_selection "CODE_FAMILY_CFG" "${selection_list[@]}" && SELECT_CONFIG_CODE_FAMILY=true
+    has_selection "VSCODIUM_CFG" "${selection_list[@]}" && SELECT_CONFIG_VSCODIUM=true
     has_selection "THUNAR_CFG" "${selection_list[@]}" && SELECT_CONFIG_THUNAR=true
     has_selection "FIREFOX_CFG" "${selection_list[@]}" && SELECT_INSTALL_FIREFOX=true
     has_selection "SDDM_CFG" "${selection_list[@]}" && SELECT_INSTALL_SDDM=true
@@ -303,31 +301,6 @@ install_config() {
     INSTALLED_COMPONENTS+=("$config_name")
 }
 
-install_code_editor_family_config() {
-    local source_settings="$SCRIPT_DIR/VSCodium/User/settings.json"
-
-    if [ ! -f "$source_settings" ]; then
-        print_warning "VS Code-family settings template not found: $source_settings"
-        return 1
-    fi
-
-    local targets=(
-        "$HOME/.config/VSCodium/User/settings.json"
-        "$HOME/.config/Code/User/settings.json"
-        "$HOME/.config/Code - OSS/User/settings.json"
-    )
-
-    local target
-    for target in "${targets[@]}"; do
-        mkdir -p "$(dirname "$target")"
-        cp "$source_settings" "$target"
-    done
-
-    print_success "VS Code-family editor settings installed"
-    INSTALLED_COMPONENTS+=("VS Code-family editor settings")
-    return 0
-}
-
 # Check if running as root (we shouldn't be)
 check_not_root() {
     if [ "$EUID" -eq 0 ]; then
@@ -386,7 +359,7 @@ preflight_check() {
         [ -d "$SCRIPT_DIR/sddm" ] && echo "  - SDDM display manager (optional)"
         [ -d "$SCRIPT_DIR/nvim" ] && echo "  - Neovim config (optional)"
         [ -d "$SCRIPT_DIR/vesktop" ] && echo "  - Vesktop/Discord (optional)"
-        [ -d "$SCRIPT_DIR/VSCodium" ] && echo "  - VS Code-family editor config (optional)"
+        [ -d "$SCRIPT_DIR/VSCodium" ] && echo "  - VSCodium (optional)"
         [ -d "$SCRIPT_DIR/thunar" ] && echo "  - Thunar file manager (optional)"
         echo ""
     fi
@@ -1228,23 +1201,23 @@ install_configs() {
             fi
         fi
         
-        # Install VS Code-family editor settings (optional)
+        # Install VSCodium configs (optional)
         if [ -d "$SCRIPT_DIR/VSCodium" ]; then
-            local install_code_family=false
+            local install_vscodium=false
             if [ "$SELECTIONS_CONFIGURED" = true ]; then
-                install_code_family="$SELECT_CONFIG_CODE_FAMILY"
+                install_vscodium="$SELECT_CONFIG_VSCODIUM"
             elif [ "$YOLO_MODE" = true ]; then
-                print_info "YOLO mode: Skipping optional VS Code-family editor settings"
+                print_info "YOLO mode: Skipping optional VSCodium config"
             else
-                read -p "Install VS Code-family editor settings? (y/n) " -n 1 -r
+                read -p "Install VSCodium configuration? (y/n) " -n 1 -r
                 echo
-                [[ $REPLY =~ ^[Yy]$ ]] && install_code_family=true
+                [[ $REPLY =~ ^[Yy]$ ]] && install_vscodium=true
             fi
             
-            if [ "$install_code_family" = true ]; then
-                install_code_editor_family_config || SKIPPED_COMPONENTS+=("VS Code-family editor settings")
+            if [ "$install_vscodium" = true ]; then
+                install_config "$SCRIPT_DIR/VSCodium" "$HOME/.config/VSCodium" "VSCodium"
             else
-                SKIPPED_COMPONENTS+=("VS Code-family editor settings")
+                SKIPPED_COMPONENTS+=("VSCodium")
             fi
         fi
         

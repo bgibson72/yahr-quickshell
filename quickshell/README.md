@@ -4,7 +4,7 @@ A comprehensive Quickshell desktop environment for Hyprland with integrated them
 
 ## Features
 
-- 🎨 **Unified Theme System** - Switch themes across Hyprland, Kitty, VS Code-family editors, Vesktop, and more
+- 🎨 **Unified Theme System** - Switch themes across Hyprland, Kitty, VSCodium, Vesktop, and more
 - 🚀 **Custom Widgets** - Calendar, app launcher, power menu, screenshot tools, settings panel
 - 🔔 **Notifications** - Integrated with mako notification daemon
 - 🖼️ **Wallpaper Management** - Dynamic wallpaper picker with theme integration
@@ -85,7 +85,7 @@ The theme switcher synchronizes colors across:
 - Hyprland (borders, colors, window rules)
 - Kitty terminal
 - Quickshell widgets and bar
-- VS Code-family editors (Code OSS, VSCodium, Visual Studio Code)
+- VSCodium editor
 - Vesktop (Discord client)
 - Neovim (via theme plugins)
 - Mako notifications

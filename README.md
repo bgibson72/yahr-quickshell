@@ -55,7 +55,7 @@ cd yahr-quickshell
 - Interactive prompts for optional components
 - Choose AUR helper (yay/paru)
 - Select NVIDIA driver type (proprietary/nouveau)
-- Optional: Neovim, Vesktop, VS Code-family editors, Thunar, Firefox, SDDM
+- Optional: Neovim, Vesktop, VSCodium, Thunar, Firefox, SDDM
 
 **YOLO Mode (Unattended)**
 - Fully automated, zero prompts
@@ -106,7 +106,7 @@ cd yahr-quickshell
 ### Optional Components (Full Install - User Choice)
 - **Neovim** - Editor with AstroVim configuration and 10 synced colorschemes
 - **Vesktop** - Discord client with Vencord theme support
-- **VS Code-family editor settings** - Shared settings template for Code OSS, VSCodium, and Visual Studio Code
+- **VSCodium** - VS Code alternative with theme integration
 - **Thunar** - File manager with thumbnail support and custom plugins
 - **Firefox** - Browser with userChrome.css theming
 - **SDDM** - Display manager (login screen) with theme

@@ -17,17 +17,6 @@ REQUIRED_QUICKSHELL_QML=(
     "ThemeManager.qml"
 )
 
-REQUIRED_HYPR_LUA=(
-    "hyprland.lua"
-    "variables.lua"
-    "monitors.lua"
-    "autostart.lua"
-    "appearance.lua"
-    "input.lua"
-    "keybinds.lua"
-    "rules.lua"
-)
-
 command_exists() {
     command -v "$1" >/dev/null 2>&1
 }
@@ -89,29 +78,6 @@ validate_quickshell_qml_set() {
     return 0
 }
 
-validate_hypr_lua_set() {
-    local base_dir="$1"
-    local label="$2"
-    local missing=()
-    local file
-
-    for file in "${REQUIRED_HYPR_LUA[@]}"; do
-        if [ ! -f "$base_dir/$file" ]; then
-            missing+=("$file")
-        fi
-    done
-
-    if [ ${#missing[@]} -gt 0 ]; then
-        echo "✗ Missing required Hypr Lua files in $label:"
-        for file in "${missing[@]}"; do
-            echo "  - $file"
-        done
-        return 1
-    fi
-
-    return 0
-}
-
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "  Sync Repo → Live Config"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
@@ -134,16 +100,9 @@ fi
 
 # Hypr
 if [ -d "$REPO_DIR/hypr" ]; then
-    validate_hypr_lua_set "$REPO_DIR/hypr" "repo" \
-        || { echo "✗ Hypr preflight validation failed"; exit 1; }
-
     echo "Syncing hypr..."
     sync_tree "$REPO_DIR/hypr" "$CONFIG_DIR/hypr" '*.backup*' 'hyprland.conf' 'look-and-feel.conf' '.current-theme' \
         || { echo "✗ Hypr sync failed"; exit 1; }
-
-    validate_hypr_lua_set "$CONFIG_DIR/hypr" "live config" \
-        || { echo "✗ Hypr post-sync validation failed"; exit 1; }
-
     echo "✓ Hypr synced"
 fi
 
