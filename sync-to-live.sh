@@ -6,16 +6,52 @@
 REPO_DIR="$HOME/yahr-quickshell"
 CONFIG_DIR="$HOME/.config"
 
+has_rsync=false
+if command -v rsync >/dev/null 2>&1; then
+    has_rsync=true
+fi
+
+sync_dir() {
+    local src_dir="$1"
+    local dest_dir="$2"
+    shift 2
+    local excludes=("$@")
+
+    mkdir -p "$dest_dir"
+
+    if [ "$has_rsync" = true ]; then
+        local rsync_args=(-av)
+        local ex
+        for ex in "${excludes[@]}"; do
+            rsync_args+=("--exclude=$ex")
+        done
+        rsync "${rsync_args[@]}" "$src_dir/" "$dest_dir/"
+        return $?
+    fi
+
+    local tar_excludes=()
+    local ex
+    for ex in "${excludes[@]}"; do
+        tar_excludes+=("--exclude=$ex")
+    done
+
+    (cd "$src_dir" && tar "${tar_excludes[@]}" -cf - .) | (cd "$dest_dir" && tar -xf -)
+}
+
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "  Sync Repo → Live Config"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
 
+if [ "$has_rsync" = false ]; then
+    echo "⚠ rsync not found; using tar fallback"
+    echo ""
+fi
+
 # Quickshell
 if [ -d "$REPO_DIR/quickshell" ]; then
     echo "Syncing quickshell..."
-    rsync -av --exclude='*.backup*' --exclude='settings.json' --exclude='ThemeManager.qml' \
-        "$REPO_DIR/quickshell/" "$CONFIG_DIR/quickshell/" \
+    sync_dir "$REPO_DIR/quickshell" "$CONFIG_DIR/quickshell" '*.backup*' 'settings.json' 'ThemeManager.qml' \
         || { echo "✗ Quickshell sync failed"; exit 1; }
     echo "✓ Quickshell synced"
 fi
@@ -23,8 +59,7 @@ fi
 # Hypr
 if [ -d "$REPO_DIR/hypr" ]; then
     echo "Syncing hypr..."
-    rsync -av --exclude='*.backup*' --exclude='hyprland.conf' --exclude='look-and-feel.conf' --exclude='.current-theme' \
-        "$REPO_DIR/hypr/" "$CONFIG_DIR/hypr/" \
+    sync_dir "$REPO_DIR/hypr" "$CONFIG_DIR/hypr" '*.backup*' 'hyprland.conf' 'look-and-feel.conf' '.current-theme' \
         || { echo "✗ Hypr sync failed"; exit 1; }
     echo "✓ Hypr synced"
 fi
@@ -32,8 +67,7 @@ fi
 # Kitty
 if [ -d "$REPO_DIR/kitty" ]; then
     echo "Syncing kitty..."
-    rsync -av --exclude='*.backup*' --exclude='current-theme.conf' --exclude='themes/current-theme.conf' \
-        "$REPO_DIR/kitty/" "$CONFIG_DIR/kitty/" \
+    sync_dir "$REPO_DIR/kitty" "$CONFIG_DIR/kitty" '*.backup*' 'current-theme.conf' 'themes/current-theme.conf' \
         || { echo "✗ Kitty sync failed"; exit 1; }
     # Re-apply the current theme so the dynamic theme file matches the active theme
     if [ -x "$CONFIG_DIR/quickshell/sync-kitty-theme.sh" ]; then
@@ -45,8 +79,7 @@ fi
 # Mako
 if [ -d "$REPO_DIR/mako" ]; then
     echo "Syncing mako..."
-    rsync -av --exclude='*.backup*' --exclude='config' \
-        "$REPO_DIR/mako/" "$CONFIG_DIR/mako/" \
+    sync_dir "$REPO_DIR/mako" "$CONFIG_DIR/mako" '*.backup*' 'config' \
         || { echo "✗ Mako sync failed"; exit 1; }
     # Re-apply the current theme so the dynamic config matches the active theme
     if [ -x "$CONFIG_DIR/quickshell/sync-mako-theme.sh" ]; then
@@ -58,8 +91,7 @@ fi
 # Nvim
 if [ -d "$REPO_DIR/nvim" ]; then
     echo "Syncing nvim..."
-    rsync -av --exclude='*.backup*' \
-        "$REPO_DIR/nvim/" "$CONFIG_DIR/nvim/" \
+    sync_dir "$REPO_DIR/nvim" "$CONFIG_DIR/nvim" '*.backup*' \
         || { echo "✗ Nvim sync failed"; exit 1; }
     echo "✓ Nvim synced"
 fi
@@ -67,8 +99,7 @@ fi
 # Wofi
 if [ -d "$REPO_DIR/wofi" ]; then
     echo "Syncing wofi..."
-    rsync -av --exclude='*.backup*' \
-        "$REPO_DIR/wofi/" "$CONFIG_DIR/wofi/" \
+    sync_dir "$REPO_DIR/wofi" "$CONFIG_DIR/wofi" '*.backup*' \
         || { echo "✗ Wofi sync failed"; exit 1; }
     echo "✓ Wofi synced"
 fi
@@ -76,8 +107,7 @@ fi
 # Fastfetch
 if [ -d "$REPO_DIR/fastfetch" ]; then
     echo "Syncing fastfetch..."
-    rsync -av --exclude='*.backup*' \
-        "$REPO_DIR/fastfetch/" "$CONFIG_DIR/fastfetch/" \
+    sync_dir "$REPO_DIR/fastfetch" "$CONFIG_DIR/fastfetch" '*.backup*' \
         || { echo "✗ Fastfetch sync failed"; exit 1; }
     echo "✓ Fastfetch synced"
 fi
