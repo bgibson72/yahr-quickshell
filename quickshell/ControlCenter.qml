@@ -938,11 +938,11 @@ Rectangle {
                         if echo "$STATUS" | grep -q "Charging"; then
                             TIME_H=$(( ($FULL - $CHARGE) / $CURRENT ))
                             TIME_M=$(( (($FULL - $CHARGE) * 60 / $CURRENT) % 60 ))
-                            echo "${TIME_H}h ${TIME_M}m until fully charged"
+                            echo "\${TIME_H}h \${TIME_M}m until fully charged"
                         elif echo "$STATUS" | grep -q "Discharging"; then
                             TIME_H=$(( $CHARGE / $CURRENT ))
                             TIME_M=$(( ($CHARGE * 60 / $CURRENT) % 60 ))
-                            echo "${TIME_H}h ${TIME_M}m remaining"
+                            echo "\${TIME_H}h \${TIME_M}m remaining"
                         fi
                     fi
                 fi

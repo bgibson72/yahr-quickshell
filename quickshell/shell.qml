@@ -590,6 +590,7 @@ ShellRoot {
         PanelWindow {
             property var modelData
             screen: modelData
+            WlrLayershell.namespace: "yahr-bar"
             
             property bool barAtBottom: false
             property bool barAutoHide: false
