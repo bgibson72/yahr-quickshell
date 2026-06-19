@@ -116,7 +116,8 @@ Rectangle {
                             transparentBackground: false,
                             showQuickLaunch: true,
                             showSystemTray: true,
-                            layoutPreset: "default"
+                            layoutPreset: "default",
+                            barStyle: "single"
                         }
                     }
                     if (!root.settings.theme) {
@@ -171,7 +172,8 @@ Rectangle {
                         },
                         bar: {
                             transparentBackground: false,
-                            layoutPreset: "default"
+                            layoutPreset: "default",
+                            barStyle: "single"
                         },
                         theme: {
                             current: "TokyoNight"
@@ -301,6 +303,7 @@ SETTINGSEOF`
             showSystemTrayCheck.checked = root.settings.bar.showSystemTray !== false
             barSizeLargeCheck.checked = root.settings.bar.barSize === "large"
             barLayoutPreset.value = root.settings.bar.layoutPreset || "default"
+            barContainerStyle.value = root.settings.bar.barStyle || "single"
         }
         
         // Widget borders
@@ -2007,6 +2010,102 @@ SETTINGSEOF`
                                 color: ThemeManager.fgSecondary
                                 wrapMode: Text.WordWrap
                                 Layout.fillWidth: true
+                            }
+
+                            Column {
+                                spacing: 12
+
+                                Text {
+                                    text: "Bar Style"
+                                    font.family: ThemeManager.uiFont
+                                    font.pixelSize: 12
+                                    font.bold: true
+                                    color: ThemeManager.fgPrimary
+                                }
+
+                                Text {
+                                    text: barContainerStyle.value === "islands"
+                                        ? "Render each bar area as a separate island."
+                                        : "Render a single continuous bar background."
+                                    font.family: ThemeManager.uiFont
+                                    font.pixelSize: 10
+                                    color: ThemeManager.fgSecondary
+                                }
+
+                                Row {
+                                    spacing: 10
+
+                                    Rectangle {
+                                        width: 130
+                                        height: 34
+                                        radius: 8
+                                        color: barContainerStyle.value === "single"
+                                            ? Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.30)
+                                            : Qt.rgba(1, 1, 1, 0.07)
+                                        border.width: 1
+                                        border.color: barContainerStyle.value === "single"
+                                            ? Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.55)
+                                            : Qt.rgba(1, 1, 1, 0.12)
+
+                                        Text {
+                                            anchors.centerIn: parent
+                                            text: "Single Bar"
+                                            font.family: ThemeManager.uiFont
+                                            font.pixelSize: 12
+                                            font.weight: Font.Medium
+                                            color: ThemeManager.fgPrimary
+                                        }
+
+                                        MouseArea {
+                                            anchors.fill: parent
+                                            cursorShape: Qt.PointingHandCursor
+                                            onClicked: {
+                                                if (!root.settings.bar) root.settings.bar = {}
+                                                barContainerStyle.value = "single"
+                                                root.settings.bar.barStyle = "single"
+                                                saveSettings()
+                                            }
+                                        }
+                                    }
+
+                                    Rectangle {
+                                        width: 120
+                                        height: 34
+                                        radius: 8
+                                        color: barContainerStyle.value === "islands"
+                                            ? Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.30)
+                                            : Qt.rgba(1, 1, 1, 0.07)
+                                        border.width: 1
+                                        border.color: barContainerStyle.value === "islands"
+                                            ? Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.55)
+                                            : Qt.rgba(1, 1, 1, 0.12)
+
+                                        Text {
+                                            anchors.centerIn: parent
+                                            text: "Islands"
+                                            font.family: ThemeManager.uiFont
+                                            font.pixelSize: 12
+                                            font.weight: Font.Medium
+                                            color: ThemeManager.fgPrimary
+                                        }
+
+                                        MouseArea {
+                                            anchors.fill: parent
+                                            cursorShape: Qt.PointingHandCursor
+                                            onClicked: {
+                                                if (!root.settings.bar) root.settings.bar = {}
+                                                barContainerStyle.value = "islands"
+                                                root.settings.bar.barStyle = "islands"
+                                                saveSettings()
+                                            }
+                                        }
+                                    }
+                                }
+
+                                QtObject {
+                                    id: barContainerStyle
+                                    property string value: "single"
+                                }
                             }
 
                             Column {
