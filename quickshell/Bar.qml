@@ -142,14 +142,16 @@ Item {
         }
     }
     
-    // Delayed initial settings load
+    // Delayed initial settings load — only for the full-width bar.
+    // Island section bars receive all props from shell.qml's immediate loader.
     Component.onCompleted: {
-        // Wait 500ms before starting settings polling
-        Qt.callLater(() => {
-            barSettingsLoader.running = true
-            hyprRoundingLoader.running = true
-            barSettingsTimer.running = true
-        })
+        if (section === "full") {
+            Qt.callLater(() => {
+                barSettingsLoader.running = true
+                hyprRoundingLoader.running = true
+                barSettingsTimer.running = true
+            })
+        }
     }
     
     // Background rectangle – glass style

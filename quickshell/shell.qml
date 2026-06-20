@@ -843,6 +843,16 @@ ShellRoot {
                 id: leftIslandBar
                 anchors.fill: parent
                 section: "left"
+                barStyle: "islands"
+                layoutPreset: shellRoot.barLayoutPreset
+                showQuickLaunch: shellRoot.barShowQuickLaunch
+                showSystemTray: shellRoot.barShowSystemTray
+                backgroundStyle: shellRoot.barBackgroundStyle
+                showBorder: shellRoot.barShowBorder
+                floating: shellRoot.barFloating
+                barOpacity: shellRoot.barOpacity
+                widgetBorderWidth: shellRoot.barWidgetBorderWidth
+                hyprRounding: shellRoot.barHyprRounding
 
                 Connections {
                     target: leftIslandBar.archComponent
@@ -889,6 +899,16 @@ ShellRoot {
                 id: centerIslandBar
                 anchors.fill: parent
                 section: "center"
+                barStyle: "islands"
+                layoutPreset: shellRoot.barLayoutPreset
+                showQuickLaunch: shellRoot.barShowQuickLaunch
+                showSystemTray: shellRoot.barShowSystemTray
+                backgroundStyle: shellRoot.barBackgroundStyle
+                showBorder: shellRoot.barShowBorder
+                floating: shellRoot.barFloating
+                barOpacity: shellRoot.barOpacity
+                widgetBorderWidth: shellRoot.barWidgetBorderWidth
+                hyprRounding: shellRoot.barHyprRounding
 
                 Connections {
                     target: centerIslandBar.clockComponent
@@ -942,6 +962,16 @@ ShellRoot {
                 id: rightIslandBar
                 anchors.fill: parent
                 section: "right"
+                barStyle: "islands"
+                layoutPreset: shellRoot.barLayoutPreset
+                showQuickLaunch: shellRoot.barShowQuickLaunch
+                showSystemTray: shellRoot.barShowSystemTray
+                backgroundStyle: shellRoot.barBackgroundStyle
+                showBorder: shellRoot.barShowBorder
+                floating: shellRoot.barFloating
+                barOpacity: shellRoot.barOpacity
+                widgetBorderWidth: shellRoot.barWidgetBorderWidth
+                hyprRounding: shellRoot.barHyprRounding
 
                 Connections {
                     target: rightIslandBar.clockComponent
