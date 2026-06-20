@@ -732,7 +732,7 @@ ShellRoot {
             screen: modelData
             WlrLayershell.namespace: "yahr-bar"
 
-            visible: barSurfaceState.barStyle !== "islands"
+            visible: true
 
             anchors {
                 top: !barSurfaceState.barAtBottom
@@ -745,10 +745,10 @@ ShellRoot {
             color: "transparent"
 
             margins {
-                top: barSurfaceState.barAutoHide && !barSurfaceState.barHovered ? (barSurfaceState.barAtBottom ? 0 : implicitHeight * -1) : (barSurfaceState.barFloating && !barSurfaceState.barAtBottom ? 8 : 0)
-                bottom: barSurfaceState.barAutoHide && !barSurfaceState.barHovered ? (barSurfaceState.barAtBottom ? implicitHeight * -1 : 0) : (barSurfaceState.barFloating && barSurfaceState.barAtBottom ? 8 : 0)
-                left: barSurfaceState.barFloating ? 8 : 0
-                right: barSurfaceState.barFloating ? 8 : 0
+                top: barSurfaceState.barAutoHide && !barSurfaceState.barHovered ? (barSurfaceState.barAtBottom ? 0 : implicitHeight * -1) : (barSurfaceState.barStyle !== "islands" && barSurfaceState.barFloating && !barSurfaceState.barAtBottom ? 8 : 0)
+                bottom: barSurfaceState.barAutoHide && !barSurfaceState.barHovered ? (barSurfaceState.barAtBottom ? implicitHeight * -1 : 0) : (barSurfaceState.barStyle !== "islands" && barSurfaceState.barFloating && barSurfaceState.barAtBottom ? 8 : 0)
+                left: barSurfaceState.barStyle !== "islands" && barSurfaceState.barFloating ? 8 : 0
+                right: barSurfaceState.barStyle !== "islands" && barSurfaceState.barFloating ? 8 : 0
             }
 
             Behavior on margins.top { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
@@ -756,7 +756,7 @@ ShellRoot {
             Behavior on margins.left { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
             Behavior on margins.right { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
 
-            exclusiveZone: barSurfaceState.barAutoHide ? 0 : height
+            exclusiveZone: barSurfaceState.barAutoHide ? 0 : (barSurfaceState.barStyle === "islands" ? (implicitHeight + (barSurfaceState.barFloating ? 8 : 0)) : height)
 
             MouseArea {
                 anchors.fill: parent
@@ -764,7 +764,7 @@ ShellRoot {
                 anchors.bottomMargin: barSurfaceState.barAtBottom ? -10 : 0
                 hoverEnabled: true
                 propagateComposedEvents: true
-                enabled: barSurfaceState.barAutoHide
+                enabled: barSurfaceState.barAutoHide && barSurfaceState.barStyle !== "islands"
                 z: 100
 
                 onEntered: barSurfaceState.barHovered = true
@@ -827,11 +827,13 @@ ShellRoot {
             implicitWidth: leftIslandBar.implicitWidth
             implicitHeight: barSurfaceState.barSize === "large" ? 53 : 42
             color: "transparent"
+            // Left island claims exclusive zone; its anchor config (top+left only) is
+            // insufficient for layer-shell exclusive zones — the single bar handles that.
             exclusiveZone: 0
 
             margins {
-                top: barSurfaceState.barAutoHide && !barSurfaceState.barHovered ? (barSurfaceState.barAtBottom ? 0 : implicitHeight * -1) : (barSurfaceState.barFloating && !barSurfaceState.barAtBottom ? 8 : 0)
-                bottom: barSurfaceState.barAutoHide && !barSurfaceState.barHovered ? (barSurfaceState.barAtBottom ? implicitHeight * -1 : 0) : (barSurfaceState.barFloating && barSurfaceState.barAtBottom ? 8 : 0)
+                top: barSurfaceState.barAutoHide && !barSurfaceState.barHovered ? (barSurfaceState.barAtBottom ? 0 : implicitHeight * -1) : (barSurfaceState.barFloating && !barSurfaceState.barAtBottom ? -implicitHeight : 0)
+                bottom: barSurfaceState.barAutoHide && !barSurfaceState.barHovered ? (barSurfaceState.barAtBottom ? implicitHeight * -1 : 0) : (barSurfaceState.barFloating && barSurfaceState.barAtBottom ? -implicitHeight : 0)
                 left: barSurfaceState.barFloating ? 8 : 0
             }
 
@@ -886,8 +888,8 @@ ShellRoot {
             exclusiveZone: 0
 
             margins {
-                top: barSurfaceState.barAutoHide && !barSurfaceState.barHovered ? (barSurfaceState.barAtBottom ? 0 : implicitHeight * -1) : (barSurfaceState.barFloating && !barSurfaceState.barAtBottom ? 8 : 0)
-                bottom: barSurfaceState.barAutoHide && !barSurfaceState.barHovered ? (barSurfaceState.barAtBottom ? implicitHeight * -1 : 0) : (barSurfaceState.barFloating && barSurfaceState.barAtBottom ? 8 : 0)
+                top: barSurfaceState.barAutoHide && !barSurfaceState.barHovered ? (barSurfaceState.barAtBottom ? 0 : implicitHeight * -1) : (barSurfaceState.barFloating && !barSurfaceState.barAtBottom ? -implicitHeight : 0)
+                bottom: barSurfaceState.barAutoHide && !barSurfaceState.barHovered ? (barSurfaceState.barAtBottom ? implicitHeight * -1 : 0) : (barSurfaceState.barFloating && barSurfaceState.barAtBottom ? -implicitHeight : 0)
                 left: Math.max(0, Math.round((screen.width - implicitWidth) / 2))
             }
 
@@ -949,8 +951,8 @@ ShellRoot {
             exclusiveZone: 0
 
             margins {
-                top: barSurfaceState.barAutoHide && !barSurfaceState.barHovered ? (barSurfaceState.barAtBottom ? 0 : implicitHeight * -1) : (barSurfaceState.barFloating && !barSurfaceState.barAtBottom ? 8 : 0)
-                bottom: barSurfaceState.barAutoHide && !barSurfaceState.barHovered ? (barSurfaceState.barAtBottom ? implicitHeight * -1 : 0) : (barSurfaceState.barFloating && barSurfaceState.barAtBottom ? 8 : 0)
+                top: barSurfaceState.barAutoHide && !barSurfaceState.barHovered ? (barSurfaceState.barAtBottom ? 0 : implicitHeight * -1) : (barSurfaceState.barFloating && !barSurfaceState.barAtBottom ? -implicitHeight : 0)
+                bottom: barSurfaceState.barAutoHide && !barSurfaceState.barHovered ? (barSurfaceState.barAtBottom ? implicitHeight * -1 : 0) : (barSurfaceState.barFloating && barSurfaceState.barAtBottom ? -implicitHeight : 0)
                 right: barSurfaceState.barFloating ? 8 : 0
             }
 

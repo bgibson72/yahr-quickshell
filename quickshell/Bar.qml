@@ -260,7 +260,7 @@ Item {
     }
 
     // LEFT SECTION - default layout (islands)
-    RowLayout {
+    Row {
         id: defaultIslandLeftRow
         visible: bar.useIslands && section === "left" && bar.layoutPreset === "default"
         anchors.left: parent.left
@@ -328,7 +328,7 @@ Item {
     }
 
     // LEFT SECTION - centered menu layout (islands)
-    RowLayout {
+    Row {
         id: centeredIslandLeftRow
         visible: bar.useIslands && section === "left" && bar.layoutPreset === "center-menu"
         anchors.left: parent.left
@@ -493,7 +493,7 @@ Item {
 
             Item {
                 visible: bar.showSystemTray
-                width: visible ? islandTrayComponent.implicitWidth + 12 : 0
+                width: visible ? islandTrayComponent.width + 12 : 0
                 height: bar.islandHeight
 
                 Rectangle {
