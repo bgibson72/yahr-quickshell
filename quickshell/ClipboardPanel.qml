@@ -9,7 +9,7 @@ Rectangle {
     
     width: 500
     height: 600
-    color: ThemeManager.bgBase
+    color: ThemeManager.bgCrust
     radius: 16
     border.width: 3
     border.color: ThemeManager.accentPurple

@@ -8,7 +8,7 @@ Rectangle {
     
     width: 420
     height: 820
-    color: Qt.rgba(ThemeManager.bgBase.r, ThemeManager.bgBase.g, ThemeManager.bgBase.b, ThemeManager.widgetOpacity)
+    color: ThemeManager.bgCrust
     radius: 16
     border.width: showWidgetBorders ? widgetBorderWidth : 0
     border.color: Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.35)
@@ -1215,31 +1215,4 @@ Rectangle {
         onTriggered: updateBrightness()
     }
 
-    // Top specular highlight
-    Rectangle {
-        anchors.top: parent.top
-        anchors.left: parent.left
-        anchors.right: parent.right
-        height: 120
-        radius: 16
-        gradient: Gradient {
-            GradientStop { position: 0.0; color: Qt.rgba(1, 1, 1, 0.07) }
-            GradientStop { position: 1.0; color: Qt.rgba(1, 1, 1, 0.0) }
-        }
-        z: 10
-    }
-
-    // Bottom fade
-    Rectangle {
-        anchors.bottom: parent.bottom
-        anchors.left: parent.left
-        anchors.right: parent.right
-        height: 80
-        radius: 16
-        gradient: Gradient {
-            GradientStop { position: 0.0; color: Qt.rgba(0, 0, 0, 0.0) }
-            GradientStop { position: 1.0; color: Qt.rgba(0, 0, 0, 0.12) }
-        }
-        z: 10
-    }
 }
