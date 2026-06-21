@@ -16,6 +16,7 @@ Rectangle {
     border.width: embedded ? 0 : (showWidgetBorders ? widgetBorderWidth : 0)
     border.color: Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.35)
     antialiasing: true
+    clip: true
     
     property bool isVisible: false
     property var settings: ({})
@@ -644,7 +645,7 @@ SETTINGSEOF`
                     model: 7
                     Rectangle {
                         property int stackIdx:   [0, 1, 2, 4, 5, 3, 6][index]
-                        property string tabIcon: ["", "", "", "", "", "", ""][index]
+                        property string tabIcon: ["", "", "", "", "", "", ""][index]
                         property string tabLabel: ["Quickshell", "Screenshots", "Bar", "Theme", "Wallpaper", "Hyprland", "Monitors"][index]
                         property bool tabHovered: false
 
@@ -720,7 +721,10 @@ SETTINGSEOF`
 
             StackLayout {
                 anchors.fill: parent
-                anchors.margins: 16
+                anchors.topMargin: 12
+                anchors.leftMargin: 8
+                anchors.rightMargin: 8
+                anchors.bottomMargin: (sidebar.currentIndex === 0 || sidebar.currentIndex === 1) ? 60 : 12
                 currentIndex: sidebar.currentIndex
 
                 // Tab 0: QUICKSHELL ───────────────────────────────
@@ -730,7 +734,7 @@ SETTINGSEOF`
                     clip: true
                     
                     ColumnLayout {
-                        width: parent.width
+                        width: parent.parent.width
                         spacing: 32
 
                         // ========== WIDGET APPEARANCE ==========
@@ -1795,7 +1799,7 @@ SETTINGSEOF`
                     clip: true
                     
                     ColumnLayout {
-                        width: parent.width
+                        width: parent.parent.width
                         spacing: 20
                         
                         // Default Delay Section
@@ -2112,7 +2116,7 @@ SETTINGSEOF`
                     clip: true
                     
                     ColumnLayout {
-                        width: parent.width
+                        width: parent.parent.width
                         spacing: 24
                         
                         // Bar Appearance Section
@@ -3205,7 +3209,7 @@ SETTINGSEOF`
                     clip: true
 
                     ColumnLayout {
-                        width: parent.parent.width - 32
+                        width: parent.parent.width
                         spacing: 32
 
                         // ========== WINDOW DECORATIONS ==========
@@ -4735,70 +4739,79 @@ SETTINGSEOF`
 
             }
 
-            // Apply Button Overlay (bottom-right corner)
+
+        }
+    }
+
+    // ── Apply Toolbar (full-width, sticky bottom) ────────────────────
+    Rectangle {
+        anchors.bottom: parent.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        height: 52
+        z: 150
+        visible: sidebar.currentIndex === 0 || sidebar.currentIndex === 1
+        color: Qt.rgba(ThemeManager.bgMantle.r, ThemeManager.bgMantle.g, ThemeManager.bgMantle.b, 0.97)
+
+        // Top separator line
+        Rectangle {
+            anchors.top: parent.top
+            anchors.left: parent.left
+            anchors.right: parent.right
+            height: 1
+            color: Qt.rgba(1, 1, 1, 0.10)
+        }
+
+        // Apply button
+        Rectangle {
+            anchors.right: parent.right
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.rightMargin: 20
+            width: 120
+            height: 36
+            radius: 8
+            clip: true
+            color: applyButtonMouseArea.containsMouse && !applyButtonSuccess
+                ? Qt.rgba(ThemeManager.accentGreen.r, ThemeManager.accentGreen.g, ThemeManager.accentGreen.b, 0.25)
+                : "transparent"
+            border.width: 1
+            border.color: Qt.rgba(ThemeManager.accentGreen.r, ThemeManager.accentGreen.g, ThemeManager.accentGreen.b, 0.55)
+
             Rectangle {
+                id: applyProgressFill
+                anchors.left: parent.left
+                anchors.top: parent.top
                 anchors.bottom: parent.bottom
-                anchors.right: parent.right
-                anchors.margins: 20
-                width: 120
-                height: 40
-                radius: 8
-                clip: true
-                color: applyButtonMouseArea.containsMouse && !applyButtonSuccess ? Qt.rgba(ThemeManager.accentGreen.r, ThemeManager.accentGreen.g, ThemeManager.accentGreen.b, 0.25) : "transparent"
-                border.width: 1
-                border.color: Qt.rgba(ThemeManager.accentGreen.r, ThemeManager.accentGreen.g, ThemeManager.accentGreen.b, 0.55)
-                visible: sidebar.currentIndex === 0 || sidebar.currentIndex === 1  // Show on Quickshell and Screenshots tabs
-                z: 100
-
-                Rectangle {
-                    id: applyProgressFill
-                    anchors.left: parent.left
-                    anchors.top: parent.top
-                    anchors.bottom: parent.bottom
-                    width: 0
-                    color: Qt.rgba(ThemeManager.accentGreen.r, ThemeManager.accentGreen.g, ThemeManager.accentGreen.b, 0.3)
-
-                    states: State {
-                        name: "filling"
-                        when: applyButtonSuccess
-                        PropertyChanges { target: applyProgressFill; width: 120 }
-                    }
-
-                    transitions: [
-                        Transition {
-                            from: ""
-                            to: "filling"
-                            NumberAnimation { property: "width"; duration: 1500; easing.type: Easing.Linear }
-                        },
-                        Transition {
-                            from: "filling"
-                            to: ""
-                            NumberAnimation { property: "width"; duration: 0 }
-                        }
-                    ]
+                width: 0
+                color: Qt.rgba(ThemeManager.accentGreen.r, ThemeManager.accentGreen.g, ThemeManager.accentGreen.b, 0.3)
+                states: State {
+                    name: "filling"
+                    when: applyButtonSuccess
+                    PropertyChanges { target: applyProgressFill; width: 120 }
                 }
+                transitions: [
+                    Transition { from: ""; to: "filling"; NumberAnimation { property: "width"; duration: 1500; easing.type: Easing.Linear } },
+                    Transition { from: "filling"; to: ""; NumberAnimation { property: "width"; duration: 0 } }
+                ]
+            }
 
-                Text {
-                    anchors.centerIn: parent
-                    text: applyButtonSuccess ? "Applying..." : "Apply"
-                    font.family: ThemeManager.uiFont
-                    font.pixelSize: 14
-                    font.weight: Font.Bold
-                    color: ThemeManager.accentGreen
-                    z: 1
-                }
+            Text {
+                anchors.centerIn: parent
+                text: applyButtonSuccess ? "Applying..." : "Apply"
+                font.family: ThemeManager.uiFont
+                font.pixelSize: 14
+                font.weight: Font.Bold
+                color: ThemeManager.accentGreen
+                z: 1
+            }
 
-                MouseArea {
-                    id: applyButtonMouseArea
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
-                    enabled: !applyButtonSuccess
-
-                    onClicked: {
-                        applySettings()
-                    }
-                }
+            MouseArea {
+                id: applyButtonMouseArea
+                anchors.fill: parent
+                hoverEnabled: true
+                cursorShape: Qt.PointingHandCursor
+                enabled: !applyButtonSuccess
+                onClicked: applySettings()
             }
         }
     }
