@@ -668,14 +668,6 @@ SETTINGSEOF`
                 }
 
                 Item { Layout.fillWidth: true; Layout.fillHeight: true }
-
-                Rectangle {
-                    Layout.fillWidth: true
-                    height: 1
-                    color: Qt.rgba(1, 1, 1, 0.08)
-                }
-
-                Item { Layout.fillWidth: true; height: 6 }
             }
 
             QtObject {
@@ -685,16 +677,9 @@ SETTINGSEOF`
             }
         }
 
-        // ── Vertical Divider ─────────────────────────────────────
-        Rectangle {
-            width: 1
-            height: parent.height
-            color: Qt.rgba(1, 1, 1, 0.08)
-        }
-
         // ── Content Area ─────────────────────────────────────────
         Item {
-            width: parent.width - 211
+            width: parent.width - 210
             height: parent.height
 
             StackLayout {
@@ -721,8 +706,6 @@ SETTINGSEOF`
                             implicitHeight: sectionCard1.implicitHeight + 32
                             color: Qt.rgba(1, 1, 1, 0.05)
                             radius: 10
-                            border.width: 1
-                            border.color: Qt.rgba(1, 1, 1, 0.10)
                             clip: true
                             Column {
                             id: sectionCard1
@@ -857,8 +840,6 @@ SETTINGSEOF`
                                     height: 160
                                     radius: 6
                                     color: Qt.rgba(0, 0, 0, 0.2)
-                                    border.width: 1
-                                    border.color: Qt.rgba(1, 1, 1, 0.10)
                                     clip: true
 
                                     ListView {
@@ -929,8 +910,6 @@ SETTINGSEOF`
                             implicitHeight: sectionCard2.implicitHeight + 32
                             color: Qt.rgba(1, 1, 1, 0.05)
                             radius: 10
-                            border.width: 1
-                            border.color: Qt.rgba(1, 1, 1, 0.10)
                             clip: true
                             Column {
                             id: sectionCard2
@@ -1218,8 +1197,6 @@ SETTINGSEOF`
                             implicitHeight: sectionCard3.implicitHeight + 32
                             color: Qt.rgba(1, 1, 1, 0.05)
                             radius: 10
-                            border.width: 1
-                            border.color: Qt.rgba(1, 1, 1, 0.10)
                             clip: true
                             Column {
                             id: sectionCard3
@@ -1445,8 +1422,6 @@ SETTINGSEOF`
                             implicitHeight: sectionCard4.implicitHeight + 32
                             color: Qt.rgba(1, 1, 1, 0.05)
                             radius: 10
-                            border.width: 1
-                            border.color: Qt.rgba(1, 1, 1, 0.10)
                             clip: true
                             Column {
                             id: sectionCard4
@@ -3196,8 +3171,6 @@ SETTINGSEOF`
                             implicitHeight: sectionCard5.implicitHeight + 32
                             color: Qt.rgba(1, 1, 1, 0.05)
                             radius: 10
-                            border.width: 1
-                            border.color: Qt.rgba(1, 1, 1, 0.10)
                             clip: true
                             Column {
                             id: sectionCard5
@@ -3454,8 +3427,6 @@ SETTINGSEOF`
                             implicitHeight: sectionCard6.implicitHeight + 32
                             color: Qt.rgba(1, 1, 1, 0.05)
                             radius: 10
-                            border.width: 1
-                            border.color: Qt.rgba(1, 1, 1, 0.10)
                             clip: true
                             Column {
                             id: sectionCard6
@@ -3636,8 +3607,6 @@ SETTINGSEOF`
                             implicitHeight: sectionCard7.implicitHeight + 32
                             color: Qt.rgba(1, 1, 1, 0.05)
                             radius: 10
-                            border.width: 1
-                            border.color: Qt.rgba(1, 1, 1, 0.10)
                             clip: true
                             Column {
                             id: sectionCard7
@@ -4233,7 +4202,7 @@ SETTINGSEOF`
                             }
                         }
 
-                        Rectangle { width: parent.width; height: 1; color: Qt.rgba(1,1,1,0.08) }
+
 
                         // ── Content ──────────────────────────────────────
                         Item {
@@ -4408,8 +4377,6 @@ SETTINGSEOF`
                             implicitHeight: sectionCard8.implicitHeight + 32
                             color: Qt.rgba(1, 1, 1, 0.05)
                             radius: 10
-                            border.width: 1
-                            border.color: Qt.rgba(1, 1, 1, 0.10)
                             clip: true
                             Column {
                             id: sectionCard8
@@ -4472,8 +4439,6 @@ SETTINGSEOF`
                                 height: monCardCol.implicitHeight + 32
                                 radius: 10
                                 color: Qt.rgba(1, 1, 1, 0.07)
-                                border.width: 1
-                                border.color: Qt.rgba(1, 1, 1, 0.10)
 
                                 property string monName: model.name
                                 property var monModes: (model.modesJson && model.modesJson.length > 2) ? JSON.parse(model.modesJson) : []
@@ -4729,20 +4694,13 @@ SETTINGSEOF`
         height: 44
         z: 150
         visible: !root.embedded
-        color: Qt.rgba(ThemeManager.bgMantle.r, ThemeManager.bgMantle.g, ThemeManager.bgMantle.b, 0.97)
-
-        // Bottom separator line
-        Rectangle {
-            anchors.bottom: parent.bottom
-            anchors.left: parent.left
-            anchors.right: parent.right
-            height: 1
-            color: Qt.rgba(1, 1, 1, 0.10)
-        }
+        color: ThemeManager.bgCrust
 
         // Title
         Text {
-            anchors.centerIn: parent
+            anchors.left: parent.left
+            anchors.leftMargin: 20
+            anchors.verticalCenter: parent.verticalCenter
             text: "Settings"
             font.family: ThemeManager.uiFont
             font.pixelSize: 16
@@ -4796,16 +4754,7 @@ SETTINGSEOF`
         height: 52
         z: 150
         visible: sidebar.currentIndex === 0 || sidebar.currentIndex === 1
-        color: Qt.rgba(ThemeManager.bgMantle.r, ThemeManager.bgMantle.g, ThemeManager.bgMantle.b, 0.97)
-
-        // Top separator line
-        Rectangle {
-            anchors.top: parent.top
-            anchors.left: parent.left
-            anchors.right: parent.right
-            height: 1
-            color: Qt.rgba(1, 1, 1, 0.10)
-        }
+        color: ThemeManager.bgCrust
 
         // Apply button
         Rectangle {
