@@ -635,21 +635,31 @@ ShellRoot {
             anchors {
                 top: true
                 left: true
+                right: true
+                bottom: true
             }
             
             margins {
-                top: (screen.height - 720) / 2
-                left: (screen.width - 1100) / 2
+                top: 0
+                left: 0
+                right: 0
+                bottom: 0
             }
-            
-            implicitWidth: 1100
-            implicitHeight: 720
             
             color: "transparent"
             exclusiveZone: 0
             
             WlrLayershell.layer: WlrLayer.Overlay
             WlrLayershell.keyboardFocus: WlrKeyboardFocus.OnDemand
+            
+            // Background overlay - click to close
+            MouseArea {
+                anchors.fill: parent
+                onClicked: {
+                    shellRoot.settingsVisible = false
+                }
+                propagateComposedEvents: false
+            }
             
             SettingsWidget {
                 anchors.centerIn: parent

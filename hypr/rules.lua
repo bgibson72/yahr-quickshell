@@ -57,10 +57,10 @@ hl.window_rule({ match = { class = "^(quickshell)$", float = true }, move = "50%
 hl.window_rule({ match = { class = "^(quickshell)$", float = true }, animation = "slide" })
 
 -- ── Layer rules ──────────────────────────────────────────────────────
--- Background blur for shell and notification layers
+-- Bar has no blur (it uses its own background rendering)
 hl.layer_rule({ match = { namespace = "^yahr%-bar" }, blur = false })
-hl.layer_rule({ match = { namespace = "^quickshell" }, blur = true })
-hl.layer_rule({ match = { namespace = "^mako"       }, blur = true })
+-- Note: quickshell and mako blur is controlled by the conditional at the top
+-- which reads settings.json. Do NOT add hardcoded blur rules here.
 
 -- ── Global rules ─────────────────────────────────────────────────────
 -- Suppress maximize requests from all apps

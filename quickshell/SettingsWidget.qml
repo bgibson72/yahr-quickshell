@@ -721,10 +721,10 @@ SETTINGSEOF`
 
             StackLayout {
                 anchors.fill: parent
-                anchors.topMargin: 12
-                anchors.leftMargin: 8
-                anchors.rightMargin: 8
-                anchors.bottomMargin: (sidebar.currentIndex === 0 || sidebar.currentIndex === 1) ? 60 : 12
+                anchors.topMargin: 16
+                anchors.leftMargin: 16
+                anchors.rightMargin: 16
+                anchors.bottomMargin: (sidebar.currentIndex === 0 || sidebar.currentIndex === 1) ? 64 : 16
                 currentIndex: sidebar.currentIndex
 
                 // Tab 0: QUICKSHELL ───────────────────────────────
@@ -740,7 +740,7 @@ SETTINGSEOF`
                         // ========== WIDGET APPEARANCE ==========
                         Rectangle {
                             Layout.fillWidth: true
-                            height: sectionCard1.implicitHeight + 32
+                            implicitHeight: sectionCard1.implicitHeight + 32
                             color: Qt.rgba(1, 1, 1, 0.05)
                             radius: 10
                             border.width: 1
@@ -948,7 +948,7 @@ SETTINGSEOF`
                         // ========== CLOCK SETTINGS ==========
                         Rectangle {
                             Layout.fillWidth: true
-                            height: sectionCard2.implicitHeight + 32
+                            implicitHeight: sectionCard2.implicitHeight + 32
                             color: Qt.rgba(1, 1, 1, 0.05)
                             radius: 10
                             border.width: 1
@@ -1237,7 +1237,7 @@ SETTINGSEOF`
                         // ========== CALENDAR SETTINGS ==========
                         Rectangle {
                             Layout.fillWidth: true
-                            height: sectionCard3.implicitHeight + 32
+                            implicitHeight: sectionCard3.implicitHeight + 32
                             color: Qt.rgba(1, 1, 1, 0.05)
                             radius: 10
                             border.width: 1
@@ -1464,7 +1464,7 @@ SETTINGSEOF`
                         // ========== WEATHER SETTINGS ==========
                         Rectangle {
                             Layout.fillWidth: true
-                            height: sectionCard4.implicitHeight + 32
+                            implicitHeight: sectionCard4.implicitHeight + 32
                             color: Qt.rgba(1, 1, 1, 0.05)
                             radius: 10
                             border.width: 1
@@ -3215,7 +3215,7 @@ SETTINGSEOF`
                         // ========== WINDOW DECORATIONS ==========
                         Rectangle {
                             Layout.fillWidth: true
-                            height: sectionCard5.implicitHeight + 32
+                            implicitHeight: sectionCard5.implicitHeight + 32
                             color: Qt.rgba(1, 1, 1, 0.05)
                             radius: 10
                             border.width: 1
@@ -3473,7 +3473,7 @@ SETTINGSEOF`
                         // ========== WINDOW GAPS ==========
                         Rectangle {
                             Layout.fillWidth: true
-                            height: sectionCard6.implicitHeight + 32
+                            implicitHeight: sectionCard6.implicitHeight + 32
                             color: Qt.rgba(1, 1, 1, 0.05)
                             radius: 10
                             border.width: 1
@@ -3655,7 +3655,7 @@ SETTINGSEOF`
                         // ========== EFFECTS ==========
                         Rectangle {
                             Layout.fillWidth: true
-                            height: sectionCard7.implicitHeight + 32
+                            implicitHeight: sectionCard7.implicitHeight + 32
                             color: Qt.rgba(1, 1, 1, 0.05)
                             radius: 10
                             border.width: 1
@@ -4427,7 +4427,7 @@ SETTINGSEOF`
 
                         Rectangle {
                             Layout.fillWidth: true
-                            height: sectionCard8.implicitHeight + 32
+                            implicitHeight: sectionCard8.implicitHeight + 32
                             color: Qt.rgba(1, 1, 1, 0.05)
                             radius: 10
                             border.width: 1
