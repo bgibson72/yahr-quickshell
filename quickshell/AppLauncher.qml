@@ -27,6 +27,7 @@ Rectangle {
     property bool isNarrow: root.width < 600
 
     signal requestClose()
+    signal openSettings()
 
     focus: true
 
@@ -194,6 +195,43 @@ Rectangle {
         anchors.top: parent.top
         anchors.bottom: parent.bottom
         width: 72
+
+        // Settings button - top right corner
+        Rectangle {
+            width: 36
+            height: 36
+            radius: 8
+            anchors.top: parent.top
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.topMargin: 12
+            color: settingsLauncherArea.containsMouse
+                ? Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.25)
+                : Qt.rgba(1, 1, 1, 0.06)
+            border.width: settingsLauncherArea.containsMouse ? 1 : 0
+            border.color: Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.55)
+
+            Behavior on color { ColorAnimation { duration: 150 } }
+
+            Text {
+                anchors.centerIn: parent
+                text: "\uf013"
+                font.family: "Symbols Nerd Font"
+                font.pixelSize: 18
+                color: settingsLauncherArea.containsMouse ? ThemeManager.accentBlue : Qt.rgba(ThemeManager.fgPrimary.r, ThemeManager.fgPrimary.g, ThemeManager.fgPrimary.b, 0.6)
+                Behavior on color { ColorAnimation { duration: 150 } }
+            }
+
+            MouseArea {
+                id: settingsLauncherArea
+                anchors.fill: parent
+                hoverEnabled: true
+                cursorShape: Qt.PointingHandCursor
+                onClicked: {
+                    root.requestClose()
+                    root.openSettings()
+                }
+            }
+        }
 
         // All power actions grouped together, vertically centered
         Column {

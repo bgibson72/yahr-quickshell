@@ -43,6 +43,7 @@ Item {
     
     signal toggleClipboard()
     signal toggleControlCenter()
+    signal toggleSettings()
     
     // Load bar settings
     Process {
@@ -466,6 +467,11 @@ Item {
             anchors.right: parent.right
             anchors.verticalCenter: parent.verticalCenter
             spacing: 8
+
+            SettingsButton {
+                anchors.verticalCenter: parent.verticalCenter
+                onClicked: bar.toggleSettings()
+            }
             
             TrayDrawer {
                 id: trayDrawerComponent
@@ -516,6 +522,25 @@ Item {
                     showTray: bar.showSystemTray
                     onToggleClipboard: bar.toggleClipboard()
                     onToggleControlCenter: bar.toggleControlCenter()
+                }
+            }
+
+            Item {
+                width: settingsIslandBtn.width + 12
+                height: bar.islandHeight
+
+                Rectangle {
+                    anchors.fill: parent
+                    radius: islandStyle.radius
+                    color: islandStyle.bg
+                    border.width: bar.showBorder ? bar.widgetBorderWidth : 0
+                    border.color: islandStyle.border
+                }
+
+                SettingsButton {
+                    id: settingsIslandBtn
+                    anchors.centerIn: parent
+                    onClicked: bar.toggleSettings()
                 }
             }
 

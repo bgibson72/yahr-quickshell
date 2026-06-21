@@ -369,6 +369,11 @@ ShellRoot {
                     onRequestClose: {
                         shellRoot.appLauncherVisible = false
                     }
+
+                    onOpenSettings: {
+                        shellRoot.appLauncherVisible = false
+                        shellRoot.settingsVisible = true
+                    }
                 }
             }
         }
@@ -824,6 +829,13 @@ ShellRoot {
                         shellRoot.controlCenterVisible = !shellRoot.controlCenterVisible
                     }
                 }
+
+                Connections {
+                    target: singleBar
+                    function onToggleSettings() {
+                        shellRoot.settingsVisible = !shellRoot.settingsVisible
+                    }
+                }
             }
         }
     }
@@ -1016,6 +1028,13 @@ ShellRoot {
                     target: rightIslandBar
                     function onToggleControlCenter() {
                         shellRoot.controlCenterVisible = !shellRoot.controlCenterVisible
+                    }
+                }
+
+                Connections {
+                    target: rightIslandBar
+                    function onToggleSettings() {
+                        shellRoot.settingsVisible = !shellRoot.settingsVisible
                     }
                 }
             }
