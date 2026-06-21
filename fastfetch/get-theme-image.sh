@@ -3,15 +3,22 @@
 # Get Theme Logo Path
 # Detects the current Quickshell theme and returns the path to the corresponding logo
 
-# Path to the theme manager file
-THEME_MANAGER="$HOME/.config/quickshell/ThemeManager.qml"
+# Primary source: settings.json (most up-to-date)
+SETTINGS="$HOME/.config/quickshell/settings.json"
+THEME_NAME=""
+if command -v python3 &>/dev/null && [ -f "$SETTINGS" ]; then
+    THEME_NAME=$(python3 -c "import json; d=json.load(open('$SETTINGS')); print(d.get('theme',{}).get('current',''))" 2>/dev/null)
+fi
 
-# Extract the current theme name
-THEME_NAME=$(grep 'themeName:' "$THEME_MANAGER" 2>/dev/null | sed -E 's/.*"(.+)".*/\1/')
-
-# If no theme found, exit with error
+# Fallback: read from ThemeManager.qml
 if [ -z "$THEME_NAME" ]; then
-    echo "Error: Could not detect theme" >&2
+    THEME_MANAGER="$HOME/.config/quickshell/ThemeManager.qml"
+    THEME_NAME=$(grep 'themeName:' "$THEME_MANAGER" 2>/dev/null | sed -E 's/.*"(.+)".*/\1/')
+fi
+
+# If still no theme found, exit with error
+if [ -z "$THEME_NAME" ]; then
+    echo "Error: Could not detect theme from settings.json or ThemeManager.qml" >&2
     exit 1
 fi
 
