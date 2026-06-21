@@ -605,7 +605,7 @@ SETTINGSEOF`
 
         // ── Left Sidebar ──────────────────────────────────────────
         Rectangle {
-            width: 175
+            width: 210
             height: parent.height
             color: Qt.rgba(0, 0, 0, 0.22)
 
@@ -625,7 +625,7 @@ SETTINGSEOF`
                         anchors.centerIn: parent
                         text: "Settings"
                         font.family: ThemeManager.uiFont
-                        font.pixelSize: 17
+                        font.pixelSize: 20
                         font.weight: Font.Bold
                         color: ThemeManager.fgPrimary
                     }
@@ -644,12 +644,12 @@ SETTINGSEOF`
                     model: 7
                     Rectangle {
                         property int stackIdx:   [0, 1, 2, 4, 5, 3, 6][index]
-                        property string tabIcon: ["⚙", "📷", "▬", "🎨", "🖼", "🪟", "🖥"][index]
+                        property string tabIcon: ["", "", "", "", "", "", ""][index]
                         property string tabLabel: ["Quickshell", "Screenshots", "Bar", "Theme", "Wallpaper", "Hyprland", "Monitors"][index]
                         property bool tabHovered: false
 
                         Layout.fillWidth: true
-                        height: 36
+                        height: 44
                         radius: 8
                         color: sidebar.currentIndex === stackIdx
                             ? Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.25)
@@ -659,33 +659,23 @@ SETTINGSEOF`
 
                         Row {
                             anchors.left: parent.left
-                            anchors.leftMargin: 10
+                            anchors.leftMargin: 12
                             anchors.verticalCenter: parent.verticalCenter
-                            spacing: 8
+                            spacing: 10
                             Text {
                                 text: tabIcon
-                                font.pixelSize: 14
+                                font.pixelSize: 17
                                 color: sidebar.currentIndex === stackIdx ? ThemeManager.accentBlue : ThemeManager.fgSecondary
                                 anchors.verticalCenter: parent.verticalCenter
                             }
                             Text {
                                 text: tabLabel
                                 font.family: ThemeManager.uiFont
-                                font.pixelSize: 13
+                                font.pixelSize: 15
                                 font.weight: sidebar.currentIndex === stackIdx ? Font.Medium : Font.Normal
                                 color: sidebar.currentIndex === stackIdx ? ThemeManager.fgPrimary : ThemeManager.fgSecondary
                                 anchors.verticalCenter: parent.verticalCenter
                             }
-                        }
-                        Rectangle {
-                            width: 3
-                            height: 20
-                            radius: 2
-                            anchors.right: parent.right
-                            anchors.rightMargin: 2
-                            anchors.verticalCenter: parent.verticalCenter
-                            color: ThemeManager.accentBlue
-                            visible: sidebar.currentIndex === stackIdx
                         }
                         MouseArea {
                             anchors.fill: parent
@@ -707,31 +697,6 @@ SETTINGSEOF`
                 }
 
                 Item { Layout.fillWidth: true; height: 6 }
-
-                // Close button
-                Rectangle {
-                    Layout.fillWidth: true
-                    height: 36
-                    radius: 8
-                    color: closeSidebarMA.containsMouse
-                        ? Qt.rgba(ThemeManager.accentRed.r, ThemeManager.accentRed.g, ThemeManager.accentRed.b, 0.20)
-                        : "transparent"
-                    visible: !root.embedded
-                    Behavior on color { ColorAnimation { duration: 100 } }
-                    Row {
-                        anchors.centerIn: parent
-                        spacing: 6
-                        Text { text: "✕"; font.pixelSize: 13; color: ThemeManager.accentRed; anchors.verticalCenter: parent.verticalCenter }
-                        Text { text: "Close"; font.family: ThemeManager.uiFont; font.pixelSize: 13; color: ThemeManager.fgSecondary; anchors.verticalCenter: parent.verticalCenter }
-                    }
-                    MouseArea {
-                        id: closeSidebarMA
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: root.closeRequested()
-                    }
-                }
             }
 
             QtObject {
@@ -750,7 +715,7 @@ SETTINGSEOF`
 
         // ── Content Area ─────────────────────────────────────────
         Item {
-            width: parent.width - 176
+            width: parent.width - 211
             height: parent.height
 
             StackLayout {
@@ -769,19 +734,25 @@ SETTINGSEOF`
                         spacing: 32
 
                         // ========== WIDGET APPEARANCE ==========
-                        Column {
+                        Rectangle {
                             Layout.fillWidth: true
+                            height: sectionCard1.implicitHeight + 32
+                            color: Qt.rgba(1, 1, 1, 0.05)
+                            radius: 10
+                            border.width: 1
+                            border.color: Qt.rgba(1, 1, 1, 0.10)
+                            clip: true
+                            Column {
+                            id: sectionCard1
+                            anchors.left: parent.left
+                            anchors.right: parent.right
+                            anchors.top: parent.top
+                            anchors.margins: 16
                             spacing: 16
 
-                            Rectangle {
-                                width: parent.width
-                                height: 2
-                                color: ThemeManager.accentBlue
-                                opacity: 0.3
-                            }
 
                             Text {
-                                text: "🪟 Widget Appearance"
+                                text: "  Widget Appearance"
                                 font.family: ThemeManager.uiFont
                                 font.pixelSize: 18
                                 font.weight: Font.Bold
@@ -796,7 +767,7 @@ SETTINGSEOF`
                                     width: 24
                                     height: 24
                                     radius: 4
-                                    color: widgetTransparentCheck.checked ? ThemeManager.accentBlue : Qt.rgba(1, 1, 1, 0.07)
+                                    color: Qt.rgba(1, 1, 1, 0.07)
                                     border.width: 2
                                     border.color: ThemeManager.accentBlue
 
@@ -805,7 +776,7 @@ SETTINGSEOF`
                                         text: "✓"
                                         font.family: "Symbols Nerd Font"
                                         font.pixelSize: 16
-                                        color: ThemeManager.fgPrimary
+                                        color: ThemeManager.accentBlue
                                         visible: widgetTransparentCheck.checked
                                     }
 
@@ -968,21 +939,28 @@ SETTINGSEOF`
                                 }
                             }
                         }
+                        }
 
                         // ========== CLOCK SETTINGS ==========
-                        Column {
+                        Rectangle {
                             Layout.fillWidth: true
+                            height: sectionCard2.implicitHeight + 32
+                            color: Qt.rgba(1, 1, 1, 0.05)
+                            radius: 10
+                            border.width: 1
+                            border.color: Qt.rgba(1, 1, 1, 0.10)
+                            clip: true
+                            Column {
+                            id: sectionCard2
+                            anchors.left: parent.left
+                            anchors.right: parent.right
+                            anchors.top: parent.top
+                            anchors.margins: 16
                             spacing: 16
                             
-                            Rectangle {
-                                width: parent.width
-                                height: 2
-                                color: ThemeManager.accentBlue
-                                opacity: 0.3
-                            }
                             
                             Text {
-                                text: "⏰ Clock Settings"
+                                text: "  Clock Settings"
                                 font.family: ThemeManager.uiFont
                                 font.pixelSize: 18
                                 font.weight: Font.Bold
@@ -997,7 +975,7 @@ SETTINGSEOF`
                                     width: 24
                                     height: 24
                                     radius: 4
-                                    color: clockFormat24hr.checked ? ThemeManager.accentBlue : Qt.rgba(1, 1, 1, 0.07)
+                                    color: Qt.rgba(1, 1, 1, 0.07)
                                     border.width: 2
                                     border.color: ThemeManager.accentBlue
                                     
@@ -1006,7 +984,7 @@ SETTINGSEOF`
                                         text: "✓"
                                         font.family: "Symbols Nerd Font"
                                         font.pixelSize: 16
-                                        color: ThemeManager.fgPrimary
+                                        color: ThemeManager.accentBlue
                                         visible: clockFormat24hr.checked
                                     }
                                     
@@ -1043,7 +1021,7 @@ SETTINGSEOF`
                                     width: 24
                                     height: 24
                                     radius: 4
-                                    color: showSeconds.checked ? ThemeManager.accentBlue : Qt.rgba(1, 1, 1, 0.07)
+                                    color: Qt.rgba(1, 1, 1, 0.07)
                                     border.width: 2
                                     border.color: ThemeManager.accentBlue
                                     
@@ -1052,7 +1030,7 @@ SETTINGSEOF`
                                         text: "✓"
                                         font.family: "Symbols Nerd Font"
                                         font.pixelSize: 16
-                                        color: ThemeManager.fgPrimary
+                                        color: ThemeManager.accentBlue
                                         visible: showSeconds.checked
                                     }
                                     
@@ -1089,7 +1067,7 @@ SETTINGSEOF`
                                     width: 24
                                     height: 24
                                     radius: 4
-                                    color: dateFormatDMY.checked ? ThemeManager.accentBlue : Qt.rgba(1, 1, 1, 0.07)
+                                    color: Qt.rgba(1, 1, 1, 0.07)
                                     border.width: 2
                                     border.color: ThemeManager.accentBlue
 
@@ -1098,7 +1076,7 @@ SETTINGSEOF`
                                         text: "✓"
                                         font.family: "Symbols Nerd Font"
                                         font.pixelSize: 16
-                                        color: ThemeManager.fgPrimary
+                                        color: ThemeManager.accentBlue
                                         visible: dateFormatDMY.checked
                                     }
 
@@ -1145,7 +1123,7 @@ SETTINGSEOF`
                                     width: 24
                                     height: 24
                                     radius: 4
-                                    color: dateLong.checked ? ThemeManager.accentBlue : Qt.rgba(1, 1, 1, 0.07)
+                                    color: Qt.rgba(1, 1, 1, 0.07)
                                     border.width: 2
                                     border.color: ThemeManager.accentBlue
 
@@ -1154,7 +1132,7 @@ SETTINGSEOF`
                                         text: "✓"
                                         font.family: "Symbols Nerd Font"
                                         font.pixelSize: 16
-                                        color: ThemeManager.fgPrimary
+                                        color: ThemeManager.accentBlue
                                         visible: dateLong.checked
                                     }
 
@@ -1202,7 +1180,7 @@ SETTINGSEOF`
                                     width: 24
                                     height: 24
                                     radius: 4
-                                    color: showDayOfWeek.checked ? ThemeManager.accentBlue : Qt.rgba(1, 1, 1, 0.07)
+                                    color: Qt.rgba(1, 1, 1, 0.07)
                                     border.width: 2
                                     border.color: ThemeManager.accentBlue
 
@@ -1211,7 +1189,7 @@ SETTINGSEOF`
                                         text: "✓"
                                         font.family: "Symbols Nerd Font"
                                         font.pixelSize: 16
-                                        color: ThemeManager.fgPrimary
+                                        color: ThemeManager.accentBlue
                                         visible: showDayOfWeek.checked
                                     }
 
@@ -1250,21 +1228,28 @@ SETTINGSEOF`
                                 }
                             }
                         }
+                        }
                         
                         // ========== CALENDAR SETTINGS ==========
-                        Column {
+                        Rectangle {
                             Layout.fillWidth: true
+                            height: sectionCard3.implicitHeight + 32
+                            color: Qt.rgba(1, 1, 1, 0.05)
+                            radius: 10
+                            border.width: 1
+                            border.color: Qt.rgba(1, 1, 1, 0.10)
+                            clip: true
+                            Column {
+                            id: sectionCard3
+                            anchors.left: parent.left
+                            anchors.right: parent.right
+                            anchors.top: parent.top
+                            anchors.margins: 16
                             spacing: 16
                             
-                            Rectangle {
-                                width: parent.width
-                                height: 2
-                                color: ThemeManager.accentBlue
-                                opacity: 0.3
-                            }
                             
                             Text {
-                                text: "📅 Calendar Settings"
+                                text: "  Calendar Settings"
                                 font.family: ThemeManager.uiFont
                                 font.pixelSize: 18
                                 font.weight: Font.Bold
@@ -1470,18 +1455,25 @@ SETTINGSEOF`
                                 }
                             }
                         }
+                        }
                         
                         // ========== WEATHER SETTINGS ==========
-                        Column {
+                        Rectangle {
                             Layout.fillWidth: true
+                            height: sectionCard4.implicitHeight + 32
+                            color: Qt.rgba(1, 1, 1, 0.05)
+                            radius: 10
+                            border.width: 1
+                            border.color: Qt.rgba(1, 1, 1, 0.10)
+                            clip: true
+                            Column {
+                            id: sectionCard4
+                            anchors.left: parent.left
+                            anchors.right: parent.right
+                            anchors.top: parent.top
+                            anchors.margins: 16
                             spacing: 16
                             
-                            Rectangle {
-                                width: parent.width
-                                height: 2
-                                color: ThemeManager.accentBlue
-                                opacity: 0.3
-                            }
                             
                             Text {
                                 text: "🌤️ Weather Settings"
@@ -1499,7 +1491,7 @@ SETTINGSEOF`
                                     width: 24
                                     height: 24
                                     radius: 4
-                                    color: useFahrenheit.checked ? ThemeManager.accentBlue : Qt.rgba(1, 1, 1, 0.07)
+                                    color: Qt.rgba(1, 1, 1, 0.07)
                                     border.width: 2
                                     border.color: ThemeManager.accentBlue
                                     
@@ -1508,7 +1500,7 @@ SETTINGSEOF`
                                         text: "✓"
                                         font.family: "Symbols Nerd Font"
                                         font.pixelSize: 16
-                                        color: ThemeManager.fgPrimary
+                                        color: ThemeManager.accentBlue
                                         visible: useFahrenheit.checked
                                     }
                                     
@@ -1535,6 +1527,7 @@ SETTINGSEOF`
                                     property bool checked: true
                                 }
                             }
+                        }
                         }
                         
                         // Weather Location Settings
@@ -1952,7 +1945,7 @@ SETTINGSEOF`
                                     width: 24
                                     height: 24
                                     radius: 4
-                                    color: saveToDiskCheck.checked ? ThemeManager.accentBlue : Qt.rgba(1, 1, 1, 0.07)
+                                    color: Qt.rgba(1, 1, 1, 0.07)
                                     border.width: 2
                                     border.color: ThemeManager.accentBlue
                                     
@@ -1961,7 +1954,7 @@ SETTINGSEOF`
                                         text: "✓"
                                         font.family: "Symbols Nerd Font"
                                         font.pixelSize: 16
-                                        color: ThemeManager.fgPrimary
+                                        color: ThemeManager.accentBlue
                                         visible: saveToDiskCheck.checked
                                     }
                                     
@@ -1997,7 +1990,7 @@ SETTINGSEOF`
                                     width: 24
                                     height: 24
                                     radius: 4
-                                    color: copyToClipboardCheck.checked ? ThemeManager.accentBlue : Qt.rgba(1, 1, 1, 0.07)
+                                    color: Qt.rgba(1, 1, 1, 0.07)
                                     border.width: 2
                                     border.color: ThemeManager.accentBlue
                                     
@@ -2006,7 +1999,7 @@ SETTINGSEOF`
                                         text: "✓"
                                         font.family: "Symbols Nerd Font"
                                         font.pixelSize: 16
-                                        color: ThemeManager.fgPrimary
+                                        color: ThemeManager.accentBlue
                                         visible: copyToClipboardCheck.checked
                                     }
                                     
@@ -2359,7 +2352,7 @@ SETTINGSEOF`
                                         width: 24
                                         height: 24
                                         radius: 4
-                                        color: barSolidCheck.checked ? ThemeManager.accentBlue : Qt.rgba(1, 1, 1, 0.07)
+                                        color: Qt.rgba(1, 1, 1, 0.07)
                                         border.width: 2
                                         border.color: ThemeManager.accentBlue
                                         
@@ -2368,7 +2361,7 @@ SETTINGSEOF`
                                             text: "✓"
                                             font.family: "Symbols Nerd Font"
                                             font.pixelSize: 16
-                                            color: ThemeManager.fgPrimary
+                                            color: ThemeManager.accentBlue
                                             visible: barSolidCheck.checked
                                         }
                                         
@@ -2515,7 +2508,7 @@ SETTINGSEOF`
                                     width: 24
                                     height: 24
                                     radius: 4
-                                    color: showBorderCheck.checked ? ThemeManager.accentBlue : Qt.rgba(1, 1, 1, 0.07)
+                                    color: Qt.rgba(1, 1, 1, 0.07)
                                     border.width: 2
                                     border.color: ThemeManager.accentBlue
 
@@ -2524,7 +2517,7 @@ SETTINGSEOF`
                                         text: "✓"
                                         font.family: "Symbols Nerd Font"
                                         font.pixelSize: 16
-                                        color: ThemeManager.fgPrimary
+                                        color: ThemeManager.accentBlue
                                         visible: showBorderCheck.checked
                                     }
 
@@ -2562,7 +2555,7 @@ SETTINGSEOF`
                                     width: 24
                                     height: 24
                                     radius: 4
-                                    color: floatingBarCheck.checked ? ThemeManager.accentBlue : Qt.rgba(1, 1, 1, 0.07)
+                                    color: Qt.rgba(1, 1, 1, 0.07)
                                     border.width: 2
                                     border.color: ThemeManager.accentBlue
 
@@ -2571,7 +2564,7 @@ SETTINGSEOF`
                                         text: "✓"
                                         font.family: "Symbols Nerd Font"
                                         font.pixelSize: 16
-                                        color: ThemeManager.fgPrimary
+                                        color: ThemeManager.accentBlue
                                         visible: floatingBarCheck.checked
                                     }
 
@@ -2620,7 +2613,7 @@ SETTINGSEOF`
                                     width: 24
                                     height: 24
                                     radius: 4
-                                    color: barSizeLargeCheck.checked ? ThemeManager.accentBlue : Qt.rgba(1, 1, 1, 0.07)
+                                    color: Qt.rgba(1, 1, 1, 0.07)
                                     border.width: 2
                                     border.color: ThemeManager.accentBlue
 
@@ -2629,7 +2622,7 @@ SETTINGSEOF`
                                         text: "✓"
                                         font.family: "Symbols Nerd Font"
                                         font.pixelSize: 16
-                                        color: ThemeManager.fgPrimary
+                                        color: ThemeManager.accentBlue
                                         visible: barSizeLargeCheck.checked
                                     }
 
@@ -2678,7 +2671,7 @@ SETTINGSEOF`
                                     width: 24
                                     height: 24
                                     radius: 4
-                                    color: barPositionBottomCheck.checked ? ThemeManager.accentBlue : Qt.rgba(1, 1, 1, 0.07)
+                                    color: Qt.rgba(1, 1, 1, 0.07)
                                     border.width: 2
                                     border.color: ThemeManager.accentBlue
 
@@ -2687,7 +2680,7 @@ SETTINGSEOF`
                                         text: "✓"
                                         font.family: "Symbols Nerd Font"
                                         font.pixelSize: 16
-                                        color: ThemeManager.fgPrimary
+                                        color: ThemeManager.accentBlue
                                         visible: barPositionBottomCheck.checked
                                     }
 
@@ -2725,7 +2718,7 @@ SETTINGSEOF`
                                     width: 24
                                     height: 24
                                     radius: 4
-                                    color: barAutoHideCheck.checked ? ThemeManager.accentBlue : Qt.rgba(1, 1, 1, 0.07)
+                                    color: Qt.rgba(1, 1, 1, 0.07)
                                     border.width: 2
                                     border.color: ThemeManager.accentBlue
                                     
@@ -2734,7 +2727,7 @@ SETTINGSEOF`
                                         text: "✓"
                                         font.family: "Symbols Nerd Font"
                                         font.pixelSize: 16
-                                        color: ThemeManager.fgPrimary
+                                        color: ThemeManager.accentBlue
                                         visible: barAutoHideCheck.checked
                                     }
                                     
@@ -2783,7 +2776,7 @@ SETTINGSEOF`
                                     width: 24
                                     height: 24
                                     radius: 4
-                                    color: showWeatherInBarCheck.checked ? ThemeManager.accentBlue : Qt.rgba(1, 1, 1, 0.07)
+                                    color: Qt.rgba(1, 1, 1, 0.07)
                                     border.width: 2
                                     border.color: ThemeManager.accentBlue
 
@@ -2792,7 +2785,7 @@ SETTINGSEOF`
                                         text: "✓"
                                         font.family: "Symbols Nerd Font"
                                         font.pixelSize: 16
-                                        color: ThemeManager.fgPrimary
+                                        color: ThemeManager.accentBlue
                                         visible: showWeatherInBarCheck.checked
                                     }
 
@@ -2842,7 +2835,7 @@ SETTINGSEOF`
                                     width: 24
                                     height: 24
                                     radius: 4
-                                    color: showQuickLaunchCheck.checked ? ThemeManager.accentBlue : Qt.rgba(1, 1, 1, 0.07)
+                                    color: Qt.rgba(1, 1, 1, 0.07)
                                     border.width: 2
                                     border.color: ThemeManager.accentBlue
 
@@ -2851,7 +2844,7 @@ SETTINGSEOF`
                                         text: "✓"
                                         font.family: "Symbols Nerd Font"
                                         font.pixelSize: 16
-                                        color: ThemeManager.fgPrimary
+                                        color: ThemeManager.accentBlue
                                         visible: showQuickLaunchCheck.checked
                                     }
 
@@ -2900,7 +2893,7 @@ SETTINGSEOF`
                                     width: 24
                                     height: 24
                                     radius: 4
-                                    color: showSystemTrayCheck.checked ? ThemeManager.accentBlue : Qt.rgba(1, 1, 1, 0.07)
+                                    color: Qt.rgba(1, 1, 1, 0.07)
                                     border.width: 2
                                     border.color: ThemeManager.accentBlue
 
@@ -2909,7 +2902,7 @@ SETTINGSEOF`
                                         text: "✓"
                                         font.family: "Symbols Nerd Font"
                                         font.pixelSize: 16
-                                        color: ThemeManager.fgPrimary
+                                        color: ThemeManager.accentBlue
                                         visible: showSystemTrayCheck.checked
                                     }
 
@@ -3068,7 +3061,7 @@ SETTINGSEOF`
                                     width: 24
                                     height: 24
                                     radius: 4
-                                    color: showBatteryDetailsCheck.checked ? ThemeManager.accentBlue : Qt.rgba(1, 1, 1, 0.07)
+                                    color: Qt.rgba(1, 1, 1, 0.07)
                                     border.width: 2
                                     border.color: ThemeManager.accentBlue
                                     
@@ -3077,7 +3070,7 @@ SETTINGSEOF`
                                         text: "✓"
                                         font.family: "Symbols Nerd Font"
                                         font.pixelSize: 16
-                                        color: ThemeManager.fgPrimary
+                                        color: ThemeManager.accentBlue
                                         visible: showBatteryDetailsCheck.checked
                                     }
                                     
@@ -3115,7 +3108,7 @@ SETTINGSEOF`
                                     width: 24
                                     height: 24
                                     radius: 4
-                                    color: showVolumeDetailsCheck.checked ? ThemeManager.accentBlue : Qt.rgba(1, 1, 1, 0.07)
+                                    color: Qt.rgba(1, 1, 1, 0.07)
                                     border.width: 2
                                     border.color: ThemeManager.accentBlue
                                     
@@ -3124,7 +3117,7 @@ SETTINGSEOF`
                                         text: "✓"
                                         font.family: "Symbols Nerd Font"
                                         font.pixelSize: 16
-                                        color: ThemeManager.fgPrimary
+                                        color: ThemeManager.accentBlue
                                         visible: showVolumeDetailsCheck.checked
                                     }
                                     
@@ -3162,7 +3155,7 @@ SETTINGSEOF`
                                     width: 24
                                     height: 24
                                     radius: 4
-                                    color: showNetworkDetailsCheck.checked ? ThemeManager.accentBlue : Qt.rgba(1, 1, 1, 0.07)
+                                    color: Qt.rgba(1, 1, 1, 0.07)
                                     border.width: 2
                                     border.color: ThemeManager.accentBlue
                                     
@@ -3171,7 +3164,7 @@ SETTINGSEOF`
                                         text: "✓"
                                         font.family: "Symbols Nerd Font"
                                         font.pixelSize: 16
-                                        color: ThemeManager.fgPrimary
+                                        color: ThemeManager.accentBlue
                                         visible: showNetworkDetailsCheck.checked
                                     }
                                     
@@ -3216,19 +3209,25 @@ SETTINGSEOF`
                         spacing: 32
 
                         // ========== WINDOW DECORATIONS ==========
-                        Column {
+                        Rectangle {
                             Layout.fillWidth: true
+                            height: sectionCard5.implicitHeight + 32
+                            color: Qt.rgba(1, 1, 1, 0.05)
+                            radius: 10
+                            border.width: 1
+                            border.color: Qt.rgba(1, 1, 1, 0.10)
+                            clip: true
+                            Column {
+                            id: sectionCard5
+                            anchors.left: parent.left
+                            anchors.right: parent.right
+                            anchors.top: parent.top
+                            anchors.margins: 16
                             spacing: 16
 
-                            Rectangle {
-                                width: parent.width
-                                height: 2
-                                color: ThemeManager.accentBlue
-                                opacity: 0.3
-                            }
 
                             Text {
-                                text: "🪟 Window Decorations"
+                                text: "  Window Decorations"
                                 font.family: ThemeManager.uiFont
                                 font.pixelSize: 18
                                 font.weight: Font.Bold
@@ -3252,7 +3251,7 @@ SETTINGSEOF`
                                     width: 24
                                     height: 24
                                     radius: 4
-                                    color: hyprBorderEnabledCheck.checked ? ThemeManager.accentBlue : Qt.rgba(1, 1, 1, 0.07)
+                                    color: Qt.rgba(1, 1, 1, 0.07)
                                     border.width: 2
                                     border.color: ThemeManager.accentBlue
 
@@ -3261,7 +3260,7 @@ SETTINGSEOF`
                                         text: "✓"
                                         font.family: "Symbols Nerd Font"
                                         font.pixelSize: 16
-                                        color: ThemeManager.fgPrimary
+                                        color: ThemeManager.accentBlue
                                         visible: hyprBorderEnabledCheck.checked
                                     }
 
@@ -3465,18 +3464,25 @@ SETTINGSEOF`
                                 }
                             }
                         }
+                        }
 
                         // ========== WINDOW GAPS ==========
-                        Column {
+                        Rectangle {
                             Layout.fillWidth: true
+                            height: sectionCard6.implicitHeight + 32
+                            color: Qt.rgba(1, 1, 1, 0.05)
+                            radius: 10
+                            border.width: 1
+                            border.color: Qt.rgba(1, 1, 1, 0.10)
+                            clip: true
+                            Column {
+                            id: sectionCard6
+                            anchors.left: parent.left
+                            anchors.right: parent.right
+                            anchors.top: parent.top
+                            anchors.margins: 16
                             spacing: 16
 
-                            Rectangle {
-                                width: parent.width
-                                height: 2
-                                color: ThemeManager.accentBlue
-                                opacity: 0.3
-                            }
 
                             Text {
                                 text: "↔ Window Gaps"
@@ -3640,18 +3646,25 @@ SETTINGSEOF`
                                 }
                             }
                         }
+                        }
 
                         // ========== EFFECTS ==========
-                        Column {
+                        Rectangle {
                             Layout.fillWidth: true
+                            height: sectionCard7.implicitHeight + 32
+                            color: Qt.rgba(1, 1, 1, 0.05)
+                            radius: 10
+                            border.width: 1
+                            border.color: Qt.rgba(1, 1, 1, 0.10)
+                            clip: true
+                            Column {
+                            id: sectionCard7
+                            anchors.left: parent.left
+                            anchors.right: parent.right
+                            anchors.top: parent.top
+                            anchors.margins: 16
                             spacing: 16
 
-                            Rectangle {
-                                width: parent.width
-                                height: 2
-                                color: ThemeManager.accentBlue
-                                opacity: 0.3
-                            }
 
                             Text {
                                 text: "✨ Effects"
@@ -3669,7 +3682,7 @@ SETTINGSEOF`
                                     width: 24
                                     height: 24
                                     radius: 4
-                                    color: hyprAnimationsCheck.checked ? ThemeManager.accentBlue : Qt.rgba(1, 1, 1, 0.07)
+                                    color: Qt.rgba(1, 1, 1, 0.07)
                                     border.width: 2
                                     border.color: ThemeManager.accentBlue
 
@@ -3678,7 +3691,7 @@ SETTINGSEOF`
                                         text: "✓"
                                         font.family: "Symbols Nerd Font"
                                         font.pixelSize: 16
-                                        color: ThemeManager.fgPrimary
+                                        color: ThemeManager.accentBlue
                                         visible: hyprAnimationsCheck.checked
                                     }
 
@@ -3718,7 +3731,7 @@ SETTINGSEOF`
                                     width: 24
                                     height: 24
                                     radius: 4
-                                    color: hyprShadowCheck.checked ? ThemeManager.accentBlue : Qt.rgba(1, 1, 1, 0.07)
+                                    color: Qt.rgba(1, 1, 1, 0.07)
                                     border.width: 2
                                     border.color: ThemeManager.accentBlue
 
@@ -3727,7 +3740,7 @@ SETTINGSEOF`
                                         text: "✓"
                                         font.family: "Symbols Nerd Font"
                                         font.pixelSize: 16
-                                        color: ThemeManager.fgPrimary
+                                        color: ThemeManager.accentBlue
                                         visible: hyprShadowCheck.checked
                                     }
 
@@ -3767,7 +3780,7 @@ SETTINGSEOF`
                                     width: 24
                                     height: 24
                                     radius: 4
-                                    color: hyprBlurCheck.checked ? ThemeManager.accentBlue : Qt.rgba(1, 1, 1, 0.07)
+                                    color: Qt.rgba(1, 1, 1, 0.07)
                                     border.width: 2
                                     border.color: ThemeManager.accentBlue
 
@@ -3776,7 +3789,7 @@ SETTINGSEOF`
                                         text: "✓"
                                         font.family: "Symbols Nerd Font"
                                         font.pixelSize: 16
-                                        color: ThemeManager.fgPrimary
+                                        color: ThemeManager.accentBlue
                                         visible: hyprBlurCheck.checked
                                     }
 
@@ -3892,6 +3905,7 @@ SETTINGSEOF`
                             }
 
                             Item { height: 16; width: 1 }
+                        }
                         }
                     }
                 }
@@ -4060,7 +4074,9 @@ SETTINGSEOF`
                                     anchors.bottom: parent.bottom
                                     anchors.left: parent.left
                                     anchors.right: parent.right
-                                    height: 14
+                                    anchors.leftMargin: 10
+                                    anchors.rightMargin: 10
+                                    height: 10
 
                                     Repeater {
                                         model: themeCard.cardAccents
@@ -4089,13 +4105,309 @@ SETTINGSEOF`
 
                 // Tab 5: WALLPAPER ────────────────────────────────
                 Item {
+                    id: wallpaperTabItem
                     Layout.fillWidth: true
                     Layout.fillHeight: true
 
-                    WallpaperPickerContent {
+                    property int wallSubTab: 0
+                    property string wallCurrentTheme: ""
+
+                    onVisibleChanged: {
+                        if (visible && wallCurrentTheme === "") {
+                            wallCurrentThemeProc.running = true
+                        }
+                    }
+
+                    Process {
+                        id: wallCurrentThemeProc
+                        running: false
+                        command: ["cat", Quickshell.env("HOME") + "/.config/hypr/.current-theme"]
+                        property string buffer: ""
+                        stdout: SplitParser { onRead: data => wallCurrentThemeProc.buffer += data }
+                        onRunningChanged: {
+                            if (!running && buffer !== "") {
+                                wallpaperTabItem.wallCurrentTheme = buffer.trim() || "TokyoNight"
+                                buffer = ""
+                                wallThemeModel.clear()
+                                wallThemeProc.running = true
+                            } else if (running) { buffer = "" }
+                        }
+                    }
+
+                    ListModel { id: wallThemeModel }
+
+                    Process {
+                        id: wallThemeProc
+                        running: false
+                        command: ["sh", "-c",
+                            "find '" + Quickshell.env("HOME") + "/Pictures/Wallpapers/" + wallpaperTabItem.wallCurrentTheme + "' " +
+                            "-maxdepth 1 -type f \\( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' -o -iname '*.webp' \\) " +
+                            "| sort -f"]
+                        stdout: SplitParser {
+                            onRead: data => {
+                                const p = data.trim()
+                                if (p.length > 0) wallThemeModel.append({path: p, name: p.split('/').pop()})
+                            }
+                        }
+                    }
+
+                    ListModel { id: wallAllModel }
+
+                    Process {
+                        id: wallAllProc
+                        running: false
+                        command: ["sh", "-c",
+                            "find '" + Quickshell.env("HOME") + "/Pictures/Wallpapers' " +
+                            "-mindepth 2 -maxdepth 2 -type f \\( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' -o -iname '*.webp' \\) " +
+                            "| sort | while IFS= read -r f; do printf '%s\\t%s\\n' \"$(basename $(dirname \"$f\"))\" \"$f\"; done"]
+                        property string buffer: ""
+                        stdout: SplitParser { onRead: data => wallAllProc.buffer += data + "\n" }
+                        onRunningChanged: {
+                            if (!running && buffer !== "") {
+                                wallAllModel.clear()
+                                const lines = buffer.trim().split("\n")
+                                const themes = {}
+                                const themeOrder = []
+                                for (const line of lines) {
+                                    const tab = line.indexOf("\t")
+                                    if (tab < 0) continue
+                                    const theme = line.substring(0, tab)
+                                    const path = line.substring(tab + 1)
+                                    if (theme && path) {
+                                        if (!themes[theme]) { themes[theme] = []; themeOrder.push(theme) }
+                                        themes[theme].push(path)
+                                    }
+                                }
+                                for (const t of themeOrder)
+                                    wallAllModel.append({theme: t, pathsJson: JSON.stringify(themes[t])})
+                                buffer = ""
+                            } else if (running) { buffer = "" }
+                        }
+                    }
+
+                    function applyWallpaper(path) {
+                        Quickshell.execDetached(["swww", "img", path,
+                            "--transition-type", "grow", "--transition-pos", "0.5,0.5", "--transition-duration", "2"])
+                        Quickshell.execDetached(["bash", "-c",
+                            'printf "%s" "$1" > ~/.config/quickshell/last-wallpaper', "--", path])
+                    }
+
+                    Column {
                         anchors.fill: parent
-                        showWidgetBorders: root.showWidgetBorders
-                        widgetBorderWidth: root.widgetBorderWidth
+                        spacing: 0
+
+                        // ── Sub-tab bar ──────────────────────────────────
+                        Rectangle {
+                            width: parent.width
+                            height: 44
+                            color: Qt.rgba(0, 0, 0, 0.15)
+
+                            Row {
+                                anchors.fill: parent
+                                anchors.leftMargin: 12
+                                spacing: 4
+
+                                Repeater {
+                                    model: ["Theme Wallpaper", "All Wallpapers"]
+
+                                    Rectangle {
+                                        width: 150
+                                        height: parent.height
+                                        radius: 6
+                                        color: wallpaperTabItem.wallSubTab === index
+                                            ? Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.20)
+                                            : (wallSubTabMA.containsMouse ? Qt.rgba(1,1,1,0.06) : "transparent")
+                                        border.width: wallpaperTabItem.wallSubTab === index ? 1 : 0
+                                        border.color: Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.40)
+                                        Behavior on color { ColorAnimation { duration: 100 } }
+
+                                        Text {
+                                            anchors.centerIn: parent
+                                            text: modelData
+                                            font.family: ThemeManager.uiFont
+                                            font.pixelSize: 13
+                                            font.weight: wallpaperTabItem.wallSubTab === index ? Font.Medium : Font.Normal
+                                            color: wallpaperTabItem.wallSubTab === index ? ThemeManager.fgPrimary : ThemeManager.fgSecondary
+                                        }
+                                        MouseArea {
+                                            id: wallSubTabMA
+                                            anchors.fill: parent
+                                            hoverEnabled: true
+                                            cursorShape: Qt.PointingHandCursor
+                                            onClicked: {
+                                                wallpaperTabItem.wallSubTab = index
+                                                if (index === 0) {
+                                                    wallThemeModel.clear()
+                                                    wallThemeProc.running = true
+                                                } else {
+                                                    if (wallAllModel.count === 0) {
+                                                        wallAllProc.running = true
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        Rectangle { width: parent.width; height: 1; color: Qt.rgba(1,1,1,0.08) }
+
+                        // ── Content ──────────────────────────────────────
+                        Item {
+                            width: parent.width
+                            height: parent.height - 45
+
+                            // Theme Wallpaper sub-tab
+                            ScrollView {
+                                anchors.fill: parent
+                                clip: true
+                                visible: wallpaperTabItem.wallSubTab === 0
+
+                                Flow {
+                                    width: parent.width
+                                    spacing: 8
+                                    topPadding: 12
+                                    leftPadding: 12
+                                    rightPadding: 12
+
+                                    Repeater {
+                                        model: wallThemeModel
+
+                                        Rectangle {
+                                            width: 155
+                                            height: 97
+                                            radius: 8
+                                            clip: true
+                                            color: Qt.rgba(1,1,1,0.05)
+                                            border.width: wallThumbMA.containsMouse ? 2 : 1
+                                            border.color: wallThumbMA.containsMouse
+                                                ? Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.9)
+                                                : Qt.rgba(1,1,1,0.12)
+
+                                            Image {
+                                                anchors.fill: parent
+                                                source: "file://" + model.path
+                                                fillMode: Image.PreserveAspectCrop
+                                                smooth: true
+                                                asynchronous: true
+                                            }
+
+                                            Rectangle {
+                                                anchors.bottom: parent.bottom
+                                                width: parent.width; height: 20
+                                                color: Qt.rgba(0,0,0,0.65)
+                                                Text {
+                                                    anchors.centerIn: parent
+                                                    text: model.name
+                                                    font.family: ThemeManager.uiFont
+                                                    font.pixelSize: 9; color: "white"
+                                                    elide: Text.ElideRight
+                                                    width: parent.width - 8
+                                                }
+                                            }
+                                            MouseArea {
+                                                id: wallThumbMA
+                                                anchors.fill: parent; hoverEnabled: true
+                                                cursorShape: Qt.PointingHandCursor
+                                                onClicked: wallpaperTabItem.applyWallpaper(model.path)
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            // All Wallpapers sub-tab
+                            ScrollView {
+                                anchors.fill: parent
+                                clip: true
+                                visible: wallpaperTabItem.wallSubTab === 1
+
+                                ColumnLayout {
+                                    width: parent.width
+                                    spacing: 20
+
+                                    Item { Layout.fillWidth: true; height: 4 }
+
+                                    Repeater {
+                                        model: wallAllModel
+
+                                        Column {
+                                            Layout.fillWidth: true
+                                            spacing: 6
+
+                                            // Theme header
+                                            Row {
+                                                leftPadding: 12
+                                                spacing: 8
+
+                                                Text {
+                                                    text: "\uf108  " + model.theme
+                                                    font.family: "Symbols Nerd Font, " + ThemeManager.uiFont
+                                                    font.pixelSize: 14
+                                                    font.weight: Font.Bold
+                                                    color: ThemeManager.accentBlue
+                                                    anchors.verticalCenter: parent.verticalCenter
+                                                }
+                                            }
+
+                                            // Wallpaper grid
+                                            Flow {
+                                                width: parent.width
+                                                spacing: 8
+                                                leftPadding: 12
+                                                rightPadding: 12
+
+                                                Repeater {
+                                                    model: { try { return JSON.parse(model.pathsJson) } catch(e) { return [] } }
+
+                                                    Rectangle {
+                                                        width: 150
+                                                        height: 94
+                                                        radius: 8
+                                                        clip: true
+                                                        color: Qt.rgba(1,1,1,0.05)
+                                                        border.width: allWallMA.containsMouse ? 2 : 1
+                                                        border.color: allWallMA.containsMouse
+                                                            ? Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.9)
+                                                            : Qt.rgba(1,1,1,0.12)
+
+                                                        Image {
+                                                            anchors.fill: parent
+                                                            source: "file://" + modelData
+                                                            fillMode: Image.PreserveAspectCrop
+                                                            smooth: true; asynchronous: true
+                                                        }
+
+                                                        Rectangle {
+                                                            anchors.bottom: parent.bottom
+                                                            width: parent.width; height: 20
+                                                            color: Qt.rgba(0,0,0,0.65)
+                                                            Text {
+                                                                anchors.centerIn: parent
+                                                                text: modelData.split('/').pop()
+                                                                font.family: ThemeManager.uiFont
+                                                                font.pixelSize: 9; color: "white"
+                                                                elide: Text.ElideRight; width: parent.width - 8
+                                                            }
+                                                        }
+
+                                                        MouseArea {
+                                                            id: allWallMA
+                                                            anchors.fill: parent; hoverEnabled: true
+                                                            cursorShape: Qt.PointingHandCursor
+                                                            onClicked: wallpaperTabItem.applyWallpaper(modelData)
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    Item { Layout.fillWidth: true; height: 16 }
+                                }
+                            }
+                        }
                     }
                 }
 
@@ -4106,22 +4418,28 @@ SETTINGSEOF`
                     clip: true
 
                     ColumnLayout {
-                        width: parent.width
+                        width: parent.parent.width
                         spacing: 24
 
-                        Column {
+                        Rectangle {
                             Layout.fillWidth: true
+                            height: sectionCard8.implicitHeight + 32
+                            color: Qt.rgba(1, 1, 1, 0.05)
+                            radius: 10
+                            border.width: 1
+                            border.color: Qt.rgba(1, 1, 1, 0.10)
+                            clip: true
+                            Column {
+                            id: sectionCard8
+                            anchors.left: parent.left
+                            anchors.right: parent.right
+                            anchors.top: parent.top
+                            anchors.margins: 16
                             spacing: 16
 
-                            Rectangle {
-                                width: parent.width
-                                height: 2
-                                color: ThemeManager.accentBlue
-                                opacity: 0.3
-                            }
 
                             Text {
-                                text: "🖥 Monitors"
+                                text: "  Monitors"
                                 font.family: ThemeManager.uiFont
                                 font.pixelSize: 18
                                 font.weight: Font.Bold
@@ -4161,6 +4479,7 @@ SETTINGSEOF`
                                     onClicked: monitorLoader.running = true
                                 }
                             }
+                        }
                         }
 
                         Repeater {
@@ -4481,6 +4800,45 @@ SETTINGSEOF`
                     }
                 }
             }
+        }
+    }
+
+    // ── Close button overlay (top-right) ──────────────────────────
+    Rectangle {
+        anchors.top: parent.top
+        anchors.right: parent.right
+        anchors.topMargin: 12
+        anchors.rightMargin: 12
+        width: 32
+        height: 32
+        radius: 6
+        z: 200
+        visible: !root.embedded
+        color: closeOverlayMA.containsMouse
+            ? Qt.rgba(ThemeManager.accentRed.r, ThemeManager.accentRed.g, ThemeManager.accentRed.b, 0.28)
+            : Qt.rgba(1, 1, 1, 0.08)
+        border.width: 1
+        border.color: closeOverlayMA.containsMouse
+            ? Qt.rgba(ThemeManager.accentRed.r, ThemeManager.accentRed.g, ThemeManager.accentRed.b, 0.55)
+            : Qt.rgba(1, 1, 1, 0.18)
+        Behavior on color { ColorAnimation { duration: 150 } }
+        Behavior on border.color { ColorAnimation { duration: 150 } }
+
+        Text {
+            anchors.centerIn: parent
+            text: "\u2715"
+            font.pixelSize: 14
+            font.weight: Font.Bold
+            color: closeOverlayMA.containsMouse ? ThemeManager.accentRed : ThemeManager.fgSecondary
+            Behavior on color { ColorAnimation { duration: 150 } }
+        }
+
+        MouseArea {
+            id: closeOverlayMA
+            anchors.fill: parent
+            hoverEnabled: true
+            cursorShape: Qt.PointingHandCursor
+            onClicked: root.closeRequested()
         }
     }
 
