@@ -4086,7 +4086,6 @@ SETTINGSEOF`
                         }
                     }
                 }
-            }
 
                 // Tab 5: WALLPAPER ────────────────────────────────
                 Item {
@@ -4415,6 +4414,7 @@ SETTINGSEOF`
                     }
                 }
 
+            }
 
             // Apply Button Overlay (bottom-right corner)
             Rectangle {
