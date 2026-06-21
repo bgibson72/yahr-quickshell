@@ -3750,23 +3750,46 @@ SETTINGSEOF`
                                     NumberAnimation { duration: 150 }
                                 }
 
-                                property var themeData: ({
-                                    "Catppuccin": { bg: "#1e1e2e", fg: "#cdd6f4", accents: ["#89b4fa", "#cba6f7", "#f5c2e7", "#f38ba8", "#fab387", "#f9e2af", "#a6e3a1", "#94e2d5"] },
-                                    "Dracula":    { bg: "#282a36", fg: "#f8f8f2", accents: ["#bd93f9", "#ff79c6", "#ff6e6e", "#ffb86c", "#f1fa8c", "#50fa7b", "#8be9fd", "#6272a4"] },
-                                    "Eldritch":   { bg: "#212337", fg: "#ebfafa", accents: ["#f16c75", "#f265b5", "#7081d0", "#a48cf2", "#37f499", "#04d1f9", "#ffd700", "#323449"] },
-                                    "Everforest": { bg: "#374247", fg: "#d3c6aa", accents: ["#e67e80", "#e69875", "#dbbc7f", "#a7c080", "#83c092", "#7fbbb3", "#d699b6", "#9da9a0"] },
-                                    "Gruvbox":    { bg: "#282828", fg: "#ebdbb2", accents: ["#fb4934", "#fe8019", "#fabd2f", "#b8bb26", "#8ec07c", "#83a598", "#d3869b", "#689d6a"] },
-                                    "Kanagawa":   { bg: "#1f1f28", fg: "#dcd7ba", accents: ["#7fb4ca", "#957fb8", "#d27e99", "#e46876", "#dca561", "#98bb6c", "#7aa89f", "#938aa9"] },
-                                    "Material":   { bg: "#263238", fg: "#eeffff", accents: ["#82aaff", "#c792ea", "#f07178", "#f78c6c", "#ffcb6b", "#c3e88d", "#89ddff", "#546e7a"] },
-                                    "Monochrome": { bg: "#252525", fg: "#bebebe", accents: ["#bebebe", "#a8a8a8", "#999999", "#888888", "#777777", "#666666", "#555555", "#444444"] },
-                                    "NightFox":   { bg: "#131a24", fg: "#cdcecf", accents: ["#719cd6", "#9d79d6", "#d67ad2", "#f52a65", "#f4a261", "#dbc074", "#63cdcf", "#4d688e"] },
-                                    "Nord":       { bg: "#2e3440", fg: "#eceff4", accents: ["#88c0d0", "#81a1c1", "#5e81ac", "#bf616a", "#d08770", "#ebcb8b", "#a3be8c", "#b48ead"] },
-                                    "Rosepine":   { bg: "#191724", fg: "#e0def4", accents: ["#c4a7e7", "#ebbcba", "#eb6f92", "#f6c177", "#ea9a97", "#9ccfd8", "#31748f", "#907aa9"] },
-                                    "Solarized":  { bg: "#002b36", fg: "#839496", accents: ["#268bd2", "#6c71c4", "#d33682", "#dc322f", "#cb4b16", "#b58900", "#859900", "#2aa198"] },
-                                    "TokyoNight": { bg: "#1a1b26", fg: "#c0caf5", accents: ["#7aa2f7", "#bb9af7", "#f7768e", "#ff9e64", "#e0af68", "#9ece6a", "#73daca", "#7dcfff"] }
-                                })
+                                property string cardBg: {
+                                    var m = {
+                                        "Catppuccin":"#1e1e2e","Dracula":"#282a36","Eldritch":"#212337",
+                                        "Everforest":"#374247","Gruvbox":"#282828","Kanagawa":"#1f1f28",
+                                        "Material":"#263238","Monochrome":"#252525","NightFox":"#131a24",
+                                        "Nord":"#2e3440","Rosepine":"#191724","Solarized":"#002b36",
+                                        "TokyoNight":"#1a1b26"
+                                    };
+                                    return m[model.name] || "#1e1e2e";
+                                }
 
-                                property var data: themeData[model.name] || { bg: "#1e1e2e", fg: "#cdd6f4", accents: ["#89b4fa", "#cba6f7", "#f38ba8", "#fab387", "#f9e2af", "#a6e3a1", "#94e2d5", "#74c7ec"] }
+                                property string cardFg: {
+                                    var m = {
+                                        "Catppuccin":"#cdd6f4","Dracula":"#f8f8f2","Eldritch":"#ebfafa",
+                                        "Everforest":"#d3c6aa","Gruvbox":"#ebdbb2","Kanagawa":"#dcd7ba",
+                                        "Material":"#eeffff","Monochrome":"#bebebe","NightFox":"#cdcecf",
+                                        "Nord":"#eceff4","Rosepine":"#e0def4","Solarized":"#839496",
+                                        "TokyoNight":"#c0caf5"
+                                    };
+                                    return m[model.name] || "#cdd6f4";
+                                }
+
+                                property var cardAccents: {
+                                    var m = {
+                                        "Catppuccin":["#89b4fa","#cba6f7","#f5c2e7","#f38ba8","#fab387","#f9e2af","#a6e3a1","#94e2d5"],
+                                        "Dracula":   ["#bd93f9","#ff79c6","#ff6e6e","#ffb86c","#f1fa8c","#50fa7b","#8be9fd","#6272a4"],
+                                        "Eldritch":  ["#f16c75","#f265b5","#7081d0","#a48cf2","#37f499","#04d1f9","#ffd700","#323449"],
+                                        "Everforest":["#e67e80","#e69875","#dbbc7f","#a7c080","#83c092","#7fbbb3","#d699b6","#9da9a0"],
+                                        "Gruvbox":   ["#fb4934","#fe8019","#fabd2f","#b8bb26","#8ec07c","#83a598","#d3869b","#689d6a"],
+                                        "Kanagawa":  ["#7fb4ca","#957fb8","#d27e99","#e46876","#dca561","#98bb6c","#7aa89f","#938aa9"],
+                                        "Material":  ["#82aaff","#c792ea","#f07178","#f78c6c","#ffcb6b","#c3e88d","#89ddff","#546e7a"],
+                                        "Monochrome":["#bebebe","#a8a8a8","#999999","#888888","#777777","#666666","#555555","#444444"],
+                                        "NightFox":  ["#719cd6","#9d79d6","#d67ad2","#f52a65","#f4a261","#dbc074","#63cdcf","#4d688e"],
+                                        "Nord":      ["#88c0d0","#81a1c1","#5e81ac","#bf616a","#d08770","#ebcb8b","#a3be8c","#b48ead"],
+                                        "Rosepine":  ["#c4a7e7","#ebbcba","#eb6f92","#f6c177","#ea9a97","#9ccfd8","#31748f","#907aa9"],
+                                        "Solarized": ["#268bd2","#6c71c4","#d33682","#dc322f","#cb4b16","#b58900","#859900","#2aa198"],
+                                        "TokyoNight":["#7aa2f7","#bb9af7","#f7768e","#ff9e64","#e0af68","#9ece6a","#73daca","#7dcfff"]
+                                    };
+                                    return m[model.name] || ["#89b4fa","#cba6f7","#f38ba8","#fab387","#f9e2af","#a6e3a1","#94e2d5","#74c7ec"];
+                                }
 
                                 // Top band — theme bg color with name and current badge
                                 Rectangle {
@@ -3775,7 +3798,7 @@ SETTINGSEOF`
                                     anchors.left: parent.left
                                     anchors.right: parent.right
                                     anchors.bottom: accentRow.top
-                                    color: themeCard.data.bg
+                                    color: themeCard.cardBg
 
                                     // Subtle hover brightening
                                     Rectangle {
@@ -3793,7 +3816,7 @@ SETTINGSEOF`
                                         font.family: ThemeManager.uiFont
                                         font.pixelSize: 15
                                         font.weight: Font.Medium
-                                        color: themeCard.data.fg
+                                        color: themeCard.cardFg
                                     }
 
                                     Rectangle {
@@ -3826,9 +3849,9 @@ SETTINGSEOF`
                                     height: 14
 
                                     Repeater {
-                                        model: themeCard.data.accents
+                                        model: themeCard.cardAccents
                                         Rectangle {
-                                            width: accentRow.width / themeCard.data.accents.length
+                                            width: accentRow.width / themeCard.cardAccents.length
                                             height: 14
                                             color: modelData
                                         }

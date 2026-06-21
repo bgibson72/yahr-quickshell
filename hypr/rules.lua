@@ -4,6 +4,17 @@
 -- Replaces: rules.conf
 -- Includes: hypremoji window rules (were sourced from hypremoji.conf)
 
+-- ── Blur layer rules (read from settings.json, re-applied on every reload) ──
+local _blur_enabled = true
+local _sf = io.open(os.getenv("HOME") .. "/.config/quickshell/settings.json", "r")
+if _sf then
+    local _sc = _sf:read("*a")
+    _sf:close()
+    if _sc:match('"blur"%s*:%s*false') then _blur_enabled = false end
+end
+hl.layer_rule({ match = { namespace = "^quickshell" }, blur = _blur_enabled })
+hl.layer_rule({ match = { namespace = "^mako" },       blur = _blur_enabled })
+
 -- ── Floating windows ────────────────────────────────────────────────
 hl.window_rule({ match = { title = "^(.*Hyprshot.*)$"                }, float = true })
 hl.window_rule({ match = { title = "^(.*Waypaper.*)$"                }, float = true })
