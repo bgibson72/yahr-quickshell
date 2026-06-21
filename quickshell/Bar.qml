@@ -17,6 +17,7 @@ Item {
     property bool floating: false
     property bool showQuickLaunch: true
     property bool showSystemTray: true
+    property int minWorkspaces: 4
     property string layoutPreset: "default"
     property string barStyle: "single"
     property int widgetBorderWidth: 1
@@ -82,6 +83,9 @@ Item {
                         }
                         if (settings.bar.showSystemTray !== undefined) {
                             bar.showSystemTray = settings.bar.showSystemTray
+                        }
+                        if (settings.bar.minWorkspaces !== undefined) {
+                            bar.minWorkspaces = settings.bar.minWorkspaces
                         }
                         if (settings.bar.layoutPreset !== undefined) {
                             bar.layoutPreset = settings.bar.layoutPreset
@@ -201,7 +205,7 @@ Item {
             return Qt.rgba(ThemeManager.bgBase.r, ThemeManager.bgBase.g, ThemeManager.bgBase.b, bar.barOpacity)
         }
         property color border: Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.35)
-        property real radius: Math.max(8, bar.hyprRounding - 2)
+        property real radius: 6
     }
     
     property var clockComponent: {
@@ -232,7 +236,7 @@ Item {
         ArchButton {
             id: singleDefaultArchComponent
         }
-        WorkspaceBar {}
+        WorkspaceBar { minWorkspaces: bar.minWorkspaces }
         Separator {
             visible: bar.showQuickLaunch
         }
@@ -250,7 +254,7 @@ Item {
         anchors.verticalCenter: parent.verticalCenter
         spacing: 8
 
-        WorkspaceBar {}
+        WorkspaceBar { minWorkspaces: bar.minWorkspaces }
         Separator {
             visible: bar.showQuickLaunch
         }
@@ -301,6 +305,7 @@ Item {
             WorkspaceBar {
                 id: islandWorkspaceDefault
                 anchors.centerIn: parent
+                minWorkspaces: bar.minWorkspaces
             }
         }
 
@@ -351,6 +356,7 @@ Item {
             WorkspaceBar {
                 id: islandWorkspaceCentered
                 anchors.centerIn: parent
+                minWorkspaces: bar.minWorkspaces
             }
         }
 

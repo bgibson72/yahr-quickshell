@@ -75,12 +75,11 @@ Rectangle {
             id: contentRect
             anchors.centerIn: parent
             width: 60  // Wider for icon + number
-            height: 32
-            
-            color: mouseArea.containsMouse ? Qt.rgba(1, 1, 1, 0.10) : "transparent"
-            radius: 6
-            border.width: mouseArea.containsMouse ? 1 : 0
-            border.color: Qt.rgba(1, 1, 1, 0.18)
+                height: parent.height - 8
+                color: mouseArea.containsMouse ? Qt.rgba(1, 1, 1, 0.10) : "transparent"
+                radius: 6
+                border.width: mouseArea.containsMouse ? 1 : 0
+                border.color: Qt.rgba(1, 1, 1, 0.18)
 
         Behavior on color {
             ColorAnimation { duration: 200 }

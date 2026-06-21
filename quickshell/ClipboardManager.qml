@@ -25,7 +25,7 @@ Rectangle {
         Rectangle {
             anchors.centerIn: parent
             width: 50
-            height: 32
+            height: parent.height - 8
             color: mouseArea.containsMouse ? Qt.rgba(1, 1, 1, 0.10) : "transparent"
             radius: 6
             border.width: mouseArea.containsMouse ? 1 : 0

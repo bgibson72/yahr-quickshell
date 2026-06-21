@@ -28,6 +28,7 @@ ShellRoot {
     property real barOpacity: 0.70
     property int barWidgetBorderWidth: 1
     property int barHyprRounding: 12
+    property int barMinWorkspaces: 4
     
     // Make shellRoot globally accessible via objectName
     objectName: "shellRoot"
@@ -58,6 +59,7 @@ ShellRoot {
                         if (settings.bar.layoutPreset !== undefined) shellRoot.barLayoutPreset = settings.bar.layoutPreset
                         if (settings.bar.showQuickLaunch !== undefined) shellRoot.barShowQuickLaunch = settings.bar.showQuickLaunch
                         if (settings.bar.showSystemTray !== undefined) shellRoot.barShowSystemTray = settings.bar.showSystemTray
+                        if (settings.bar.minWorkspaces !== undefined) shellRoot.barMinWorkspaces = settings.bar.minWorkspaces
                         if (settings.bar.showBorder !== undefined) shellRoot.barShowBorder = settings.bar.showBorder
                         if (settings.bar.backgroundStyle !== undefined) shellRoot.barBackgroundStyle = settings.bar.backgroundStyle
                         if (settings.bar.barOpacity !== undefined) shellRoot.barOpacity = settings.bar.barOpacity
@@ -141,19 +143,20 @@ ShellRoot {
         }
     }
 
-    // On every quickshell startup, sync .current-theme to the active theme in ThemeManager.qml.
+    // On every quickshell startup, sync .current-theme to the active theme from settings.json.
     // This prevents a stale .current-theme from causing theme reversions on restart.
     Process {
         id: themeFileSync
         running: true
-        // Pass ThemeManager.themeName as $1 so no shell-injection risk from theme name.
-        // Also re-applies kitty and mako themes so they match the active quickshell theme
-        // on every startup (not just when switch-theme.sh is run).
+        // Read theme from settings.json — the authoritative source — to avoid depending
+        // on a ThemeManager property that may not exist or be unset at startup.
+        // Also re-applies kitty, mako and hyprlock themes so they match on every startup.
         command: ["bash", "-c",
-            "printf '%s' \"$1\" > \"$HOME/.config/hypr/.current-theme\"; " +
+            "theme=$(python3 -c \"import json,os; d=json.load(open(os.environ['HOME']+'/.config/quickshell/settings.json')); print(d.get('theme',{}).get('current','Catppuccin'))\" 2>/dev/null || echo 'Catppuccin'); " +
+            "printf '%s' \"$theme\" > \"$HOME/.config/hypr/.current-theme\"; " +
             "\"$HOME/.config/quickshell/sync-kitty-theme.sh\" >/dev/null 2>&1; " +
-            "\"$HOME/.config/quickshell/sync-mako-theme.sh\" >/dev/null 2>&1",
-            "--", ThemeManager.themeName]
+            "\"$HOME/.config/quickshell/sync-mako-theme.sh\" >/dev/null 2>&1; " +
+            "\"$HOME/.config/quickshell/sync-hyprlock-theme.sh\" >/dev/null 2>&1"]
     }
 
     // Listen for calendar toggle requests
@@ -325,27 +328,44 @@ ShellRoot {
                 propagateComposedEvents: false
             }
             
-            // Panel positioned at center, slides down from top
+            // Panel - positioned and sized based on Arch button location
             Item {
-                width: 1000
-                height: 600
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.verticalCenter: parent.verticalCenter
-                anchors.verticalCenterOffset: shellRoot.appLauncherVisible ? 0 : -800
+                id: launcherPanel
+                // isLeft: Arch button in left island ("default" preset)
+                // center: Arch button in center island ("center-menu" preset)
+                property bool isLeft: shellRoot.barLayoutPreset === "default"
+                property int barBottom: (ThemeManager.barLarge ? 43 : 36) + (shellRoot.barFloating ? 8 : 0) + 8
 
-                Behavior on anchors.verticalCenterOffset {
+                width: isLeft ? 480 : 1000
+                height: isLeft ? 700 : 600
+
+                x: isLeft
+                    ? (shellRoot.appLauncherVisible ? 8 : -(width + 8))
+                    : (parent.width - width) / 2
+
+                y: isLeft
+                    ? barBottom
+                    : (parent.height - height) / 2 + (shellRoot.appLauncherVisible ? 0 : -800)
+
+                Behavior on x {
+                    enabled: launcherPanel.isLeft
+                    NumberAnimation { duration: 300; easing.type: Easing.OutCubic }
+                }
+
+                Behavior on y {
+                    enabled: !launcherPanel.isLeft
                     NumberAnimation { duration: 350; easing.type: Easing.OutCubic }
                 }
-                
+
                 AppLauncher {
                     anchors.fill: parent
                     isVisible: shellRoot.appLauncherVisible
                     opacity: shellRoot.appLauncherVisible ? 1 : 0
-                    
+
                     Behavior on opacity {
                         NumberAnimation { duration: 250; easing.type: Easing.OutCubic }
                     }
-                    
+
                     onRequestClose: {
                         shellRoot.appLauncherVisible = false
                     }
@@ -849,6 +869,7 @@ ShellRoot {
                 layoutPreset: shellRoot.barLayoutPreset
                 showQuickLaunch: shellRoot.barShowQuickLaunch
                 showSystemTray: shellRoot.barShowSystemTray
+                minWorkspaces: shellRoot.barMinWorkspaces
                 backgroundStyle: shellRoot.barBackgroundStyle
                 showBorder: shellRoot.barShowBorder
                 floating: shellRoot.barFloating
@@ -905,6 +926,7 @@ ShellRoot {
                 layoutPreset: shellRoot.barLayoutPreset
                 showQuickLaunch: shellRoot.barShowQuickLaunch
                 showSystemTray: shellRoot.barShowSystemTray
+                minWorkspaces: shellRoot.barMinWorkspaces
                 backgroundStyle: shellRoot.barBackgroundStyle
                 showBorder: shellRoot.barShowBorder
                 floating: shellRoot.barFloating
@@ -968,6 +990,7 @@ ShellRoot {
                 layoutPreset: shellRoot.barLayoutPreset
                 showQuickLaunch: shellRoot.barShowQuickLaunch
                 showSystemTray: shellRoot.barShowSystemTray
+                minWorkspaces: shellRoot.barMinWorkspaces
                 backgroundStyle: shellRoot.barBackgroundStyle
                 showBorder: shellRoot.barShowBorder
                 floating: shellRoot.barFloating

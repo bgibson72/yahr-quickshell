@@ -38,6 +38,9 @@ try:
     if "blur" in h:
         v = "true" if h["blur"] else "false"
         ev("hl.config({decoration={blur={enabled=" + v + "}}})")
+        # Also control layer-specific blur so quickshell/mako respect the setting
+        ev("hl.layer_rule({match={namespace='^quickshell'}, blur=" + v + "})")
+        ev("hl.layer_rule({match={namespace='^mako'}, blur=" + v + "})")
     if "blurSize" in h:
         ev("hl.config({decoration={blur={size=" + str(int(h["blurSize"])) + "}}})")
 except Exception as e:

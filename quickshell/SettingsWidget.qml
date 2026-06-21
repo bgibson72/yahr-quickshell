@@ -301,6 +301,7 @@ SETTINGSEOF`
             floatingBarCheck.checked = root.settings.bar.floating === true
             showQuickLaunchCheck.checked = root.settings.bar.showQuickLaunch !== false
             showSystemTrayCheck.checked = root.settings.bar.showSystemTray !== false
+            workspaceCountObj.value = root.settings.bar.minWorkspaces !== undefined ? root.settings.bar.minWorkspaces : 4
             barSizeLargeCheck.checked = root.settings.bar.barSize === "large"
             barLayoutPreset.value = root.settings.bar.layoutPreset || "default"
             barContainerStyle.value = root.settings.bar.barStyle || "single"
@@ -2759,6 +2760,116 @@ SETTINGSEOF`
                                 }
                             }
 
+                            // Minimum Workspaces
+                            Row {
+                                spacing: 16
+
+                                Column {
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    spacing: 2
+
+                                    Text {
+                                        text: "Minimum workspaces shown"
+                                        font.family: ThemeManager.uiFont
+                                        font.pixelSize: 12
+                                        color: ThemeManager.fgPrimary
+                                    }
+
+                                    Text {
+                                        text: "Number of workspace indicators always visible in the bar"
+                                        font.family: ThemeManager.uiFont
+                                        font.pixelSize: 10
+                                        color: ThemeManager.fgSecondary
+                                    }
+                                }
+
+                                Row {
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    spacing: 6
+
+                                    Rectangle {
+                                        width: 28
+                                        height: 28
+                                        radius: 6
+                                        color: Qt.rgba(1, 1, 1, 0.07)
+                                        border.width: 1
+                                        border.color: Qt.rgba(1, 1, 1, 0.15)
+
+                                        Text {
+                                            anchors.centerIn: parent
+                                            text: "−"
+                                            font.pixelSize: 16
+                                            color: workspaceCountObj.value > 1 ? ThemeManager.fgPrimary : ThemeManager.fgSecondary
+                                        }
+
+                                        MouseArea {
+                                            anchors.fill: parent
+                                            cursorShape: Qt.PointingHandCursor
+                                            onClicked: {
+                                                if (workspaceCountObj.value > 1) {
+                                                    workspaceCountObj.value -= 1
+                                                    if (!root.settings.bar) root.settings.bar = {}
+                                                    root.settings.bar.minWorkspaces = workspaceCountObj.value
+                                                    saveSettings()
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    Rectangle {
+                                        width: 32
+                                        height: 28
+                                        radius: 6
+                                        color: Qt.rgba(1, 1, 1, 0.10)
+                                        border.width: 1
+                                        border.color: Qt.rgba(1, 1, 1, 0.20)
+
+                                        Text {
+                                            anchors.centerIn: parent
+                                            text: workspaceCountObj.value.toString()
+                                            font.family: ThemeManager.uiFont
+                                            font.pixelSize: 13
+                                            font.bold: true
+                                            color: ThemeManager.fgPrimary
+                                        }
+                                    }
+
+                                    Rectangle {
+                                        width: 28
+                                        height: 28
+                                        radius: 6
+                                        color: Qt.rgba(1, 1, 1, 0.07)
+                                        border.width: 1
+                                        border.color: Qt.rgba(1, 1, 1, 0.15)
+
+                                        Text {
+                                            anchors.centerIn: parent
+                                            text: "+"
+                                            font.pixelSize: 14
+                                            color: workspaceCountObj.value < 10 ? ThemeManager.fgPrimary : ThemeManager.fgSecondary
+                                        }
+
+                                        MouseArea {
+                                            anchors.fill: parent
+                                            cursorShape: Qt.PointingHandCursor
+                                            onClicked: {
+                                                if (workspaceCountObj.value < 10) {
+                                                    workspaceCountObj.value += 1
+                                                    if (!root.settings.bar) root.settings.bar = {}
+                                                    root.settings.bar.minWorkspaces = workspaceCountObj.value
+                                                    saveSettings()
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+
+                                QtObject {
+                                    id: workspaceCountObj
+                                    property int value: 4
+                                }
+                            }
+
                             // Show Battery Details
                             Row {
                                 spacing: 12
@@ -3484,7 +3595,10 @@ SETTINGSEOF`
                                         onClicked: {
                                             hyprBlurCheck.checked = !hyprBlurCheck.checked
                                             const en = hyprBlurCheck.checked
-                                            Quickshell.execDetached(["hyprctl", "eval", "hl.config({decoration={blur={enabled=" + (en ? "true" : "false") + "}}})"])
+                                            const bval = en ? "true" : "false"
+                                            Quickshell.execDetached(["hyprctl", "eval", "hl.config({decoration={blur={enabled=" + bval + "}}})"])
+                                            Quickshell.execDetached(["hyprctl", "eval", "hl.layer_rule({match={namespace='^quickshell'}, blur=" + bval + "})"])
+                                            Quickshell.execDetached(["hyprctl", "eval", "hl.layer_rule({match={namespace='^mako'}, blur=" + bval + "})"])
                                             if (!root.settings.hypr) root.settings.hypr = {}
                                             root.settings.hypr.blur = en
                                             saveSettings()

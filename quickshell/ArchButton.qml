@@ -9,16 +9,31 @@ Rectangle {
 
     signal toggleLauncher()
 
-    color: {
-        if (mouseArea.pressed) return Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.45)
-        if (mouseArea.containsMouse) return Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.30)
-        return "transparent"
+    color: "transparent"
+
+    Rectangle {
+        id: highlight
+        anchors.centerIn: parent
+        width: parent.width
+        height: parent.height - 8
+        radius: 6
+
+        color: {
+            if (mouseArea.pressed) return Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.45)
+            if (mouseArea.containsMouse) return Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.30)
+            return "transparent"
+        }
+
+        border.width: mouseArea.containsMouse || mouseArea.pressed ? 1 : 0
+        border.color: Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.55)
+
+        Behavior on color {
+            ColorAnimation { duration: 150 }
+        }
+        Behavior on border.width {
+            NumberAnimation { duration: 150 }
+        }
     }
-
-    radius: 6
-
-    border.width: mouseArea.containsMouse || mouseArea.pressed ? 1 : 0
-    border.color: Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.55)
 
     Text {
         anchors.centerIn: parent
@@ -35,12 +50,5 @@ Rectangle {
         cursorShape: Qt.PointingHandCursor
 
         onClicked: archButton.toggleLauncher()
-    }
-
-    Behavior on color {
-        ColorAnimation { duration: 150 }
-    }
-    Behavior on border.width {
-        NumberAnimation { duration: 150 }
     }
 }

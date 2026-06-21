@@ -30,13 +30,20 @@ Rectangle {
     width: trayRow.width + 20
     height: 35
     
-    color: trayMouseArea.containsMouse ? Qt.rgba(1, 1, 1, 0.10) : "transparent"
-    radius: 6
-    border.width: trayMouseArea.containsMouse ? 1 : 0
-    border.color: Qt.rgba(1, 1, 1, 0.18)
+    color: "transparent"
 
-    Behavior on color { ColorAnimation { duration: 200 } }
-    Behavior on border.width { NumberAnimation { duration: 200 } }
+    Rectangle {
+        id: highlightRect
+        anchors.centerIn: parent
+        width: parent.width - 10
+        height: parent.height - 8
+        radius: 6
+        color: trayMouseArea.containsMouse ? Qt.rgba(1, 1, 1, 0.10) : "transparent"
+        border.width: trayMouseArea.containsMouse ? 1 : 0
+        border.color: Qt.rgba(1, 1, 1, 0.18)
+        Behavior on color { ColorAnimation { duration: 200 } }
+        Behavior on border.width { NumberAnimation { duration: 200 } }
+    }
 
     // Clickable overlay on top of everything
     MouseArea {

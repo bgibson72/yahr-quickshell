@@ -24,6 +24,7 @@ Rectangle {
     property string searchText: ""
     property bool hasLoadedApps: false
     property bool isGridView: true
+    property bool isNarrow: root.width < 600
 
     signal requestClose()
 
@@ -456,9 +457,9 @@ Rectangle {
                 visible: root.isGridView
                 model: filteredModel
 
-                property int cols: 6
+                property int cols: root.isNarrow ? 4 : 6
                 cellWidth: Math.floor(width / cols)
-                cellHeight: 120
+                cellHeight: root.isNarrow ? 130 : 120
 
                 ScrollBar.vertical: ScrollBar { policy: ScrollBar.AsNeeded }
 
@@ -472,8 +473,8 @@ Rectangle {
                         width: parent.width - 12
 
                         Rectangle {
-                            width: 64
-                            height: 64
+                            width: root.isNarrow ? 76 : 64
+                            height: root.isNarrow ? 76 : 64
                             anchors.horizontalCenter: parent.horizontalCenter
                             color: gridItemArea.pressed
                                 ? Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.35)
@@ -487,13 +488,13 @@ Rectangle {
 
                             Item {
                                 anchors.centerIn: parent
-                                width: 44
-                                height: 44
+                                width: root.isNarrow ? 54 : 44
+                                height: root.isNarrow ? 54 : 44
 
                                 Image {
                                     id: gridIcon
                                     anchors.fill: parent
-                                    sourceSize: Qt.size(44, 44)
+                                    sourceSize: Qt.size(root.isNarrow ? 54 : 44, root.isNarrow ? 54 : 44)
                                     smooth: true
                                     fillMode: Image.PreserveAspectFit
                                     source: model.appIcon.startsWith('/') ? "file://" + model.appIcon : ""
@@ -503,7 +504,7 @@ Rectangle {
                                     anchors.centerIn: parent
                                     text: "󰣆"
                                     font.family: "Symbols Nerd Font"
-                                    font.pixelSize: 28
+                                    font.pixelSize: root.isNarrow ? 34 : 28
                                     color: ThemeManager.fgPrimary
                                     visible: !gridIcon.visible
                                 }

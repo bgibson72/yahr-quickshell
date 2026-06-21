@@ -15,14 +15,19 @@ MouseArea {
     z: 10
     
     Rectangle {
-        anchors.fill: parent
-        color: iconButton.containsMouse ? 
-            Qt.rgba(ThemeManager.fgPrimary.r, ThemeManager.fgPrimary.g, ThemeManager.fgPrimary.b, 0.1) : 
-            "transparent"
+        anchors.centerIn: parent
+        width: parent.width - 4
+        height: parent.height - 8
+        color: iconButton.containsMouse ? Qt.rgba(1, 1, 1, 0.10) : "transparent"
         radius: 6
-        
+        border.width: iconButton.containsMouse ? 1 : 0
+        border.color: Qt.rgba(1, 1, 1, 0.18)
+
         Behavior on color {
             ColorAnimation { duration: 200 }
+        }
+        Behavior on border.width {
+            NumberAnimation { duration: 200 }
         }
         
         Text {

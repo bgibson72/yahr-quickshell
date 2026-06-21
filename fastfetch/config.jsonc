@@ -4,7 +4,6 @@
     "type": "kitty-direct",
     "source": "~/.config/fastfetch/current-theme-logo.png",
     "width": 15,
-    "height": 9,
     "preserveAspectRatio": true,
     "padding":{
       "top":1,
