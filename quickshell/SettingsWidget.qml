@@ -612,33 +612,11 @@ SETTINGSEOF`
 
             ColumnLayout {
                 anchors.fill: parent
-                anchors.topMargin: 20
+                anchors.topMargin: 52
                 anchors.bottomMargin: 16
                 anchors.leftMargin: 8
                 anchors.rightMargin: 8
                 spacing: 2
-
-                // Title
-                Item {
-                    Layout.fillWidth: true
-                    height: 56
-                    Text {
-                        anchors.centerIn: parent
-                        text: "Settings"
-                        font.family: ThemeManager.uiFont
-                        font.pixelSize: 20
-                        font.weight: Font.Bold
-                        color: ThemeManager.fgPrimary
-                    }
-                }
-
-                Rectangle {
-                    Layout.fillWidth: true
-                    height: 1
-                    color: Qt.rgba(1, 1, 1, 0.10)
-                }
-
-                Item { Layout.fillWidth: true; height: 6 }
 
                 // Tab navigation buttons
                 Repeater {
@@ -721,7 +699,7 @@ SETTINGSEOF`
 
             StackLayout {
                 anchors.fill: parent
-                anchors.topMargin: 16
+                anchors.topMargin: 52
                 anchors.leftMargin: 16
                 anchors.rightMargin: 16
                 anchors.bottomMargin: (sidebar.currentIndex === 0 || sidebar.currentIndex === 1) ? 64 : 16
@@ -4743,6 +4721,73 @@ SETTINGSEOF`
         }
     }
 
+    // ── Header Bar (full-width, sticky top) ──────────────────────────
+    Rectangle {
+        anchors.top: parent.top
+        anchors.left: parent.left
+        anchors.right: parent.right
+        height: 44
+        z: 150
+        visible: !root.embedded
+        color: Qt.rgba(ThemeManager.bgMantle.r, ThemeManager.bgMantle.g, ThemeManager.bgMantle.b, 0.97)
+
+        // Bottom separator line
+        Rectangle {
+            anchors.bottom: parent.bottom
+            anchors.left: parent.left
+            anchors.right: parent.right
+            height: 1
+            color: Qt.rgba(1, 1, 1, 0.10)
+        }
+
+        // Title
+        Text {
+            anchors.centerIn: parent
+            text: "Settings"
+            font.family: ThemeManager.uiFont
+            font.pixelSize: 16
+            font.weight: Font.Bold
+            color: ThemeManager.fgPrimary
+        }
+
+        // Close button
+        Rectangle {
+            id: headerCloseBtn
+            anchors.right: parent.right
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.rightMargin: 12
+            width: 28
+            height: 28
+            radius: 6
+            color: headerCloseMA.containsMouse
+                ? Qt.rgba(ThemeManager.accentRed.r, ThemeManager.accentRed.g, ThemeManager.accentRed.b, 0.28)
+                : Qt.rgba(1, 1, 1, 0.08)
+            border.width: 1
+            border.color: headerCloseMA.containsMouse
+                ? Qt.rgba(ThemeManager.accentRed.r, ThemeManager.accentRed.g, ThemeManager.accentRed.b, 0.55)
+                : Qt.rgba(1, 1, 1, 0.18)
+            Behavior on color { ColorAnimation { duration: 150 } }
+            Behavior on border.color { ColorAnimation { duration: 150 } }
+
+            Text {
+                anchors.centerIn: parent
+                text: "\u2715"
+                font.pixelSize: 13
+                font.weight: Font.Bold
+                color: headerCloseMA.containsMouse ? ThemeManager.accentRed : ThemeManager.fgSecondary
+                Behavior on color { ColorAnimation { duration: 150 } }
+            }
+
+            MouseArea {
+                id: headerCloseMA
+                anchors.fill: parent
+                hoverEnabled: true
+                cursorShape: Qt.PointingHandCursor
+                onClicked: root.closeRequested()
+            }
+        }
+    }
+
     // ── Apply Toolbar (full-width, sticky bottom) ────────────────────
     Rectangle {
         anchors.bottom: parent.bottom
@@ -4816,43 +4861,5 @@ SETTINGSEOF`
         }
     }
 
-    // ── Close button overlay (top-right) ──────────────────────────
-    Rectangle {
-        anchors.top: parent.top
-        anchors.right: parent.right
-        anchors.topMargin: 12
-        anchors.rightMargin: 12
-        width: 32
-        height: 32
-        radius: 6
-        z: 200
-        visible: !root.embedded
-        color: closeOverlayMA.containsMouse
-            ? Qt.rgba(ThemeManager.accentRed.r, ThemeManager.accentRed.g, ThemeManager.accentRed.b, 0.28)
-            : Qt.rgba(1, 1, 1, 0.08)
-        border.width: 1
-        border.color: closeOverlayMA.containsMouse
-            ? Qt.rgba(ThemeManager.accentRed.r, ThemeManager.accentRed.g, ThemeManager.accentRed.b, 0.55)
-            : Qt.rgba(1, 1, 1, 0.18)
-        Behavior on color { ColorAnimation { duration: 150 } }
-        Behavior on border.color { ColorAnimation { duration: 150 } }
-
-        Text {
-            anchors.centerIn: parent
-            text: "\u2715"
-            font.pixelSize: 14
-            font.weight: Font.Bold
-            color: closeOverlayMA.containsMouse ? ThemeManager.accentRed : ThemeManager.fgSecondary
-            Behavior on color { ColorAnimation { duration: 150 } }
-        }
-
-        MouseArea {
-            id: closeOverlayMA
-            anchors.fill: parent
-            hoverEnabled: true
-            cursorShape: Qt.PointingHandCursor
-            onClicked: root.closeRequested()
-        }
-    }
-
 }
+

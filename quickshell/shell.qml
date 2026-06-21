@@ -584,16 +584,16 @@ ShellRoot {
                 propagateComposedEvents: false
             }
             
-            // Panel positioned at top-right, slides down from top
+            // Panel positioned at top-right, slides in from right
             Item {
                 width: 420
                 height: 820
                 anchors.top: parent.top
                 anchors.right: parent.right
-                anchors.topMargin: shellRoot.controlCenterVisible ? 6 : -860
-                anchors.rightMargin: 6
+                anchors.topMargin: 6
+                anchors.rightMargin: shellRoot.controlCenterVisible ? 6 : -(420 + 12)
                 
-                Behavior on anchors.topMargin {
+                Behavior on anchors.rightMargin {
                     NumberAnimation { duration: 300; easing.type: Easing.OutCubic }
                 }
                 
@@ -662,7 +662,13 @@ ShellRoot {
             }
             
             SettingsWidget {
-                anchors.centerIn: parent
+                anchors.horizontalCenter: parent.horizontalCenter
+                y: shellRoot.settingsVisible ? (parent.height / 2 - 360) : parent.height
+                
+                Behavior on y {
+                    NumberAnimation { duration: 350; easing.type: Easing.OutCubic }
+                }
+                
                 isVisible: shellRoot.settingsVisible
                 
                 onCloseRequested: {

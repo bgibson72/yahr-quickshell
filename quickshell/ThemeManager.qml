@@ -4,53 +4,47 @@ import QtQuick
 
 QtObject {
     // Theme name
-    property string themeName: "Eldritch"
+    property string themeName: "NightFox"
     
     // Bar opacity setting (0.0 - 1.0)
-    property real barOpacity: 0.750495079212674
-
-    // Widget panel opacity (0.75 = translucent, 1.0 = fully opaque)
-    property real widgetOpacity: 0.75
-
-    // Bar size — true when "chonky bar" is selected
-    property bool barLarge: false
+    property real barOpacity: 0.70
     
     // Accent colors
-    property color accentRose: "#f265b5"
-    property color accentCoral: "#f265b5" 
-    property color accentPink: "#f265b5"
-    property color accentPurple: "#a48cf2"
-    property color accentRed: "#f16c75"
-    property color accentMaroon: "#f16c75"
-    property color accentOrange: "#f7c67f"
-    property color accentYellow: "#f1fc79"
-    property color accentGreen: "#37f499"
-    property color accentTeal: "#04d1f9"
-    property color accentCyan: "#04d1f9"
-    property color accentSapphire: "#04d1f9"
-    property color accentBlue: "#a48cf2"
-    property color accentLavender: "#a48cf2"
+    property color accentRose: "#ea9a97"
+    property color accentCoral: "#eb746b" 
+    property color accentPink: "#eb98c3"
+    property color accentPurple: "#a78cfa"
+    property color accentRed: "#eb746b"
+    property color accentMaroon: "#d67f8a"
+    property color accentOrange: "#ea9a97"
+    property color accentYellow: "#f6b079"
+    property color accentGreen: "#7eb4b3"
+    property color accentTeal: "#569fba"
+    property color accentCyan: "#7eb4b3"
+    property color accentSapphire: "#6db3ce"
+    property color accentBlue: "#6db3ce"
+    property color accentLavender: "#a78cfa"
     
     // Text colors  
-    property color fgPrimary: "#ebfafa"
-    property color fgSecondary: "#ebfafa"
-    property color fgTertiary: "#7081d0"
+    property color fgPrimary: "#cdcbe0"
+    property color fgSecondary: "#aeafca"
+    property color fgTertiary: "#9b9cb8"
     
     // Border colors
-    property color border2: "#7081d0"
-    property color border1: "#7081d0"
-    property color border0: "#323449"
+    property color border2: "#817c9c"
+    property color border1: "#6e6a86"
+    property color border0: "#555169"
     
     // Surface colors
-    property color surface2: "#323449"
-    property color surface1: "#323449"
-    property color surface0: "#323449"
+    property color surface2: "#3f3d54"
+    property color surface1: "#32303f"
+    property color surface0: "#2b2837"
     
     // Background colors
-    property color bgBase: "#212337"
+    property color bgBase: "#232136"
     property color bgBaseAlpha: Qt.rgba(bgBase.r, bgBase.g, bgBase.b, barOpacity)
-    property color bgMantle: "#212337"
-    property color bgCrust: "#212337"
+    property color bgMantle: "#1e1e2e"
+    property color bgCrust: "#131021"
     
     // Font sizes
     property int fontSizeSmall: 11
@@ -59,7 +53,7 @@ QtObject {
     property int fontSizeIcon: 14
 
     // Persistent user preferences (preserved across theme switches)
-    property real widgetOpacity: 0.75
-    property bool barLarge: false
-    property string uiFont: "Sen"
+    property real widgetOpacity: 1.0
+    property bool barLarge: true
+    property string uiFont: "Inter"
 }
