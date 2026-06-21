@@ -88,7 +88,7 @@ Rectangle {
                 anchors.margins: 5
                 spacing: 5
 
-                property real tabWidth: (width - spacing * 4) / 5
+                property real tabWidth: (width - spacing * 2) / 3
 
                 // Calendar Tab
                 Rectangle {
@@ -204,81 +204,6 @@ Rectangle {
                     }
                 }
 
-                // Wallpaper Tab
-                Rectangle {
-                    width: tabBarRow.tabWidth
-                    height: parent.height
-                    radius: 8
-                    color: root.currentTab === 3 ? Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.30) : "transparent"
-                    border.width: root.currentTab === 3 ? 1 : 0
-                    border.color: Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.55)
-
-                    Behavior on color { ColorAnimation { duration: 150 } }
-
-                    MouseArea {
-                        anchors.fill: parent
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: root.currentTab = 3
-                    }
-
-                    Row {
-                        anchors.centerIn: parent
-                        spacing: 8
-
-                        Text {
-                            text: "🖼️"
-                            font.pixelSize: 18
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-
-                        Text {
-                            text: "Wallpaper"
-                            font.family: ThemeManager.uiFont
-                            font.pixelSize: 14
-                            font.weight: Font.Medium
-                            color: ThemeManager.fgPrimary
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-                    }
-                }
-
-                // Settings Tab
-                Rectangle {
-                    width: tabBarRow.tabWidth
-                    height: parent.height
-                    radius: 8
-                    color: root.currentTab === 4 ? Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.30) : "transparent"
-                    border.width: root.currentTab === 4 ? 1 : 0
-                    border.color: Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.55)
-
-                    Behavior on color { ColorAnimation { duration: 150 } }
-
-                    MouseArea {
-                        anchors.fill: parent
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: root.currentTab = 4
-                    }
-
-                    Row {
-                        anchors.centerIn: parent
-                        spacing: 8
-
-                        Text {
-                            text: "⚙️"
-                            font.pixelSize: 18
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-
-                        Text {
-                            text: "Settings"
-                            font.family: ThemeManager.uiFont
-                            font.pixelSize: 14
-                            font.weight: Font.Medium
-                            color: ThemeManager.fgPrimary
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-                    }
-                }
             }
         }
         
@@ -310,26 +235,6 @@ Rectangle {
                 anchors.fill: parent
                 visible: root.currentTab === 2
                 active: root.isVisible && root.currentTab === 2
-            }
-
-            // Wallpaper Tab Content
-            WallpaperPickerContent {
-                id: wallpaperTab
-                anchors.fill: parent
-                visible: root.currentTab === 3
-                showWidgetBorders: root.showWidgetBorders
-                widgetBorderWidth: root.widgetBorderWidth
-            }
-
-            // Settings Tab Content
-            SettingsWidget {
-                id: settingsTab
-                anchors.fill: parent
-                visible: root.currentTab === 4
-                isVisible: root.isVisible && root.currentTab === 4
-                embedded: true
-
-                onCloseRequested: root.currentTab = 0
             }
         }
     }

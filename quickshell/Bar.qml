@@ -280,7 +280,7 @@ Item {
                 anchors.fill: parent
                 radius: islandStyle.radius
                 color: islandStyle.bg
-                border.width: bar.showBorder ? bar.widgetBorderWidth : 1
+                border.width: bar.showBorder ? bar.widgetBorderWidth : 0
                 border.color: islandStyle.border
             }
 
@@ -298,7 +298,7 @@ Item {
                 anchors.fill: parent
                 radius: islandStyle.radius
                 color: islandStyle.bg
-                border.width: bar.showBorder ? bar.widgetBorderWidth : 1
+                border.width: bar.showBorder ? bar.widgetBorderWidth : 0
                 border.color: islandStyle.border
             }
 
@@ -318,7 +318,7 @@ Item {
                 anchors.fill: parent
                 radius: islandStyle.radius
                 color: islandStyle.bg
-                border.width: bar.showBorder ? bar.widgetBorderWidth : 1
+                border.width: bar.showBorder ? bar.widgetBorderWidth : 0
                 border.color: islandStyle.border
             }
 
@@ -349,7 +349,7 @@ Item {
                 anchors.fill: parent
                 radius: islandStyle.radius
                 color: islandStyle.bg
-                border.width: bar.showBorder ? bar.widgetBorderWidth : 1
+                border.width: bar.showBorder ? bar.widgetBorderWidth : 0
                 border.color: islandStyle.border
             }
 
@@ -369,7 +369,7 @@ Item {
                 anchors.fill: parent
                 radius: islandStyle.radius
                 color: islandStyle.bg
-                border.width: bar.showBorder ? bar.widgetBorderWidth : 1
+                border.width: bar.showBorder ? bar.widgetBorderWidth : 0
                 border.color: islandStyle.border
             }
 
@@ -403,7 +403,7 @@ Item {
             anchors.fill: parent
             radius: islandStyle.radius
             color: islandStyle.bg
-            border.width: bar.showBorder ? bar.widgetBorderWidth : 1
+            border.width: bar.showBorder ? bar.widgetBorderWidth : 0
             border.color: islandStyle.border
         }
 
@@ -433,7 +433,7 @@ Item {
             anchors.fill: parent
             radius: islandStyle.radius
             color: islandStyle.bg
-            border.width: bar.showBorder ? bar.widgetBorderWidth : 1
+            border.width: bar.showBorder ? bar.widgetBorderWidth : 0
             border.color: islandStyle.border
         }
 
@@ -506,7 +506,7 @@ Item {
                     anchors.fill: parent
                     radius: islandStyle.radius
                     color: islandStyle.bg
-                    border.width: bar.showBorder ? bar.widgetBorderWidth : 1
+                    border.width: bar.showBorder ? bar.widgetBorderWidth : 0
                     border.color: islandStyle.border
                 }
 
@@ -528,7 +528,7 @@ Item {
                     anchors.fill: parent
                     radius: islandStyle.radius
                     color: islandStyle.bg
-                    border.width: bar.showBorder ? bar.widgetBorderWidth : 1
+                    border.width: bar.showBorder ? bar.widgetBorderWidth : 0
                     border.color: islandStyle.border
                 }
 

@@ -633,12 +633,12 @@ ShellRoot {
             }
             
             margins {
-                top: (screen.height - 600) / 2
-                left: (screen.width - 800) / 2
+                top: (screen.height - 720) / 2
+                left: (screen.width - 1100) / 2
             }
             
-            implicitWidth: 800
-            implicitHeight: 600
+            implicitWidth: 1100
+            implicitHeight: 720
             
             color: "transparent"
             exclusiveZone: 0

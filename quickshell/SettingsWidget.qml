@@ -7,8 +7,8 @@ import Quickshell.Io
 Rectangle {
     id: root
 
-    width: 800
-    height: 600
+    width: 1100
+    height: 720
     // When embedded as a tab inside another widget, suppress the background
     property bool embedded: false
     color: embedded ? "transparent" : ThemeManager.bgCrust
@@ -298,6 +298,7 @@ SETTINGSEOF`
             barPositionBottomCheck.checked = root.settings.bar.position === "bottom"
             barAutoHideCheck.checked = root.settings.bar.autoHide === true
             showBorderCheck.checked = root.settings.bar.showBorder === true
+            showWeatherInBarCheck.checked = root.settings.bar.showWeatherInBar === true
             floatingBarCheck.checked = root.settings.bar.floating === true
             showQuickLaunchCheck.checked = root.settings.bar.showQuickLaunch !== false
             showSystemTrayCheck.checked = root.settings.bar.showSystemTray !== false
@@ -509,127 +510,255 @@ SETTINGSEOF`
         // The theme-switcher-quickshell script handles all necessary updates
     }
     
-    ColumnLayout {
-        anchors.fill: parent
-        anchors.margins: 16
-        spacing: 12
-        
-        // Header
-        Rectangle {
-            Layout.fillWidth: true
-            Layout.preferredHeight: 40
-            color: "transparent"
-            
-            Text {
-                anchors.centerIn: parent
-                text: "YahrShell Settings"
-                font.family: ThemeManager.uiFont
-                font.pixelSize: 18
-                font.weight: Font.Bold
-                color: ThemeManager.fgPrimary
-            }
-            
-            // Close button (hidden when embedded as a tab inside another widget)
-            Rectangle {
-                width: 32
-                height: 32
-                anchors.right: parent.right
-                anchors.verticalCenter: parent.verticalCenter
-                radius: 6
-                visible: !root.embedded
-                color: closeMouseArea.containsMouse ? Qt.rgba(ThemeManager.accentRed.r, ThemeManager.accentRed.g, ThemeManager.accentRed.b, 0.30) : "transparent"
-                border.width: closeMouseArea.containsMouse ? 1 : 0
-                border.color: Qt.rgba(ThemeManager.accentRed.r, ThemeManager.accentRed.g, ThemeManager.accentRed.b, 0.5)
 
-                Behavior on color { ColorAnimation { duration: 150 } }
 
-                Text {
-                    anchors.centerIn: parent
-                    text: "✕"
-                    font.family: ThemeManager.uiFont
-                    font.pixelSize: 18
-                    font.weight: Font.Bold
-                    color: ThemeManager.fgSecondary
+    // ─── Monitor management ──────────────────────────────────────
+    ListModel { id: monitorsModel }
+
+    Process {
+        id: monitorLoader
+        running: false
+        command: ["hyprctl", "monitors", "-j"]
+
+        property string buffer: ""
+
+        stdout: SplitParser {
+            onRead: data => { monitorLoader.buffer += data }
+        }
+
+        onRunningChanged: {
+            if (!running && buffer !== "") {
+                try {
+                    var mons = JSON.parse(buffer)
+                    monitorsModel.clear()
+                    for (var i = 0; i < mons.length; i++) {
+                        var m = mons[i]
+                        var modes = m.availableModes || []
+                        monitorsModel.append({
+                            name:        m.name || "",
+                            description: m.description || "",
+                            width:       m.width || 1920,
+                            height:      m.height || 1080,
+                            refreshRate: m.refreshRate || 60.0,
+                            scale:       m.scale || 1.0,
+                            x:           m.x || 0,
+                            y:           m.y || 0,
+                            focused:     m.focused || false,
+                            modesJson:   JSON.stringify(modes),
+                            currentMode: (m.width || 1920) + "x" + (m.height || 1080) + "@" + (m.refreshRate || 60.0).toFixed(2) + "Hz"
+                        })
+                    }
+                } catch(e) {
+                    console.log("Monitor parse error:", e)
                 }
-                
-                MouseArea {
-                    id: closeMouseArea
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: root.closeRequested()
-                }
+                monitorLoader.buffer = ""
             }
         }
-        
-        // Tab Bar
+    }
+
+    Process {
+        id: monitorCmdRunner
+        running: false
+        command: ["bash", "-c", "true"]
+    }
+
+    function applyMonitorMode(monitorName, mode) {
+        var scale = 1.0
+        for (var i = 0; i < monitorsModel.count; i++) {
+            if (monitorsModel.get(i).name === monitorName) {
+                scale = monitorsModel.get(i).scale
+                break
+            }
+        }
+        monitorCmdRunner.command = ["bash", "-c",
+            "hyprctl keyword monitor " + monitorName + "," + mode + ",auto," + scale.toFixed(2)]
+        monitorCmdRunner.running = true
+        // Refresh after short delay
+        monitorRefreshTimer.start()
+    }
+
+    function applyMonitorScale(monitorName, scale) {
+        var mode = "preferred"
+        for (var i = 0; i < monitorsModel.count; i++) {
+            if (monitorsModel.get(i).name === monitorName) {
+                var m = monitorsModel.get(i)
+                mode = m.width + "x" + m.height + "@" + m.refreshRate.toFixed(2) + "Hz"
+                break
+            }
+        }
+        monitorCmdRunner.command = ["bash", "-c",
+            "hyprctl keyword monitor " + monitorName + "," + mode + ",auto," + scale.toFixed(2)]
+        monitorCmdRunner.running = true
+        monitorRefreshTimer.start()
+    }
+
+    Timer {
+        id: monitorRefreshTimer
+        interval: 800
+        repeat: false
+        onTriggered: monitorLoader.running = true
+    }
+
+    Row {
+        anchors.fill: parent
+        spacing: 0
+
+        // ── Left Sidebar ──────────────────────────────────────────
         Rectangle {
-            Layout.fillWidth: true
-            Layout.preferredHeight: 50
-            color: Qt.rgba(1, 1, 1, 0.07)
-            radius: 12
-            border.width: 1
-            border.color: Qt.rgba(1, 1, 1, 0.10)
+            width: 175
+            height: parent.height
+            color: Qt.rgba(0, 0, 0, 0.22)
 
-            Row {
+            ColumnLayout {
                 anchors.fill: parent
-                anchors.margins: 8
-                spacing: 8
+                anchors.topMargin: 20
+                anchors.bottomMargin: 16
+                anchors.leftMargin: 8
+                anchors.rightMargin: 8
+                spacing: 2
 
+                // Title
+                Item {
+                    Layout.fillWidth: true
+                    height: 56
+                    Text {
+                        anchors.centerIn: parent
+                        text: "Settings"
+                        font.family: ThemeManager.uiFont
+                        font.pixelSize: 17
+                        font.weight: Font.Bold
+                        color: ThemeManager.fgPrimary
+                    }
+                }
+
+                Rectangle {
+                    Layout.fillWidth: true
+                    height: 1
+                    color: Qt.rgba(1, 1, 1, 0.10)
+                }
+
+                Item { Layout.fillWidth: true; height: 6 }
+
+                // Tab navigation buttons
                 Repeater {
-                    model: ["Widgets", "Screenshots", "Bar", "Hyprland", "Theme"]
-
+                    model: 7
                     Rectangle {
-                        width: (parent.width - 30) / 5
-                        height: parent.height
+                        property int stackIdx:   [0, 1, 2, 4, 5, 3, 6][index]
+                        property string tabIcon: ["⚙", "📷", "▬", "🎨", "🖼", "🪟", "🖥"][index]
+                        property string tabLabel: ["Quickshell", "Screenshots", "Bar", "Theme", "Wallpaper", "Hyprland", "Monitors"][index]
+                        property bool tabHovered: false
+
+                        Layout.fillWidth: true
+                        height: 36
                         radius: 8
-                        color: tabBar.currentIndex === index ? Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.30) : "transparent"
-                        border.width: tabBar.currentIndex === index ? 1 : 0
-                        border.color: Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.55)
+                        color: sidebar.currentIndex === stackIdx
+                            ? Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.25)
+                            : (tabHovered ? Qt.rgba(1, 1, 1, 0.06) : "transparent")
 
-                        Behavior on color { ColorAnimation { duration: 150 } }
+                        Behavior on color { ColorAnimation { duration: 100 } }
 
-                        Text {
-                            anchors.centerIn: parent
-                            text: modelData
-                            font.family: ThemeManager.uiFont
-                            font.pixelSize: 13
-                            font.weight: Font.Medium
-                            color: ThemeManager.fgPrimary
+                        Row {
+                            anchors.left: parent.left
+                            anchors.leftMargin: 10
+                            anchors.verticalCenter: parent.verticalCenter
+                            spacing: 8
+                            Text {
+                                text: tabIcon
+                                font.pixelSize: 14
+                                color: sidebar.currentIndex === stackIdx ? ThemeManager.accentBlue : ThemeManager.fgSecondary
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+                            Text {
+                                text: tabLabel
+                                font.family: ThemeManager.uiFont
+                                font.pixelSize: 13
+                                font.weight: sidebar.currentIndex === stackIdx ? Font.Medium : Font.Normal
+                                color: sidebar.currentIndex === stackIdx ? ThemeManager.fgPrimary : ThemeManager.fgSecondary
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
                         }
-                        
+                        Rectangle {
+                            width: 3
+                            height: 20
+                            radius: 2
+                            anchors.right: parent.right
+                            anchors.rightMargin: 2
+                            anchors.verticalCenter: parent.verticalCenter
+                            color: ThemeManager.accentBlue
+                            visible: sidebar.currentIndex === stackIdx
+                        }
                         MouseArea {
                             anchors.fill: parent
+                            hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
-                            onClicked: tabBar.currentIndex = index
+                            onEntered: parent.tabHovered = true
+                            onExited: parent.tabHovered = false
+                            onClicked: sidebar.currentIndex = parent.stackIdx
                         }
                     }
                 }
+
+                Item { Layout.fillWidth: true; Layout.fillHeight: true }
+
+                Rectangle {
+                    Layout.fillWidth: true
+                    height: 1
+                    color: Qt.rgba(1, 1, 1, 0.08)
+                }
+
+                Item { Layout.fillWidth: true; height: 6 }
+
+                // Close button
+                Rectangle {
+                    Layout.fillWidth: true
+                    height: 36
+                    radius: 8
+                    color: closeSidebarMA.containsMouse
+                        ? Qt.rgba(ThemeManager.accentRed.r, ThemeManager.accentRed.g, ThemeManager.accentRed.b, 0.20)
+                        : "transparent"
+                    visible: !root.embedded
+                    Behavior on color { ColorAnimation { duration: 100 } }
+                    Row {
+                        anchors.centerIn: parent
+                        spacing: 6
+                        Text { text: "✕"; font.pixelSize: 13; color: ThemeManager.accentRed; anchors.verticalCenter: parent.verticalCenter }
+                        Text { text: "Close"; font.family: ThemeManager.uiFont; font.pixelSize: 13; color: ThemeManager.fgSecondary; anchors.verticalCenter: parent.verticalCenter }
+                    }
+                    MouseArea {
+                        id: closeSidebarMA
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: root.closeRequested()
+                    }
+                }
             }
-            
+
             QtObject {
-                id: tabBar
+                id: sidebar
                 property int currentIndex: 0
+                onCurrentIndexChanged: { if (currentIndex === 6 && monitorsModel.count === 0) monitorLoader.running = true }
             }
         }
-        
-        // Content Area
+
+        // ── Vertical Divider ─────────────────────────────────────
         Rectangle {
-            id: contentArea
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            Layout.topMargin: 12
-            color: Qt.rgba(1, 1, 1, 0.07)
-            radius: 12
-            border.width: 1
-            border.color: Qt.rgba(1, 1, 1, 0.10)
+            width: 1
+            height: parent.height
+            color: Qt.rgba(1, 1, 1, 0.08)
+        }
+
+        // ── Content Area ─────────────────────────────────────────
+        Item {
+            width: parent.width - 176
+            height: parent.height
 
             StackLayout {
                 anchors.fill: parent
                 anchors.margins: 16
-                currentIndex: tabBar.currentIndex
-                
-                // Widgets Tab
+                currentIndex: sidebar.currentIndex
+
+                // Tab 0: QUICKSHELL ───────────────────────────────
                 ScrollView {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
@@ -1665,7 +1794,8 @@ SETTINGSEOF`
                     }
                 }
                 
-                // Screenshots Tab
+
+                // Tab 1: SCREENSHOTS ──────────────────────────────
                 ScrollView {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
@@ -1981,7 +2111,8 @@ SETTINGSEOF`
                     }
                 }
                 
-                // Bar Tab
+
+                // Tab 2: BAR ────────────────────────────────────────
                 ScrollView {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
@@ -2644,6 +2775,65 @@ SETTINGSEOF`
                                 }
                             }
 
+                            // Show Weather in Bar Toggle
+                            Row {
+                                spacing: 12
+
+                                Rectangle {
+                                    width: 24
+                                    height: 24
+                                    radius: 4
+                                    color: showWeatherInBarCheck.checked ? ThemeManager.accentBlue : Qt.rgba(1, 1, 1, 0.07)
+                                    border.width: 2
+                                    border.color: ThemeManager.accentBlue
+
+                                    Text {
+                                        anchors.centerIn: parent
+                                        text: "✓"
+                                        font.family: "Symbols Nerd Font"
+                                        font.pixelSize: 16
+                                        color: ThemeManager.fgPrimary
+                                        visible: showWeatherInBarCheck.checked
+                                    }
+
+                                    MouseArea {
+                                        anchors.fill: parent
+                                        cursorShape: Qt.PointingHandCursor
+                                        onClicked: {
+                                            showWeatherInBarCheck.checked = !showWeatherInBarCheck.checked
+                                            if (!root.settings.bar) root.settings.bar = {}
+                                            root.settings.bar.showWeatherInBar = showWeatherInBarCheck.checked
+                                            saveSettings()
+                                        }
+                                    }
+                                }
+
+                                Column {
+                                    spacing: 2
+
+                                    Text {
+                                        text: "Show weather in bar"
+                                        font.family: ThemeManager.uiFont
+                                        font.pixelSize: 12
+                                        color: ThemeManager.fgPrimary
+                                    }
+
+                                    Text {
+                                        text: showWeatherInBarCheck.checked
+                                            ? "Showing current condition and temperature in bar"
+                                            : "Weather is hidden from the bar"
+                                        font.family: ThemeManager.uiFont
+                                        font.pixelSize: 10
+                                        color: ThemeManager.fgTertiary
+                                    }
+                                }
+
+                                QtObject {
+                                    id: showWeatherInBarCheck
+                                    property bool checked: false
+                                }
+                            }
+
                             // Show Quick Launch Drawer Toggle
                             Row {
                                 spacing: 12
@@ -3014,7 +3204,8 @@ SETTINGSEOF`
                     }
                 }
                 
-                // Hyprland Tab
+
+                // Tab 3: HYPRLAND ────────────────────────────────────
                 ScrollView {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
@@ -3705,7 +3896,8 @@ SETTINGSEOF`
                     }
                 }
 
-                // Theme Tab
+
+                // Tab 4: THEME ──────────────────────────────────────
                 ScrollView {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
@@ -3728,6 +3920,28 @@ SETTINGSEOF`
                                 font.pixelSize: 11
                                 font.italic: true
                                 color: ThemeManager.fgSecondary
+                            }
+                        }
+
+                        // App restart note
+                        Rectangle {
+                            width: parent.width
+                            height: restartNoteText.implicitHeight + 20
+                            color: Qt.rgba(ThemeManager.accentYellow.r, ThemeManager.accentYellow.g, ThemeManager.accentYellow.b, 0.08)
+                            radius: 8
+                            border.width: 1
+                            border.color: Qt.rgba(ThemeManager.accentYellow.r, ThemeManager.accentYellow.g, ThemeManager.accentYellow.b, 0.30)
+
+                            Text {
+                                id: restartNoteText
+                                anchors.centerIn: parent
+                                width: parent.width - 24
+                                text: "⚠  Some applications need to be relaunched before theme changes take full effect, including Kitty terminal and Thunar file manager."
+                                font.family: ThemeManager.uiFont
+                                font.pixelSize: 11
+                                font.italic: true
+                                color: ThemeManager.accentYellow
+                                wrapMode: Text.WordWrap
                             }
                         }
                         
@@ -3874,6 +4088,334 @@ SETTINGSEOF`
                 }
             }
 
+                // Tab 5: WALLPAPER ────────────────────────────────
+                Item {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+
+                    WallpaperPickerContent {
+                        anchors.fill: parent
+                        showWidgetBorders: root.showWidgetBorders
+                        widgetBorderWidth: root.widgetBorderWidth
+                    }
+                }
+
+                // Tab 6: MONITORS ─────────────────────────────────
+                ScrollView {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    clip: true
+
+                    ColumnLayout {
+                        width: parent.width
+                        spacing: 24
+
+                        Column {
+                            Layout.fillWidth: true
+                            spacing: 16
+
+                            Rectangle {
+                                width: parent.width
+                                height: 2
+                                color: ThemeManager.accentBlue
+                                opacity: 0.3
+                            }
+
+                            Text {
+                                text: "🖥 Monitors"
+                                font.family: ThemeManager.uiFont
+                                font.pixelSize: 18
+                                font.weight: Font.Bold
+                                color: ThemeManager.accentBlue
+                            }
+
+                            Text {
+                                text: "Configure connected displays. Changes apply immediately via Hyprland."
+                                font.family: ThemeManager.uiFont
+                                font.pixelSize: 11
+                                color: ThemeManager.fgSecondary
+                                wrapMode: Text.WordWrap
+                                width: parent.width
+                            }
+
+                            Rectangle {
+                                width: 130
+                                height: 30
+                                radius: 6
+                                color: monRefreshHover.containsMouse ? Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.20) : Qt.rgba(1,1,1,0.06)
+                                border.width: 1
+                                border.color: Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.35)
+
+                                Text {
+                                    anchors.centerIn: parent
+                                    text: "↺  Refresh"
+                                    font.family: ThemeManager.uiFont
+                                    font.pixelSize: 12
+                                    color: ThemeManager.fgPrimary
+                                }
+
+                                MouseArea {
+                                    id: monRefreshHover
+                                    anchors.fill: parent
+                                    hoverEnabled: true
+                                    cursorShape: Qt.PointingHandCursor
+                                    onClicked: monitorLoader.running = true
+                                }
+                            }
+                        }
+
+                        Repeater {
+                            model: monitorsModel
+
+                            delegate: Rectangle {
+                                Layout.fillWidth: true
+                                height: monCardCol.implicitHeight + 32
+                                radius: 10
+                                color: Qt.rgba(1, 1, 1, 0.07)
+                                border.width: 1
+                                border.color: Qt.rgba(1, 1, 1, 0.10)
+
+                                property string monName: model.name
+                                property var monModes: (model.modesJson && model.modesJson.length > 2) ? JSON.parse(model.modesJson) : []
+                                property real monScale: model.scale
+
+                                ColumnLayout {
+                                    id: monCardCol
+                                    anchors.left: parent.left
+                                    anchors.right: parent.right
+                                    anchors.top: parent.top
+                                    anchors.margins: 16
+                                    spacing: 12
+
+                                    Row {
+                                        spacing: 10
+                                        Text {
+                                            text: "🖥  " + model.name
+                                            font.family: ThemeManager.uiFont
+                                            font.pixelSize: 15
+                                            font.weight: Font.Bold
+                                            color: ThemeManager.fgPrimary
+                                            anchors.verticalCenter: parent.verticalCenter
+                                        }
+                                        Rectangle {
+                                            visible: model.focused
+                                            width: focBadge.implicitWidth + 12
+                                            height: 18
+                                            radius: 4
+                                            color: Qt.rgba(ThemeManager.accentGreen.r, ThemeManager.accentGreen.g, ThemeManager.accentGreen.b, 0.20)
+                                            border.width: 1
+                                            border.color: Qt.rgba(ThemeManager.accentGreen.r, ThemeManager.accentGreen.g, ThemeManager.accentGreen.b, 0.50)
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            Text { id: focBadge; anchors.centerIn: parent; text: "focused"; font.pixelSize: 10; color: ThemeManager.accentGreen }
+                                        }
+                                    }
+
+                                    Text {
+                                        text: model.description || ""
+                                        font.family: ThemeManager.uiFont
+                                        font.pixelSize: 10
+                                        color: ThemeManager.fgTertiary
+                                        wrapMode: Text.WordWrap
+                                        Layout.fillWidth: true
+                                        visible: (model.description || "").length > 0
+                                    }
+
+                                    Text {
+                                        text: "Current: " + model.width + "×" + model.height + " @ " + Math.round(model.refreshRate) + " Hz  ·  Scale: " + model.scale.toFixed(2)
+                                        font.family: ThemeManager.uiFont
+                                        font.pixelSize: 11
+                                        color: ThemeManager.fgSecondary
+                                    }
+
+                                    // Mode selector
+                                    Column {
+                                        Layout.fillWidth: true
+                                        spacing: 6
+
+                                        Text {
+                                            text: "Resolution & Refresh Rate"
+                                            font.family: ThemeManager.uiFont
+                                            font.pixelSize: 12
+                                            font.weight: Font.Medium
+                                            color: ThemeManager.fgPrimary
+                                        }
+
+                                        ComboBox {
+                                            id: modeCombo
+                                            width: parent.width
+                                            model: monModes
+                                            currentIndex: monModes.indexOf(model.currentMode)
+
+                                            background: Rectangle {
+                                                color: modeCombo.pressed ? Qt.rgba(1,1,1,0.12) : Qt.rgba(1,1,1,0.07)
+                                                radius: 6
+                                                border.width: 1
+                                                border.color: Qt.rgba(1, 1, 1, 0.18)
+                                            }
+
+                                            contentItem: Text {
+                                                leftPadding: 8
+                                                text: modeCombo.displayText
+                                                color: ThemeManager.fgPrimary
+                                                font.family: ThemeManager.uiFont
+                                                font.pixelSize: 12
+                                                verticalAlignment: Text.AlignVCenter
+                                            }
+
+                                            delegate: ItemDelegate {
+                                                width: modeCombo.width
+                                                contentItem: Text {
+                                                    text: modelData
+                                                    color: ThemeManager.fgPrimary
+                                                    font.family: ThemeManager.uiFont
+                                                    font.pixelSize: 12
+                                                    verticalAlignment: Text.AlignVCenter
+                                                }
+                                                background: Rectangle {
+                                                    color: parent.hovered ? Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.20) : ThemeManager.bgBase
+                                                }
+                                            }
+
+                                            popup: Popup {
+                                                y: modeCombo.height
+                                                width: modeCombo.width
+                                                padding: 0
+                                                contentItem: ListView {
+                                                    clip: true
+                                                    implicitHeight: Math.min(contentHeight, 200)
+                                                    model: modeCombo.delegateModel
+                                                    ScrollIndicator.vertical: ScrollIndicator {}
+                                                }
+                                                background: Rectangle {
+                                                    color: ThemeManager.bgBase
+                                                    radius: 6
+                                                    border.width: 1
+                                                    border.color: Qt.rgba(1,1,1,0.15)
+                                                }
+                                            }
+                                        }
+
+                                        Rectangle {
+                                            width: 110
+                                            height: 28
+                                            radius: 6
+                                            color: applyModeHov.containsMouse ? Qt.rgba(ThemeManager.accentGreen.r, ThemeManager.accentGreen.g, ThemeManager.accentGreen.b, 0.25) : Qt.rgba(1,1,1,0.06)
+                                            border.width: 1
+                                            border.color: Qt.rgba(ThemeManager.accentGreen.r, ThemeManager.accentGreen.g, ThemeManager.accentGreen.b, 0.45)
+
+                                            Text {
+                                                anchors.centerIn: parent
+                                                text: "Apply Mode"
+                                                font.family: ThemeManager.uiFont
+                                                font.pixelSize: 11
+                                                color: ThemeManager.accentGreen
+                                            }
+
+                                            MouseArea {
+                                                id: applyModeHov
+                                                anchors.fill: parent
+                                                hoverEnabled: true
+                                                cursorShape: Qt.PointingHandCursor
+                                                onClicked: {
+                                                    if (modeCombo.currentIndex >= 0 && modeCombo.currentIndex < monModes.length) {
+                                                        applyMonitorMode(monName, monModes[modeCombo.currentIndex])
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    // Scale
+                                    Column {
+                                        Layout.fillWidth: true
+                                        spacing: 6
+
+                                        Row {
+                                            spacing: 8
+                                            Text {
+                                                text: "Scale:"
+                                                font.family: ThemeManager.uiFont
+                                                font.pixelSize: 12
+                                                font.weight: Font.Medium
+                                                color: ThemeManager.fgPrimary
+                                                anchors.verticalCenter: parent.verticalCenter
+                                            }
+                                            Text {
+                                                text: scaleSlider.value.toFixed(2) + "×"
+                                                font.family: ThemeManager.uiFont
+                                                font.pixelSize: 12
+                                                color: ThemeManager.accentBlue
+                                                anchors.verticalCenter: parent.verticalCenter
+                                            }
+                                        }
+
+                                        Slider {
+                                            id: scaleSlider
+                                            width: parent.width
+                                            from: 0.5
+                                            to: 3.0
+                                            stepSize: 0.25
+                                            value: monScale
+
+                                            background: Rectangle {
+                                                x: scaleSlider.leftPadding
+                                                y: scaleSlider.topPadding + scaleSlider.availableHeight / 2 - height / 2
+                                                width: scaleSlider.availableWidth
+                                                height: 4
+                                                radius: 2
+                                                color: Qt.rgba(1, 1, 1, 0.15)
+                                                Rectangle {
+                                                    width: scaleSlider.visualPosition * parent.width
+                                                    height: parent.height
+                                                    color: ThemeManager.accentBlue
+                                                    radius: 2
+                                                }
+                                            }
+
+                                            handle: Rectangle {
+                                                x: scaleSlider.leftPadding + scaleSlider.visualPosition * (scaleSlider.availableWidth - width)
+                                                y: scaleSlider.topPadding + scaleSlider.availableHeight / 2 - height / 2
+                                                width: 16
+                                                height: 16
+                                                radius: 8
+                                                color: ThemeManager.accentBlue
+                                            }
+                                        }
+
+                                        Rectangle {
+                                            width: 110
+                                            height: 28
+                                            radius: 6
+                                            color: applyScaleHov.containsMouse ? Qt.rgba(ThemeManager.accentGreen.r, ThemeManager.accentGreen.g, ThemeManager.accentGreen.b, 0.25) : Qt.rgba(1,1,1,0.06)
+                                            border.width: 1
+                                            border.color: Qt.rgba(ThemeManager.accentGreen.r, ThemeManager.accentGreen.g, ThemeManager.accentGreen.b, 0.45)
+
+                                            Text {
+                                                anchors.centerIn: parent
+                                                text: "Apply Scale"
+                                                font.family: ThemeManager.uiFont
+                                                font.pixelSize: 11
+                                                color: ThemeManager.accentGreen
+                                            }
+
+                                            MouseArea {
+                                                id: applyScaleHov
+                                                anchors.fill: parent
+                                                hoverEnabled: true
+                                                cursorShape: Qt.PointingHandCursor
+                                                onClicked: applyMonitorScale(monName, scaleSlider.value)
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        Item { Layout.fillWidth: true; height: 20 }
+                    }
+                }
+
+
             // Apply Button Overlay (bottom-right corner)
             Rectangle {
                 anchors.bottom: parent.bottom
@@ -3886,10 +4428,9 @@ SETTINGSEOF`
                 color: applyButtonMouseArea.containsMouse && !applyButtonSuccess ? Qt.rgba(ThemeManager.accentGreen.r, ThemeManager.accentGreen.g, ThemeManager.accentGreen.b, 0.25) : "transparent"
                 border.width: 1
                 border.color: Qt.rgba(ThemeManager.accentGreen.r, ThemeManager.accentGreen.g, ThemeManager.accentGreen.b, 0.55)
-                visible: tabBar.currentIndex === 0 || tabBar.currentIndex === 1  // Show on Widgets and Screenshots tabs
-                z: 100  // Ensure it's on top
+                visible: sidebar.currentIndex === 0 || sidebar.currentIndex === 1  // Show on Quickshell and Screenshots tabs
+                z: 100
 
-                // Progress fill — animates left-to-right while applying
                 Rectangle {
                     id: applyProgressFill
                     anchors.left: parent.left
@@ -3917,7 +4458,7 @@ SETTINGSEOF`
                         }
                     ]
                 }
-                
+
                 Text {
                     anchors.centerIn: parent
                     text: applyButtonSuccess ? "Applying..." : "Apply"
@@ -3927,14 +4468,14 @@ SETTINGSEOF`
                     color: ThemeManager.accentGreen
                     z: 1
                 }
-                
+
                 MouseArea {
                     id: applyButtonMouseArea
                     anchors.fill: parent
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
-                    enabled: !applyButtonSuccess  // Disable while showing success
-                    
+                    enabled: !applyButtonSuccess
+
                     onClicked: {
                         applySettings()
                     }
