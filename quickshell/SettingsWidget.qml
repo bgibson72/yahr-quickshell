@@ -11,7 +11,7 @@ Rectangle {
     height: 720
     // When embedded as a tab inside another widget, suppress the background
     property bool embedded: false
-    color: embedded ? "transparent" : ThemeManager.bgCrust
+    color: embedded ? "transparent" : ThemeManager.bgBase
     radius: embedded ? 0 : 16
     border.width: embedded ? 0 : (showWidgetBorders ? widgetBorderWidth : 0)
     border.color: Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.35)
@@ -623,7 +623,7 @@ SETTINGSEOF`
                     model: 7
                     Rectangle {
                         property int stackIdx:   [0, 1, 2, 4, 5, 3, 6][index]
-                        property string tabIcon: ["", "", "", "", "", "", ""][index]
+                        property string tabIcon: ["", "", "", "", "", "", ""][index]
                         property string tabLabel: ["Quickshell", "Screenshots", "Bar", "Theme", "Wallpaper", "Hyprland", "Monitors"][index]
                         property bool tabHovered: false
 
@@ -729,20 +729,20 @@ SETTINGSEOF`
                                 spacing: 12
 
                                 Rectangle {
-                                    width: 24
+                                    width: 48
                                     height: 24
-                                    radius: 4
-                                    color: Qt.rgba(1, 1, 1, 0.07)
-                                    border.width: 2
-                                    border.color: ThemeManager.accentBlue
+                                    radius: 12
+                                    color: widgetTransparentCheck.checked ? ThemeManager.accentGreen : Qt.rgba(1, 1, 1, 0.07)
+                                    Behavior on color { ColorAnimation { duration: 150 } }
 
-                                    Text {
-                                        anchors.centerIn: parent
-                                        text: "✓"
-                                        font.family: "Symbols Nerd Font"
-                                        font.pixelSize: 16
-                                        color: ThemeManager.accentBlue
-                                        visible: widgetTransparentCheck.checked
+                                    Rectangle {
+                                        width: 18
+                                        height: 18
+                                        radius: 9
+                                        color: ThemeManager.fgPrimary
+                                        x: widgetTransparentCheck.checked ? parent.width - width - 3 : 3
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        Behavior on x { NumberAnimation { duration: 200 } }
                                     }
 
                                     MouseArea {
@@ -933,23 +933,23 @@ SETTINGSEOF`
                                 spacing: 12
                                 
                                 Rectangle {
-                                    width: 24
+                                    width: 48
                                     height: 24
-                                    radius: 4
-                                    color: Qt.rgba(1, 1, 1, 0.07)
-                                    border.width: 2
-                                    border.color: ThemeManager.accentBlue
-                                    
-                                    Text {
-                                        anchors.centerIn: parent
-                                        text: "✓"
-                                        font.family: "Symbols Nerd Font"
-                                        font.pixelSize: 16
-                                        color: ThemeManager.accentBlue
-                                        visible: clockFormat24hr.checked
+                                    radius: 12
+                                    color: clockFormat24hr.checked ? ThemeManager.accentGreen : Qt.rgba(1, 1, 1, 0.07)
+                                    Behavior on color { ColorAnimation { duration: 150 } }
+
+                                    Rectangle {
+                                        width: 18
+                                        height: 18
+                                        radius: 9
+                                        color: ThemeManager.fgPrimary
+                                        x: clockFormat24hr.checked ? parent.width - width - 3 : 3
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        Behavior on x { NumberAnimation { duration: 200 } }
                                     }
-                                    
-                                    MouseArea {
+
+MouseArea {
                                         anchors.fill: parent
                                         cursorShape: Qt.PointingHandCursor
                                         onClicked: {
@@ -979,23 +979,23 @@ SETTINGSEOF`
                                 spacing: 12
                                 
                                 Rectangle {
-                                    width: 24
+                                    width: 48
                                     height: 24
-                                    radius: 4
-                                    color: Qt.rgba(1, 1, 1, 0.07)
-                                    border.width: 2
-                                    border.color: ThemeManager.accentBlue
-                                    
-                                    Text {
-                                        anchors.centerIn: parent
-                                        text: "✓"
-                                        font.family: "Symbols Nerd Font"
-                                        font.pixelSize: 16
-                                        color: ThemeManager.accentBlue
-                                        visible: showSeconds.checked
+                                    radius: 12
+                                    color: showSeconds.checked ? ThemeManager.accentGreen : Qt.rgba(1, 1, 1, 0.07)
+                                    Behavior on color { ColorAnimation { duration: 150 } }
+
+                                    Rectangle {
+                                        width: 18
+                                        height: 18
+                                        radius: 9
+                                        color: ThemeManager.fgPrimary
+                                        x: showSeconds.checked ? parent.width - width - 3 : 3
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        Behavior on x { NumberAnimation { duration: 200 } }
                                     }
-                                    
-                                    MouseArea {
+
+MouseArea {
                                         anchors.fill: parent
                                         cursorShape: Qt.PointingHandCursor
                                         onClicked: {
@@ -1025,20 +1025,20 @@ SETTINGSEOF`
                                 spacing: 12
 
                                 Rectangle {
-                                    width: 24
+                                    width: 48
                                     height: 24
-                                    radius: 4
-                                    color: Qt.rgba(1, 1, 1, 0.07)
-                                    border.width: 2
-                                    border.color: ThemeManager.accentBlue
+                                    radius: 12
+                                    color: dateFormatDMY.checked ? ThemeManager.accentGreen : Qt.rgba(1, 1, 1, 0.07)
+                                    Behavior on color { ColorAnimation { duration: 150 } }
 
-                                    Text {
-                                        anchors.centerIn: parent
-                                        text: "✓"
-                                        font.family: "Symbols Nerd Font"
-                                        font.pixelSize: 16
-                                        color: ThemeManager.accentBlue
-                                        visible: dateFormatDMY.checked
+                                    Rectangle {
+                                        width: 18
+                                        height: 18
+                                        radius: 9
+                                        color: ThemeManager.fgPrimary
+                                        x: dateFormatDMY.checked ? parent.width - width - 3 : 3
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        Behavior on x { NumberAnimation { duration: 200 } }
                                     }
 
                                     MouseArea {
@@ -1081,20 +1081,20 @@ SETTINGSEOF`
                                 spacing: 12
 
                                 Rectangle {
-                                    width: 24
+                                    width: 48
                                     height: 24
-                                    radius: 4
-                                    color: Qt.rgba(1, 1, 1, 0.07)
-                                    border.width: 2
-                                    border.color: ThemeManager.accentBlue
+                                    radius: 12
+                                    color: dateLong.checked ? ThemeManager.accentGreen : Qt.rgba(1, 1, 1, 0.07)
+                                    Behavior on color { ColorAnimation { duration: 150 } }
 
-                                    Text {
-                                        anchors.centerIn: parent
-                                        text: "✓"
-                                        font.family: "Symbols Nerd Font"
-                                        font.pixelSize: 16
-                                        color: ThemeManager.accentBlue
-                                        visible: dateLong.checked
+                                    Rectangle {
+                                        width: 18
+                                        height: 18
+                                        radius: 9
+                                        color: ThemeManager.fgPrimary
+                                        x: dateLong.checked ? parent.width - width - 3 : 3
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        Behavior on x { NumberAnimation { duration: 200 } }
                                     }
 
                                     MouseArea {
@@ -1138,20 +1138,20 @@ SETTINGSEOF`
                                 visible: dateLong.checked
 
                                 Rectangle {
-                                    width: 24
+                                    width: 48
                                     height: 24
-                                    radius: 4
-                                    color: Qt.rgba(1, 1, 1, 0.07)
-                                    border.width: 2
-                                    border.color: ThemeManager.accentBlue
+                                    radius: 12
+                                    color: showDayOfWeek.checked ? ThemeManager.accentGreen : Qt.rgba(1, 1, 1, 0.07)
+                                    Behavior on color { ColorAnimation { duration: 150 } }
 
-                                    Text {
-                                        anchors.centerIn: parent
-                                        text: "✓"
-                                        font.family: "Symbols Nerd Font"
-                                        font.pixelSize: 16
-                                        color: ThemeManager.accentBlue
-                                        visible: showDayOfWeek.checked
+                                    Rectangle {
+                                        width: 18
+                                        height: 18
+                                        radius: 9
+                                        color: ThemeManager.fgPrimary
+                                        x: showDayOfWeek.checked ? parent.width - width - 3 : 3
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        Behavior on x { NumberAnimation { duration: 200 } }
                                     }
 
                                     MouseArea {
@@ -1445,23 +1445,23 @@ SETTINGSEOF`
                                 spacing: 12
                                 
                                 Rectangle {
-                                    width: 24
+                                    width: 48
                                     height: 24
-                                    radius: 4
-                                    color: Qt.rgba(1, 1, 1, 0.07)
-                                    border.width: 2
-                                    border.color: ThemeManager.accentBlue
-                                    
-                                    Text {
-                                        anchors.centerIn: parent
-                                        text: "✓"
-                                        font.family: "Symbols Nerd Font"
-                                        font.pixelSize: 16
-                                        color: ThemeManager.accentBlue
-                                        visible: useFahrenheit.checked
+                                    radius: 12
+                                    color: useFahrenheit.checked ? ThemeManager.accentGreen : Qt.rgba(1, 1, 1, 0.07)
+                                    Behavior on color { ColorAnimation { duration: 150 } }
+
+                                    Rectangle {
+                                        width: 18
+                                        height: 18
+                                        radius: 9
+                                        color: ThemeManager.fgPrimary
+                                        x: useFahrenheit.checked ? parent.width - width - 3 : 3
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        Behavior on x { NumberAnimation { duration: 200 } }
                                     }
-                                    
-                                    MouseArea {
+
+MouseArea {
                                         anchors.fill: parent
                                         cursorShape: Qt.PointingHandCursor
                                         onClicked: {
@@ -1899,23 +1899,23 @@ SETTINGSEOF`
                                 spacing: 12
                                 
                                 Rectangle {
-                                    width: 24
+                                    width: 48
                                     height: 24
-                                    radius: 4
-                                    color: Qt.rgba(1, 1, 1, 0.07)
-                                    border.width: 2
-                                    border.color: ThemeManager.accentBlue
-                                    
-                                    Text {
-                                        anchors.centerIn: parent
-                                        text: "✓"
-                                        font.family: "Symbols Nerd Font"
-                                        font.pixelSize: 16
-                                        color: ThemeManager.accentBlue
-                                        visible: saveToDiskCheck.checked
+                                    radius: 12
+                                    color: saveToDiskCheck.checked ? ThemeManager.accentGreen : Qt.rgba(1, 1, 1, 0.07)
+                                    Behavior on color { ColorAnimation { duration: 150 } }
+
+                                    Rectangle {
+                                        width: 18
+                                        height: 18
+                                        radius: 9
+                                        color: ThemeManager.fgPrimary
+                                        x: saveToDiskCheck.checked ? parent.width - width - 3 : 3
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        Behavior on x { NumberAnimation { duration: 200 } }
                                     }
-                                    
-                                    MouseArea {
+
+MouseArea {
                                         anchors.fill: parent
                                         cursorShape: Qt.PointingHandCursor
                                         onClicked: {
@@ -1944,23 +1944,23 @@ SETTINGSEOF`
                                 spacing: 12
                                 
                                 Rectangle {
-                                    width: 24
+                                    width: 48
                                     height: 24
-                                    radius: 4
-                                    color: Qt.rgba(1, 1, 1, 0.07)
-                                    border.width: 2
-                                    border.color: ThemeManager.accentBlue
-                                    
-                                    Text {
-                                        anchors.centerIn: parent
-                                        text: "✓"
-                                        font.family: "Symbols Nerd Font"
-                                        font.pixelSize: 16
-                                        color: ThemeManager.accentBlue
-                                        visible: copyToClipboardCheck.checked
+                                    radius: 12
+                                    color: copyToClipboardCheck.checked ? ThemeManager.accentGreen : Qt.rgba(1, 1, 1, 0.07)
+                                    Behavior on color { ColorAnimation { duration: 150 } }
+
+                                    Rectangle {
+                                        width: 18
+                                        height: 18
+                                        radius: 9
+                                        color: ThemeManager.fgPrimary
+                                        x: copyToClipboardCheck.checked ? parent.width - width - 3 : 3
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        Behavior on x { NumberAnimation { duration: 200 } }
                                     }
-                                    
-                                    MouseArea {
+
+MouseArea {
                                         anchors.fill: parent
                                         cursorShape: Qt.PointingHandCursor
                                         onClicked: {
@@ -2306,23 +2306,23 @@ SETTINGSEOF`
                                     leftPadding: 20
                                     
                                     Rectangle {
-                                        width: 24
+                                        width: 48
                                         height: 24
-                                        radius: 4
-                                        color: Qt.rgba(1, 1, 1, 0.07)
-                                        border.width: 2
-                                        border.color: ThemeManager.accentBlue
-                                        
-                                        Text {
-                                            anchors.centerIn: parent
-                                            text: "✓"
-                                            font.family: "Symbols Nerd Font"
-                                            font.pixelSize: 16
-                                            color: ThemeManager.accentBlue
-                                            visible: barSolidCheck.checked
+                                        radius: 12
+                                        color: barSolidCheck.checked ? ThemeManager.accentGreen : Qt.rgba(1, 1, 1, 0.07)
+                                        Behavior on color { ColorAnimation { duration: 150 } }
+
+                                        Rectangle {
+                                            width: 18
+                                            height: 18
+                                            radius: 9
+                                            color: ThemeManager.fgPrimary
+                                            x: barSolidCheck.checked ? parent.width - width - 3 : 3
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            Behavior on x { NumberAnimation { duration: 200 } }
                                         }
-                                        
-                                        MouseArea {
+
+MouseArea {
                                             anchors.fill: parent
                                             cursorShape: Qt.PointingHandCursor
                                             onClicked: {
@@ -2337,7 +2337,7 @@ SETTINGSEOF`
                                                 saveSettings()
                                             }
                                         }
-                                    }
+                                                                        }
                                     
                                     Text {
                                         anchors.verticalCenter: parent.verticalCenter
@@ -2462,20 +2462,20 @@ SETTINGSEOF`
                                 spacing: 12
 
                                 Rectangle {
-                                    width: 24
+                                    width: 48
                                     height: 24
-                                    radius: 4
-                                    color: Qt.rgba(1, 1, 1, 0.07)
-                                    border.width: 2
-                                    border.color: ThemeManager.accentBlue
+                                    radius: 12
+                                    color: showBorderCheck.checked ? ThemeManager.accentGreen : Qt.rgba(1, 1, 1, 0.07)
+                                    Behavior on color { ColorAnimation { duration: 150 } }
 
-                                    Text {
-                                        anchors.centerIn: parent
-                                        text: "✓"
-                                        font.family: "Symbols Nerd Font"
-                                        font.pixelSize: 16
-                                        color: ThemeManager.accentBlue
-                                        visible: showBorderCheck.checked
+                                    Rectangle {
+                                        width: 18
+                                        height: 18
+                                        radius: 9
+                                        color: ThemeManager.fgPrimary
+                                        x: showBorderCheck.checked ? parent.width - width - 3 : 3
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        Behavior on x { NumberAnimation { duration: 200 } }
                                     }
 
                                     MouseArea {
@@ -2509,20 +2509,20 @@ SETTINGSEOF`
                                 spacing: 12
 
                                 Rectangle {
-                                    width: 24
+                                    width: 48
                                     height: 24
-                                    radius: 4
-                                    color: Qt.rgba(1, 1, 1, 0.07)
-                                    border.width: 2
-                                    border.color: ThemeManager.accentBlue
+                                    radius: 12
+                                    color: floatingBarCheck.checked ? ThemeManager.accentGreen : Qt.rgba(1, 1, 1, 0.07)
+                                    Behavior on color { ColorAnimation { duration: 150 } }
 
-                                    Text {
-                                        anchors.centerIn: parent
-                                        text: "✓"
-                                        font.family: "Symbols Nerd Font"
-                                        font.pixelSize: 16
-                                        color: ThemeManager.accentBlue
-                                        visible: floatingBarCheck.checked
+                                    Rectangle {
+                                        width: 18
+                                        height: 18
+                                        radius: 9
+                                        color: ThemeManager.fgPrimary
+                                        x: floatingBarCheck.checked ? parent.width - width - 3 : 3
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        Behavior on x { NumberAnimation { duration: 200 } }
                                     }
 
                                     MouseArea {
@@ -2567,20 +2567,20 @@ SETTINGSEOF`
                                 spacing: 12
 
                                 Rectangle {
-                                    width: 24
+                                    width: 48
                                     height: 24
-                                    radius: 4
-                                    color: Qt.rgba(1, 1, 1, 0.07)
-                                    border.width: 2
-                                    border.color: ThemeManager.accentBlue
+                                    radius: 12
+                                    color: barSizeLargeCheck.checked ? ThemeManager.accentGreen : Qt.rgba(1, 1, 1, 0.07)
+                                    Behavior on color { ColorAnimation { duration: 150 } }
 
-                                    Text {
-                                        anchors.centerIn: parent
-                                        text: "✓"
-                                        font.family: "Symbols Nerd Font"
-                                        font.pixelSize: 16
-                                        color: ThemeManager.accentBlue
-                                        visible: barSizeLargeCheck.checked
+                                    Rectangle {
+                                        width: 18
+                                        height: 18
+                                        radius: 9
+                                        color: ThemeManager.fgPrimary
+                                        x: barSizeLargeCheck.checked ? parent.width - width - 3 : 3
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        Behavior on x { NumberAnimation { duration: 200 } }
                                     }
 
                                     MouseArea {
@@ -2625,20 +2625,20 @@ SETTINGSEOF`
                                 spacing: 12
 
                                 Rectangle {
-                                    width: 24
+                                    width: 48
                                     height: 24
-                                    radius: 4
-                                    color: Qt.rgba(1, 1, 1, 0.07)
-                                    border.width: 2
-                                    border.color: ThemeManager.accentBlue
+                                    radius: 12
+                                    color: barPositionBottomCheck.checked ? ThemeManager.accentGreen : Qt.rgba(1, 1, 1, 0.07)
+                                    Behavior on color { ColorAnimation { duration: 150 } }
 
-                                    Text {
-                                        anchors.centerIn: parent
-                                        text: "✓"
-                                        font.family: "Symbols Nerd Font"
-                                        font.pixelSize: 16
-                                        color: ThemeManager.accentBlue
-                                        visible: barPositionBottomCheck.checked
+                                    Rectangle {
+                                        width: 18
+                                        height: 18
+                                        radius: 9
+                                        color: ThemeManager.fgPrimary
+                                        x: barPositionBottomCheck.checked ? parent.width - width - 3 : 3
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        Behavior on x { NumberAnimation { duration: 200 } }
                                     }
 
                                     MouseArea {
@@ -2672,23 +2672,23 @@ SETTINGSEOF`
                                 spacing: 12
                                 
                                 Rectangle {
-                                    width: 24
+                                    width: 48
                                     height: 24
-                                    radius: 4
-                                    color: Qt.rgba(1, 1, 1, 0.07)
-                                    border.width: 2
-                                    border.color: ThemeManager.accentBlue
-                                    
-                                    Text {
-                                        anchors.centerIn: parent
-                                        text: "✓"
-                                        font.family: "Symbols Nerd Font"
-                                        font.pixelSize: 16
-                                        color: ThemeManager.accentBlue
-                                        visible: barAutoHideCheck.checked
+                                    radius: 12
+                                    color: barAutoHideCheck.checked ? ThemeManager.accentGreen : Qt.rgba(1, 1, 1, 0.07)
+                                    Behavior on color { ColorAnimation { duration: 150 } }
+
+                                    Rectangle {
+                                        width: 18
+                                        height: 18
+                                        radius: 9
+                                        color: ThemeManager.fgPrimary
+                                        x: barAutoHideCheck.checked ? parent.width - width - 3 : 3
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        Behavior on x { NumberAnimation { duration: 200 } }
                                     }
-                                    
-                                    MouseArea {
+
+MouseArea {
                                         anchors.fill: parent
                                         cursorShape: Qt.PointingHandCursor
                                         onClicked: {
@@ -2730,20 +2730,20 @@ SETTINGSEOF`
                                 spacing: 12
 
                                 Rectangle {
-                                    width: 24
+                                    width: 48
                                     height: 24
-                                    radius: 4
-                                    color: Qt.rgba(1, 1, 1, 0.07)
-                                    border.width: 2
-                                    border.color: ThemeManager.accentBlue
+                                    radius: 12
+                                    color: showWeatherInBarCheck.checked ? ThemeManager.accentGreen : Qt.rgba(1, 1, 1, 0.07)
+                                    Behavior on color { ColorAnimation { duration: 150 } }
 
-                                    Text {
-                                        anchors.centerIn: parent
-                                        text: "✓"
-                                        font.family: "Symbols Nerd Font"
-                                        font.pixelSize: 16
-                                        color: ThemeManager.accentBlue
-                                        visible: showWeatherInBarCheck.checked
+                                    Rectangle {
+                                        width: 18
+                                        height: 18
+                                        radius: 9
+                                        color: ThemeManager.fgPrimary
+                                        x: showWeatherInBarCheck.checked ? parent.width - width - 3 : 3
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        Behavior on x { NumberAnimation { duration: 200 } }
                                     }
 
                                     MouseArea {
@@ -2789,20 +2789,20 @@ SETTINGSEOF`
                                 spacing: 12
 
                                 Rectangle {
-                                    width: 24
+                                    width: 48
                                     height: 24
-                                    radius: 4
-                                    color: Qt.rgba(1, 1, 1, 0.07)
-                                    border.width: 2
-                                    border.color: ThemeManager.accentBlue
+                                    radius: 12
+                                    color: showQuickLaunchCheck.checked ? ThemeManager.accentGreen : Qt.rgba(1, 1, 1, 0.07)
+                                    Behavior on color { ColorAnimation { duration: 150 } }
 
-                                    Text {
-                                        anchors.centerIn: parent
-                                        text: "✓"
-                                        font.family: "Symbols Nerd Font"
-                                        font.pixelSize: 16
-                                        color: ThemeManager.accentBlue
-                                        visible: showQuickLaunchCheck.checked
+                                    Rectangle {
+                                        width: 18
+                                        height: 18
+                                        radius: 9
+                                        color: ThemeManager.fgPrimary
+                                        x: showQuickLaunchCheck.checked ? parent.width - width - 3 : 3
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        Behavior on x { NumberAnimation { duration: 200 } }
                                     }
 
                                     MouseArea {
@@ -2847,20 +2847,20 @@ SETTINGSEOF`
                                 spacing: 12
 
                                 Rectangle {
-                                    width: 24
+                                    width: 48
                                     height: 24
-                                    radius: 4
-                                    color: Qt.rgba(1, 1, 1, 0.07)
-                                    border.width: 2
-                                    border.color: ThemeManager.accentBlue
+                                    radius: 12
+                                    color: showSystemTrayCheck.checked ? ThemeManager.accentGreen : Qt.rgba(1, 1, 1, 0.07)
+                                    Behavior on color { ColorAnimation { duration: 150 } }
 
-                                    Text {
-                                        anchors.centerIn: parent
-                                        text: "✓"
-                                        font.family: "Symbols Nerd Font"
-                                        font.pixelSize: 16
-                                        color: ThemeManager.accentBlue
-                                        visible: showSystemTrayCheck.checked
+                                    Rectangle {
+                                        width: 18
+                                        height: 18
+                                        radius: 9
+                                        color: ThemeManager.fgPrimary
+                                        x: showSystemTrayCheck.checked ? parent.width - width - 3 : 3
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        Behavior on x { NumberAnimation { duration: 200 } }
                                     }
 
                                     MouseArea {
@@ -3015,23 +3015,23 @@ SETTINGSEOF`
                                 spacing: 12
                                 
                                 Rectangle {
-                                    width: 24
+                                    width: 48
                                     height: 24
-                                    radius: 4
-                                    color: Qt.rgba(1, 1, 1, 0.07)
-                                    border.width: 2
-                                    border.color: ThemeManager.accentBlue
-                                    
-                                    Text {
-                                        anchors.centerIn: parent
-                                        text: "✓"
-                                        font.family: "Symbols Nerd Font"
-                                        font.pixelSize: 16
-                                        color: ThemeManager.accentBlue
-                                        visible: showBatteryDetailsCheck.checked
+                                    radius: 12
+                                    color: showBatteryDetailsCheck.checked ? ThemeManager.accentGreen : Qt.rgba(1, 1, 1, 0.07)
+                                    Behavior on color { ColorAnimation { duration: 150 } }
+
+                                    Rectangle {
+                                        width: 18
+                                        height: 18
+                                        radius: 9
+                                        color: ThemeManager.fgPrimary
+                                        x: showBatteryDetailsCheck.checked ? parent.width - width - 3 : 3
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        Behavior on x { NumberAnimation { duration: 200 } }
                                     }
-                                    
-                                    MouseArea {
+
+MouseArea {
                                         anchors.fill: parent
                                         cursorShape: Qt.PointingHandCursor
                                         onClicked: {
@@ -3062,23 +3062,23 @@ SETTINGSEOF`
                                 spacing: 12
                                 
                                 Rectangle {
-                                    width: 24
+                                    width: 48
                                     height: 24
-                                    radius: 4
-                                    color: Qt.rgba(1, 1, 1, 0.07)
-                                    border.width: 2
-                                    border.color: ThemeManager.accentBlue
-                                    
-                                    Text {
-                                        anchors.centerIn: parent
-                                        text: "✓"
-                                        font.family: "Symbols Nerd Font"
-                                        font.pixelSize: 16
-                                        color: ThemeManager.accentBlue
-                                        visible: showVolumeDetailsCheck.checked
+                                    radius: 12
+                                    color: showVolumeDetailsCheck.checked ? ThemeManager.accentGreen : Qt.rgba(1, 1, 1, 0.07)
+                                    Behavior on color { ColorAnimation { duration: 150 } }
+
+                                    Rectangle {
+                                        width: 18
+                                        height: 18
+                                        radius: 9
+                                        color: ThemeManager.fgPrimary
+                                        x: showVolumeDetailsCheck.checked ? parent.width - width - 3 : 3
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        Behavior on x { NumberAnimation { duration: 200 } }
                                     }
-                                    
-                                    MouseArea {
+
+MouseArea {
                                         anchors.fill: parent
                                         cursorShape: Qt.PointingHandCursor
                                         onClicked: {
@@ -3109,23 +3109,23 @@ SETTINGSEOF`
                                 spacing: 12
                                 
                                 Rectangle {
-                                    width: 24
+                                    width: 48
                                     height: 24
-                                    radius: 4
-                                    color: Qt.rgba(1, 1, 1, 0.07)
-                                    border.width: 2
-                                    border.color: ThemeManager.accentBlue
-                                    
-                                    Text {
-                                        anchors.centerIn: parent
-                                        text: "✓"
-                                        font.family: "Symbols Nerd Font"
-                                        font.pixelSize: 16
-                                        color: ThemeManager.accentBlue
-                                        visible: showNetworkDetailsCheck.checked
+                                    radius: 12
+                                    color: showNetworkDetailsCheck.checked ? ThemeManager.accentGreen : Qt.rgba(1, 1, 1, 0.07)
+                                    Behavior on color { ColorAnimation { duration: 150 } }
+
+                                    Rectangle {
+                                        width: 18
+                                        height: 18
+                                        radius: 9
+                                        color: ThemeManager.fgPrimary
+                                        x: showNetworkDetailsCheck.checked ? parent.width - width - 3 : 3
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        Behavior on x { NumberAnimation { duration: 200 } }
                                     }
-                                    
-                                    MouseArea {
+
+MouseArea {
                                         anchors.fill: parent
                                         cursorShape: Qt.PointingHandCursor
                                         onClicked: {
@@ -3203,20 +3203,20 @@ SETTINGSEOF`
                                 spacing: 12
 
                                 Rectangle {
-                                    width: 24
+                                    width: 48
                                     height: 24
-                                    radius: 4
-                                    color: Qt.rgba(1, 1, 1, 0.07)
-                                    border.width: 2
-                                    border.color: ThemeManager.accentBlue
+                                    radius: 12
+                                    color: hyprBorderEnabledCheck.checked ? ThemeManager.accentGreen : Qt.rgba(1, 1, 1, 0.07)
+                                    Behavior on color { ColorAnimation { duration: 150 } }
 
-                                    Text {
-                                        anchors.centerIn: parent
-                                        text: "✓"
-                                        font.family: "Symbols Nerd Font"
-                                        font.pixelSize: 16
-                                        color: ThemeManager.accentBlue
-                                        visible: hyprBorderEnabledCheck.checked
+                                    Rectangle {
+                                        width: 18
+                                        height: 18
+                                        radius: 9
+                                        color: ThemeManager.fgPrimary
+                                        x: hyprBorderEnabledCheck.checked ? parent.width - width - 3 : 3
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        Behavior on x { NumberAnimation { duration: 200 } }
                                     }
 
                                     MouseArea {
@@ -3630,20 +3630,20 @@ SETTINGSEOF`
                                 spacing: 12
 
                                 Rectangle {
-                                    width: 24
+                                    width: 48
                                     height: 24
-                                    radius: 4
-                                    color: Qt.rgba(1, 1, 1, 0.07)
-                                    border.width: 2
-                                    border.color: ThemeManager.accentBlue
+                                    radius: 12
+                                    color: hyprAnimationsCheck.checked ? ThemeManager.accentGreen : Qt.rgba(1, 1, 1, 0.07)
+                                    Behavior on color { ColorAnimation { duration: 150 } }
 
-                                    Text {
-                                        anchors.centerIn: parent
-                                        text: "✓"
-                                        font.family: "Symbols Nerd Font"
-                                        font.pixelSize: 16
-                                        color: ThemeManager.accentBlue
-                                        visible: hyprAnimationsCheck.checked
+                                    Rectangle {
+                                        width: 18
+                                        height: 18
+                                        radius: 9
+                                        color: ThemeManager.fgPrimary
+                                        x: hyprAnimationsCheck.checked ? parent.width - width - 3 : 3
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        Behavior on x { NumberAnimation { duration: 200 } }
                                     }
 
                                     MouseArea {
@@ -3679,20 +3679,20 @@ SETTINGSEOF`
                                 spacing: 12
 
                                 Rectangle {
-                                    width: 24
+                                    width: 48
                                     height: 24
-                                    radius: 4
-                                    color: Qt.rgba(1, 1, 1, 0.07)
-                                    border.width: 2
-                                    border.color: ThemeManager.accentBlue
+                                    radius: 12
+                                    color: hyprShadowCheck.checked ? ThemeManager.accentGreen : Qt.rgba(1, 1, 1, 0.07)
+                                    Behavior on color { ColorAnimation { duration: 150 } }
 
-                                    Text {
-                                        anchors.centerIn: parent
-                                        text: "✓"
-                                        font.family: "Symbols Nerd Font"
-                                        font.pixelSize: 16
-                                        color: ThemeManager.accentBlue
-                                        visible: hyprShadowCheck.checked
+                                    Rectangle {
+                                        width: 18
+                                        height: 18
+                                        radius: 9
+                                        color: ThemeManager.fgPrimary
+                                        x: hyprShadowCheck.checked ? parent.width - width - 3 : 3
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        Behavior on x { NumberAnimation { duration: 200 } }
                                     }
 
                                     MouseArea {
@@ -3728,20 +3728,20 @@ SETTINGSEOF`
                                 spacing: 12
 
                                 Rectangle {
-                                    width: 24
+                                    width: 48
                                     height: 24
-                                    radius: 4
-                                    color: Qt.rgba(1, 1, 1, 0.07)
-                                    border.width: 2
-                                    border.color: ThemeManager.accentBlue
+                                    radius: 12
+                                    color: hyprBlurCheck.checked ? ThemeManager.accentGreen : Qt.rgba(1, 1, 1, 0.07)
+                                    Behavior on color { ColorAnimation { duration: 150 } }
 
-                                    Text {
-                                        anchors.centerIn: parent
-                                        text: "✓"
-                                        font.family: "Symbols Nerd Font"
-                                        font.pixelSize: 16
-                                        color: ThemeManager.accentBlue
-                                        visible: hyprBlurCheck.checked
+                                    Rectangle {
+                                        width: 18
+                                        height: 18
+                                        radius: 9
+                                        color: ThemeManager.fgPrimary
+                                        x: hyprBlurCheck.checked ? parent.width - width - 3 : 3
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        Behavior on x { NumberAnimation { duration: 200 } }
                                     }
 
                                     MouseArea {
@@ -4694,7 +4694,7 @@ SETTINGSEOF`
         height: 44
         z: 150
         visible: !root.embedded
-        color: ThemeManager.bgCrust
+        color: ThemeManager.bgBase
 
         // Title
         Text {
@@ -4754,7 +4754,7 @@ SETTINGSEOF`
         height: 52
         z: 150
         visible: sidebar.currentIndex === 0 || sidebar.currentIndex === 1
-        color: ThemeManager.bgCrust
+        color: ThemeManager.bgBase
 
         // Apply button
         Rectangle {

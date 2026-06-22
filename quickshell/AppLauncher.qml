@@ -8,7 +8,7 @@ Rectangle {
 
     width: 1000
     height: 600
-    color: ThemeManager.bgCrust
+    color: ThemeManager.bgBase
     radius: 20
     border.width: showWidgetBorders ? widgetBorderWidth : 0
     border.color: Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.35)
@@ -387,16 +387,6 @@ Rectangle {
             }
         }
 
-        // Vertical separator on left edge of sidebar
-        Rectangle {
-            anchors.left: parent.left
-            anchors.top: parent.top
-            anchors.bottom: parent.bottom
-            anchors.topMargin: 20
-            anchors.bottomMargin: 20
-            width: 1
-            color: Qt.rgba(1, 1, 1, 0.07)
-        }
     }
 
     // ══════════════════════════════════════════════════════

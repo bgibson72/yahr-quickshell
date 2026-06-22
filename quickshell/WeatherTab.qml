@@ -31,8 +31,6 @@ Item {
             height: (parent.height - 16) * 0.45
             color: Qt.rgba(1, 1, 1, 0.07)
             radius: 12
-            border.width: 1
-            border.color: Qt.rgba(1, 1, 1, 0.10)
             
             Item {
                 anchors.fill: parent
@@ -195,8 +193,6 @@ Item {
             color: Qt.rgba(1, 1, 1, 0.07)
             radius: 12
             clip: false
-            border.width: 1
-            border.color: Qt.rgba(1, 1, 1, 0.10)
             
             Column {
                 anchors.fill: parent
@@ -221,12 +217,6 @@ Item {
                         color: ThemeManager.fgPrimary
                         anchors.verticalCenter: parent.verticalCenter
                     }
-                }
-                
-                Rectangle {
-                    width: parent.width
-                    height: 2
-                    color: Qt.rgba(1, 1, 1, 0.10)
                 }
                 
                 // Forecast items

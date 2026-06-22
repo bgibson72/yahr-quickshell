@@ -107,8 +107,6 @@ Item {
             height: 100
             color: Qt.rgba(1, 1, 1, 0.07)
             radius: 12
-            border.width: 1
-            border.color: Qt.rgba(1, 1, 1, 0.10)
             
             // Measure the widest possible time string so the clock width never changes
             TextMetrics {
@@ -136,19 +134,6 @@ Item {
                         color: ThemeManager.fgPrimary
                         text: "Sunday, May 24, 2026"
                         horizontalAlignment: Text.AlignHCenter
-                    }
-                }
-
-                // Separator
-                Item {
-                    width: 2
-                    height: parent.height
-
-                    Rectangle {
-                        anchors.centerIn: parent
-                        width: 2
-                        height: 66
-                        color: Qt.rgba(1, 1, 1, 0.10)
                     }
                 }
 
@@ -230,8 +215,6 @@ Item {
             height: parent.height
             color: Qt.rgba(1, 1, 1, 0.07)
             radius: 12
-            border.width: 1
-            border.color: Qt.rgba(1, 1, 1, 0.10)
             
             Item {
                 anchors.fill: parent
@@ -317,8 +300,6 @@ Item {
                     anchors.bottom: parent.bottom
                     color: Qt.rgba(1, 1, 1, 0.07)
                     radius: 8
-                    border.width: 1
-                    border.color: Qt.rgba(1, 1, 1, 0.10)
 
                     Row {
                         anchors.fill: parent
@@ -534,8 +515,6 @@ Item {
             height: parent.height
             color: Qt.rgba(1, 1, 1, 0.07)
             radius: 12
-            border.width: 1
-            border.color: Qt.rgba(1, 1, 1, 0.10)
                 
                 Column {
                     anchors.fill: parent
@@ -560,12 +539,6 @@ Item {
                             color: ThemeManager.fgPrimary
                             anchors.verticalCenter: parent.verticalCenter
                         }
-                    }
-                    
-                    Rectangle {
-                        width: parent.width
-                        height: 2
-                        color: Qt.rgba(1, 1, 1, 0.10)
                     }
                     
                     // Events scroll area

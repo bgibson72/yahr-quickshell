@@ -8,7 +8,7 @@ Rectangle {
     
     width: 420
     height: 820
-    color: ThemeManager.bgCrust
+    color: ThemeManager.bgBase
     radius: 16
     border.width: showWidgetBorders ? widgetBorderWidth : 0
     border.color: Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.35)
@@ -136,8 +136,6 @@ Rectangle {
             height: 140
             color: Qt.rgba(1, 1, 1, 0.07)
             radius: 12
-            border.width: 1
-            border.color: Qt.rgba(1, 1, 1, 0.10)
             
             Column {
                 anchors.fill: parent
@@ -293,8 +291,6 @@ Rectangle {
             height: 136
             color: Qt.rgba(1, 1, 1, 0.07)
             radius: 12
-            border.width: 1
-            border.color: Qt.rgba(1, 1, 1, 0.10)
             
             Column {
                 anchors.fill: parent
@@ -436,8 +432,6 @@ Rectangle {
             height: Math.max(116, 80 + (bluetoothDevicesColumn.children.length * 28))
             color: Qt.rgba(1, 1, 1, 0.07)
             radius: 12
-            border.width: 1
-            border.color: Qt.rgba(1, 1, 1, 0.10)
             
             Column {
                 anchors.fill: parent
@@ -569,8 +563,6 @@ Rectangle {
             height: 136
             color: Qt.rgba(1, 1, 1, 0.07)
             radius: 12
-            border.width: 1
-            border.color: Qt.rgba(1, 1, 1, 0.10)
             
             Column {
                 anchors.fill: parent
@@ -687,8 +679,6 @@ Rectangle {
             height: 116
             color: Qt.rgba(1, 1, 1, 0.07)
             radius: 12
-            border.width: 1
-            border.color: Qt.rgba(1, 1, 1, 0.10)
             
             Column {
                 anchors.fill: parent

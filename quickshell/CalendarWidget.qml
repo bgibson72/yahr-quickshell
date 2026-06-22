@@ -7,7 +7,7 @@ Rectangle {
 
     width: 540
     height: 432
-    color: ThemeManager.bgCrust
+    color: ThemeManager.bgBase
     radius: 16
     border.width: 1
     border.color: Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.35)
@@ -78,8 +78,6 @@ Rectangle {
                 height: parent.height
                 color: Qt.rgba(1, 1, 1, 0.07)
                 radius: 12
-                border.width: 1
-                border.color: Qt.rgba(1, 1, 1, 0.10)
                 
                 Column {
                     anchors {
@@ -185,8 +183,6 @@ Rectangle {
                     height: 80
                     color: Qt.rgba(1, 1, 1, 0.07)
                     radius: 12
-                    border.width: 1
-                    border.color: Qt.rgba(1, 1, 1, 0.10)
                     
                     Row {
                         anchors.centerIn: parent
@@ -295,8 +291,6 @@ Rectangle {
                     height: 178
                     color: Qt.rgba(1, 1, 1, 0.07)
                     radius: 12
-                    border.width: 1
-                    border.color: Qt.rgba(1, 1, 1, 0.10)
                 
                 Column {
                     anchors.centerIn: parent
@@ -369,8 +363,6 @@ Rectangle {
             height: 106
             color: Qt.rgba(1, 1, 1, 0.07)
             radius: 12
-            border.width: 1
-            border.color: Qt.rgba(1, 1, 1, 0.10)
 
             Row {
                 spacing: 40
