@@ -16,8 +16,11 @@ Complete Arch Linux desktop environment featuring Hyprland + Quickshell with uni
 - 🔧 **Two Installation Modes** - Full (all features) or Minimal (core only)
 - ⚙️ **YOLO Mode** - Completely unattended installation option
 - 🕐 **Flexible Date & Clock Formats** - Toggle 12/24hr, MM/DD/YYYY vs DD/MM/YYYY, numeric or long date, optional day-of-week
-- 🖼️ **Smart Wallpaper Picker** - Browse theme-matched or all wallpapers; persists across reboots
+- 🖼️ **Smart Wallpaper Picker** - Browse theme-matched or all wallpapers in a flat grid; persists across reboots
 - 🔒 **Synced Login Screen** - SDDM and Hyprlock date format follows your Settings choices automatically
+- 🔢 **Workspace Style Toggle** - Switch bar workspaces between numbered labels and dot indicators
+- 🔵 **Live Widget Borders** - Show/hide widget borders and adjust thickness without restarting
+- 🔄 **Persistent Theme Settings** - Widget rounding, borders, and workspace style survive theme switches
 
 ## 📋 Prerequisites
 
@@ -232,15 +235,39 @@ Full-featured calendar with Google Calendar iCal URL support. Displays events, r
 <details>
 <summary><b>Settings</b> - Super + Shift + S - Quickshell configuration panel</summary>
 
-Configure weather, clock format, date format, screenshots, system tray visibility, theme selection, bar transparency, bar position (top/bottom), and Sip-StartPage installation.
+A full-featured settings panel organized into seven tabs:
 
-**Widgets tab options:**
+**Quickshell tab**
 - **Clock** — 12/24-hour format, show/hide seconds
-- **Date format** — MM/DD/YYYY or DD/MM/YYYY
-- **Long date** — numeric (`03/27/2026`) or long form (`March 27, 2026` / `27 March 2026`)
-- **Day of week** — prepend weekday when long date is enabled (e.g. `Wednesday, March 27, 2026`)
-- **Wallpaper picker** — show theme-only or all wallpapers
+- **Date format** — MM/DD/YYYY or DD/MM/YYYY, numeric or long-form, optional day-of-week
+- **System tray** — toggle battery, volume, and network indicators
+- **Widget transparency** — enable semi-transparent widget backgrounds
+- **Widget borders** — show/hide accent borders on all widgets; adjust thickness
+- **UI font** — choose the font used across all widgets
 
+**Screenshots tab** — configure screenshot save directory and format
+
+**Bar tab**
+- **Bar size** — compact or large
+- **Bar position** — top or bottom of screen
+- **Background style** — solid, transparent, or gradient
+- **Workspace style** — numbered labels or dot indicators
+- **Min workspaces** — minimum number of workspace buttons shown
+
+**Theme tab** — visual theme selector (same as Super + T)
+
+**Wallpaper tab**
+- **Theme Wallpaper** — grid of wallpapers matching the current theme
+- **All Wallpapers** — flat grid of every wallpaper across all theme folders
+
+**Hyprland tab**
+- **Window rounding** — corner radius for all widgets and windows (live update)
+- **Window borders** — enable/disable and set border thickness
+
+**Monitors tab** — per-monitor resolution, refresh rate, and scale
+
+<!-- TODO: add updated settings screenshot -->
+<!-- ![settings.png](previews/settings.png) -->
 ![settings.png](previews/settings.png)
 </details>
 
@@ -253,8 +280,14 @@ Configure weather, clock format, date format, screenshots, system tray visibilit
 <details>
 <summary><b>Wallpaper Picker</b> - Super + Shift + W - Browse and select wallpapers</summary>
 
-Browse wallpapers for your current theme or toggle "Show all wallpapers" in Settings to see every wallpaper across all themes. Selected wallpaper persists across reboots and is automatically restored on login.
+Two tabs for browsing wallpapers:
+- **Theme Wallpaper** — shows only wallpapers matching the active theme folder
+- **All Wallpapers** — flat grid of every image found in `~/Pictures/Wallpapers/` across all theme subfolders
 
+Selected wallpaper persists across reboots and is automatically restored on login via `autostart.conf`.
+
+<!-- TODO: add updated wallpaper picker screenshot -->
+<!-- ![wallpaper_picker.png](previews/wallpaper_picker.png) -->
 ![wallpaper_picker.png](previews/wallpaper_picker.png)
 </details>
 
@@ -347,7 +380,22 @@ git push
 
 ### Key Features & Recent Improvements
 
-**Latest Updates (v1.5)**
+**Latest Updates (v1.6)**
+- **Consistent Widget Colors** — All widgets (App Launcher, Calendar/Weather/System, Control Center, Settings, Power Menu, Screenshot, Clipboard) now share the same `bgBase` background color; previously some used the darker `bgCrust` color causing visible mismatches
+- **Workspace Style Setting** — New toggle in Settings → Bar tab to switch workspace indicators between numbered labels and dot characters; updates the bar live without restart
+- **Live Widget Borders** — Show/hide accent borders on all widgets and adjust border thickness in real time via Settings → Quickshell tab; changes apply immediately across all open widgets
+- **Theme Switch Persistence** — `switch-theme.sh` now preserves all user preferences (rounding, border show/hide, border width, workspace style, opacity, font, bar size) across theme switches; previously switching themes reset these to defaults
+- **Fixed GTK Theme Mappings** — `sync-gtk-theme.sh` now maps all 13 themes to their correct installed GTK theme names; previously several themes (Catppuccin, Rose Pine, Kanagawa, Monochrome, Solarized) mapped to non-installed themes causing Thunar to stay light-mode. Graceful fallback to Catppuccin-Dark instead of aborting.
+- **All Wallpapers Flat Grid** — The "All Wallpapers" tab in Settings now shows a flat scrollable grid of every image in `~/Pictures/Wallpapers/*` (no theme grouping, no section headers); matches the same thumbnail style as the Theme Wallpaper tab
+- **Wallpaper Tab Bar Cleaned Up** — Removed the dark background bar behind "Theme Wallpaper" / "All Wallpapers" tab labels in Settings
+- **Monochrome & Solarized Wallpapers** — Two new wallpaper sets added
+- **bgBaseAlpha Fix** — All theme files now correctly compute `bgBaseAlpha` using `Qt.rgba(bgBase.r, bgBase.g, bgBase.b, barOpacity)` instead of the fragile `parseInt(toString().substr(...))` pattern
+- **Gruvbox Color Fix** — `bgCrust` (#111111) now correctly differs from `bgMantle` (#1d2021) in the Gruvbox theme
+
+<!-- TODO: add side-by-side widget consistency screenshot -->
+<!-- ![widget_consistency.png](previews/widget_consistency.png) -->
+
+**Previous Updates (v1.5)**
 - **Flexible Date Format Controls** - New Widgets tab options in Settings:
   - Toggle between MM/DD/YYYY and DD/MM/YYYY layouts
   - Switch between numeric date (`03/27/2026`) and long-form (`March 27, 2026` or `27 March 2026`)
