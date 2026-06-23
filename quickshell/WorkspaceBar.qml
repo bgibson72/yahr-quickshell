@@ -87,10 +87,10 @@ RowLayout {
             Text {
                 id: workspaceText
                 anchors.centerIn: workspaceRect
-                text: staticWorkspaceButton.workspaceId.toString()
-                font.family: ThemeManager.uiFont
-                font.pixelSize: 13
-                font.bold: staticWorkspaceButton.isCurrentWorkspace
+                text: ThemeManager.workspaceStyle === "dots" ? "\uf444" : staticWorkspaceButton.workspaceId.toString()
+                font.family: ThemeManager.workspaceStyle === "dots" ? "Symbols Nerd Font" : ThemeManager.uiFont
+                font.pixelSize: ThemeManager.workspaceStyle === "dots" ? 12 : 13
+                font.bold: ThemeManager.workspaceStyle !== "dots" && staticWorkspaceButton.isCurrentWorkspace
                 textFormat: Text.PlainText
 
                 color: {

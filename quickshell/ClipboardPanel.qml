@@ -10,9 +10,9 @@ Rectangle {
     width: 500
     height: 600
     color: ThemeManager.bgBase
-    radius: 16
-    border.width: 3
-    border.color: ThemeManager.accentPurple
+    radius: ThemeManager.hyprRounding
+    border.width: ThemeManager.showWidgetBorders ? ThemeManager.widgetBorderWidth : 0
+    border.color: Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.35)
     
     property bool isVisible: false
     signal requestClose()

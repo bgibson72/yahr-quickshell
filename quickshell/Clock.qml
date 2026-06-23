@@ -4,10 +4,10 @@ import Quickshell.Io
 
 Rectangle {
     id: clockArea
-    
-    width: clockText.width + 40
+
+    width: clockRow.width + 40
     height: parent.height - 10
-    
+
     color: mouseArea.containsMouse ? Qt.rgba(1, 1, 1, 0.10) : "transparent"
     radius: 6
     border.width: mouseArea.containsMouse ? 1 : 0
@@ -20,60 +20,100 @@ Rectangle {
     property bool dateFormatDMY: false
     property bool dateLong: false
     property bool showDayOfWeek: false
+    property bool showWeatherInBar: false
 
-    Behavior on color {
-        ColorAnimation { duration: 200 }
+    property string barWeatherIcon: "\ue302"
+    property string barWeatherTemp: "--"
+
+    Behavior on color { ColorAnimation { duration: 200 } }
+    Behavior on border.width { NumberAnimation { duration: 200 } }
+
+    function getWeatherNFIcon(emoji) {
+        if (!emoji) return "\ue30d"
+        if (emoji.indexOf("\u2600") >= 0) return "\ue30d"
+        if (emoji.indexOf("\u26C5") >= 0 || emoji.indexOf("\u2601") >= 0) return "\ue302"
+        if (emoji.indexOf("\u{1F324}") >= 0) return "\ue302"
+        if (emoji.indexOf("\u{1F325}") >= 0) return "\ue312"
+        if (emoji.indexOf("\u{1F326}") >= 0) return "\ue309"
+        if (emoji.indexOf("\u{1F327}") >= 0) return "\ue308"
+        if (emoji.indexOf("\u26C8") >= 0 || emoji.indexOf("\u{1F329}") >= 0) return "\ue30f"
+        if (emoji.indexOf("\u{1F328}") >= 0 || emoji.indexOf("\u2744") >= 0) return "\ue30a"
+        if (emoji.indexOf("\u{1F32B}") >= 0) return "\ue313"
+        if (emoji.indexOf("\u{1F32C}") >= 0) return "\ue34b"
+        return "\ue30d"
     }
-    Behavior on border.width {
-        NumberAnimation { duration: 200 }
-    }
-    
-    Text {
-        id: clockText
+
+    Row {
+        id: clockRow
         anchors.centerIn: parent
-        font.family: ThemeManager.uiFont
-        font.pixelSize: ThemeManager.barLarge ? 16 : 13
-        color: ThemeManager.fgPrimary
+        spacing: 8
+
+        Text {
+            id: dateText
+            font.family: ThemeManager.uiFont
+            font.pixelSize: ThemeManager.barLarge ? 16 : 13
+            color: ThemeManager.fgPrimary
+            anchors.verticalCenter: parent.verticalCenter
+        }
+
+        Text {
+            id: barWeatherIconText
+            visible: clockArea.showWeatherInBar
+            text: clockArea.barWeatherIcon
+            font.family: "Symbols Nerd Font"
+            font.pixelSize: ThemeManager.barLarge ? 15 : 12
+            color: ThemeManager.accentBlue
+            anchors.verticalCenter: parent.verticalCenter
+        }
+
+        Text {
+            id: barWeatherTempText
+            visible: clockArea.showWeatherInBar
+            text: clockArea.barWeatherTemp
+            font.family: ThemeManager.uiFont
+            font.pixelSize: ThemeManager.barLarge ? 16 : 13
+            color: ThemeManager.fgPrimary
+            anchors.verticalCenter: parent.verticalCenter
+        }
+
+        Text {
+            id: timeText
+            font.family: ThemeManager.uiFont
+            font.pixelSize: ThemeManager.barLarge ? 16 : 13
+            color: ThemeManager.fgPrimary
+            anchors.verticalCenter: parent.verticalCenter
+        }
     }
-    
+
     MouseArea {
         id: mouseArea
         anchors.fill: parent
         hoverEnabled: true
         cursorShape: Qt.PointingHandCursor
-        
         onClicked: {
             toggleCalendar()
             console.log("Calendar toggle signal emitted")
         }
     }
-    
-    // Load settings periodically
+
     Timer {
         interval: 1000
         running: true
         repeat: true
         triggeredOnStart: true
-        
-        onTriggered: {
-            settingsLoader.running = true
-        }
+        onTriggered: { settingsLoader.running = true }
     }
-    
-    // Settings loader
+
     Process {
         id: settingsLoader
         running: false
         command: ["cat", Quickshell.env("HOME") + "/.config/quickshell/settings.json"]
-        
         property string buffer: ""
-        
+
         stdout: SplitParser {
-            onRead: data => {
-                settingsLoader.buffer += data
-            }
+            onRead: data => { settingsLoader.buffer += data }
         }
-        
+
         onRunningChanged: {
             if (!running && buffer !== "") {
                 try {
@@ -85,8 +125,14 @@ Rectangle {
                         clockArea.dateLong = settings.general.dateLong === true
                         clockArea.showDayOfWeek = settings.general.showDayOfWeek === true
                     }
+                    if (settings.bar) {
+                        const newShowWeather = settings.bar.showWeatherInBar === true
+                        if (newShowWeather && !clockArea.showWeatherInBar) {
+                            weatherProcess.running = true
+                        }
+                        clockArea.showWeatherInBar = newShowWeather
+                    }
                 } catch (e) {
-                    // Use defaults on error
                     clockArea.use24Hour = false
                     clockArea.showSeconds = false
                 }
@@ -96,13 +142,46 @@ Rectangle {
             }
         }
     }
-    
+
+    Timer {
+        id: weatherTimer
+        interval: 600000
+        running: clockArea.showWeatherInBar
+        repeat: true
+        triggeredOnStart: true
+        onTriggered: { weatherProcess.running = true }
+    }
+
+    Process {
+        id: weatherProcess
+        command: ["sh", "-c", "curl -s 'wttr.in/?u&format=%c|%t'"]
+        running: false
+        property string buffer: ""
+
+        stdout: SplitParser {
+            onRead: data => { weatherProcess.buffer += data }
+        }
+
+        onRunningChanged: {
+            if (!running && buffer !== "") {
+                const parts = weatherProcess.buffer.trim().split("|")
+                if (parts.length >= 2) {
+                    clockArea.barWeatherIcon = clockArea.getWeatherNFIcon(parts[0].trim())
+                    clockArea.barWeatherTemp = parts[1].trim().replace(/^\+/, "")
+                }
+                buffer = ""
+            } else if (running) {
+                buffer = ""
+            }
+        }
+    }
+
     Timer {
         interval: 1000
         running: true
         repeat: true
         triggeredOnStart: true
-        
+
         onTriggered: {
             let now = new Date()
             let month = (now.getMonth() + 1).toString().padStart(2, '0')
@@ -113,7 +192,6 @@ Rectangle {
             let minutes = now.getMinutes().toString().padStart(2, '0')
             let seconds = now.getSeconds().toString().padStart(2, '0')
 
-            // Build date string
             let dateStr
             if (clockArea.dateLong) {
                 const monthNames = ["January", "February", "March", "April", "May", "June",
@@ -139,21 +217,21 @@ Rectangle {
             }
 
             if (clockArea.use24Hour) {
-                // 24-hour format
-                let timeStr = clockArea.showSeconds 
+                let timeStr = clockArea.showSeconds
                     ? `${hours.toString().padStart(2, '0')}:${minutes}:${seconds}`
                     : `${hours.toString().padStart(2, '0')}:${minutes}`
-                clockText.text = `${dateStr}  ${timeStr}`
+                dateText.text = dateStr
+                timeText.text = timeStr
             } else {
-                // 12-hour format with AM/PM
                 let ampm = hours >= 12 ? 'PM' : 'AM'
                 hours = hours % 12
                 hours = hours ? hours : 12
                 hours = hours.toString().padStart(2, '0')
-                let timeStr = clockArea.showSeconds 
+                let timeStr = clockArea.showSeconds
                     ? `${hours}:${minutes}:${seconds}`
                     : `${hours}:${minutes}`
-                clockText.text = `${dateStr}  ${timeStr} ${ampm}`
+                dateText.text = dateStr
+                timeText.text = `${timeStr} ${ampm}`
             }
         }
     }

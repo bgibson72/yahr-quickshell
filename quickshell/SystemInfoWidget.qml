@@ -7,9 +7,9 @@ Rectangle {
 
     width: 900
     height: 700
-    color: ThemeManager.bgCrust
-    radius: 16
-    border.width: showWidgetBorders ? widgetBorderWidth : 0
+    color: ThemeManager.bgBase
+    radius: ThemeManager.hyprRounding
+    border.width: ThemeManager.showWidgetBorders ? ThemeManager.widgetBorderWidth : 0
     border.color: Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.35)
     antialiasing: true
     
@@ -112,8 +112,10 @@ Rectangle {
                         spacing: 8
 
                         Text {
-                            text: "📅"
-                            font.pixelSize: 18
+                            text: "\uf073"
+                            font.family: "Symbols Nerd Font"
+                            font.pixelSize: 16
+                            color: ThemeManager.accentBlue
                             anchors.verticalCenter: parent.verticalCenter
                         }
 
@@ -150,8 +152,10 @@ Rectangle {
                         spacing: 8
 
                         Text {
-                            text: "⛅"
-                            font.pixelSize: 18
+                            text: "\ue302"
+                            font.family: "Symbols Nerd Font"
+                            font.pixelSize: 16
+                            color: ThemeManager.accentBlue
                             anchors.verticalCenter: parent.verticalCenter
                         }
 
@@ -188,8 +192,10 @@ Rectangle {
                         spacing: 8
 
                         Text {
-                            text: "💻"
-                            font.pixelSize: 18
+                            text: "\uf108"
+                            font.family: "Symbols Nerd Font"
+                            font.pixelSize: 16
+                            color: ThemeManager.accentBlue
                             anchors.verticalCenter: parent.verticalCenter
                         }
 

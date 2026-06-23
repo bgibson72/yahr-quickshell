@@ -344,8 +344,8 @@ ShellRoot {
                     : (parent.width - width) / 2
 
                 y: isLeft
-                    ? barBottom
-                    : (parent.height - height) / 2 + (shellRoot.appLauncherVisible ? 0 : -800)
+                    ? 6
+                    : (shellRoot.appLauncherVisible ? 6 : -(height + 8))
 
                 Behavior on x {
                     enabled: launcherPanel.isLeft
@@ -663,9 +663,10 @@ ShellRoot {
             
             SettingsWidget {
                 anchors.horizontalCenter: parent.horizontalCenter
-                y: shellRoot.settingsVisible ? (parent.height / 2 - 360) : parent.height
-                
-                Behavior on y {
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.verticalCenterOffset: shellRoot.settingsVisible ? 0 : 800
+
+                Behavior on anchors.verticalCenterOffset {
                     NumberAnimation { duration: 350; easing.type: Easing.OutCubic }
                 }
                 
@@ -909,6 +910,13 @@ ShellRoot {
                     target: leftIslandBar.archComponent
                     function onToggleLauncher() {
                         shellRoot.appLauncherVisible = !shellRoot.appLauncherVisible
+                    }
+                }
+
+                Connections {
+                    target: leftIslandBar
+                    function onToggleSettings() {
+                        shellRoot.settingsVisible = !shellRoot.settingsVisible
                     }
                 }
             }

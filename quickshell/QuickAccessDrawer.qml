@@ -8,11 +8,13 @@ Item {
     property bool forceExpanded: false
     property bool hideChevron: false
 
+    signal toggleSettings()
+
     readonly property bool isExpanded: forceExpanded || expanded
 
     width: implicitWidth
     height: implicitHeight
-    implicitWidth: isExpanded ? (hideChevron ? 140 : 176) : 32
+    implicitWidth: isExpanded ? (hideChevron ? 176 : 212) : 32
     implicitHeight: 35
     
     // Container for the drawer content
@@ -67,7 +69,7 @@ Item {
             
             // Quick access buttons - only visible when expanded
             Item {
-                Layout.preferredWidth: drawer.isExpanded ? 140 : 0
+                Layout.preferredWidth: drawer.isExpanded ? 176 : 0
                 Layout.preferredHeight: 32
                 clip: true
                 visible: drawer.isExpanded
@@ -81,6 +83,7 @@ Item {
                     FilesButton {}
                     FirefoxButton {}
                     ScreenshotButton {}
+                    SettingsButton { onClicked: drawer.toggleSettings() }
                 }
             }
         }

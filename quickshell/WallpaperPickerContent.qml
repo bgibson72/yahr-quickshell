@@ -222,10 +222,10 @@ Item {
         anchors.left: parent.left
         anchors.right: parent.right
         height: 56  // extra height gives breathing room between tab labels and scrollbar
-        color: Qt.rgba(1, 1, 1, 0.04)
+        color: "transparent"
         radius: 10
-        border.width: root.showWidgetBorders ? 1 : 0
-        border.color: Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.18)
+        border.width: 0
+        border.color: "transparent"
 
         ListView {
             id: themeTabList

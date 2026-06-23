@@ -88,6 +88,9 @@ Item {
                         if (settings.bar.minWorkspaces !== undefined) {
                             bar.minWorkspaces = settings.bar.minWorkspaces
                         }
+                        if (settings.bar.workspaceStyle !== undefined) {
+                            ThemeManager.workspaceStyle = settings.bar.workspaceStyle
+                        }
                         if (settings.bar.layoutPreset !== undefined) {
                             bar.layoutPreset = settings.bar.layoutPreset
                         }
@@ -98,8 +101,16 @@ Item {
                     if (settings.general && settings.general.enableBlur !== undefined) {
                         bar.enableBlur = settings.general.enableBlur
                     }
+                    if (settings.general && settings.general.showWidgetBorders !== undefined) {
+                        ThemeManager.showWidgetBorders = settings.general.showWidgetBorders !== false
+                    }
                     if (settings.general && settings.general.widgetBorderWidth !== undefined) {
                         bar.widgetBorderWidth = settings.general.widgetBorderWidth
+                        ThemeManager.widgetBorderWidth = settings.general.widgetBorderWidth
+                    }
+                    if (settings.hypr && settings.hypr.rounding !== undefined) {
+                        bar.hyprRounding = settings.hypr.rounding
+                        ThemeManager.hyprRounding = settings.hypr.rounding
                     }
                 } catch (e) {
                     console.log("🎨 Error parsing bar settings:", e)
@@ -127,7 +138,10 @@ Item {
         onRunningChanged: {
             if (!running && buffer !== "") {
                 const val = parseInt(buffer.trim())
-                if (!isNaN(val)) bar.hyprRounding = val
+                if (!isNaN(val)) {
+                    bar.hyprRounding = val
+                    ThemeManager.hyprRounding = val
+                }
                 buffer = ""
             } else if (running) {
                 buffer = ""
@@ -206,7 +220,7 @@ Item {
             return Qt.rgba(ThemeManager.bgBase.r, ThemeManager.bgBase.g, ThemeManager.bgBase.b, bar.barOpacity)
         }
         property color border: Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.35)
-        property real radius: 6
+        property real radius: bar.hyprRounding
     }
     
     property var clockComponent: {
@@ -244,6 +258,7 @@ Item {
         QuickAccessDrawer {
             id: quickAccessDrawer
             visible: bar.showQuickLaunch
+            onToggleSettings: bar.toggleSettings()
         }
     }
 
@@ -261,6 +276,7 @@ Item {
         }
         QuickAccessDrawer {
             visible: bar.showQuickLaunch
+            onToggleSettings: bar.toggleSettings()
         }
     }
 
@@ -329,6 +345,7 @@ Item {
                 visible: parent.visible
                 forceExpanded: true
                 hideChevron: true
+                onToggleSettings: bar.toggleSettings()
             }
         }
     }
@@ -380,6 +397,7 @@ Item {
                 visible: parent.visible
                 forceExpanded: true
                 hideChevron: true
+                onToggleSettings: bar.toggleSettings()
             }
         }
     }

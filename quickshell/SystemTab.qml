@@ -32,11 +32,13 @@ Item {
                     spacing: 8
                     
                     Text {
-                        text: "🖥️"
-                        font.pixelSize: 20
+                        text: "\uf2db"
+                        font.family: "Symbols Nerd Font"
+                        font.pixelSize: 18
+                        color: ThemeManager.accentBlue
                         anchors.verticalCenter: parent.verticalCenter
                     }
-                    
+
                     Text {
                         text: "CPU Usage"
                         font.family: ThemeManager.uiFont
@@ -115,8 +117,10 @@ Item {
                     spacing: 8
                     
                     Text {
-                        text: "💾"
-                        font.pixelSize: 20
+                        text: "\uf538"
+                        font.family: "Symbols Nerd Font"
+                        font.pixelSize: 18
+                        color: ThemeManager.accentBlue
                         anchors.verticalCenter: parent.verticalCenter
                     }
                     
@@ -198,8 +202,10 @@ Item {
                     spacing: 8
                     
                     Text {
-                        text: "💿"
-                        font.pixelSize: 20
+                        text: "\uf0a0"
+                        font.family: "Symbols Nerd Font"
+                        font.pixelSize: 18
+                        color: ThemeManager.accentBlue
                         anchors.verticalCenter: parent.verticalCenter
                     }
                     
@@ -345,8 +351,10 @@ Item {
                     spacing: 8
                     
                     Text {
-                        text: "🌡️"
-                        font.pixelSize: 20
+                        text: "\uf2c9"
+                        font.family: "Symbols Nerd Font"
+                        font.pixelSize: 18
+                        color: ThemeManager.accentRed
                         anchors.verticalCenter: parent.verticalCenter
                     }
                     

@@ -41,11 +41,7 @@ QtObject {
     property color border2: "#5a5a5a"
     
     property real barOpacity: 0.90
-    property color bgBaseAlpha: Qt.rgba(
-        parseInt(bgBase.toString().substr(1,2), 16) / 255,
-        parseInt(bgBase.toString().substr(3,2), 16) / 255,
-        parseInt(bgBase.toString().substr(5,2), 16) / 255,
-        barOpacity
+    property color bgBaseAlpha: Qt.rgba(bgBase.r, bgBase.g, bgBase.b, barOpacity)
     )
     
     property int fontSizeClock: 14

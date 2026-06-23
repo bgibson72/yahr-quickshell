@@ -9,8 +9,8 @@ Rectangle {
     width: 1000
     height: 600
     color: ThemeManager.bgBase
-    radius: 20
-    border.width: showWidgetBorders ? widgetBorderWidth : 0
+    radius: ThemeManager.hyprRounding
+    border.width: ThemeManager.showWidgetBorders ? ThemeManager.widgetBorderWidth : 0
     border.color: Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.35)
     antialiasing: true
 
@@ -189,12 +189,21 @@ Rectangle {
     //  RIGHT: Power sidebar
     // ══════════════════════════════════════════════════════
 
-    Item {
-        id: sidebar
+    Rectangle {
+        id: sidebarCard
         anchors.right: parent.right
         anchors.top: parent.top
         anchors.bottom: parent.bottom
+        anchors.margins: 10
         width: 72
+        color: Qt.rgba(1, 1, 1, 0.05)
+        radius: ThemeManager.hyprRounding - 2
+        border.width: 1
+        border.color: Qt.rgba(1, 1, 1, 0.07)
+
+    Item {
+        id: sidebar
+        anchors.fill: parent
 
         // Settings button - top right corner
         Rectangle {
@@ -387,18 +396,31 @@ Rectangle {
             }
         }
 
-    }
+    }  // Item sidebar
+
+    }  // sidebarCard
 
     // ══════════════════════════════════════════════════════
     //  LEFT: Search bar + App grid/list
     // ══════════════════════════════════════════════════════
 
-    Item {
-        id: mainContent
+    Rectangle {
+        id: mainCard
         anchors.left: parent.left
-        anchors.right: sidebar.left
+        anchors.right: sidebarCard.left
         anchors.top: parent.top
         anchors.bottom: parent.bottom
+        anchors.margins: 10
+        anchors.rightMargin: 6
+        color: Qt.rgba(1, 1, 1, 0.04)
+        radius: ThemeManager.hyprRounding - 2
+        border.width: 1
+        border.color: Qt.rgba(1, 1, 1, 0.07)
+        clip: true
+
+    Item {
+        id: mainContent
+        anchors.fill: parent
 
         // ── Search bar ──
         Rectangle {
@@ -410,8 +432,8 @@ Rectangle {
             anchors.leftMargin: 20
             anchors.rightMargin: 20
             height: 44
-            color: Qt.rgba(ThemeManager.bgBase.r, ThemeManager.bgBase.g, ThemeManager.bgBase.b, 0.35)
-            radius: 12
+            color: Qt.rgba(1, 1, 1, 0.07)
+            radius: 10
             border.width: 1
             border.color: searchField.activeFocus
                 ? Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.65)
@@ -719,6 +741,8 @@ Rectangle {
                 }
             }
         }
-    }
+    }  // mainContent
+
+    }  // mainCard
 
 }

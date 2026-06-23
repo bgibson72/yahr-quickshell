@@ -12,8 +12,8 @@ Rectangle {
     // When embedded as a tab inside another widget, suppress the background
     property bool embedded: false
     color: embedded ? "transparent" : ThemeManager.bgBase
-    radius: embedded ? 0 : 16
-    border.width: embedded ? 0 : (showWidgetBorders ? widgetBorderWidth : 0)
+    radius: embedded ? 0 : root.hyprRounding
+    border.width: embedded ? 0 : (ThemeManager.showWidgetBorders ? ThemeManager.widgetBorderWidth : 0)
     border.color: Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.35)
     antialiasing: true
     clip: true
@@ -46,8 +46,8 @@ Rectangle {
     onIsVisibleChanged: {
         if (isVisible) {
             loadSettings()
-            loadThemes()
-            loadFonts()
+            if (themeModel.count === 0) loadThemes()
+            if (root.fontList.length === 0) loadFonts()
             root.forceActiveFocus()
         }
     }
@@ -304,6 +304,7 @@ SETTINGSEOF`
             showQuickLaunchCheck.checked = root.settings.bar.showQuickLaunch !== false
             showSystemTrayCheck.checked = root.settings.bar.showSystemTray !== false
             workspaceCountObj.value = root.settings.bar.minWorkspaces !== undefined ? root.settings.bar.minWorkspaces : 4
+            ThemeManager.workspaceStyle = root.settings.bar.workspaceStyle || "numbers"
             barSizeLargeCheck.checked = root.settings.bar.barSize === "large"
             barLayoutPreset.value = root.settings.bar.layoutPreset || "default"
             barContainerStyle.value = root.settings.bar.barStyle || "single"
@@ -313,6 +314,8 @@ SETTINGSEOF`
         root.showWidgetBorders = root.settings.general ? root.settings.general.showWidgetBorders !== false : true
         root.widgetBorderWidth = (root.settings.general && root.settings.general.widgetBorderWidth !== undefined)
             ? root.settings.general.widgetBorderWidth : 1
+        ThemeManager.showWidgetBorders = root.showWidgetBorders
+        ThemeManager.widgetBorderWidth = root.widgetBorderWidth
 
         // Widget transparency
         const transparent = root.settings.general ? root.settings.general.widgetTransparent !== false : true
@@ -366,9 +369,7 @@ SETTINGSEOF`
         id: themeModel
     }
 
-    ListModel {
-        id: fontModel
-    }
+    property var fontList: []
 
     property string currentFontSelection: ThemeManager.uiFont
 
@@ -377,18 +378,25 @@ SETTINGSEOF`
         running: false
         command: ["sh", "-c", "fc-list : family | tr ',' '\\n' | sed 's/^ *//' | grep -ivE '^symbols |emoji|noto color emoji|^font awesome|weather icon' | sort -uf"]
 
+        property string buffer: ""
+
         stdout: SplitParser {
-            onRead: data => {
-                const name = data.trim()
-                if (name.length > 0) {
-                    fontModel.append({name: name})
-                }
+            onRead: data => { fontLoader.buffer += data + "\n" }
+        }
+
+        onRunningChanged: {
+            if (running) {
+                fontLoader.buffer = ""
+            } else if (buffer !== "") {
+                root.fontList = buffer.split("\n")
+                    .map(n => n.trim())
+                    .filter(n => n.length > 0)
+                fontLoader.buffer = ""
             }
         }
     }
 
     function loadFonts() {
-        fontModel.clear()
         fontLoader.running = true
     }
 
@@ -482,6 +490,10 @@ SETTINGSEOF`
         if (field !== undefined) {
             root.settings.hypr[field] = value
             saveSettings()
+            if (field === "rounding") {
+                root.hyprRounding = value
+                ThemeManager.hyprRounding = value
+            }
         }
     }
     
@@ -528,7 +540,9 @@ SETTINGSEOF`
         }
 
         onRunningChanged: {
-            if (!running && buffer !== "") {
+            if (running) {
+                buffer = ""
+            } else if (!running && buffer !== "") {
                 try {
                     var mons = JSON.parse(buffer)
                     monitorsModel.clear()
@@ -565,30 +579,35 @@ SETTINGSEOF`
 
     function applyMonitorMode(monitorName, mode) {
         var scale = 1.0
+        var posStr = "auto"
         for (var i = 0; i < monitorsModel.count; i++) {
             if (monitorsModel.get(i).name === monitorName) {
                 scale = monitorsModel.get(i).scale
+                var mx = monitorsModel.get(i).x
+                var my = monitorsModel.get(i).y
+                posStr = mx + "x" + my
                 break
             }
         }
-        monitorCmdRunner.command = ["bash", "-c",
-            "hyprctl keyword monitor " + monitorName + "," + mode + ",auto," + scale.toFixed(2)]
+        var luaCmd = 'hl.monitor({ output = "' + monitorName + '", mode = "' + mode + '", position = "' + posStr + '", scale = ' + scale.toFixed(2) + ' })'
+        monitorCmdRunner.command = ["hyprctl", "eval", luaCmd]
         monitorCmdRunner.running = true
-        // Refresh after short delay
         monitorRefreshTimer.start()
     }
 
     function applyMonitorScale(monitorName, scale) {
         var mode = "preferred"
+        var posStr = "auto"
         for (var i = 0; i < monitorsModel.count; i++) {
             if (monitorsModel.get(i).name === monitorName) {
                 var m = monitorsModel.get(i)
                 mode = m.width + "x" + m.height + "@" + m.refreshRate.toFixed(2) + "Hz"
+                posStr = m.x + "x" + m.y
                 break
             }
         }
-        monitorCmdRunner.command = ["bash", "-c",
-            "hyprctl keyword monitor " + monitorName + "," + mode + ",auto," + scale.toFixed(2)]
+        var luaCmd = 'hl.monitor({ output = "' + monitorName + '", mode = "' + mode + '", position = "' + posStr + '", scale = ' + scale.toFixed(2) + ' })'
+        monitorCmdRunner.command = ["hyprctl", "eval", luaCmd]
         monitorCmdRunner.running = true
         monitorRefreshTimer.start()
     }
@@ -605,15 +624,25 @@ SETTINGSEOF`
         spacing: 0
 
         // ── Left Sidebar ──────────────────────────────────────────
-        Rectangle {
-            width: 210
+        Item {
+            width: 218
             height: parent.height
-            color: Qt.rgba(0, 0, 0, 0.22)
+
+            Rectangle {
+                anchors.left: parent.left
+                anchors.leftMargin: 8
+                anchors.right: parent.right
+                anchors.top: parent.top
+                anchors.topMargin: 64
+                anchors.bottom: parent.bottom
+                anchors.bottomMargin: (sidebar.currentIndex === 0 || sidebar.currentIndex === 1) ? 56 : 12
+                radius: root.hyprRounding
+                color: Qt.rgba(0, 0, 0, 0.22)
 
             ColumnLayout {
                 anchors.fill: parent
-                anchors.topMargin: 52
-                anchors.bottomMargin: 16
+                anchors.topMargin: 12
+                anchors.bottomMargin: 12
                 anchors.leftMargin: 8
                 anchors.rightMargin: 8
                 spacing: 2
@@ -675,19 +704,20 @@ SETTINGSEOF`
                 property int currentIndex: 0
                 onCurrentIndexChanged: { if (currentIndex === 6 && monitorsModel.count === 0) monitorLoader.running = true }
             }
+            }
         }
 
         // ── Content Area ─────────────────────────────────────────
         Item {
-            width: parent.width - 210
+            width: parent.width - 218
             height: parent.height
 
             StackLayout {
                 anchors.fill: parent
-                anchors.topMargin: 52
+                anchors.topMargin: 56
                 anchors.leftMargin: 16
                 anchors.rightMargin: 16
-                anchors.bottomMargin: (sidebar.currentIndex === 0 || sidebar.currentIndex === 1) ? 64 : 16
+                anchors.bottomMargin: (sidebar.currentIndex === 0 || sidebar.currentIndex === 1) ? 56 : 16
                 currentIndex: sidebar.currentIndex
 
                 // Tab 0: QUICKSHELL ───────────────────────────────
@@ -847,23 +877,24 @@ SETTINGSEOF`
                                         anchors.fill: parent
                                         anchors.margins: 4
                                         clip: true
-                                        model: fontModel
+                                        cacheBuffer: 200
                                         boundsBehavior: Flickable.StopAtBounds
                                         ScrollBar.vertical: ScrollBar {}
 
-                                        // Filter via wrapper
                                         property string filterText: fontSearchField.text.toLowerCase()
+                                        model: filterText.length > 0
+                                            ? root.fontList.filter(n => n.toLowerCase().indexOf(filterText) !== -1)
+                                            : root.fontList
 
                                         delegate: Item {
                                             width: fontListView.width
-                                            height: visible ? 28 : 0
-                                            visible: model.name.toLowerCase().indexOf(fontListView.filterText) !== -1
+                                            height: 28
 
                                             Rectangle {
                                                 anchors.fill: parent
                                                 anchors.margins: 2
                                                 radius: 4
-                                                color: model.name === root.currentFontSelection
+                                                color: modelData === root.currentFontSelection
                                                     ? Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.25)
                                                     : (fontDelegateArea.containsMouse ? Qt.rgba(1, 1, 1, 0.07) : "transparent")
 
@@ -873,10 +904,10 @@ SETTINGSEOF`
                                                     anchors.leftMargin: 8
                                                     anchors.right: parent.right
                                                     anchors.rightMargin: 8
-                                                    text: model.name
-                                                    font.family: model.name
+                                                    text: modelData
+                                                    font.family: modelData
                                                     font.pixelSize: 12
-                                                    color: model.name === root.currentFontSelection
+                                                    color: modelData === root.currentFontSelection
                                                         ? ThemeManager.accentBlue
                                                         : ThemeManager.fgPrimary
                                                     elide: Text.ElideRight
@@ -888,12 +919,12 @@ SETTINGSEOF`
                                                     hoverEnabled: true
                                                     cursorShape: Qt.PointingHandCursor
                                                     onClicked: {
-                                                        root.currentFontSelection = model.name
-                                                        ThemeManager.uiFont = model.name
+                                                        root.currentFontSelection = modelData
+                                                        ThemeManager.uiFont = modelData
                                                         if (!root.settings.general) root.settings.general = {}
-                                                        root.settings.general.uiFont = model.name
+                                                        root.settings.general.uiFont = modelData
                                                         saveSettings()
-                                                        Quickshell.execDetached(["bash", Quickshell.env("HOME") + "/.config/quickshell/sync-font.sh", model.name])
+                                                        Quickshell.execDetached(["bash", Quickshell.env("HOME") + "/.config/quickshell/sync-font.sh", modelData])
                                                     }
                                                 }
                                             }
@@ -1433,7 +1464,7 @@ MouseArea {
                             
                             
                             Text {
-                                text: "🌤️ Weather Settings"
+                                text: "\ue30c  Weather Settings"
                                 font.family: ThemeManager.uiFont
                                 font.pixelSize: 18
                                 font.weight: Font.Bold
@@ -3010,6 +3041,101 @@ MouseArea {
                                 }
                             }
 
+                            // Workspace Style
+                            Row {
+                                spacing: 12
+
+                                Column {
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    spacing: 2
+
+                                    Text {
+                                        text: "Workspace indicators"
+                                        font.family: ThemeManager.uiFont
+                                        font.pixelSize: 12
+                                        color: ThemeManager.fgPrimary
+                                    }
+
+                                    Text {
+                                        text: "Show workspace numbers or dots in the bar"
+                                        font.family: ThemeManager.uiFont
+                                        font.pixelSize: 10
+                                        color: ThemeManager.fgSecondary
+                                    }
+                                }
+
+                                Row {
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    spacing: 2
+
+                                    Rectangle {
+                                        width: 64
+                                        height: 28
+                                        radius: 6
+                                        color: ThemeManager.workspaceStyle !== "dots"
+                                            ? Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.25)
+                                            : Qt.rgba(1, 1, 1, 0.07)
+                                        border.width: 1
+                                        border.color: ThemeManager.workspaceStyle !== "dots"
+                                            ? Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.55)
+                                            : Qt.rgba(1, 1, 1, 0.15)
+                                        Behavior on color { ColorAnimation { duration: 150 } }
+
+                                        Text {
+                                            anchors.centerIn: parent
+                                            text: "1  2  3"
+                                            font.family: ThemeManager.uiFont
+                                            font.pixelSize: 11
+                                            color: ThemeManager.workspaceStyle !== "dots" ? ThemeManager.accentBlue : ThemeManager.fgSecondary
+                                        }
+
+                                        MouseArea {
+                                            anchors.fill: parent
+                                            cursorShape: Qt.PointingHandCursor
+                                            onClicked: {
+                                                ThemeManager.workspaceStyle = "numbers"
+                                                if (!root.settings.bar) root.settings.bar = {}
+                                                root.settings.bar.workspaceStyle = "numbers"
+                                                saveSettings()
+                                            }
+                                        }
+                                    }
+
+                                    Rectangle {
+                                        width: 64
+                                        height: 28
+                                        radius: 6
+                                        color: ThemeManager.workspaceStyle === "dots"
+                                            ? Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.25)
+                                            : Qt.rgba(1, 1, 1, 0.07)
+                                        border.width: 1
+                                        border.color: ThemeManager.workspaceStyle === "dots"
+                                            ? Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.55)
+                                            : Qt.rgba(1, 1, 1, 0.15)
+                                        Behavior on color { ColorAnimation { duration: 150 } }
+
+                                        Text {
+                                            anchors.centerIn: parent
+                                            text: "\uf444  \uf444  \uf444"
+                                            font.family: "Symbols Nerd Font"
+                                            font.pixelSize: 11
+                                            color: ThemeManager.workspaceStyle === "dots" ? ThemeManager.accentBlue : ThemeManager.fgSecondary
+                                        }
+
+                                        MouseArea {
+                                            anchors.fill: parent
+                                            cursorShape: Qt.PointingHandCursor
+                                            onClicked: {
+                                                ThemeManager.workspaceStyle = "dots"
+                                                if (!root.settings.bar) root.settings.bar = {}
+                                                root.settings.bar.workspaceStyle = "dots"
+                                                saveSettings()
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
                             // Show Battery Details
                             Row {
                                 spacing: 12
@@ -3233,6 +3359,7 @@ MouseArea {
                                             root.settings.general.showWidgetBorders = hyprBorderEnabledCheck.checked
                                             root.settings.bar.showBorder = hyprBorderEnabledCheck.checked
                                             root.showWidgetBorders = hyprBorderEnabledCheck.checked
+                                            ThemeManager.showWidgetBorders = hyprBorderEnabledCheck.checked
                                             saveSettings()
                                             // Sync mako border thickness (0 when borders disabled)
                                             Quickshell.execDetached(["sh", "-c",
@@ -3318,6 +3445,7 @@ MouseArea {
                                             if (!root.settings.general) root.settings.general = {}
                                             root.settings.general.widgetBorderWidth = val
                                             root.widgetBorderWidth = val
+                                            ThemeManager.widgetBorderWidth = val
                                             saveSettings()
                                             // Sync mako border thickness
                                             Quickshell.execDetached(["sh", "-c",
@@ -3915,10 +4043,12 @@ MouseArea {
                             
                             Rectangle {
                                 id: themeCard
-                                width: parent.width
+                                width: Math.min(parent.width - 40, 520)
+                                x: (parent.width - width) / 2
                                 height: 72
                                 radius: 10
                                 clip: true
+                                color: cardBg
 
                                 property bool isActive: model.name === root.currentTheme
 
@@ -3974,10 +4104,15 @@ MouseArea {
                                 Rectangle {
                                     id: topBand
                                     anchors.top: parent.top
+                                    anchors.topMargin: themeCard.border.width
                                     anchors.left: parent.left
+                                    anchors.leftMargin: themeCard.border.width
                                     anchors.right: parent.right
-                                    anchors.bottom: accentRow.top
+                                    anchors.rightMargin: themeCard.border.width
+                                    anchors.bottom: accentBarWrap.top
                                     color: themeCard.cardBg
+                                    topLeftRadius: Math.max(0, themeCard.radius - themeCard.border.width)
+                                    topRightRadius: Math.max(0, themeCard.radius - themeCard.border.width)
 
                                     // Subtle hover brightening
                                     Rectangle {
@@ -4020,21 +4155,25 @@ MouseArea {
                                 }
 
                                 // Accent color band strip at bottom
-                                Row {
-                                    id: accentRow
+                                Rectangle {
+                                    id: accentBarWrap
                                     anchors.bottom: parent.bottom
-                                    anchors.left: parent.left
-                                    anchors.right: parent.right
-                                    anchors.leftMargin: 10
-                                    anchors.rightMargin: 10
-                                    height: 10
+                                    anchors.bottomMargin: 8
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                    width: Math.min(parent.width - 80, 480)
+                                    height: 8
+                                    radius: 4
+                                    clip: true
 
-                                    Repeater {
-                                        model: themeCard.cardAccents
-                                        Rectangle {
-                                            width: accentRow.width / themeCard.cardAccents.length
-                                            height: 14
-                                            color: modelData
+                                    Row {
+                                        anchors.fill: parent
+                                        Repeater {
+                                            model: themeCard.cardAccents
+                                            Rectangle {
+                                                width: accentBarWrap.width / themeCard.cardAccents.length
+                                                height: accentBarWrap.height
+                                                color: modelData
+                                            }
                                         }
                                     }
                                 }
@@ -4107,37 +4246,26 @@ MouseArea {
                     Process {
                         id: wallAllProc
                         running: false
-                        command: ["sh", "-c",
-                            "find '" + Quickshell.env("HOME") + "/Pictures/Wallpapers' " +
-                            "-mindepth 2 -maxdepth 2 -type f \\( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' -o -iname '*.webp' \\) " +
-                            "| sort | while IFS= read -r f; do printf '%s\\t%s\\n' \"$(basename $(dirname \"$f\"))\" \"$f\"; done"]
+                        command: ["find", Quickshell.env("HOME") + "/Pictures/Wallpapers",
+                            "-type", "f",
+                            "(", "-iname", "*.jpg", "-o", "-iname", "*.jpeg",
+                                 "-o", "-iname", "*.png", "-o", "-iname", "*.webp", ")",
+                            "-not", "-path", "*/.*"]
                         property string buffer: ""
                         stdout: SplitParser { onRead: data => wallAllProc.buffer += data + "\n" }
                         onRunningChanged: {
                             if (!running && buffer !== "") {
                                 wallAllModel.clear()
-                                const lines = buffer.trim().split("\n")
-                                const themes = {}
-                                const themeOrder = []
-                                for (const line of lines) {
-                                    const tab = line.indexOf("\t")
-                                    if (tab < 0) continue
-                                    const theme = line.substring(0, tab)
-                                    const path = line.substring(tab + 1)
-                                    if (theme && path) {
-                                        if (!themes[theme]) { themes[theme] = []; themeOrder.push(theme) }
-                                        themes[theme].push(path)
-                                    }
-                                }
-                                for (const t of themeOrder)
-                                    wallAllModel.append({theme: t, pathsJson: JSON.stringify(themes[t])})
+                                const lines = buffer.trim().split("\n").filter(l => l.length > 0).sort()
+                                for (const p of lines)
+                                    wallAllModel.append({path: p, name: p.split('/').pop()})
                                 buffer = ""
                             } else if (running) { buffer = "" }
                         }
                     }
 
                     function applyWallpaper(path) {
-                        Quickshell.execDetached(["swww", "img", path,
+                        Quickshell.execDetached(["awww", "img", path,
                             "--transition-type", "grow", "--transition-pos", "0.5,0.5", "--transition-duration", "2"])
                         Quickshell.execDetached(["bash", "-c",
                             'printf "%s" "$1" > ~/.config/quickshell/last-wallpaper', "--", path])
@@ -4151,7 +4279,7 @@ MouseArea {
                         Rectangle {
                             width: parent.width
                             height: 44
-                            color: Qt.rgba(0, 0, 0, 0.15)
+                            color: "transparent"
 
                             Row {
                                 anchors.fill: parent
@@ -4210,152 +4338,132 @@ MouseArea {
                             height: parent.height - 45
 
                             // Theme Wallpaper sub-tab
-                            ScrollView {
+                            GridView {
+                                id: wallThemeGrid
                                 anchors.fill: parent
                                 clip: true
                                 visible: wallpaperTabItem.wallSubTab === 0
+                                model: wallThemeModel
+                                boundsBehavior: Flickable.StopAtBounds
+                                property int cols: 3
+                                cellWidth: Math.floor(width / cols)
+                                cellHeight: Math.floor(cellWidth * 10 / 16) + 4
+                                topMargin: 12
+                                bottomMargin: 12
 
-                                Flow {
-                                    width: parent.width
-                                    spacing: 8
-                                    topPadding: 12
-                                    leftPadding: 12
-                                    rightPadding: 12
+                                delegate: Item {
+                                    width: wallThemeGrid.cellWidth
+                                    height: wallThemeGrid.cellHeight
+                                    property string wallPath: model.path
+                                    property string wallName: model.name
 
-                                    Repeater {
-                                        model: wallThemeModel
+                                    Rectangle {
+                                        anchors.fill: parent
+                                        anchors.margins: 6
+                                        radius: 8
+                                        clip: true
+                                        color: Qt.rgba(1,1,1,0.05)
+                                        border.width: wallThumbMA.containsMouse ? 2 : 1
+                                        border.color: wallThumbMA.containsMouse
+                                            ? Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.9)
+                                            : Qt.rgba(1,1,1,0.12)
+
+                                        Image {
+                                            anchors.fill: parent
+                                            source: "file://" + wallPath
+                                            fillMode: Image.PreserveAspectCrop
+                                            smooth: true
+                                            asynchronous: true
+                                        }
 
                                         Rectangle {
-                                            width: 155
-                                            height: 97
-                                            radius: 8
-                                            clip: true
-                                            color: Qt.rgba(1,1,1,0.05)
-                                            border.width: wallThumbMA.containsMouse ? 2 : 1
-                                            border.color: wallThumbMA.containsMouse
-                                                ? Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.9)
-                                                : Qt.rgba(1,1,1,0.12)
+                                            anchors.bottom: parent.bottom
+                                            width: parent.width
+                                            height: 22
+                                            color: Qt.rgba(0,0,0,0.65)
+                                            Text {
+                                                anchors.centerIn: parent
+                                                text: wallName
+                                                font.family: ThemeManager.uiFont
+                                                font.pixelSize: 10
+                                                color: "white"
+                                                elide: Text.ElideRight
+                                                width: parent.width - 8
+                                            }
+                                        }
 
-                                            Image {
-                                                anchors.fill: parent
-                                                source: "file://" + model.path
-                                                fillMode: Image.PreserveAspectCrop
-                                                smooth: true
-                                                asynchronous: true
-                                            }
-
-                                            Rectangle {
-                                                anchors.bottom: parent.bottom
-                                                width: parent.width; height: 20
-                                                color: Qt.rgba(0,0,0,0.65)
-                                                Text {
-                                                    anchors.centerIn: parent
-                                                    text: model.name
-                                                    font.family: ThemeManager.uiFont
-                                                    font.pixelSize: 9; color: "white"
-                                                    elide: Text.ElideRight
-                                                    width: parent.width - 8
-                                                }
-                                            }
-                                            MouseArea {
-                                                id: wallThumbMA
-                                                anchors.fill: parent; hoverEnabled: true
-                                                cursorShape: Qt.PointingHandCursor
-                                                onClicked: wallpaperTabItem.applyWallpaper(model.path)
-                                            }
+                                        MouseArea {
+                                            id: wallThumbMA
+                                            anchors.fill: parent
+                                            hoverEnabled: true
+                                            cursorShape: Qt.PointingHandCursor
+                                            onClicked: wallpaperTabItem.applyWallpaper(wallPath)
                                         }
                                     }
                                 }
                             }
 
                             // All Wallpapers sub-tab
-                            ScrollView {
+                            GridView {
+                                id: wallAllGrid
                                 anchors.fill: parent
                                 clip: true
                                 visible: wallpaperTabItem.wallSubTab === 1
+                                model: wallAllModel
+                                boundsBehavior: Flickable.StopAtBounds
+                                property int cols: 3
+                                cellWidth: Math.floor(width / cols)
+                                cellHeight: Math.floor(cellWidth * 10 / 16) + 4
+                                topMargin: 12
+                                bottomMargin: 12
 
-                                ColumnLayout {
-                                    width: parent.width
-                                    spacing: 20
+                                delegate: Item {
+                                    width: wallAllGrid.cellWidth
+                                    height: wallAllGrid.cellHeight
 
-                                    Item { Layout.fillWidth: true; height: 4 }
+                                    Rectangle {
+                                        anchors.fill: parent
+                                        anchors.margins: 6
+                                        radius: 8
+                                        clip: true
+                                        color: Qt.rgba(1,1,1,0.05)
+                                        border.width: allWallMA.containsMouse ? 2 : 1
+                                        border.color: allWallMA.containsMouse
+                                            ? Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.9)
+                                            : Qt.rgba(1,1,1,0.12)
 
-                                    Repeater {
-                                        model: wallAllModel
+                                        Image {
+                                            anchors.fill: parent
+                                            source: "file://" + model.path
+                                            fillMode: Image.PreserveAspectCrop
+                                            smooth: true
+                                            asynchronous: true
+                                        }
 
-                                        Column {
-                                            Layout.fillWidth: true
-                                            spacing: 6
-
-                                            // Theme header
-                                            Row {
-                                                leftPadding: 12
-                                                spacing: 8
-
-                                                Text {
-                                                    text: "\uf108  " + model.theme
-                                                    font.family: "Symbols Nerd Font, " + ThemeManager.uiFont
-                                                    font.pixelSize: 14
-                                                    font.weight: Font.Bold
-                                                    color: ThemeManager.accentBlue
-                                                    anchors.verticalCenter: parent.verticalCenter
-                                                }
-                                            }
-
-                                            // Wallpaper grid
-                                            Flow {
-                                                width: parent.width
-                                                spacing: 8
-                                                leftPadding: 12
-                                                rightPadding: 12
-
-                                                Repeater {
-                                                    model: { try { return JSON.parse(model.pathsJson) } catch(e) { return [] } }
-
-                                                    Rectangle {
-                                                        width: 150
-                                                        height: 94
-                                                        radius: 8
-                                                        clip: true
-                                                        color: Qt.rgba(1,1,1,0.05)
-                                                        border.width: allWallMA.containsMouse ? 2 : 1
-                                                        border.color: allWallMA.containsMouse
-                                                            ? Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.9)
-                                                            : Qt.rgba(1,1,1,0.12)
-
-                                                        Image {
-                                                            anchors.fill: parent
-                                                            source: "file://" + modelData
-                                                            fillMode: Image.PreserveAspectCrop
-                                                            smooth: true; asynchronous: true
-                                                        }
-
-                                                        Rectangle {
-                                                            anchors.bottom: parent.bottom
-                                                            width: parent.width; height: 20
-                                                            color: Qt.rgba(0,0,0,0.65)
-                                                            Text {
-                                                                anchors.centerIn: parent
-                                                                text: modelData.split('/').pop()
-                                                                font.family: ThemeManager.uiFont
-                                                                font.pixelSize: 9; color: "white"
-                                                                elide: Text.ElideRight; width: parent.width - 8
-                                                            }
-                                                        }
-
-                                                        MouseArea {
-                                                            id: allWallMA
-                                                            anchors.fill: parent; hoverEnabled: true
-                                                            cursorShape: Qt.PointingHandCursor
-                                                            onClicked: wallpaperTabItem.applyWallpaper(modelData)
-                                                        }
-                                                    }
-                                                }
+                                        Rectangle {
+                                            anchors.bottom: parent.bottom
+                                            width: parent.width
+                                            height: 22
+                                            color: Qt.rgba(0,0,0,0.65)
+                                            Text {
+                                                anchors.centerIn: parent
+                                                text: model.name
+                                                font.family: ThemeManager.uiFont
+                                                font.pixelSize: 10
+                                                color: "white"
+                                                elide: Text.ElideRight
+                                                width: parent.width - 8
                                             }
                                         }
-                                    }
 
-                                    Item { Layout.fillWidth: true; height: 16 }
+                                        MouseArea {
+                                            id: allWallMA
+                                            anchors.fill: parent
+                                            hoverEnabled: true
+                                            cursorShape: Qt.PointingHandCursor
+                                            onClicked: wallpaperTabItem.applyWallpaper(model.path)
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -4425,7 +4533,10 @@ MouseArea {
                                     anchors.fill: parent
                                     hoverEnabled: true
                                     cursorShape: Qt.PointingHandCursor
-                                    onClicked: monitorLoader.running = true
+                                    onClicked: {
+                                        monitorLoader.buffer = ""
+                                        monitorLoader.running = true
+                                    }
                                 }
                             }
                         }
@@ -4443,6 +4554,7 @@ MouseArea {
                                 property string monName: model.name
                                 property var monModes: (model.modesJson && model.modesJson.length > 2) ? JSON.parse(model.modesJson) : []
                                 property real monScale: model.scale
+                                property string monCurrentMode: model.currentMode
 
                                 ColumnLayout {
                                     id: monCardCol
@@ -4508,8 +4620,12 @@ MouseArea {
                                         ComboBox {
                                             id: modeCombo
                                             width: parent.width
+                                            height: 32
                                             model: monModes
-                                            currentIndex: monModes.indexOf(model.currentMode)
+                                            currentIndex: {
+                                                var idx = monModes.indexOf(monCurrentMode)
+                                                return idx >= 0 ? idx : 0
+                                            }
 
                                             background: Rectangle {
                                                 color: modeCombo.pressed ? Qt.rgba(1,1,1,0.12) : Qt.rgba(1,1,1,0.07)
@@ -4617,9 +4733,10 @@ MouseArea {
                                         Slider {
                                             id: scaleSlider
                                             width: parent.width
+                                            height: 24
                                             from: 0.5
                                             to: 3.0
-                                            stepSize: 0.25
+                                            stepSize: 0.1
                                             value: monScale
 
                                             background: Rectangle {
@@ -4691,10 +4808,15 @@ MouseArea {
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: parent.right
-        height: 44
+        anchors.topMargin: root.border.width
+        anchors.leftMargin: root.border.width
+        anchors.rightMargin: root.border.width
+        height: 56
         z: 150
         visible: !root.embedded
         color: ThemeManager.bgBase
+        topLeftRadius: Math.max(0, root.hyprRounding - root.border.width)
+        topRightRadius: Math.max(0, root.hyprRounding - root.border.width)
 
         // Title
         Text {
@@ -4730,8 +4852,8 @@ MouseArea {
             Text {
                 anchors.centerIn: parent
                 text: "\u2715"
+                font.family: "Symbols Nerd Font"
                 font.pixelSize: 13
-                font.weight: Font.Bold
                 color: headerCloseMA.containsMouse ? ThemeManager.accentRed : ThemeManager.fgSecondary
                 Behavior on color { ColorAnimation { duration: 150 } }
             }
@@ -4751,10 +4873,12 @@ MouseArea {
         anchors.bottom: parent.bottom
         anchors.left: parent.left
         anchors.right: parent.right
-        height: 52
+        height: 56
         z: 150
         visible: sidebar.currentIndex === 0 || sidebar.currentIndex === 1
         color: ThemeManager.bgBase
+        bottomLeftRadius: root.hyprRounding
+        bottomRightRadius: root.hyprRounding
 
         // Apply button
         Rectangle {

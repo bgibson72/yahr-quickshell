@@ -8,8 +8,8 @@ Rectangle {
     width: 540
     height: 432
     color: ThemeManager.bgBase
-    radius: 16
-    border.width: 1
+    radius: ThemeManager.hyprRounding
+    border.width: ThemeManager.showWidgetBorders ? ThemeManager.widgetBorderWidth : 0
     border.color: Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.35)
     antialiasing: true
     
@@ -303,9 +303,10 @@ Rectangle {
                         
                         Text {
                             id: weatherIcon
-                            text: "⛅"
-                            font.family: "Noto Color Emoji"
-                            font.pixelSize: 52
+                            text: "\ue302"
+                            font.family: "Symbols Nerd Font"
+                            font.pixelSize: 48
+                            color: ThemeManager.accentBlue
                             anchors.verticalCenter: parent.verticalCenter
                         }
                         
@@ -335,21 +336,43 @@ Rectangle {
                     Row {
                         spacing: 16
                         anchors.horizontalCenter: parent.horizontalCenter
-                        
-                        Text {
-                            id: humidityText
-                            text: "💧 47%"
-                            font.family: ThemeManager.uiFont
-                            font.pixelSize: 14
-                            color: ThemeManager.fgSecondary
+
+                        Row {
+                            spacing: 5
+                            anchors.verticalCenter: parent.verticalCenter
+                            Text {
+                                font.family: "Symbols Nerd Font"
+                                font.pixelSize: 14
+                                text: "\uf043"
+                                color: ThemeManager.accentBlue
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+                            Text {
+                                id: humidityText
+                                text: "47%"
+                                font.family: ThemeManager.uiFont
+                                font.pixelSize: 14
+                                color: ThemeManager.fgSecondary
+                            }
                         }
-                        
-                        Text {
-                            id: windText
-                            text: "💨 4mph"
-                            font.family: ThemeManager.uiFont
-                            font.pixelSize: 14
-                            color: ThemeManager.fgSecondary
+
+                        Row {
+                            spacing: 5
+                            anchors.verticalCenter: parent.verticalCenter
+                            Text {
+                                font.family: "Symbols Nerd Font"
+                                font.pixelSize: 14
+                                text: "\ue34b"
+                                color: ThemeManager.fgSecondary
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+                            Text {
+                                id: windText
+                                text: "4mph"
+                                font.family: ThemeManager.uiFont
+                                font.pixelSize: 14
+                                color: ThemeManager.fgSecondary
+                            }
                         }
                     }
                 }
@@ -658,6 +681,21 @@ Rectangle {
         }
     }
     
+    // Map wttr.in emoji codes to Nerd Font weather icons
+    function getWeatherNFIcon(emoji) {
+        if (!emoji) return "\ue30d"
+        if (emoji.indexOf("☀") >= 0 || emoji.indexOf("🌞") >= 0) return "\ue30d"
+        if (emoji.indexOf("🌤") >= 0 || emoji.indexOf("⛅") >= 0) return "\ue302"
+        if (emoji.indexOf("🌥") >= 0 || emoji.indexOf("☁") >= 0) return "\ue312"
+        if (emoji.indexOf("🌦") >= 0) return "\ue309"
+        if (emoji.indexOf("🌧") >= 0) return "\ue308"
+        if (emoji.indexOf("⛈") >= 0 || emoji.indexOf("🌩") >= 0) return "\ue30f"
+        if (emoji.indexOf("🌨") >= 0 || emoji.indexOf("❄") >= 0) return "\ue30a"
+        if (emoji.indexOf("🌫") >= 0) return "\ue313"
+        if (emoji.indexOf("🌬") >= 0 || emoji.indexOf("💨") >= 0) return "\ue34b"
+        return "\ue30d"
+    }
+
     // Fetch weather
     Process {
         id: weatherProcess
@@ -668,12 +706,12 @@ Rectangle {
             onRead: data => {
                 const parts = data.trim().split('|')
                 if (parts.length >= 5) {
-                    weatherIcon.text = (parts[0] || "🌡️").trim()
+                    weatherIcon.text = getWeatherNFIcon((parts[0] || "").trim())
                     let temp = (parts[1] || "N/A").trim()
                     temperatureText.text = temp.replace(/^\+/, "").trim()
                     conditionText.text = (parts[2] || "Unknown").trim()
-                    humidityText.text = "💧 " + (parts[3] || "--").trim()
-                    windText.text = "💨 " + (parts[4] || "--").trim()
+                    humidityText.text = (parts[3] || "--").trim()
+                    windText.text = (parts[4] || "--").trim()
                 }
             }
         }

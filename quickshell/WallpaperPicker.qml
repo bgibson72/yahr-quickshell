@@ -276,10 +276,10 @@ PanelWindow {
             Rectangle {
                 width: parent.width
                 height: 44
-                color: Qt.rgba(1, 1, 1, 0.04)
+                color: "transparent"
                 radius: 10
-                border.width: wallpaperWindow.showWidgetBorders ? 1 : 0
-                border.color: Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.18)
+                border.width: 0
+                border.color: "transparent"
 
                 ListView {
                     id: tabBar

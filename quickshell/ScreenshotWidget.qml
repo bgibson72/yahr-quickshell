@@ -168,8 +168,8 @@ PanelWindow {
         id: background
         anchors.fill: parent
         color: ThemeManager.bgBase
-        radius: 16
-        border.width: screenshotWindow.showWidgetBorders ? screenshotWindow.widgetBorderWidth : 0
+        radius: ThemeManager.hyprRounding
+        border.width: ThemeManager.showWidgetBorders ? ThemeManager.widgetBorderWidth : 0
         border.color: Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.35)
         antialiasing: true
         
@@ -200,19 +200,19 @@ PanelWindow {
                     anchors.right: parent.right
                     anchors.verticalCenter: parent.verticalCenter
                     radius: 6
-                    color: closeMouseArea.containsMouse ? Qt.rgba(ThemeManager.accentRed.r, ThemeManager.accentRed.g, ThemeManager.accentRed.b, 0.30) : "transparent"
-                    border.width: closeMouseArea.containsMouse ? 1 : 0
-                    border.color: Qt.rgba(ThemeManager.accentRed.r, ThemeManager.accentRed.g, ThemeManager.accentRed.b, 0.5)
+                    color: closeMouseArea.containsMouse ? Qt.rgba(ThemeManager.accentRed.r, ThemeManager.accentRed.g, ThemeManager.accentRed.b, 0.30) : Qt.rgba(1,1,1,0.08)
+                    border.width: 1
+                    border.color: closeMouseArea.containsMouse ? Qt.rgba(ThemeManager.accentRed.r, ThemeManager.accentRed.g, ThemeManager.accentRed.b, 0.5) : Qt.rgba(1,1,1,0.18)
 
                     Behavior on color { ColorAnimation { duration: 150 } }
 
                     Text {
                         anchors.centerIn: parent
-                        text: "✕"
-                        font.family: ThemeManager.uiFont
-                        font.pixelSize: 18
-                        font.weight: Font.Bold
-                        color: ThemeManager.fgSecondary
+                        text: "\u2715"
+                        font.family: "Symbols Nerd Font"
+                        font.pixelSize: 13
+                        color: closeMouseArea.containsMouse ? ThemeManager.accentRed : ThemeManager.fgSecondary
+                        Behavior on color { ColorAnimation { duration: 150 } }
                     }
 
                     MouseArea {

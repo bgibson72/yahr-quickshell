@@ -25,7 +25,7 @@ QtObject {
     
     property color bgBase: "#282828"
     property color bgMantle: "#1d2021"
-    property color bgCrust: "#1d2021"
+    property color bgCrust: "#111111"
     
     property color surface0: "#3c3836"
     property color surface1: "#504945"
@@ -36,12 +36,7 @@ QtObject {
     property color border2: "#a89984"
     
     property real barOpacity: 0.85
-    property color bgBaseAlpha: Qt.rgba(
-        parseInt(bgBase.toString().substr(1,2), 16) / 255,
-        parseInt(bgBase.toString().substr(3,2), 16) / 255,
-        parseInt(bgBase.toString().substr(5,2), 16) / 255,
-        barOpacity
-    )
+    property color bgBaseAlpha: Qt.rgba(bgBase.r, bgBase.g, bgBase.b, barOpacity)
     
     property int fontSizeClock: 14
     property int fontSizeWorkspace: 14

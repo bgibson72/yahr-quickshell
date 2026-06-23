@@ -27,8 +27,8 @@ case "$theme_name" in
         gtk_theme="Everforest-Dark"
         icon_theme="Papirus-Dark"
         ;;
-    "catppuccin-mocha"|"Catppuccin Mocha")
-        gtk_theme="Catppuccin-Mocha-Standard-Blue-Dark"
+    "catppuccin-mocha"|"Catppuccin Mocha"|"Catppuccin")
+        gtk_theme="Catppuccin-Dark"
         icon_theme="Papirus-Dark"
         ;;
     "gruvbox-dark"|"Gruvbox")
@@ -52,11 +52,11 @@ case "$theme_name" in
         icon_theme="Papirus-Dark"
         ;;
     "rosepine"|"Rose Pine")
-        gtk_theme="Rose-Pine"
+        gtk_theme="Rosepine-Dark"
         icon_theme="Papirus-Dark"
         ;;
     "solarized-dark"|"Solarized Dark"|"Solarized")
-        gtk_theme="Osaka-BL-LB-Dark-Solarized"
+        gtk_theme="Osaka-Dark"
         icon_theme="Papirus-Dark"
         ;;
     "material"|"Material"|"Material Palenight")
@@ -68,7 +68,7 @@ case "$theme_name" in
         icon_theme="Papirus-Dark"
         ;;
     "kanagawa"|"Kanagawa")
-        gtk_theme="Kanagawa"
+        gtk_theme="Kanagawa-Dark-Dragon"
         icon_theme="Papirus-Dark"
         ;;
     "eldritch"|"Eldritch")
@@ -76,11 +76,11 @@ case "$theme_name" in
         icon_theme="Papirus-Dark"
         ;;
     "monochrome"|"Monochrome")
-        gtk_theme="Graphite-Dark"
+        gtk_theme="Catppuccin-Dark"
         icon_theme="Papirus-Dark"
         ;;
     "solarized"|"Solarized"|"Solarized Dark")
-        gtk_theme="Osaka-BL-LB-Dark-Solarized"
+        gtk_theme="Osaka-Dark"
         icon_theme="Papirus-Dark"
         ;;
     *)
@@ -93,9 +93,8 @@ esac
 
 # Check if GTK theme exists
 if [[ ! -d "$HOME/.themes/$gtk_theme" ]] && [[ ! -d "/usr/share/themes/$gtk_theme" ]]; then
-    echo "⚠ GTK theme not found: $gtk_theme"
-    echo "  Install it or edit the theme mapping in this script"
-    exit 1
+    echo "⚠ GTK theme not found: $gtk_theme, falling back to Catppuccin-Dark"
+    gtk_theme="Catppuccin-Dark"
 fi
 
 # Update GTK3 settings

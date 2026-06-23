@@ -55,6 +55,10 @@ SETTINGS_FILE="$HOME/.config/quickshell/settings.json"
 WIDGET_OPACITY="0.75"
 BAR_LARGE="false"
 UI_FONT="Sen"
+HYPR_ROUNDING="12"
+SHOW_WIDGET_BORDERS="true"
+WIDGET_BORDER_WIDTH="1"
+WORKSPACE_STYLE="numbers"
 if [[ -f "$SETTINGS_FILE" ]]; then
     wo=$(python3 -c "import json; d=json.load(open('$SETTINGS_FILE')); print(d.get('general',{}).get('widgetTransparent', True) and 0.75 or 1.0)" 2>/dev/null)
     [[ -n "$wo" ]] && WIDGET_OPACITY="$wo"
@@ -62,6 +66,14 @@ if [[ -f "$SETTINGS_FILE" ]]; then
     [[ -n "$bl" ]] && BAR_LARGE="$bl"
     uf=$(python3 -c "import json; d=json.load(open('$SETTINGS_FILE')); print(d.get('general',{}).get('uiFont','Sen'))" 2>/dev/null)
     [[ -n "$uf" ]] && UI_FONT="$uf"
+    hr=$(python3 -c "import json; d=json.load(open('$SETTINGS_FILE')); print(d.get('hypr',{}).get('rounding',12))" 2>/dev/null)
+    [[ -n "$hr" ]] && HYPR_ROUNDING="$hr"
+    swb=$(python3 -c "import json; d=json.load(open('$SETTINGS_FILE')); print('true' if d.get('general',{}).get('showWidgetBorders',True) else 'false')" 2>/dev/null)
+    [[ -n "$swb" ]] && SHOW_WIDGET_BORDERS="$swb"
+    wbw=$(python3 -c "import json; d=json.load(open('$SETTINGS_FILE')); print(d.get('general',{}).get('widgetBorderWidth',1))" 2>/dev/null)
+    [[ -n "$wbw" ]] && WIDGET_BORDER_WIDTH="$wbw"
+    ws=$(python3 -c "import json; d=json.load(open('$SETTINGS_FILE')); print(d.get('bar',{}).get('workspaceStyle','numbers'))" 2>/dev/null)
+    [[ -n "$ws" ]] && WORKSPACE_STYLE="$ws"
 fi
 # Append properties if not already present, or update them
 if grep -q "widgetOpacity" "$TARGET"; then
@@ -78,6 +90,26 @@ if grep -q "uiFont" "$TARGET"; then
     sed -i "s/property string uiFont:.*/property string uiFont: \"$UI_FONT\"/" "$TARGET"
 else
     sed -i "/^}$/i\\    property string uiFont: \"$UI_FONT\"" "$TARGET"
+fi
+if grep -q "hyprRounding" "$TARGET"; then
+    sed -i "s/property int hyprRounding:.*/property int hyprRounding: $HYPR_ROUNDING/" "$TARGET"
+else
+    sed -i "/^}$/i\\    property int hyprRounding: $HYPR_ROUNDING" "$TARGET"
+fi
+if grep -q "showWidgetBorders" "$TARGET"; then
+    sed -i "s/property bool showWidgetBorders:.*/property bool showWidgetBorders: $SHOW_WIDGET_BORDERS/" "$TARGET"
+else
+    sed -i "/^}$/i\\    property bool showWidgetBorders: $SHOW_WIDGET_BORDERS" "$TARGET"
+fi
+if grep -q "widgetBorderWidth" "$TARGET"; then
+    sed -i "s/property int widgetBorderWidth:.*/property int widgetBorderWidth: $WIDGET_BORDER_WIDTH/" "$TARGET"
+else
+    sed -i "/^}$/i\\    property int widgetBorderWidth: $WIDGET_BORDER_WIDTH" "$TARGET"
+fi
+if grep -q "workspaceStyle" "$TARGET"; then
+    sed -i "s/property string workspaceStyle:.*/property string workspaceStyle: \"$WORKSPACE_STYLE\"/" "$TARGET"
+else
+    sed -i "/^}$/i\\    property string workspaceStyle: \"$WORKSPACE_STYLE\"" "$TARGET"
 fi
 
 echo -e "${GREEN}✓ Theme switched to: $THEME${NC}"
