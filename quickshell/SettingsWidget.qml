@@ -4813,10 +4813,10 @@ MouseArea {
 
                         Item {
                             Layout.alignment: Qt.AlignHCenter
-                            Layout.preferredWidth: 80
-                            Layout.preferredHeight: 80
-                            implicitWidth: 80
-                            implicitHeight: 80
+                            Layout.preferredWidth: 160
+                            Layout.preferredHeight: 160
+                            implicitWidth: 160
+                            implicitHeight: 160
 
                             Image {
                                 anchors.fill: parent
