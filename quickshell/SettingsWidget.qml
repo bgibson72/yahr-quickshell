@@ -4813,7 +4813,7 @@ MouseArea {
 
                         Image {
                             Layout.alignment: Qt.AlignHCenter
-                            width: 148; height: 148
+                            width: 74; height: 74
                             source: "file://" + Quickshell.env("HOME") + "/.config/quickshell/yahr_logo.png"
                             fillMode: Image.PreserveAspectFit
                             smooth: true; antialiasing: true
