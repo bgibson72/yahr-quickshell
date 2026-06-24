@@ -113,7 +113,7 @@ Rectangle {
             width: 420
             height: column.height + 80
             radius: 28
-            color: Qt.rgba(bgBase.r, bgBase.g, bgBase.b, widgetOpacity)
+            color: Qt.rgba(bgBase.r, bgBase.g, bgBase.b, 1.0)
             border.width: 1
             border.color: Qt.rgba(fgPrimary.r, fgPrimary.g, fgPrimary.b, 0.12)
             
