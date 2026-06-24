@@ -2,12 +2,11 @@
 
 Complete Arch Linux desktop environment featuring Hyprland + Quickshell with unified theme system and comprehensive automated installation.
 
-![yahr_quickshell.png](previews/yahr_quickshell.png)
+![yahr_logo.png](qiockshell/yahr_logo.png)
 
 ## ✨ Features
 - 🎨 **13 Beautiful Themes** - Instant switching across all applications
 - 🖥️ **Quickshell Desktop** - Modern QML-based desktop environment with glass/liquid glass UI
-- 🪟 **Glassmorphism UI** - Semi-transparent panels, frosted glass cards, and gradient borders throughout
 - ⚡ **Unified Theme System** - Synced themes for Hyprland, GTK, Kitty, Firefox, VSCodium, Discord, and more
 - 🎯 **GPU-Aware Installation** - Auto-detects and installs appropriate drivers (NVIDIA/AMD/Intel/Hybrid)
 - 🚀 **Fully Automated Installer** - One command from minimal Arch to complete desktop
@@ -15,11 +14,8 @@ Complete Arch Linux desktop environment featuring Hyprland + Quickshell with uni
 - 📦 **Complete Graphics Stack** - Wayland, Mesa, Vulkan, Qt5/Qt6 support
 - 🔧 **Two Installation Modes** - Full (all features) or Minimal (core only)
 - ⚙️ **YOLO Mode** - Completely unattended installation option
-- 🕐 **Flexible Date & Clock Formats** - Toggle 12/24hr, MM/DD/YYYY vs DD/MM/YYYY, numeric or long date, optional day-of-week
 - 🖼️ **Smart Wallpaper Picker** - Browse theme-matched or all wallpapers in a flat grid; persists across reboots
-- 🔒 **Synced Login Screen** - SDDM and Hyprlock date format follows your Settings choices automatically
-- 🔢 **Workspace Style Toggle** - Switch bar workspaces between numbered labels and dot indicators
-- 🔵 **Live Widget Borders** - Show/hide widget borders and adjust thickness without restarting
+- 🔒 **SDDM & Hyprlock** - Matching SDDM and Hyprlock themes to match your desktop
 - 🔄 **Persistent Theme Settings** - Widget rounding, borders, and workspace style survive theme switches
 
 ## 📋 Prerequisites
