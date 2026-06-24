@@ -4808,7 +4808,6 @@ MouseArea {
                         id: aboutContent
                         width: parent.parent.width
                         spacing: 0
-                        spacing: 0
 
                         Item { Layout.fillWidth: true; height: 32 }
 
