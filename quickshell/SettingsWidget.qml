@@ -4807,8 +4807,7 @@ MouseArea {
                     ColumnLayout {
                         id: aboutContent
                         width: parent.parent.width
-                        leftPadding: 32
-                        rightPadding: 32
+                        spacing: 0
                         spacing: 0
 
                         Item { Layout.fillWidth: true; height: 32 }
@@ -4920,6 +4919,8 @@ MouseArea {
                             ]
                             delegate: ColumnLayout {
                                 Layout.fillWidth: true
+                                Layout.leftMargin: 32
+                                Layout.rightMargin: 32
                                 spacing: 5
                                 RowLayout {
                                     Layout.fillWidth: true
