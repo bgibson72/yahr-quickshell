@@ -4806,8 +4806,9 @@ MouseArea {
 
                     ColumnLayout {
                         id: aboutContent
-                        width: Math.min(640, parent.parent.width - 48)
-                        anchors.horizontalCenter: parent.horizontalCenter
+                        width: parent.parent.width
+                        leftPadding: 32
+                        rightPadding: 32
                         spacing: 0
 
                         Item { Layout.fillWidth: true; height: 32 }
