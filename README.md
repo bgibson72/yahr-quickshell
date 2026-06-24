@@ -225,7 +225,7 @@ Full-featured calendar with Google Calendar iCal URL support. Displays events, r
 <details>
 <summary><b>Settings</b> - Super + Shift + S - YAHR Settings</summary>
 
-![settings.ong](previews/settings.png)
+![settings.png](previews/settings.png)
 </details>
 
 A full-featured settings panel organized into seven tabs:
@@ -285,11 +285,27 @@ Selected wallpaper persists across reboots and is automatically restored on logi
 </details>
 
 <details>
+<summary><b>Weather Widget</b> - Live weather display in the system bar</summary>
+
+Displays current weather conditions, temperature, and a forecast icon directly in the bar. Powered by wttr.in — no API key required. Updates automatically on a configurable interval.
+
+![weather.png](previews/weather.png)
+</details>
+
+<details>
+<summary><b>System Monitor</b> - CPU, RAM, and disk usage at a glance</summary>
+
+Real-time system resource overview showing CPU usage, RAM consumption, and disk utilization with sparkline charts.
+
+![system.png](previews/system.png)
+</details>
+
+<details>
 <summary><b>SDDM Login Screen</b> - Themed display manager with automatic theme sync</summary>
 
 Custom SDDM theme that automatically syncs colors and wallpaper with your selected theme. Test without logging out using: `sddm-greeter-qt6 --test-mode --theme /usr/share/sddm/themes/yahr-theme`
 
-![sddm_screenshot.png](previews/sddm_screenshot.png)
+![sddm.png](previews/sddm.png)
 </details>
 
 
