@@ -649,11 +649,11 @@ SETTINGSEOF`
 
                 // Tab navigation buttons
                 Repeater {
-                    model: 7
+                    model: 8
                     Rectangle {
-                        property int stackIdx:   [0, 1, 2, 4, 5, 3, 6][index]
-                        property string tabIcon: ["", "", "", "", "", "", ""][index]
-                        property string tabLabel: ["Quickshell", "Screenshots", "Bar", "Theme", "Wallpaper", "Hyprland", "Monitors"][index]
+                        property int stackIdx:   [0, 1, 2, 4, 5, 3, 6, 7][index]
+                        property string tabIcon: ["\uf013", "\uf030", "\uf0c9", "\uf1fc", "\uf03e", "\uf359", "\uf108", "\uf05a"][index]
+                        property string tabLabel: ["Quickshell", "Screenshots", "Bar", "Theme", "Wallpaper", "Hyprland", "Monitors", "About"][index]
                         property bool tabHovered: false
 
                         Layout.fillWidth: true
@@ -4797,6 +4797,161 @@ MouseArea {
                     }
                 }
 
+                // Tab 7: ABOUT ─────────────────────────────────────────
+                ScrollView {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    clip: true
+                    ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
+
+                    ColumnLayout {
+                        id: aboutContent
+                        width: Math.min(640, parent.parent.width - 48)
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        spacing: 0
+
+                        Item { Layout.fillWidth: true; height: 32 }
+
+                        Image {
+                            Layout.alignment: Qt.AlignHCenter
+                            width: 148; height: 148
+                            source: "file://" + Quickshell.env("HOME") + "/.config/quickshell/yahr_logo.png"
+                            fillMode: Image.PreserveAspectFit
+                            smooth: true; antialiasing: true
+                        }
+
+                        Item { Layout.fillWidth: true; height: 16 }
+
+                        Text {
+                            Layout.alignment: Qt.AlignHCenter
+                            text: "YahrShell"
+                            font.family: ThemeManager.uiFont
+                            font.pixelSize: 30; font.weight: Font.Bold
+                            color: ThemeManager.fgPrimary
+                        }
+
+                        Item { Layout.fillWidth: true; height: 4 }
+
+                        Text {
+                            Layout.alignment: Qt.AlignHCenter
+                            text: "Yet Another Hyprland Rice"
+                            font.family: ThemeManager.uiFont
+                            font.pixelSize: 14
+                            color: ThemeManager.fgSecondary
+                        }
+
+                        Item { Layout.fillWidth: true; height: 4 }
+
+                        Text {
+                            Layout.alignment: Qt.AlignHCenter
+                            text: "v1.6"
+                            font.family: ThemeManager.uiFont
+                            font.pixelSize: 12; font.weight: Font.Bold
+                            color: ThemeManager.accentBlue
+                        }
+
+                        Item { Layout.fillWidth: true; height: 24 }
+
+                        Row {
+                            Layout.alignment: Qt.AlignHCenter
+                            spacing: 12
+
+                            Rectangle {
+                                width: 196; height: 40; radius: 8
+                                color: ghMA.containsMouse
+                                    ? Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.22)
+                                    : Qt.rgba(1,1,1,0.06)
+                                border.width: 1
+                                border.color: Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.40)
+                                Behavior on color { ColorAnimation { duration: 120 } }
+                                Row {
+                                    anchors.centerIn: parent; spacing: 8
+                                    Text { text: "\uf09b"; font.family: "Symbols Nerd Font"; font.pixelSize: 17; color: ThemeManager.accentBlue; anchors.verticalCenter: parent.verticalCenter }
+                                    Text { text: "GitHub Repository"; font.family: ThemeManager.uiFont; font.pixelSize: 13; color: ThemeManager.fgPrimary; anchors.verticalCenter: parent.verticalCenter }
+                                }
+                                MouseArea {
+                                    id: ghMA; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor
+                                    onClicked: Quickshell.execDetached(["xdg-open", "https://github.com/bgibson72/yahr-quickshell"])
+                                }
+                            }
+
+                            Rectangle {
+                                width: 196; height: 40; radius: 8
+                                color: webMA.containsMouse
+                                    ? Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.22)
+                                    : Qt.rgba(1,1,1,0.06)
+                                border.width: 1
+                                border.color: Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.40)
+                                Behavior on color { ColorAnimation { duration: 120 } }
+                                Row {
+                                    anchors.centerIn: parent; spacing: 8
+                                    Text { text: "\uf0ac"; font.family: "Symbols Nerd Font"; font.pixelSize: 15; color: ThemeManager.accentBlue; anchors.verticalCenter: parent.verticalCenter }
+                                    Text { text: "vegvisirdesign.me"; font.family: ThemeManager.uiFont; font.pixelSize: 13; color: ThemeManager.fgPrimary; anchors.verticalCenter: parent.verticalCenter }
+                                }
+                                MouseArea {
+                                    id: webMA; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor
+                                    onClicked: Quickshell.execDetached(["xdg-open", "https://vegvisirdesign.me"])
+                                }
+                            }
+                        }
+
+                        Item { Layout.fillWidth: true; height: 28 }
+                        Rectangle { Layout.fillWidth: true; height: 1; color: Qt.rgba(1,1,1,0.10) }
+                        Item { Layout.fillWidth: true; height: 20 }
+
+                        Row {
+                            spacing: 8
+                            Text { text: "\uf1da"; font.family: "Symbols Nerd Font"; font.pixelSize: 15; color: ThemeManager.accentBlue; anchors.verticalCenter: parent.verticalCenter }
+                            Text { text: "Update Log"; font.family: ThemeManager.uiFont; font.pixelSize: 15; font.weight: Font.Bold; color: ThemeManager.fgPrimary; anchors.verticalCenter: parent.verticalCenter }
+                        }
+
+                        Item { Layout.fillWidth: true; height: 14 }
+
+                        Repeater {
+                            model: [
+                                {version: "v1.6", date: "June 2026", summary: "Widget color consistency across all panels; workspace style toggle (numbers/dots); live widget borders; all 7 ThemeManager preferences now persist across theme switches; flat All Wallpapers grid; GTK theme mapping fixes; bgBaseAlpha fix in all theme files; Monochrome & Solarized wallpaper sets."},
+                                {version: "v1.5", date: "2026", summary: "Flexible date format controls — 12/24hr, MM/DD vs DD/MM, numeric or long-form, optional day-of-week prefix; SDDM & Hyprlock date sync; wallpaper persistence across reboots; awww daemon support replacing swww."},
+                                {version: "v1.4", date: "2026", summary: "Glass/Liquid Glass UI overhaul — frosted panels, specular highlights, smooth hover transitions; glass window borders with 45° theme-accent gradient; glass Mako notification styling; Sip-StartPage integration; AppLauncher cubic slide animation."},
+                                {version: "v1.3", date: "2026", summary: "Google Calendar integration via iCal URL — full RRULE support (daily/weekly/monthly/yearly); timezone-aware event parsing; all-day events; event indicators; auto-refresh every 15 minutes."},
+                                {version: "v1.2", date: "2026", summary: "Bar position toggle (top/bottom); Neovim AstroVim theme sync; enhanced GPU auto-detection installer; Thunar thumbnail support; colored weather emoji icons; fastfetch themed logos; CLI app launcher support."},
+                                {version: "v1.1", date: "2026", summary: "Update counter for official repos and AUR; pacman lock file handling; paru/yay integration; hourly checks with wake-from-sleep detection."},
+                                {version: "v1.0", date: "2025", summary: "Initial release — Hyprland + Quickshell desktop with 13 themes, unified instant theme switching, glassmorphism UI, fully automated Arch Linux installer with GPU detection and YOLO unattended mode."}
+                            ]
+                            delegate: ColumnLayout {
+                                Layout.fillWidth: true
+                                spacing: 5
+                                RowLayout {
+                                    Layout.fillWidth: true
+                                    Text { text: modelData.version; font.family: ThemeManager.uiFont; font.pixelSize: 13; font.weight: Font.Bold; color: ThemeManager.accentBlue }
+                                    Text { text: "— " + modelData.date; font.family: ThemeManager.uiFont; font.pixelSize: 12; color: ThemeManager.fgTertiary }
+                                    Item { Layout.fillWidth: true }
+                                }
+                                Text {
+                                    Layout.fillWidth: true
+                                    text: modelData.summary
+                                    font.family: ThemeManager.uiFont; font.pixelSize: 12
+                                    color: ThemeManager.fgSecondary
+                                    wrapMode: Text.WordWrap; lineHeight: 1.35
+                                }
+                                Item { Layout.fillWidth: true; height: 6 }
+                                Rectangle { Layout.fillWidth: true; height: 1; color: Qt.rgba(1,1,1,0.07) }
+                                Item { Layout.fillWidth: true; height: 10 }
+                            }
+                        }
+
+                        Item { Layout.fillWidth: true; height: 8 }
+
+                        Text {
+                            Layout.alignment: Qt.AlignHCenter
+                            text: "\uf004  Made with love for the Arch + Hyprland community"
+                            font.family: "Symbols Nerd Font, " + ThemeManager.uiFont
+                            font.pixelSize: 12; color: ThemeManager.fgTertiary
+                        }
+
+                        Item { Layout.fillWidth: true; height: 28 }
+                    }
+                }
+
             }
 
 
@@ -4823,7 +4978,7 @@ MouseArea {
             anchors.left: parent.left
             anchors.leftMargin: 20
             anchors.verticalCenter: parent.verticalCenter
-            text: "Settings"
+            text: "YAHR Settings"
             font.family: ThemeManager.uiFont
             font.pixelSize: 16
             font.weight: Font.Bold
