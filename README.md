@@ -217,6 +217,18 @@ Full-featured calendar with Google Calendar iCal URL support. Displays events, r
 </details>
 
 <details>
+<summary><b>Weather</b> - Super + C - Local weather (requires OpenWeather API key or location information shared in Settings</summary>
+
+![weather.png](previews/weather.png)
+</details>
+
+<details>
+<summary><b>System</b> - Super + Shift + C - System gauges including CPU, Memory and Disk Usage, and CPU Temperature</summary>
+
+![system.png](previews/system.png)
+</details>
+
+<details>
 <summary><b>Screenshot Tool</b> - Super + PrtScrn - Multi-mode screenshots</summary>
 
 ![screenshot_tool.png](previews/screenshot_tool.png)
