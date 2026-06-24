@@ -199,7 +199,7 @@ Switch themes instantly with Super + T. All themes include matching wallpapers a
 <details>
 <summary><b>App Launcher</b> - Super + A - Fuzzy search application launcher</summary>
 
-![app_launcher.png](previews/app_launcher.png)
+![app_menu.png](previews/app_menu.png)
 </details>
 
 <details>
@@ -213,13 +213,7 @@ Switch themes instantly with Super + T. All themes include matching wallpapers a
 
 Full-featured calendar with Google Calendar iCal URL support. Displays events, recurring events (daily, weekly, monthly, yearly), all-day events, and timezone-aware events. Click any day to view its events. Event indicators show which days have scheduled events. Auto-refreshes every 15 minutes.
 
-![calendar_widgets.png](previews/calendar_widgets.png)
-</details>
-
-<details>
-<summary><b>Power Menu</b> - Super + Escape - System controls</summary>
-
-![power_menu.png](previews/power_menu.png)
+![calendar.png](previews/calendar.png)
 </details>
 
 <details>
@@ -229,7 +223,10 @@ Full-featured calendar with Google Calendar iCal URL support. Displays events, r
 </details>
 
 <details>
-<summary><b>Settings</b> - Super + Shift + S - Quickshell configuration panel</summary>
+<summary><b>Settings</b> - Super + Shift + S - YAHR Settings</summary>
+
+![settings.ong](previews/settings.png)
+</details>
 
 A full-featured settings panel organized into seven tabs:
 
