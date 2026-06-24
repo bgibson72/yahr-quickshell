@@ -663,6 +663,10 @@ QtObject {
     property real widgetOpacity: WIDGET_OPACITY_PLACEHOLDER
     property bool barLarge: BAR_LARGE_PLACEHOLDER
     property string uiFont: "UI_FONT_PLACEHOLDER"
+    property int hyprRounding: HYPR_ROUNDING_PLACEHOLDER
+    property bool showWidgetBorders: SHOW_WIDGET_BORDERS_PLACEHOLDER
+    property int widgetBorderWidth: WIDGET_BORDER_WIDTH_PLACEHOLDER
+    property string workspaceStyle: "WORKSPACE_STYLE_PLACEHOLDER"
 }
 EOF
 
@@ -738,6 +742,10 @@ EOF
     local widget_opacity="0.75"
     local bar_large="false"
     local ui_font="Sen"
+    local hypr_rounding="12"
+    local show_widget_borders="true"
+    local widget_border_width="1"
+    local workspace_style="numbers"
     if [[ -f "$settings_file" ]]; then
         local wo
         wo=$(python3 -c "import sys,json; d=json.load(open('$settings_file')); print(d.get('general',{}).get('widgetTransparent', True) and 0.75 or 1.0)" 2>/dev/null)
@@ -748,10 +756,26 @@ EOF
         local uf
         uf=$(python3 -c "import sys,json; d=json.load(open('$settings_file')); print(d.get('general',{}).get('uiFont','Sen'))" 2>/dev/null)
         [[ -n "$uf" ]] && ui_font="$uf"
+        local hr
+        hr=$(python3 -c "import sys,json; d=json.load(open('$settings_file')); print(d.get('hypr',{}).get('rounding',12))" 2>/dev/null)
+        [[ -n "$hr" ]] && hypr_rounding="$hr"
+        local swb
+        swb=$(python3 -c "import sys,json; d=json.load(open('$settings_file')); print('true' if d.get('general',{}).get('showWidgetBorders',True) else 'false')" 2>/dev/null)
+        [[ -n "$swb" ]] && show_widget_borders="$swb"
+        local wbw
+        wbw=$(python3 -c "import sys,json; d=json.load(open('$settings_file')); print(d.get('general',{}).get('widgetBorderWidth',1))" 2>/dev/null)
+        [[ -n "$wbw" ]] && widget_border_width="$wbw"
+        local ws
+        ws=$(python3 -c "import sys,json; d=json.load(open('$settings_file')); print(d.get('bar',{}).get('workspaceStyle','numbers'))" 2>/dev/null)
+        [[ -n "$ws" ]] && workspace_style="$ws"
     fi
     sed -i "s/WIDGET_OPACITY_PLACEHOLDER/$widget_opacity/g" "$QUICKSHELL_DIR/ThemeManager.qml.tmp"
     sed -i "s/BAR_LARGE_PLACEHOLDER/$bar_large/g" "$QUICKSHELL_DIR/ThemeManager.qml.tmp"
     sed -i "s/UI_FONT_PLACEHOLDER/$ui_font/g" "$QUICKSHELL_DIR/ThemeManager.qml.tmp"
+    sed -i "s/HYPR_ROUNDING_PLACEHOLDER/$hypr_rounding/g" "$QUICKSHELL_DIR/ThemeManager.qml.tmp"
+    sed -i "s/SHOW_WIDGET_BORDERS_PLACEHOLDER/$show_widget_borders/g" "$QUICKSHELL_DIR/ThemeManager.qml.tmp"
+    sed -i "s/WIDGET_BORDER_WIDTH_PLACEHOLDER/$widget_border_width/g" "$QUICKSHELL_DIR/ThemeManager.qml.tmp"
+    sed -i "s/WORKSPACE_STYLE_PLACEHOLDER/$workspace_style/g" "$QUICKSHELL_DIR/ThemeManager.qml.tmp"
 
     # Move temp file to final location atomically
     mv "$QUICKSHELL_DIR/ThemeManager.qml.tmp" "$QUICKSHELL_DIR/ThemeManager.qml"
