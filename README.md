@@ -2,7 +2,7 @@
 
 Complete Arch Linux desktop environment featuring Hyprland + Quickshell with unified theme system and comprehensive automated installation.
 
-![yahr_logo.png](qiockshell/yahr_logo.png)
+![yahr_logo.png](quickshell/yahr_logo.png)
 
 ## ✨ Features
 - 🎨 **13 Beautiful Themes** - Instant switching across all applications
