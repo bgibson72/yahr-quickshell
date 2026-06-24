@@ -4813,10 +4813,10 @@ MouseArea {
 
                         Item {
                             Layout.alignment: Qt.AlignHCenter
-                Layout.preferredWidth: 320
-                Layout.preferredHeight: 320
-                implicitWidth: 320
-                implicitHeight: 320
+                Layout.preferredWidth: 420
+                Layout.preferredHeight: 420
+                implicitWidth: 420
+                implicitHeight: 420
                             Image {
                                 anchors.fill: parent
                                 source: "file://" + Quickshell.env("HOME") + "/.config/quickshell/yahr_logo.png"
