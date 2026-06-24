@@ -4811,12 +4811,19 @@ MouseArea {
 
                         Item { Layout.fillWidth: true; height: 32 }
 
-                        Image {
+                        Item {
                             Layout.alignment: Qt.AlignHCenter
-                            width: 74; height: 74
-                            source: "file://" + Quickshell.env("HOME") + "/.config/quickshell/yahr_logo.png"
-                            fillMode: Image.PreserveAspectFit
-                            smooth: true; antialiasing: true
+                            Layout.preferredWidth: 80
+                            Layout.preferredHeight: 80
+                            implicitWidth: 80
+                            implicitHeight: 80
+
+                            Image {
+                                anchors.fill: parent
+                                source: "file://" + Quickshell.env("HOME") + "/.config/quickshell/yahr_logo.png"
+                                fillMode: Image.PreserveAspectFit
+                                smooth: true; antialiasing: true
+                            }
                         }
 
                         Item { Layout.fillWidth: true; height: 16 }
