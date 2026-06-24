@@ -197,7 +197,7 @@ Switch themes instantly with Super + T. All themes include matching wallpapers a
 ### Custom Widgets
 
 <details>
-<summary><b>App Launcher</b> - Super + A - Fuzzy search application launcher</summary>
+<summary><b>App Menu</b> - Super + A - Fuzzy search application launcher</summary>
 
 ![app_menu.png](previews/app_menu.png)
 </details>
