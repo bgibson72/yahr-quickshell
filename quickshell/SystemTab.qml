@@ -607,7 +607,7 @@ Item {
     // Temperature process
     Process {
         id: tempProcess
-        command: ["sh", "-c", "sensors 2>/dev/null | grep -E 'Package id 0|Tctl|Core 0' | head -1 | awk '{print $4}' | sed 's/[+°C]//g' || echo 0"]
+        command: ["sh", "-c", "sensors 2>/dev/null | grep -E 'Package id 0:|Tctl:|^CPU:' | head -1 | grep -oE '\\+[0-9]+\\.[0-9]+' | head -1 | tr -d '+' || echo 0"]
         running: false
         
         stdout: SplitParser {

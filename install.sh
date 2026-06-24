@@ -811,7 +811,11 @@ check_dependencies() {
     if ! command_exists "checkupdates"; then
         missing_recommended+=("pacman-contrib")
     fi
-    
+
+    if ! command_exists "sensors"; then
+        missing_recommended+=("lm_sensors")
+    fi
+
     # Install critical dependencies
     if [ ${#missing_critical[@]} -gt 0 ]; then
         print_error "Missing critical dependencies:"
