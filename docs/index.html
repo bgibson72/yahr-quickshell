@@ -207,7 +207,6 @@
       backdrop-filter: blur(22px) saturate(1.4);
       border-bottom: 1px solid var(--border);
       transition: background var(--t);
-      overflow: visible;
     }
 
     .nav-inner {
@@ -228,15 +227,8 @@
       font-size: 17px;
       color: var(--fg-primary);
       text-decoration: none;
-      overflow: visible;
     }
-    .nav-logo img {
-      width: 125px; height: 125px;
-      position: relative;
-      top: 20px;
-      z-index: 1;
-      flex-shrink: 0;
-    }
+
     .nav-logo:hover { color: var(--accent); }
 
     .nav-links {
@@ -1105,7 +1097,6 @@
 <nav id="navbar">
   <div class="nav-inner">
     <a href="#hero" class="nav-logo">
-      <img src="logos/yahr_logo_notext.png" alt="YahrShell">
       YahrShell
     </a>
 
