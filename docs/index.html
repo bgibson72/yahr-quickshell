@@ -2410,7 +2410,7 @@ function applyPalette(name) {
   Object.entries(p.vars).forEach(([k,v]) => root.style.setProperty(k, v));
 
   // Update logos
-  document.querySelectorAll('.hero-logo, .nav-logo img, .footer-logo img').forEach(el => {
+  document.querySelectorAll('.hero-logo, .footer-logo img').forEach(el => {
     el.src = p.logo;
   });
 
