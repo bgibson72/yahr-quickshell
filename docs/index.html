@@ -1,0 +1,2470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="YahrShell — Yet Another Hyprland Rice. Complete Arch Linux desktop with 13 themes, glassmorphism UI, GPU-aware installation, and one-command install.">
+  <meta property="og:title" content="YahrShell — Yet Another Hyprland Rice">
+  <meta property="og:description" content="Modern Arch Linux desktop with 13 curated themes, glassmorphism UI, GPU-aware install.">
+  <meta property="og:image" content="https://raw.githubusercontent.com/bgibson72/yahr-quickshell/main/previews/catppuccin.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <title>YahrShell — Yet Another Hyprland Rice</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+
+  <style>
+    /* ============================================================
+       VARIABLES & RESET
+    ============================================================ */
+    :root {
+      --bg-base:     #1e1e2e;
+      --bg-mantle:   #181825;
+      --bg-crust:    #11111b;
+      --bg-surface0: #313244;
+      --bg-surface1: #45475a;
+      --fg-primary:  #cdd6f4;
+      --fg-secondary:#bac2de;
+      --fg-tertiary: #a6adc8;
+      --accent:        #89b4fa;
+      --accent-purple: #cba6f7;
+      --accent-green:  #a6e3a1;
+      --accent-red:    #f38ba8;
+      --accent-yellow: #f9e2af;
+      --accent-pink:   #f5c2e7;
+      --accent-teal:   #94e2d5;
+      --accent-orange: #fab387;
+      --border:       rgba(137,180,250,.12);
+      --border-hover: rgba(137,180,250,.35);
+      --glass:        rgba(49,50,68,.65);
+      --shadow:       0 8px 32px rgba(0,0,0,.55);
+      --glow:         0 0 50px rgba(137,180,250,.15);
+      --r:  12px;
+      --rs:  8px;
+      --rl: 20px;
+      --t:  .2s ease;
+      --ts: .4s ease;
+      --font:      'Inter', system-ui, sans-serif;
+      --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+    }
+
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+    html {
+      scroll-behavior: smooth;
+      scrollbar-width: thin;
+      scrollbar-color: var(--bg-surface1) var(--bg-crust);
+    }
+
+    ::-webkit-scrollbar { width:6px; }
+    ::-webkit-scrollbar-track { background: var(--bg-crust); }
+    ::-webkit-scrollbar-thumb { background: var(--bg-surface1); border-radius:3px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+    body {
+      background: var(--bg-crust);
+      color: var(--fg-primary);
+      font-family: var(--font);
+      line-height: 1.65;
+      overflow-x: hidden;
+    }
+
+    a { color: var(--accent); text-decoration: none; transition: color var(--t); }
+    a:hover { color: var(--accent-purple); }
+    img { max-width:100%; display:block; }
+    button { font-family: var(--font); }
+
+    /* ============================================================
+       TYPOGRAPHY HELPERS
+    ============================================================ */
+    .section-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      color: var(--accent);
+      padding: 4px 14px;
+      background: rgba(137,180,250,.08);
+      border: 1px solid rgba(137,180,250,.22);
+      border-radius: 999px;
+      margin-bottom: 14px;
+    }
+
+    .section-title {
+      font-size: clamp(26px, 4vw, 46px);
+      font-weight: 800;
+      letter-spacing: -.02em;
+      margin-bottom: 14px;
+      background: linear-gradient(135deg, var(--fg-primary) 0%, var(--accent) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .section-sub {
+      font-size: 16px;
+      color: var(--fg-secondary);
+      max-width: 560px;
+      line-height: 1.75;
+    }
+
+    code {
+      font-family: var(--font-mono);
+      font-size: .85em;
+      padding: 2px 7px;
+      background: rgba(137,180,250,.1);
+      color: var(--accent);
+      border-radius: 4px;
+    }
+
+    kbd {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 8px;
+      background: var(--bg-surface0);
+      border: 1px solid var(--bg-surface1);
+      border-radius: 5px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--fg-secondary);
+      box-shadow: 0 2px 0 var(--bg-crust);
+    }
+
+    /* ============================================================
+       LAYOUT
+    ============================================================ */
+    .container {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    section { padding: 96px 0; position: relative; }
+
+    .section-hd { margin-bottom: 56px; }
+
+    /* ============================================================
+       BUTTONS
+    ============================================================ */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 22px;
+      border-radius: var(--rs);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid transparent;
+      text-decoration: none;
+      transition: all var(--t);
+    }
+    .btn-lg { padding: 14px 32px; font-size: 16px; border-radius: var(--r); }
+
+    .btn-primary {
+      background: var(--accent);
+      color: var(--bg-crust);
+      border-color: var(--accent);
+    }
+    .btn-primary:hover {
+      background: transparent;
+      color: var(--accent);
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--fg-primary);
+      border-color: rgba(255,255,255,.15);
+    }
+    .btn-outline:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: rgba(137,180,250,.06);
+    }
+
+    .btn-green {
+      background: var(--accent-green);
+      color: var(--bg-crust);
+      border-color: var(--accent-green);
+    }
+    .btn-green:hover {
+      background: transparent;
+      color: var(--accent-green);
+    }
+
+    /* ============================================================
+       NAVBAR
+    ============================================================ */
+    #navbar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 1000;
+      background: rgba(17,17,27,.82);
+      backdrop-filter: blur(22px) saturate(1.4);
+      border-bottom: 1px solid var(--border);
+      transition: background var(--t);
+    }
+
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 62px;
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      font-weight: 800;
+      font-size: 17px;
+      color: var(--fg-primary);
+      text-decoration: none;
+    }
+    .nav-logo img { width:34px; height:34px; border-radius:8px; }
+    .nav-logo:hover { color: var(--accent); }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+      list-style: none;
+    }
+    .nav-links a {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--fg-secondary);
+      position: relative;
+      transition: color var(--t);
+    }
+    .nav-links a::after {
+      content:'';
+      position: absolute;
+      bottom: -4px; left: 0;
+      width: 0; height: 2px;
+      background: var(--accent);
+      border-radius: 1px;
+      transition: width var(--t);
+    }
+    .nav-links a:hover, .nav-links a.active { color: var(--fg-primary); }
+    .nav-links a:hover::after, .nav-links a.active::after { width:100%; }
+
+    .nav-right { display:flex; align-items:center; gap:10px; }
+
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      padding: 5px;
+    }
+    .hamburger span {
+      display:block;
+      width:23px; height:2px;
+      background: var(--fg-primary);
+      border-radius:1px;
+      transition: all var(--t);
+    }
+    .hamburger.open span:nth-child(1) { transform: rotate(45deg) translate(5px,5px); }
+    .hamburger.open span:nth-child(2) { opacity:0; }
+    .hamburger.open span:nth-child(3) { transform: rotate(-45deg) translate(5px,-5px); }
+
+    .mobile-menu {
+      display: none;
+      position: fixed;
+      top: 62px; left:0; right:0;
+      background: rgba(17,17,27,.97);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 24px 20px;
+      z-index: 999;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .mobile-menu.open { display:flex; }
+    .mobile-menu a {
+      padding: 13px 14px;
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--fg-secondary);
+      border-radius: 8px;
+      transition: all var(--t);
+    }
+    .mobile-menu a:hover { background: rgba(137,180,250,.08); color: var(--accent); }
+
+    /* ============================================================
+       HERO
+    ============================================================ */
+    #hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 110px 24px 80px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    #stars-canvas {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .hero-glow {
+      position: absolute;
+      width: 700px; height: 700px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(137,180,250,.1) 0%, transparent 70%);
+      top: 50%; left: 50%;
+      transform: translate(-50%,-50%);
+      pointer-events: none;
+      animation: glow-pulse 5s ease-in-out infinite;
+    }
+
+    .hero-glow-2 {
+      position: absolute;
+      width: 400px; height: 400px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(203,166,247,.07) 0%, transparent 70%);
+      top: 30%; right: 10%;
+      pointer-events: none;
+      animation: glow-pulse 7s ease-in-out infinite reverse;
+    }
+
+    @keyframes glow-pulse {
+      0%,100% { opacity:.7; transform:translate(-50%,-50%) scale(1); }
+      50%      { opacity:1;  transform:translate(-50%,-50%) scale(1.12); }
+    }
+
+    .hero-content { position:relative; z-index:1; max-width:820px; }
+
+    .hero-logo {
+      width: 128px; height: 128px;
+      margin: 0 auto 28px;
+      filter: drop-shadow(0 0 40px rgba(137,180,250,.45));
+      animation: float 6s ease-in-out infinite;
+      border-radius: 24px;
+    }
+    @keyframes float {
+      0%,100% { transform: translateY(0); }
+      50%      { transform: translateY(-14px); }
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 16px;
+      background: rgba(137,180,250,.1);
+      border: 1px solid rgba(137,180,250,.28);
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--accent);
+      margin-bottom: 22px;
+      letter-spacing: .04em;
+    }
+
+    .hero-title {
+      font-size: clamp(52px, 10vw, 104px);
+      font-weight: 900;
+      letter-spacing: -.04em;
+      line-height: 1;
+      margin-bottom: 14px;
+      background: linear-gradient(135deg, #cdd6f4 0%, #89b4fa 40%, #cba6f7 80%, #f5c2e7 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-subtitle {
+      font-size: clamp(13px,2vw,16px);
+      color: var(--fg-tertiary);
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      font-weight: 400;
+      margin-bottom: 8px;
+    }
+
+    .hero-desc {
+      font-size: clamp(14px,2vw,18px);
+      color: var(--fg-secondary);
+      margin: 0 auto 44px;
+      max-width: 600px;
+      line-height: 1.75;
+    }
+
+    .hero-actions {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .hero-stats {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 36px;
+      margin-top: 64px;
+      flex-wrap: wrap;
+    }
+    .hero-stat { text-align:center; }
+    .hero-stat-num {
+      font-size: 34px;
+      font-weight: 800;
+      color: var(--accent);
+      line-height:1;
+    }
+    .hero-stat-label {
+      font-size: 11px;
+      color: var(--fg-tertiary);
+      margin-top: 4px;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+    }
+    .hero-sep { width:1px; height:40px; background:var(--border); }
+
+    .scroll-hint {
+      position: absolute;
+      bottom: 36px; left:50%;
+      transform: translateX(-50%);
+      display:flex; flex-direction:column; align-items:center; gap:6px;
+      font-size:10px; color:var(--fg-tertiary);
+      letter-spacing: .12em; text-transform:uppercase;
+      animation: bounce-hint 2.2s ease-in-out infinite;
+      cursor:pointer; user-select:none;
+    }
+    @keyframes bounce-hint {
+      0%,100% { transform:translateX(-50%) translateY(0); }
+      50%      { transform:translateX(-50%) translateY(9px); }
+    }
+    .scroll-hint svg { opacity:.5; }
+
+    /* ============================================================
+       FEATURES
+    ============================================================ */
+    #features { background: var(--bg-mantle); border-top:1px solid var(--border); border-bottom:1px solid var(--border); }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(270px,1fr));
+      gap: 18px;
+    }
+
+    .feat-card {
+      background: var(--glass);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 28px;
+      transition: all var(--t);
+      position:relative;
+      overflow:hidden;
+      backdrop-filter: blur(10px);
+    }
+    .feat-card::before {
+      content:'';
+      position:absolute; top:0; left:0; right:0; height:1px;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+      opacity:0; transition:opacity var(--t);
+    }
+    .feat-card:hover { border-color:var(--border-hover); transform:translateY(-5px); box-shadow:var(--shadow),var(--glow); }
+    .feat-card:hover::before { opacity:1; }
+
+    .feat-icon { font-size:28px; margin-bottom:14px; display:block; }
+    .feat-title { font-size:15px; font-weight:700; color:var(--fg-primary); margin-bottom:7px; }
+    .feat-desc { font-size:13px; color:var(--fg-secondary); line-height:1.65; }
+
+    /* ============================================================
+       COMPONENTS
+    ============================================================ */
+    #components { background: var(--bg-crust); }
+
+    .comp-grid {
+      display: grid;
+      grid-template-columns: repeat(2,1fr);
+      gap: 20px;
+    }
+
+    .comp-card {
+      background: var(--glass);
+      border: 1px solid var(--border);
+      border-radius: var(--rl);
+      padding: 28px;
+      transition: all var(--t);
+      display:flex; gap:18px; align-items:flex-start;
+    }
+    .comp-card:hover { border-color:var(--border-hover); box-shadow:var(--shadow); transform:translateY(-3px); }
+
+    .comp-icon {
+      width:52px; height:52px; flex-shrink:0;
+      border-radius: var(--rs);
+      background: rgba(137,180,250,.1);
+      border: 1px solid rgba(137,180,250,.2);
+      display:flex; align-items:center; justify-content:center;
+      font-size:22px;
+    }
+
+    .comp-body h3 { font-size:17px; font-weight:700; color:var(--fg-primary); margin-bottom:3px; }
+    .comp-type {
+      display:inline-block; font-size:10px; font-weight:700;
+      letter-spacing:.08em; text-transform:uppercase;
+      color:var(--accent); background:rgba(137,180,250,.1);
+      border-radius:4px; padding:2px 7px; margin-bottom:8px;
+    }
+    .comp-body p { font-size:13px; color:var(--fg-secondary); line-height:1.65; }
+    .comp-tags { display:flex; flex-wrap:wrap; gap:6px; margin-top:12px; }
+    .tag {
+      font-size:11px; padding:3px 10px; border-radius:999px;
+      font-weight:500; border:1px solid;
+    }
+    .tag-b { background:rgba(137,180,250,.1); color:var(--accent); border-color:rgba(137,180,250,.25); }
+    .tag-g { background:rgba(166,227,161,.1); color:var(--accent-green); border-color:rgba(166,227,161,.25); }
+    .tag-p { background:rgba(203,166,247,.1); color:var(--accent-purple); border-color:rgba(203,166,247,.25); }
+    .tag-t { background:rgba(148,226,213,.1); color:var(--accent-teal); border-color:rgba(148,226,213,.25); }
+    .tag-y { background:rgba(249,226,175,.1); color:var(--accent-yellow); border-color:rgba(249,226,175,.25); }
+
+    /* ============================================================
+       THEMING
+    ============================================================ */
+    #themes { background: var(--bg-mantle); border-top:1px solid var(--border); border-bottom:1px solid var(--border); }
+
+    .themes-intro {
+      background: linear-gradient(135deg, rgba(137,180,250,.07), rgba(203,166,247,.07));
+      border: 1px solid rgba(137,180,250,.18);
+      border-radius: var(--r);
+      padding: 24px 28px;
+      margin-bottom: 40px;
+      font-size: 14px;
+      color: var(--fg-secondary);
+      line-height: 1.7;
+    }
+    .themes-intro strong { color: var(--accent); font-weight:600; }
+
+    .themes-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(175px,1fr));
+      gap: 14px;
+      margin-bottom: 36px;
+    }
+
+    .theme-card {
+      border-radius: var(--r);
+      overflow: hidden;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: all var(--t);
+      position:relative;
+    }
+    .theme-card:hover { transform:translateY(-5px); box-shadow:0 12px 40px rgba(0,0,0,.6); }
+    .theme-card.active { border-color: var(--accent-green) !important; box-shadow: 0 0 0 4px rgba(166,227,161,.15), 0 12px 40px rgba(0,0,0,.6); }
+
+    .theme-top {
+      padding: 16px 14px 12px;
+      display:flex; align-items:center; justify-content:space-between;
+    }
+    .theme-name { font-size:13px; font-weight:700; }
+    .theme-check {
+      width:17px; height:17px; border-radius:50%;
+      background:var(--accent-green);
+      display:flex; align-items:center; justify-content:center;
+      font-size:9px; color:#11111b; font-weight:700;
+      opacity:0; transform:scale(0);
+      transition: all var(--t);
+    }
+    .theme-card.active .theme-check { opacity:1; transform:scale(1); }
+
+    .theme-swatches {
+      display:flex; padding:0 14px 14px; gap:3px;
+    }
+    .swatch { flex:1; height:7px; border-radius:2px; }
+
+    .theme-active-badge {
+      position:absolute; top:8px; left:8px;
+      font-size:9px; font-weight:700; color:#11111b;
+      background:var(--accent-green); border-radius:4px;
+      padding:2px 6px; opacity:0; transition:opacity var(--t);
+    }
+    .theme-card.active .theme-active-badge { opacity:1; }
+
+    /* Preview pane */
+    .theme-preview-wrap {
+      border-radius: var(--rl);
+      overflow:hidden;
+      border: 1px solid var(--border);
+      position:relative;
+      background: var(--bg-surface0);
+      min-height: 420px;
+    }
+    .theme-preview-wrap img {
+      width:100%; height:auto;
+      display:block;
+      transition:opacity .35s ease;
+    }
+    .preview-label {
+      position:absolute; bottom:0; left:0; right:0;
+      padding:16px 20px;
+      background:linear-gradient(to top, rgba(17,17,27,.9), transparent);
+      font-size:14px; font-weight:600; color:var(--fg-primary);
+    }
+    .preview-hint {
+      text-align:center; font-size:13px; color:var(--fg-tertiary);
+      padding:40px 20px; margin:0;
+    }
+
+    /* ============================================================
+       INSTALL
+    ============================================================ */
+    #install { background: var(--bg-crust); }
+
+    .install-wrap {
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      gap: 48px;
+      align-items: flex-start;
+    }
+
+    /* Sticky step nav */
+    .install-nav { position:sticky; top:90px; }
+    .install-nav-list { list-style:none; display:flex; flex-direction:column; gap:4px; }
+    .install-nav-item a {
+      display:flex; align-items:center; gap:12px;
+      padding:12px 14px; border-radius:8px;
+      font-size:13px; font-weight:500; color:var(--fg-secondary);
+      transition:all var(--t); text-decoration:none;
+    }
+    .install-nav-item a:hover { background:rgba(137,180,250,.08); color:var(--accent); }
+    .install-nav-item.active a { background:rgba(137,180,250,.12); color:var(--accent); font-weight:600; }
+    .step-dot {
+      width:22px; height:22px; border-radius:50%;
+      display:flex; align-items:center; justify-content:center;
+      font-size:11px; font-weight:700; flex-shrink:0;
+      background:var(--bg-surface0); color:var(--fg-tertiary);
+      border:1px solid var(--border);
+      transition: all var(--t);
+    }
+    .install-nav-item.active .step-dot {
+      background:var(--accent); color:var(--bg-crust); border-color:var(--accent);
+    }
+
+    .install-steps { display:flex; flex-direction:column; gap:48px; }
+
+    .install-step {
+      padding-top: 8px;
+    }
+
+    .step-hd {
+      display:flex; align-items:center; gap:14px; margin-bottom:16px;
+    }
+    .step-num {
+      width:42px; height:42px; border-radius:50%; flex-shrink:0;
+      background:rgba(137,180,250,.12);
+      border:2px solid var(--accent);
+      display:flex; align-items:center; justify-content:center;
+      font-size:17px; font-weight:800; color:var(--accent);
+    }
+    .step-hd h3 { font-size:20px; font-weight:700; color:var(--fg-primary); }
+    .step-hd .step-tag {
+      font-size:10px; font-weight:700; text-transform:uppercase;
+      letter-spacing:.08em; padding:3px 9px;
+      border-radius:4px;
+    }
+    .step-tag-req { background:rgba(166,227,161,.12); color:var(--accent-green); border:1px solid rgba(166,227,161,.3); }
+    .step-tag-opt { background:rgba(249,226,175,.12); color:var(--accent-yellow); border:1px solid rgba(249,226,175,.3); }
+    .step-tag-rec { background:rgba(137,180,250,.12); color:var(--accent); border:1px solid rgba(137,180,250,.3); }
+
+    .step-body p {
+      font-size:15px; color:var(--fg-secondary);
+      line-height:1.75; margin-bottom:16px;
+    }
+
+    /* Terminal */
+    .terminal {
+      background: #0d0d14;
+      border:1px solid rgba(255,255,255,.07);
+      border-radius:var(--r); overflow:hidden;
+      font-family:var(--font-mono); font-size:13.5px;
+      position:relative; margin-bottom:16px;
+    }
+    .term-bar {
+      display:flex; align-items:center; gap:7px;
+      padding:9px 14px;
+      background:rgba(255,255,255,.04);
+      border-bottom:1px solid rgba(255,255,255,.05);
+    }
+    .tdot { width:11px; height:11px; border-radius:50%; }
+    .tdot-r { background:#f38ba8; }
+    .tdot-y { background:#f9e2af; }
+    .tdot-g { background:#a6e3a1; }
+    .term-title { flex:1; text-align:center; font-size:11px; color:var(--fg-tertiary); }
+    .copy-btn {
+      background:transparent; border:1px solid rgba(255,255,255,.12);
+      border-radius:4px; padding:2px 9px; font-size:11px;
+      color:var(--fg-tertiary); cursor:pointer;
+      transition:all var(--t);
+    }
+    .copy-btn:hover { border-color:var(--accent); color:var(--accent); }
+    .copy-btn.ok { border-color:var(--accent-green); color:var(--accent-green); }
+    .term-body { padding:18px 20px; line-height:1.9; }
+    .tl { display:flex; gap:8px; }
+    .tp { color:#a6e3a1; user-select:none; }
+    .tc { color:#cdd6f4; }
+    .tcmt { color:#6c7086; font-style:italic; }
+    .tout { color:#89b4fa; padding-left:18px; }
+    .thighlight { color:#f9e2af; }
+    .tgood { color:#a6e3a1; }
+    .tblank { display:block; height:8px; }
+
+    /* Mode cards */
+    .mode-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:16px; }
+    .mode-card {
+      background:var(--glass);
+      border:1px solid var(--border);
+      border-radius:var(--r); padding:22px;
+    }
+    .mode-card h4 {
+      font-size:15px; font-weight:700; color:var(--fg-primary);
+      margin-bottom:4px; display:flex; align-items:center; gap:8px;
+    }
+    .mode-card .rec-badge {
+      font-size:9px; font-weight:700; text-transform:uppercase;
+      letter-spacing:.08em; color:#11111b; background:var(--accent-green);
+      border-radius:3px; padding:2px 6px;
+    }
+    .mode-card p { font-size:12px; color:var(--fg-tertiary); margin-bottom:12px; }
+    .mode-card ul { list-style:none; display:flex; flex-direction:column; gap:5px; }
+    .mode-card li { font-size:12px; color:var(--fg-secondary); display:flex; align-items:flex-start; gap:7px; }
+    .mode-card li::before { content:'›'; color:var(--accent); font-weight:700; flex-shrink:0; margin-top:1px; }
+
+    /* Install type cards */
+    .type-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:16px; }
+    .type-card {
+      background:var(--glass); border:1px solid var(--border);
+      border-radius:var(--r); padding:22px;
+    }
+    .type-card h4 { font-size:15px; font-weight:700; color:var(--fg-primary); margin-bottom:8px; }
+    .type-card ul { list-style:none; display:flex; flex-direction:column; gap:4px; }
+    .type-card li { font-size:12px; color:var(--fg-secondary); display:flex; align-items:center; gap:7px; }
+    .type-card li::before { content:'✓'; color:var(--accent-green); font-weight:700; }
+
+    /* ============================================================
+       SCREENSHOT GALLERY
+    ============================================================ */
+    #screenshots { background: var(--bg-mantle); border-top:1px solid var(--border); }
+
+    .gallery-tabs {
+      display:flex; gap:8px; margin-bottom:28px; flex-wrap:wrap;
+    }
+    .gtab {
+      padding:8px 20px; border-radius:999px;
+      font-size:13px; font-weight:600;
+      cursor:pointer; border:1px solid var(--border);
+      color:var(--fg-secondary); background:transparent;
+      transition:all var(--t);
+    }
+    .gtab:hover { border-color:var(--accent); color:var(--accent); }
+    .gtab.active { background:rgba(137,180,250,.12); border-color:rgba(137,180,250,.4); color:var(--accent); }
+
+    .gallery-panel { display:none; }
+    .gallery-panel.active {
+      display:grid;
+      grid-template-columns: repeat(3,1fr);
+      gap:14px;
+    }
+
+    .gitem {
+      position:relative; border-radius:var(--r); overflow:hidden;
+      cursor:pointer; aspect-ratio:16/10;
+      background:var(--bg-surface0);
+      border:1px solid var(--border);
+      transition:all var(--t);
+    }
+    .gitem:hover { border-color:rgba(137,180,250,.5); box-shadow:var(--shadow); }
+    .gitem img {
+      width:100%; height:100%;
+      object-fit:cover;
+      transition:transform var(--ts);
+    }
+    .gitem:hover img { transform:scale(1.05); }
+    .g-overlay {
+      position:absolute; inset:0;
+      background:rgba(17,17,27,.65);
+      display:flex; flex-direction:column;
+      align-items:center; justify-content:center;
+      gap:8px;
+      opacity:0; transition:opacity var(--t);
+    }
+    .gitem:hover .g-overlay { opacity:1; }
+    .g-overlay-icon { font-size:28px; }
+    .g-overlay-label {
+      font-size:12px; font-weight:600; color:white;
+      text-shadow:0 2px 8px rgba(0,0,0,.6);
+    }
+    .g-cap {
+      position:absolute; bottom:0; left:0; right:0;
+      padding:10px 12px;
+      background:linear-gradient(to top,rgba(0,0,0,.8),transparent);
+      font-size:11px; font-weight:600; color:white;
+    }
+
+    /* ============================================================
+       KEYBINDS
+    ============================================================ */
+    #keybinds { background: var(--bg-crust); border-top:1px solid var(--border); }
+
+    .keybind-grid {
+      display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr));
+      gap:14px;
+    }
+    .keybind-card {
+      display:flex; align-items:center; justify-content:space-between;
+      background:var(--glass); border:1px solid var(--border);
+      border-radius:var(--rs); padding:14px 18px;
+      transition:border-color var(--t);
+    }
+    .keybind-card:hover { border-color:var(--border-hover); }
+    .keybind-name { font-size:13px; font-weight:500; color:var(--fg-primary); }
+    .keybind-desc { font-size:12px; color:var(--fg-tertiary); margin-top:2px; }
+    .keybind-keys { display:flex; align-items:center; gap:4px; flex-shrink:0; margin-left:12px; }
+    .keybind-keys .plus { font-size:10px; color:var(--fg-tertiary); }
+
+    /* ============================================================
+       TROUBLESHOOT
+    ============================================================ */
+    #troubleshoot { background: var(--bg-mantle); border-top:1px solid var(--border); }
+
+    .faq { display:flex; flex-direction:column; gap:10px; margin-bottom:56px; }
+
+    .faq-item {
+      background:var(--glass); border:1px solid var(--border);
+      border-radius:var(--r); overflow:hidden;
+      transition:border-color var(--t);
+    }
+    .faq-item:hover { border-color:var(--border-hover); }
+    .faq-item.open { border-color:rgba(137,180,250,.3); }
+
+    .faq-q {
+      display:flex; align-items:center; justify-content:space-between;
+      padding:18px 22px; cursor:pointer; gap:14px;
+      user-select:none;
+    }
+    .faq-q-left { display:flex; align-items:center; gap:12px; }
+    .faq-label {
+      font-size:10px; font-weight:700; text-transform:uppercase;
+      letter-spacing:.07em; padding:2px 8px; border-radius:4px;
+      flex-shrink:0;
+    }
+    .lbl-common { background:rgba(249,226,175,.12); color:var(--accent-yellow); border:1px solid rgba(249,226,175,.25); }
+    .lbl-gpu    { background:rgba(203,166,247,.12); color:var(--accent-purple); border:1px solid rgba(203,166,247,.25); }
+    .lbl-theme  { background:rgba(137,180,250,.12); color:var(--accent); border:1px solid rgba(137,180,250,.25); }
+    .lbl-gh     { background:rgba(166,227,161,.12); color:var(--accent-green); border:1px solid rgba(166,227,161,.25); }
+    .lbl-audio  { background:rgba(148,226,213,.12); color:var(--accent-teal); border:1px solid rgba(148,226,213,.25); }
+    .lbl-sddm   { background:rgba(245,194,231,.12); color:var(--accent-pink); border:1px solid rgba(245,194,231,.25); }
+
+    .faq-text { font-size:14px; font-weight:600; color:var(--fg-primary); }
+    .faq-chev { font-size:18px; color:var(--fg-tertiary); transition:transform var(--t); flex-shrink:0; }
+    .faq-item.open .faq-chev { transform:rotate(180deg); color:var(--accent); }
+
+    .faq-body { max-height:0; overflow:hidden; transition:max-height .4s ease; }
+    .faq-item.open .faq-body { max-height:600px; }
+    .faq-content {
+      padding:0 22px 22px;
+      border-top:1px solid var(--border);
+      padding-top:18px;
+    }
+    .faq-content p { font-size:13px; color:var(--fg-secondary); line-height:1.75; margin-bottom:10px; }
+    .faq-content p:last-child { margin-bottom:0; }
+    .faq-content ul { list-style:none; display:flex; flex-direction:column; gap:5px; padding-left:8px; }
+    .faq-content ul li { font-size:13px; color:var(--fg-secondary); display:flex; align-items:flex-start; gap:8px; }
+    .faq-content ul li::before { content:'→'; color:var(--accent); flex-shrink:0; }
+
+    /* Issue CTA */
+    .issue-cta {
+      background:linear-gradient(135deg,rgba(137,180,250,.07),rgba(203,166,247,.07));
+      border:1px solid rgba(137,180,250,.2);
+      border-radius:var(--rl); padding:52px;
+      text-align:center;
+    }
+    .issue-cta h3 { font-size:26px; font-weight:800; color:var(--fg-primary); margin-bottom:12px; }
+    .issue-cta > p { font-size:15px; color:var(--fg-secondary); max-width:500px; margin:0 auto 32px; line-height:1.75; }
+
+    .issue-checklist {
+      display:grid; grid-template-columns:repeat(2,1fr);
+      gap:10px; max-width:580px; margin:0 auto 36px; text-align:left;
+    }
+    .iss-item {
+      display:flex; align-items:flex-start; gap:8px;
+      font-size:13px; color:var(--fg-secondary); line-height:1.5;
+    }
+    .iss-item::before { content:'✓'; color:var(--accent-green); font-weight:700; flex-shrink:0; margin-top:1px; }
+
+    .issue-actions { display:flex; align-items:center; justify-content:center; gap:12px; flex-wrap:wrap; }
+
+    /* ============================================================
+       FOOTER
+    ============================================================ */
+    footer {
+      background:var(--bg-crust);
+      border-top:1px solid var(--border);
+      padding:64px 0 32px;
+    }
+
+    .footer-grid {
+      display:grid; grid-template-columns:2.2fr 1fr 1fr 1fr;
+      gap:48px; margin-bottom:48px;
+    }
+
+    .footer-brand { display:flex; flex-direction:column; gap:14px; }
+    .footer-logo {
+      display:flex; align-items:center; gap:10px;
+      font-weight:800; font-size:17px; color:var(--fg-primary);
+      text-decoration:none;
+    }
+    .footer-logo img { width:32px; height:32px; border-radius:7px; }
+    .footer-logo:hover { color:var(--accent); }
+    .footer-desc { font-size:13px; color:var(--fg-tertiary); line-height:1.7; }
+    .footer-social { display:flex; gap:10px; }
+    .social-btn {
+      width:34px; height:34px; border-radius:var(--rs);
+      background:var(--glass); border:1px solid var(--border);
+      display:flex; align-items:center; justify-content:center;
+      font-size:16px; color:var(--fg-tertiary);
+      transition:all var(--t); text-decoration:none;
+    }
+    .social-btn:hover { border-color:var(--accent); color:var(--accent); }
+
+    .footer-col h4 {
+      font-size:12px; font-weight:700; color:var(--fg-primary);
+      text-transform:uppercase; letter-spacing:.1em; margin-bottom:16px;
+    }
+    .footer-links { list-style:none; display:flex; flex-direction:column; gap:9px; }
+    .footer-links a { font-size:13px; color:var(--fg-tertiary); transition:color var(--t); }
+    .footer-links a:hover { color:var(--accent); }
+
+    .footer-bottom {
+      display:flex; align-items:center; justify-content:space-between;
+      padding-top:24px; border-top:1px solid var(--border);
+      flex-wrap:wrap; gap:10px;
+    }
+    .footer-copy { font-size:12px; color:var(--fg-tertiary); }
+    .footer-copy a { color:var(--fg-secondary); }
+    .footer-made { font-size:12px; color:var(--fg-tertiary); }
+
+    /* ============================================================
+       LIGHTBOX
+    ============================================================ */
+    #lightbox {
+      position:fixed; inset:0; z-index:9999;
+      background:rgba(17,17,27,.93);
+      backdrop-filter:blur(22px);
+      display:flex; align-items:center; justify-content:center;
+      opacity:0; pointer-events:none; transition:opacity .3s ease;
+      padding:20px;
+    }
+    #lightbox.open { opacity:1; pointer-events:all; }
+    .lb-inner { position:relative; max-width:92vw; }
+    .lb-inner img { max-width:90vw; max-height:87vh; border-radius:var(--r); box-shadow:0 24px 80px rgba(0,0,0,.9); display:block; }
+    .lb-close {
+      position:absolute; top:-44px; right:0;
+      background:none; border:none; cursor:pointer;
+      font-size:22px; color:var(--fg-secondary); padding:8px;
+      transition:color var(--t);
+    }
+    .lb-close:hover { color:var(--accent-red); }
+    .lb-cap { text-align:center; margin-top:12px; font-size:13px; color:var(--fg-secondary); }
+
+    /* ============================================================
+       FADE-IN ANIMATIONS
+    ============================================================ */
+    .fi {
+      opacity:0;
+      transform:translateY(22px);
+      transition:opacity .65s ease, transform .65s ease;
+    }
+    .fi.vis { opacity:1; transform:translateY(0); }
+    .fi-d1 { transition-delay:.08s; }
+    .fi-d2 { transition-delay:.16s; }
+    .fi-d3 { transition-delay:.24s; }
+    .fi-d4 { transition-delay:.32s; }
+    .fi-d5 { transition-delay:.40s; }
+
+    /* Divider */
+    .divider { width:100%; height:1px; background:var(--border); }
+
+    /* ============================================================
+       RESPONSIVE
+    ============================================================ */
+    @media (max-width:1024px) {
+      .install-wrap { grid-template-columns:1fr; }
+      .install-nav { display:none; }
+      .comp-grid { grid-template-columns:1fr; }
+      .footer-grid { grid-template-columns:1fr 1fr; }
+    }
+
+    @media (max-width:768px) {
+      section { padding:64px 0; }
+      .nav-links, .nav-right .btn { display:none; }
+      .hamburger { display:flex; }
+      .gallery-panel.active { grid-template-columns:repeat(2,1fr); }
+      .mode-grid, .type-grid { grid-template-columns:1fr; }
+      .themes-grid { grid-template-columns:repeat(2,1fr); }
+      .footer-grid { grid-template-columns:1fr; }
+      .issue-checklist { grid-template-columns:1fr; }
+      .hero-stats { gap:20px; }
+      .hero-sep { display:none; }
+      .issue-cta { padding:32px 24px; }
+      .keybind-grid { grid-template-columns:1fr; }
+    }
+
+    @media (max-width:480px) {
+      .gallery-panel.active { grid-template-columns:1fr; }
+      .themes-grid { grid-template-columns:repeat(2,1fr); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ============================================================
+     LIGHTBOX
+============================================================ -->
+<div id="lightbox">
+  <div class="lb-inner">
+    <button class="lb-close" onclick="closeLB()" aria-label="Close">✕</button>
+    <img id="lb-img" src="" alt="">
+    <p class="lb-cap" id="lb-cap"></p>
+  </div>
+</div>
+
+<!-- ============================================================
+     NAVBAR
+============================================================ -->
+<nav id="navbar">
+  <div class="nav-inner">
+    <a href="#hero" class="nav-logo">
+      <img src="https://raw.githubusercontent.com/bgibson72/yahr-quickshell/main/quickshell/yahr_logo.png" alt="YahrShell">
+      YahrShell
+    </a>
+
+    <ul class="nav-links" id="nav-links">
+      <li><a href="#features">Features</a></li>
+      <li><a href="#components">Components</a></li>
+      <li><a href="#themes">Themes</a></li>
+      <li><a href="#install">Install</a></li>
+      <li><a href="#screenshots">Gallery</a></li>
+      <li><a href="#troubleshoot">Help</a></li>
+    </ul>
+
+    <div class="nav-right">
+      <a href="https://github.com/bgibson72/yahr-quickshell" target="_blank" rel="noopener" class="btn btn-outline">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>
+        GitHub
+      </a>
+      <a href="#install" class="btn btn-primary">Install Now</a>
+    </div>
+
+    <div class="hamburger" id="ham" onclick="toggleMobile()">
+      <span></span><span></span><span></span>
+    </div>
+  </div>
+</nav>
+
+<!-- Mobile Menu -->
+<div class="mobile-menu" id="mob-menu">
+  <a href="#features"    onclick="closeMob()">✨ Features</a>
+  <a href="#components"  onclick="closeMob()">🧩 Components</a>
+  <a href="#themes"      onclick="closeMob()">🎨 Themes</a>
+  <a href="#install"     onclick="closeMob()">🚀 Install</a>
+  <a href="#screenshots" onclick="closeMob()">🖼️ Gallery</a>
+  <a href="#keybinds"    onclick="closeMob()">⌨️ Keybinds</a>
+  <a href="#troubleshoot" onclick="closeMob()">🔧 Help</a>
+</div>
+
+<!-- ============================================================
+     HERO
+============================================================ -->
+<section id="hero">
+  <canvas id="stars-canvas"></canvas>
+  <div class="hero-glow"></div>
+  <div class="hero-glow-2"></div>
+
+  <div class="hero-content">
+    <img
+      src="https://raw.githubusercontent.com/bgibson72/yahr-quickshell/main/quickshell/yahr_logo.png"
+      alt="YahrShell Logo"
+      class="hero-logo"
+    >
+
+    <div class="hero-badge">🍚 v1.6 — Yet Another Hyprland Rice</div>
+
+    <h1 class="hero-title">YahrShell</h1>
+    <p class="hero-subtitle">Arch Linux · Hyprland · Quickshell</p>
+    <p class="hero-desc">
+      A complete, beautiful Arch Linux desktop with 13 curated themes, glassmorphism UI,
+      GPU-aware installation, and a single-command installer that takes you from a minimal Arch ISO to a full desktop.
+    </p>
+
+    <div class="hero-actions">
+      <a href="#install" class="btn btn-primary btn-lg">🚀 Get Started</a>
+      <a href="https://github.com/bgibson72/yahr-quickshell" target="_blank" rel="noopener" class="btn btn-outline btn-lg">View on GitHub</a>
+    </div>
+
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <div class="hero-stat-num" data-count="13">0</div>
+        <div class="hero-stat-label">Themes</div>
+      </div>
+      <div class="hero-sep"></div>
+      <div class="hero-stat">
+        <div class="hero-stat-num">1</div>
+        <div class="hero-stat-label">Command Install</div>
+      </div>
+      <div class="hero-sep"></div>
+      <div class="hero-stat">
+        <div class="hero-stat-num" data-count="65">0</div>
+        <div class="hero-stat-label">GitHub Stars</div>
+      </div>
+      <div class="hero-sep"></div>
+      <div class="hero-stat">
+        <div class="hero-stat-num" data-count="7">0</div>
+        <div class="hero-stat-label">Widget Panels</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="scroll-hint" onclick="document.getElementById('features').scrollIntoView({behavior:'smooth'})">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+    <span>scroll</span>
+  </div>
+</section>
+
+<!-- ============================================================
+     FEATURES
+============================================================ -->
+<section id="features">
+  <div class="container">
+    <div class="section-hd fi">
+      <div class="section-label">✨ Why YahrShell?</div>
+      <h2 class="section-title">Everything you need, out of the box</h2>
+      <p class="section-sub">Curated defaults, powerful customization, and a unified theme system that syncs across every application.</p>
+    </div>
+
+    <div class="features-grid">
+      <div class="feat-card fi fi-d1">
+        <span class="feat-icon">🎨</span>
+        <h3 class="feat-title">13 Beautiful Themes</h3>
+        <p class="feat-desc">Catppuccin, Dracula, Gruvbox, Nord, TokyoNight, and 8 more. Switch instantly with <kbd>Super</kbd><kbd>T</kbd> — all apps sync in 30–45 seconds.</p>
+      </div>
+      <div class="feat-card fi fi-d2">
+        <span class="feat-icon">💧</span>
+        <h3 class="feat-title">Glass / Liquid Glass UI</h3>
+        <p class="feat-desc">Frosted panels, specular highlights, accent borders at 35% alpha, and 150ms smooth transitions on every hover and state change.</p>
+      </div>
+      <div class="feat-card fi fi-d3">
+        <span class="feat-icon">🚀</span>
+        <h3 class="feat-title">One-Command Install</h3>
+        <p class="feat-desc">Clone the repo and run <code>./install.sh</code>. The installer handles GPU drivers, AUR, the full graphics stack, and all desktop components.</p>
+      </div>
+      <div class="feat-card fi fi-d4">
+        <span class="feat-icon">🎯</span>
+        <h3 class="feat-title">GPU-Aware Installation</h3>
+        <p class="feat-desc">Auto-detects NVIDIA (dkms/nouveau), AMD, Intel, and Hybrid GPU configs and installs the correct driver stack with proper env vars.</p>
+      </div>
+      <div class="feat-card fi fi-d1">
+        <span class="feat-icon">⚙️</span>
+        <h3 class="feat-title">YOLO Unattended Mode</h3>
+        <p class="feat-desc">Zero prompts, fully automated. Ideal for scripted installs, VMs, or when you just want the defaults applied with no questions asked.</p>
+      </div>
+      <div class="feat-card fi fi-d2">
+        <span class="feat-icon">🖼️</span>
+        <h3 class="feat-title">Smart Wallpaper Picker</h3>
+        <p class="feat-desc">Browse theme-matched or all wallpapers in a flat grid. Last choice persists across reboots via <code>~/.config/quickshell/last-wallpaper</code>.</p>
+      </div>
+      <div class="feat-card fi fi-d3">
+        <span class="feat-icon">🔄</span>
+        <h3 class="feat-title">Persistent Settings</h3>
+        <p class="feat-desc">Rounding, border thickness, workspace style, font, and bar size all survive theme switches. Settings stored in a clean JSON file.</p>
+      </div>
+      <div class="feat-card fi fi-d4">
+        <span class="feat-icon">📅</span>
+        <h3 class="feat-title">Google Calendar Integration</h3>
+        <p class="feat-desc">Full iCal URL support with RRULE recurring events (daily/weekly/monthly/yearly), timezone handling, event indicators, and 15-min auto-refresh.</p>
+      </div>
+      <div class="feat-card fi fi-d1">
+        <span class="feat-icon">🔒</span>
+        <h3 class="feat-title">SDDM & Hyprlock Sync</h3>
+        <p class="feat-desc">Login screen and lock screen automatically receive your active theme's colors and wallpaper whenever you switch themes.</p>
+      </div>
+      <div class="feat-card fi fi-d2">
+        <span class="feat-icon">⚡</span>
+        <h3 class="feat-title">Unified Theme Sync</h3>
+        <p class="feat-desc">GTK, Kitty, Firefox, Neovim (AstroVim), VSCodium, Mako, Hyprlock, Starship — all get your active theme colors automatically.</p>
+      </div>
+      <div class="feat-card fi fi-d3">
+        <span class="feat-icon">🖥️</span>
+        <h3 class="feat-title">Multi-Monitor Manager</h3>
+        <p class="feat-desc">Live resolution, refresh rate, and scale controls per monitor in the Settings panel — changes apply immediately via Hyprland.</p>
+      </div>
+      <div class="feat-card fi fi-d4">
+        <span class="feat-icon">📦</span>
+        <h3 class="feat-title">Modular Config</h3>
+        <p class="feat-desc">Hyprland config split into focused files: <code>monitors.conf</code>, <code>keybinds.conf</code>, <code>look-and-feel.conf</code>, and more. Easy to maintain.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     CORE COMPONENTS
+============================================================ -->
+<section id="components">
+  <div class="container">
+    <div class="section-hd fi">
+      <div class="section-label">🧩 Core Components</div>
+      <h2 class="section-title">A thoughtfully assembled stack</h2>
+      <p class="section-sub">Each component is chosen for quality, theme compatibility, and seamless integration with the rest of the system.</p>
+    </div>
+
+    <div class="comp-grid">
+
+      <div class="comp-card fi fi-d1">
+        <div class="comp-icon">🖥️</div>
+        <div class="comp-body">
+          <span class="comp-type">Desktop Framework</span>
+          <h3>Quickshell</h3>
+          <p>A modern QML-based desktop environment shell by <em>outfoxxed</em>. Drives the bar, all widgets, panels, and drawers with smooth animations and live property bindings.</p>
+          <div class="comp-tags">
+            <span class="tag tag-b">QML</span>
+            <span class="tag tag-b">Wayland</span>
+            <span class="tag tag-g">Live Updates</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="comp-card fi fi-d2">
+        <div class="comp-icon">⚡</div>
+        <div class="comp-body">
+          <span class="comp-type">Wayland Compositor</span>
+          <h3>Hyprland</h3>
+          <p>Dynamic tiling Wayland compositor by Vaxry. Handles windows, workspaces, animations, keybinds, and effects. Configured through modular <code>.conf</code> files.</p>
+          <div class="comp-tags">
+            <span class="tag tag-b">Tiling</span>
+            <span class="tag tag-p">Animations</span>
+            <span class="tag tag-g">Glass Borders</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="comp-card fi fi-d3">
+        <div class="comp-icon">🐱</div>
+        <div class="comp-body">
+          <span class="comp-type">Terminal Emulator</span>
+          <h3>Kitty</h3>
+          <p>GPU-accelerated terminal with full theme sync. Colors update automatically with each theme switch. Supports the kitty graphics protocol for fastfetch logo rendering.</p>
+          <div class="comp-tags">
+            <span class="tag tag-g">Theme Sync</span>
+            <span class="tag tag-b">GPU Accelerated</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="comp-card fi fi-d4">
+        <div class="comp-icon">🔔</div>
+        <div class="comp-body">
+          <span class="comp-type">Notification Daemon</span>
+          <h3>Mako</h3>
+          <p>Wayland-native notification daemon styled to match the glass design language — semi-transparent background, thin urgency-aware accent border, compositor blur, and themed progress bars.</p>
+          <div class="comp-tags">
+            <span class="tag tag-b">Glass Style</span>
+            <span class="tag tag-p">Theme Sync</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="comp-card fi fi-d1">
+        <div class="comp-icon">🔍</div>
+        <div class="comp-body">
+          <span class="comp-type">App Launcher + Clipboard</span>
+          <h3>Wofi + Cliphist</h3>
+          <p>Wofi provides the fuzzy-search application launcher and clipboard history GUI. Cliphist captures your clipboard history in the background, surfaced via <kbd>Super</kbd><kbd>V</kbd>.</p>
+          <div class="comp-tags">
+            <span class="tag tag-b">Fuzzy Search</span>
+            <span class="tag tag-t">Clipboard</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="comp-card fi fi-d2">
+        <div class="comp-icon">🎵</div>
+        <div class="comp-body">
+          <span class="comp-type">Audio Stack</span>
+          <h3>PipeWire + WirePlumber</h3>
+          <p>Modern low-latency audio with PipeWire and WirePlumber session manager. Pavucontrol provides a graphical mixer. Volume controls integrate directly into the bar tray.</p>
+          <div class="comp-tags">
+            <span class="tag tag-g">Low Latency</span>
+            <span class="tag tag-b">Wayland Native</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="comp-card fi fi-d3">
+        <div class="comp-icon">🎭</div>
+        <div class="comp-body">
+          <span class="comp-type">Icon Theme</span>
+          <h3>Papirus Icons</h3>
+          <p>Papirus icon theme with dynamic folder colors that automatically match your active accent color when you switch themes. Managed via <code>papirus-folders</code>.</p>
+          <div class="comp-tags">
+            <span class="tag tag-p">Dynamic Colors</span>
+            <span class="tag tag-g">Theme Sync</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="comp-card fi fi-d4">
+        <div class="comp-icon">🌟</div>
+        <div class="comp-body">
+          <span class="comp-type">Shell Prompt</span>
+          <h3>Starship</h3>
+          <p>Cross-shell prompt with a YahrShell configuration that matches your theme's accent colors. Color-only updates preserve your custom glyphs and segments.</p>
+          <div class="comp-tags">
+            <span class="tag tag-y">Theme Sync</span>
+            <span class="tag tag-b">Cross-Shell</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="comp-card fi fi-d1">
+        <div class="comp-icon">📸</div>
+        <div class="comp-body">
+          <span class="comp-type">Screenshot Tool</span>
+          <h3>Hyprshot + Grim</h3>
+          <p>Multi-mode screenshot widget accessible via <kbd>Super</kbd><kbd>PrtScrn</kbd>. Supports region, window, and fullscreen capture with configurable save path and format.</p>
+          <div class="comp-tags">
+            <span class="tag tag-b">Multi-Mode</span>
+            <span class="tag tag-g">GUI Widget</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="comp-card fi fi-d2">
+        <div class="comp-icon">🔐</div>
+        <div class="comp-body">
+          <span class="comp-type">Display Manager</span>
+          <h3>SDDM (optional)</h3>
+          <p>Custom SDDM theme that syncs colors and wallpaper with your system theme. Installing creates a minimal sudoers rule for passwordless sync — can be skipped if preferred.</p>
+          <div class="comp-tags">
+            <span class="tag tag-p">Theme Sync</span>
+            <span class="tag tag-y">Optional</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     THEMING
+============================================================ -->
+<section id="themes">
+  <div class="container">
+    <div class="section-hd fi">
+      <div class="section-label">🎨 Heavy Theming</div>
+      <h2 class="section-title">13 handcrafted themes</h2>
+      <p class="section-sub">Switch instantly with <kbd>Super</kbd><kbd>T</kbd>. Every color is propagated to Hyprland, GTK, Kitty, Firefox, Neovim, SDDM, and more within seconds.</p>
+    </div>
+
+    <div class="themes-intro fi">
+      <strong>The theme system is fully unified.</strong> A single <code>switch-theme.sh</code> call updates Hyprland border colors, GTK theme, Kitty terminal colors, Firefox userChrome, Neovim colorscheme, SDDM login screen, Hyprlock lock screen, Mako notification styling, Starship prompt, Papirus icon folder colors, and fastfetch display — while preserving all your personal settings like rounding, border thickness, and workspace style.
+      <br><br>
+      Click any theme below to preview it.
+    </div>
+
+    <div class="themes-grid fi" id="themes-grid">
+      <!-- Injected by JS -->
+    </div>
+
+    <div class="theme-preview-wrap fi" id="theme-preview-wrap">
+      <p class="preview-hint" id="preview-hint">👆 Click a theme above to preview it</p>
+      <img id="theme-preview-img" src="" alt="" style="display:none;" onclick="openLB(this.src, document.getElementById('theme-preview-label').textContent)">
+      <div class="preview-label" id="theme-preview-label" style="display:none;"></div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============================================================
+     INSTALLATION WALKTHROUGH
+============================================================ -->
+<section id="install">
+  <div class="container">
+    <div class="section-hd fi">
+      <div class="section-label">🚀 Installation</div>
+      <h2 class="section-title">From minimal Arch to full desktop</h2>
+      <p class="section-sub">All you need is a minimal Arch Linux installation, an internet connection, and <code>git</code>. The installer does everything else.</p>
+    </div>
+
+    <div class="install-wrap">
+      <!-- Sidebar nav (hidden on mobile) -->
+      <div class="install-nav fi">
+        <ul class="install-nav-list" id="install-nav">
+          <li class="install-nav-item active"><a href="#step1"><span class="step-dot">1</span>Prerequisites</a></li>
+          <li class="install-nav-item"><a href="#step2"><span class="step-dot">2</span>Clone the Repo</a></li>
+          <li class="install-nav-item"><a href="#step3"><span class="step-dot">3</span>Run Installer</a></li>
+          <li class="install-nav-item"><a href="#step4"><span class="step-dot">4</span>Choose Mode</a></li>
+          <li class="install-nav-item"><a href="#step5"><span class="step-dot">5</span>Full vs. Minimal</a></li>
+          <li class="install-nav-item"><a href="#step6"><span class="step-dot">6</span>All Done!</a></li>
+        </ul>
+      </div>
+
+      <div class="install-steps">
+
+        <!-- STEP 1 -->
+        <div class="install-step fi" id="step1">
+          <div class="step-hd">
+            <div class="step-num">1</div>
+            <h3>Prerequisites</h3>
+            <span class="step-tag step-tag-req">Required</span>
+          </div>
+          <div class="step-body">
+            <p>Start from a minimal Arch Linux installation (base system is all you need). The installer detects and handles everything else automatically.</p>
+            <div class="terminal">
+              <div class="term-bar">
+                <div class="tdot tdot-r"></div><div class="tdot tdot-y"></div><div class="tdot tdot-g"></div>
+                <div class="term-title">bash — prerequisites</div>
+                <button class="copy-btn" onclick="copyCode(this,'sudo pacman -S git')">Copy</button>
+              </div>
+              <div class="term-body">
+                <div class="tl"><span class="tcmt"># Make sure git is installed — that's the only hard requirement</span></div>
+                <div class="tl"><span class="tp">[user@arch ~]$</span><span class="tc"> sudo pacman -S git</span></div>
+                <span class="tblank"></span>
+                <div class="tl"><span class="tcmt"># Verify your Arch base is up to date</span></div>
+                <div class="tl"><span class="tp">[user@arch ~]$</span><span class="tc"> sudo pacman -Syu</span></div>
+              </div>
+            </div>
+            <p><strong>Minimum requirements:</strong> Fresh or existing Arch Linux install · Internet connection · <code>git</code></p>
+          </div>
+        </div>
+
+        <!-- STEP 2 -->
+        <div class="install-step fi" id="step2">
+          <div class="step-hd">
+            <div class="step-num">2</div>
+            <h3>Clone the Repository</h3>
+            <span class="step-tag step-tag-req">Required</span>
+          </div>
+          <div class="step-body">
+            <p>Clone YahrShell from GitHub and enter the project directory.</p>
+            <div class="terminal">
+              <div class="term-bar">
+                <div class="tdot tdot-r"></div><div class="tdot tdot-y"></div><div class="tdot tdot-g"></div>
+                <div class="term-title">bash — clone</div>
+                <button class="copy-btn" onclick="copyCode(this,'git clone https://github.com/bgibson72/yahr-quickshell.git\ncd yahr-quickshell')">Copy</button>
+              </div>
+              <div class="term-body">
+                <div class="tl"><span class="tp">[user@arch ~]$</span><span class="tc"> git clone https://github.com/bgibson72/yahr-quickshell.git</span></div>
+                <div class="tl"><span class="tout">Cloning into 'yahr-quickshell'...</span></div>
+                <div class="tl"><span class="tout">remote: Enumerating objects: done.</span></div>
+                <span class="tblank"></span>
+                <div class="tl"><span class="tp">[user@arch ~]$</span><span class="tc"> cd yahr-quickshell</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 3 -->
+        <div class="install-step fi" id="step3">
+          <div class="step-hd">
+            <div class="step-num">3</div>
+            <h3>Run the Installer</h3>
+            <span class="step-tag step-tag-req">Required</span>
+          </div>
+          <div class="step-body">
+            <p>The installer script handles everything: GPU driver detection, AUR helper installation, complete graphics stack (Wayland, Mesa, Vulkan, Qt5/Qt6), all desktop components, and your configurations.</p>
+            <div class="terminal">
+              <div class="term-bar">
+                <div class="tdot tdot-r"></div><div class="tdot tdot-y"></div><div class="tdot tdot-g"></div>
+                <div class="term-title">bash — install.sh</div>
+                <button class="copy-btn" onclick="copyCode(this,'./install.sh')">Copy</button>
+              </div>
+              <div class="term-body">
+                <div class="tl"><span class="tp">[user@arch yahr-quickshell]$</span><span class="tc"> ./install.sh</span></div>
+                <span class="tblank"></span>
+                <div class="tl"><span class="tout">  ___   ___  ___  ___   ___</span></div>
+                <div class="tl"><span class="tout"> /\  \ /\  \/\  \/\  \ /\  \</span></div>
+                <div class="tl"><span class="tout"> \ \  \\ \  \_\  \\_\  \\ \  \</span></div>
+                <div class="tl"><span class="tout">  \ \  \\ \  ____\\ \  \\ \  \</span></div>
+                <div class="tl"><span class="tout">   \ \__\\ \__\    \ \__\\ \__\</span></div>
+                <div class="tl"><span class="tout">    \/__/ \/__/     \/__/ \/__/</span></div>
+                <span class="tblank"></span>
+                <div class="tl"><span class="tgood">  YahrShell Installer — Yet Another Hyprland Rice</span></div>
+                <div class="tl"><span class="tout">  Detecting GPU hardware...</span></div>
+                <div class="tl"><span class="tgood">  ✓ NVIDIA GPU detected — will install nvidia-dkms</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 4 -->
+        <div class="install-step fi" id="step4">
+          <div class="step-hd">
+            <div class="step-num">4</div>
+            <h3>Choose Your Install Mode</h3>
+            <span class="step-tag step-tag-opt">Choose One</span>
+          </div>
+          <div class="step-body">
+            <p>The installer offers two modes. Normal is recommended for first-time users who want control over their choices.</p>
+            <div class="mode-grid">
+              <div class="mode-card">
+                <h4>🎛️ Normal Mode <span class="rec-badge">Recommended</span></h4>
+                <p>Interactive prompts let you make every decision.</p>
+                <ul>
+                  <li>Choose AUR helper (yay / paru)</li>
+                  <li>Select NVIDIA driver type</li>
+                  <li>Pick optional apps (Neovim, Vesktop, Firefox…)</li>
+                  <li>Choose whether to install SDDM</li>
+                </ul>
+              </div>
+              <div class="mode-card">
+                <h4>⚡ YOLO Mode</h4>
+                <p>Fully automated, zero prompts.</p>
+                <ul>
+                  <li>Auto-installs <code>yay</code> as AUR helper</li>
+                  <li>Selects proprietary NVIDIA drivers</li>
+                  <li>Skips all optional components</li>
+                  <li>Perfect for scripts and VM installs</li>
+                </ul>
+              </div>
+            </div>
+            <div class="terminal" style="margin-top:16px;">
+              <div class="term-bar">
+                <div class="tdot tdot-r"></div><div class="tdot tdot-y"></div><div class="tdot tdot-g"></div>
+                <div class="term-title">bash — YOLO mode</div>
+                <button class="copy-btn" onclick="copyCode(this,'./install.sh --yolo')">Copy</button>
+              </div>
+              <div class="term-body">
+                <div class="tl"><span class="tcmt"># Unattended one-liner</span></div>
+                <div class="tl"><span class="tp">[user@arch yahr-quickshell]$</span><span class="tc"> ./install.sh --yolo</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 5 -->
+        <div class="install-step fi" id="step5">
+          <div class="step-hd">
+            <div class="step-num">5</div>
+            <h3>Full vs. Minimal Install</h3>
+            <span class="step-tag step-tag-opt">Choose One</span>
+          </div>
+          <div class="step-body">
+            <p>In Normal mode you'll also choose between a Full install (all core components + optional applications) or a Minimal install (core desktop only).</p>
+            <div class="type-grid">
+              <div class="type-card">
+                <h4>🎯 Full Install</h4>
+                <ul>
+                  <li>Quickshell + Hyprland</li>
+                  <li>Kitty + Mako + Wofi</li>
+                  <li>PipeWire audio stack</li>
+                  <li>Thunar file manager</li>
+                  <li>Firefox browser</li>
+                  <li>SDDM display manager</li>
+                  <li>All GPU drivers</li>
+                  <li>Papirus icons + fonts</li>
+                  <li>Neovim, Vesktop, VSCodium</li>
+                </ul>
+              </div>
+              <div class="type-card">
+                <h4>🪶 Minimal Install</h4>
+                <ul>
+                  <li>Quickshell + Hyprland</li>
+                  <li>Kitty terminal</li>
+                  <li>Mako notifications</li>
+                  <li>GPU drivers (auto)</li>
+                  <li>Core fonts</li>
+                  <li>No optional apps</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 6 -->
+        <div class="install-step fi" id="step6">
+          <div class="step-hd">
+            <div class="step-num">6</div>
+            <h3>Reboot &amp; Enjoy!</h3>
+            <span class="step-tag step-tag-req">Final Step</span>
+          </div>
+          <div class="step-body">
+            <p>After the installer completes, reboot to apply GPU driver changes, then log in and launch Hyprland. YahrShell starts automatically.</p>
+            <div class="terminal">
+              <div class="term-bar">
+                <div class="tdot tdot-r"></div><div class="tdot tdot-y"></div><div class="tdot tdot-g"></div>
+                <div class="term-title">bash — reboot</div>
+                <button class="copy-btn" onclick="copyCode(this,'sudo reboot')">Copy</button>
+              </div>
+              <div class="term-body">
+                <div class="tl"><span class="tgood">  ✓ Installation complete!</span></div>
+                <span class="tblank"></span>
+                <div class="tl"><span class="tp">[user@arch yahr-quickshell]$</span><span class="tc"> sudo reboot</span></div>
+                <span class="tblank"></span>
+                <div class="tl"><span class="tcmt"># After reboot, log in and start Hyprland:</span></div>
+                <div class="tl"><span class="tp">[user@arch ~]$</span><span class="tc"> Hyprland</span></div>
+                <span class="tblank"></span>
+                <div class="tl"><span class="tgood">  🎉 Welcome to YahrShell!</span></div>
+              </div>
+            </div>
+            <p>Switch themes with <kbd>Super</kbd><kbd>T</kbd> · Open settings with <kbd>Super</kbd><kbd>Shift</kbd><kbd>S</kbd> · Launch apps with <kbd>Super</kbd><kbd>A</kbd></p>
+          </div>
+        </div>
+
+      </div><!-- /install-steps -->
+    </div><!-- /install-wrap -->
+  </div>
+</section>
+
+<!-- ============================================================
+     SCREENSHOT GALLERY
+============================================================ -->
+<section id="screenshots">
+  <div class="container">
+    <div class="section-hd fi">
+      <div class="section-label">🖼️ Screenshot Showcase</div>
+      <h2 class="section-title">See it in action</h2>
+      <p class="section-sub">All 13 themes, widget panels, bar styles, and the SDDM login screen. Click any image to expand.</p>
+    </div>
+
+    <div class="gallery-tabs fi">
+      <button class="gtab active" onclick="switchGallery('themes',this)">🎨 Themes</button>
+      <button class="gtab" onclick="switchGallery('widgets',this)">🧩 Widgets</button>
+      <button class="gtab" onclick="switchGallery('bar',this)">📊 Bar Styles</button>
+      <button class="gtab" onclick="switchGallery('sddm',this)">🔐 Login Screen</button>
+    </div>
+
+    <!-- Themes Panel -->
+    <div class="gallery-panel active" id="gp-themes">
+      <div class="gitem fi" onclick="openLB('https://raw.githubusercontent.com/bgibson72/yahr-quickshell/main/previews/catppuccin.png','Catppuccin Mocha — Default Theme')">
+        <img src="https://raw.githubusercontent.com/bgibson72/yahr-quickshell/main/previews/catppuccin.png" alt="Catppuccin" loading="lazy">
+        <div class="g-overlay"><div class="g-overlay-icon">🔍</div><div class="g-overlay-label">View Full Size</div></div>
+        <div class="g-cap">Catppuccin Mocha</div>
+      </div>
+      <div class="gitem fi fi-d1" onclick="openLB('https://raw.githubusercontent.com/bgibson72/yahr-quickshell/main/previews/dracula.png','Dracula')">
+        <img src="https://raw.githubusercontent.com/bgibson72/yahr-quickshell/main/previews/dracula.png" alt="Dracula" loading="lazy">
+        <div class="g-overlay"><div class="g-overlay-icon">🔍</div><div class="g-overlay-label">View Full Size</div></div>
+        <div class="g-cap">Dracula</div>
+      </div>
+      <div class="gitem fi fi-d2" onclick="openLB('https://raw.githubusercontent.com/bgibson72/yahr-quickshell/main/previews/tokyo_night.png','TokyoNight')">
+        <img src="https://raw.githubusercontent.com/bgibson72/yahr-quickshell/main/previews/tokyo_night.png" alt="TokyoNight" loading="lazy">
+        <div class="g-overlay"><div class="g-overlay-icon">🔍</div><div class="g-overlay-label">View Full Size</div></div>
+        <div class="g-cap">TokyoNight</div>
+      </div>
+      <div class="gitem fi fi-d1" onclick="openLB('https://raw.githubusercontent.com/bgibson72/yahr-quickshell/main/previews/nord.png','Nord')">
+        <img src="https://raw.githubusercontent.com/bgibson72/yahr-quickshell/main/previews/nord.png" alt="Nord" loading="lazy">
+        <div class="g-overlay"><div class="g-overlay-icon">🔍</div><div class="g-overlay-label">View Full Size</div></div>
+        <div class="g-cap">Nord</div>
+      </div>
+      <div class="gitem fi fi-d2" onclick="openLB('https://raw.githubusercontent.com/bgibson72/yahr-quickshell/main/previews/gruv_box.png','Gruvbox')">
+        <img src="https://raw.githubusercontent.com/bgibson72/yahr-quickshell/main/previews/gruv_box.png" alt="Gruvbox" loading="lazy">
+        <div class="g-overlay"><div class="g-overlay-icon">🔍</div><div class="g-overlay-label">View Full Size</div></div>
+        <div class="g-cap">Gruvbox</div>
+      </div>
+      <div class="gitem fi fi-d3" onclick="openLB('https://raw.githubusercontent.com/bgibson72/yahr-quickshell/main/previews/kanagawa.png','Kanagawa')">
+        <img src="https://raw.githubusercontent.com/bgibson72/yahr-quickshell/main/previews/kanagawa.png" alt="Kanagawa" loading="lazy">
+        <div class="g-overlay"><div class="g-overlay-icon">🔍</div><div class="g-overlay-label">View Full Size</div></div>
+        <div class="g-cap">Kanagawa</div>
+      </div>
+      <div class="gitem fi" onclick="openLB('https://raw.githubusercontent.com/bgibson72/yahr-quickshell/main/previews/material.png','Material Palenight')">
+        <img src="https://raw.githubusercontent.com/bgibson72/yahr-quickshell/main/previews/material.png" alt="Material" loading="lazy">
+        <div class="g-overlay"><div class="g-overlay-icon">🔍</div><div class="g-overlay-label">View Full Size</div></div>
+        <div class="g-cap">Material Palenight</div>
+      </div>
+      <div class="gitem fi fi-d1" onclick="openLB('https://raw.githubusercontent.com/bgibson72/yahr-quickshell/main/previews/eldritch.png','Eldritch')">
+        <img src="https://raw.githubusercontent.com/bgibson72/yahr-quickshell/main/previews/eldritch.png" alt="Eldritch" loading="lazy">
+        <div class="g-overlay"><div class="g-overlay-icon">🔍</div><div class="g-overlay-label">View Full Size</div></div>
+        <div class="g-cap">Eldritch</div>
+      </div>
+      <div class="gitem fi fi-d2" onclick="openLB('https://raw.githubusercontent.com/bgibson72/yahr-quickshell/main/previews/everforest.png','Everforest')">
+        <img src="https://raw.githubusercontent.com/bgibson72/yahr-quickshell/main/previews/everforest.png" alt="Everforest" loading="lazy">
+        <div class="g-overlay"><div class="g-overlay-icon">🔍</div><div class="g-overlay-label">View Full Size</div></div>
+        <div class="g-cap">Everforest</div>
+      </div>
+      <div class="gitem fi fi-d1" onclick="openLB('https://raw.githubusercontent.com/bgibson72/yahr-quickshell/main/previews/rose_pine.png','Rosé Pine')">
+        <img src="https://raw.githubusercontent.com/bgibson72/yahr-quickshell/main/previews/rose_pine.png" alt="Rose Pine" loading="lazy">
+        <div class="g-overlay"><div class="g-overlay-icon">🔍</div><div class="g-overlay-label">View Full Size</div></div>
+        <div class="g-cap">Rosé Pine</div>
+      </div>
+      <div class="gitem fi fi-d2" onclick="openLB('https://raw.githubusercontent.com/bgibson72/yahr-quickshell/main/previews/night_fox.png','NightFox')">
+        <img src="https://raw.githubusercontent.com/bgibson72/yahr-quickshell/main/previews/night_fox.png" alt="NightFox" loading="lazy">
+        <div class="g-overlay"><div class="g-overlay-icon">🔍</div><div class="g-overlay-label">View Full Size</div></div>
+        <div class="g-cap">NightFox</div>
+      </div>
+      <div class="gitem fi fi-d3" onclick="openLB('https://raw.githubusercontent.com/bgibson72/yahr-quickshell/main/previews/monochrome.png','Monochrome')">
+        <img src="https://raw.githubusercontent.com/bgibson72/yahr-quickshell/main/previews/monochrome.png" alt="Monochrome" loading="lazy">
+        <div class="g-overlay"><div class="g-overlay-icon">🔍</div><div class="g-overlay-label">View Full Size</div></div>
+        <div class="g-cap">Monochrome</div>
+      </div>
+      <div class="gitem fi fi-d1" onclick="openLB('https://raw.githubusercontent.com/bgibson72/yahr-quickshell/main/previews/solarized.png','Solarized Dark')">
+        <img src="https://raw.githubusercontent.com/bgibson72/yahr-quickshell/main/previews/solarized.png" alt="Solarized" loading="lazy">
+        <div class="g-overlay"><div class="g-overlay-icon">🔍</div><div class="g-overlay-label">View Full Size</div></div>
+        <div class="g-cap">Solarized Dark</div>
+      </div>
+    </div>
+
+    <!-- Widgets Panel -->
+    <div class="gallery-panel" id="gp-widgets">
+      <div class="gitem fi" onclick="openLB('https://raw.githubusercontent.com/bgibson72/yahr-quickshell/main/previews/app_menu.png','App Launcher — Super + A')">
+        <img src="https://raw.githubusercontent.com/bgibson72/yahr-quickshell/main/previews/app_menu.png" alt="App Menu" loading="lazy">
+        <div class="g-overlay"><div class="g-overlay-icon">🔍</div><div class="g-overlay-label">View Full Size</div></div>
+        <div class="g-cap">App Launcher</div>
+      </div>
+      <div class="gitem fi fi-d1" onclick="openLB('https://raw.githubusercontent.com/bgibson72/yahr-quickshell/main/previews/control_center.png','Control Center')">
+        <img src="https://raw.githubusercontent.com/bgibson72/yahr-quickshell/main/previews/control_center.png" alt="Control Center" loading="lazy">
+        <div class="g-overlay"><div class="g-overlay-icon">🔍</div><div class="g-overlay-label">View Full Size</div></div>
+        <div class="g-cap">Control Center</div>
+      </div>
+      <div class="gitem fi fi-d2" onclick="openLB('https://raw.githubusercontent.com/bgibson72/yahr-quickshell/main/previews/calendar.png','Calendar — Super + C')">
+        <img src="https://raw.githubusercontent.com/bgibson72/yahr-quickshell/main/previews/calendar.png" alt="Calendar" loading="lazy">
+        <div class="g-overlay"><div class="g-overlay-icon">🔍</div><div class="g-overlay-label">View Full Size</div></div>
+        <div class="g-cap">Calendar &amp; Events</div>
+      </div>
+      <div class="gitem fi fi-d1" onclick="openLB('https://raw.githubusercontent.com/bgibson72/yahr-quickshell/main/previews/weather.png','Weather Widget')">
+        <img src="https://raw.githubusercontent.com/bgibson72/yahr-quickshell/main/previews/weather.png" alt="Weather" loading="lazy">
+        <div class="g-overlay"><div class="g-overlay-icon">🔍</div><div class="g-overlay-label">View Full Size</div></div>
+        <div class="g-cap">Weather Widget</div>
+      </div>
+      <div class="gitem fi fi-d2" onclick="openLB('https://raw.githubusercontent.com/bgibson72/yahr-quickshell/main/previews/system.png','System Monitor — Super + Shift + C')">
+        <img src="https://raw.githubusercontent.com/bgibson72/yahr-quickshell/main/previews/system.png" alt="System Monitor" loading="lazy">
+        <div class="g-overlay"><div class="g-overlay-icon">🔍</div><div class="g-overlay-label">View Full Size</div></div>
+        <div class="g-cap">System Monitor</div>
+      </div>
+      <div class="gitem fi fi-d3" onclick="openLB('https://raw.githubusercontent.com/bgibson72/yahr-quickshell/main/previews/screenshot_tool.png','Screenshot Tool — Super + PrtScrn')">
+        <img src="https://raw.githubusercontent.com/bgibson72/yahr-quickshell/main/previews/screenshot_tool.png" alt="Screenshot Tool" loading="lazy">
+        <div class="g-overlay"><div class="g-overlay-icon">🔍</div><div class="g-overlay-label">View Full Size</div></div>
+        <div class="g-cap">Screenshot Tool</div>
+      </div>
+      <div class="gitem fi" onclick="openLB('https://raw.githubusercontent.com/bgibson72/yahr-quickshell/main/previews/settings.png','Settings — Super + Shift + S')">
+        <img src="https://raw.githubusercontent.com/bgibson72/yahr-quickshell/main/previews/settings.png" alt="Settings" loading="lazy">
+        <div class="g-overlay"><div class="g-overlay-icon">🔍</div><div class="g-overlay-label">View Full Size</div></div>
+        <div class="g-cap">Settings Panel</div>
+      </div>
+      <div class="gitem fi fi-d1" onclick="openLB('https://raw.githubusercontent.com/bgibson72/yahr-quickshell/main/previews/theme_switcher.png','Theme Switcher — Super + T')">
+        <img src="https://raw.githubusercontent.com/bgibson72/yahr-quickshell/main/previews/theme_switcher.png" alt="Theme Switcher" loading="lazy">
+        <div class="g-overlay"><div class="g-overlay-icon">🔍</div><div class="g-overlay-label">View Full Size</div></div>
+        <div class="g-cap">Theme Switcher</div>
+      </div>
+      <div class="gitem fi fi-d2" onclick="openLB('https://raw.githubusercontent.com/bgibson72/yahr-quickshell/main/previews/wallpaper_picker.png','Wallpaper Picker — Super + Shift + W')">
+        <img src="https://raw.githubusercontent.com/bgibson72/yahr-quickshell/main/previews/wallpaper_picker.png" alt="Wallpaper Picker" loading="lazy">
+        <div class="g-overlay"><div class="g-overlay-icon">🔍</div><div class="g-overlay-label">View Full Size</div></div>
+        <div class="g-cap">Wallpaper Picker</div>
+      </div>
+    </div>
+
+    <!-- Bar Panel -->
+    <div class="gallery-panel" id="gp-bar">
+      <div class="gitem fi" onclick="openLB('https://raw.githubusercontent.com/bgibson72/yahr-quickshell/main/previews/bar01.png','Bar Style 1 — Continuous Bar')">
+        <img src="https://raw.githubusercontent.com/bgibson72/yahr-quickshell/main/previews/bar01.png" alt="Bar Style 1" loading="lazy">
+        <div class="g-overlay"><div class="g-overlay-icon">🔍</div><div class="g-overlay-label">View Full Size</div></div>
+        <div class="g-cap">Continuous Bar</div>
+      </div>
+      <div class="gitem fi fi-d1" onclick="openLB('https://raw.githubusercontent.com/bgibson72/yahr-quickshell/main/previews/bar02.png','Bar Style 2 — Floating Islands')">
+        <img src="https://raw.githubusercontent.com/bgibson72/yahr-quickshell/main/previews/bar02.png" alt="Bar Style 2" loading="lazy">
+        <div class="g-overlay"><div class="g-overlay-icon">🔍</div><div class="g-overlay-label">View Full Size</div></div>
+        <div class="g-cap">Floating Islands</div>
+      </div>
+      <div class="gitem fi fi-d2" onclick="openLB('https://raw.githubusercontent.com/bgibson72/yahr-quickshell/main/previews/bar03.png','Bar Style 3 — Compact')">
+        <img src="https://raw.githubusercontent.com/bgibson72/yahr-quickshell/main/previews/bar03.png" alt="Bar Style 3" loading="lazy">
+        <div class="g-overlay"><div class="g-overlay-icon">🔍</div><div class="g-overlay-label">View Full Size</div></div>
+        <div class="g-cap">Compact Layout</div>
+      </div>
+      <div class="gitem fi fi-d3" onclick="openLB('https://raw.githubusercontent.com/bgibson72/yahr-quickshell/main/previews/bar04.png','Bar Style 4 — Transparent')">
+        <img src="https://raw.githubusercontent.com/bgibson72/yahr-quickshell/main/previews/bar04.png" alt="Bar Style 4" loading="lazy">
+        <div class="g-overlay"><div class="g-overlay-icon">🔍</div><div class="g-overlay-label">View Full Size</div></div>
+        <div class="g-cap">Transparent Style</div>
+      </div>
+      <div class="gitem fi fi-d4" onclick="openLB('https://raw.githubusercontent.com/bgibson72/yahr-quickshell/main/previews/bar05.png','Bar Style 5 — Center Menu')">
+        <img src="https://raw.githubusercontent.com/bgibson72/yahr-quickshell/main/previews/bar05.png" alt="Bar Style 5" loading="lazy">
+        <div class="g-overlay"><div class="g-overlay-icon">🔍</div><div class="g-overlay-label">View Full Size</div></div>
+        <div class="g-cap">Center Menu Layout</div>
+      </div>
+    </div>
+
+    <!-- SDDM Panel -->
+    <div class="gallery-panel" id="gp-sddm">
+      <div class="gitem fi" onclick="openLB('https://raw.githubusercontent.com/bgibson72/yahr-quickshell/main/previews/sddm.png','SDDM Login Screen')">
+        <img src="https://raw.githubusercontent.com/bgibson72/yahr-quickshell/main/previews/sddm.png" alt="SDDM" loading="lazy">
+        <div class="g-overlay"><div class="g-overlay-icon">🔍</div><div class="g-overlay-label">View Full Size</div></div>
+        <div class="g-cap">SDDM Login Screen</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============================================================
+     KEYBINDS
+============================================================ -->
+<section id="keybinds">
+  <div class="container">
+    <div class="section-hd fi">
+      <div class="section-label">⌨️ Quick Reference</div>
+      <h2 class="section-title">Key bindings</h2>
+      <p class="section-sub">The most important shortcuts to get you up and running. Full keybind list in <code>hypr/keybinds.conf</code>.</p>
+    </div>
+    <div class="keybind-grid fi">
+      <div class="keybind-card">
+        <div><div class="keybind-name">App Launcher</div><div class="keybind-desc">Fuzzy search all installed apps</div></div>
+        <div class="keybind-keys"><kbd>Super</kbd><span class="plus">+</span><kbd>A</kbd></div>
+      </div>
+      <div class="keybind-card">
+        <div><div class="keybind-name">Theme Switcher</div><div class="keybind-desc">Visual theme selector overlay</div></div>
+        <div class="keybind-keys"><kbd>Super</kbd><span class="plus">+</span><kbd>T</kbd></div>
+      </div>
+      <div class="keybind-card">
+        <div><div class="keybind-name">Calendar &amp; Weather</div><div class="keybind-desc">Calendar with events + weather tab</div></div>
+        <div class="keybind-keys"><kbd>Super</kbd><span class="plus">+</span><kbd>C</kbd></div>
+      </div>
+      <div class="keybind-card">
+        <div><div class="keybind-name">System Monitor</div><div class="keybind-desc">CPU, RAM, disk, temp gauges</div></div>
+        <div class="keybind-keys"><kbd>Super</kbd><span class="plus">+</span><kbd>Shift</kbd><span class="plus">+</span><kbd>C</kbd></div>
+      </div>
+      <div class="keybind-card">
+        <div><div class="keybind-name">Screenshot</div><div class="keybind-desc">Multi-mode screenshot widget</div></div>
+        <div class="keybind-keys"><kbd>Super</kbd><span class="plus">+</span><kbd>PrtScrn</kbd></div>
+      </div>
+      <div class="keybind-card">
+        <div><div class="keybind-name">Settings</div><div class="keybind-desc">Full YAHR settings panel (7 tabs)</div></div>
+        <div class="keybind-keys"><kbd>Super</kbd><span class="plus">+</span><kbd>Shift</kbd><span class="plus">+</span><kbd>S</kbd></div>
+      </div>
+      <div class="keybind-card">
+        <div><div class="keybind-name">Wallpaper Picker</div><div class="keybind-desc">Browse &amp; set wallpaper</div></div>
+        <div class="keybind-keys"><kbd>Super</kbd><span class="plus">+</span><kbd>Shift</kbd><span class="plus">+</span><kbd>W</kbd></div>
+      </div>
+      <div class="keybind-card">
+        <div><div class="keybind-name">Clipboard History</div><div class="keybind-desc">Browse clipboard via Wofi</div></div>
+        <div class="keybind-keys"><kbd>Super</kbd><span class="plus">+</span><kbd>V</kbd></div>
+      </div>
+      <div class="keybind-card">
+        <div><div class="keybind-name">Terminal</div><div class="keybind-desc">Open Kitty terminal</div></div>
+        <div class="keybind-keys"><kbd>Super</kbd><span class="plus">+</span><kbd>Return</kbd></div>
+      </div>
+      <div class="keybind-card">
+        <div><div class="keybind-name">Close Window</div><div class="keybind-desc">Kill the focused window</div></div>
+        <div class="keybind-keys"><kbd>Super</kbd><span class="plus">+</span><kbd>Q</kbd></div>
+      </div>
+      <div class="keybind-card">
+        <div><div class="keybind-name">Switch Workspace</div><div class="keybind-desc">Jump to workspace 1–9</div></div>
+        <div class="keybind-keys"><kbd>Super</kbd><span class="plus">+</span><kbd>1–9</kbd></div>
+      </div>
+      <div class="keybind-card">
+        <div><div class="keybind-name">Float Toggle</div><div class="keybind-desc">Toggle window floating mode</div></div>
+        <div class="keybind-keys"><kbd>Super</kbd><span class="plus">+</span><kbd>F</kbd></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     TROUBLESHOOTING
+============================================================ -->
+<section id="troubleshoot">
+  <div class="container">
+    <div class="section-hd fi">
+      <div class="section-label">🔧 Troubleshooting</div>
+      <h2 class="section-title">Common issues &amp; fixes</h2>
+      <p class="section-sub">Solutions to the most frequently encountered problems. If your issue isn't here, open a GitHub ticket.</p>
+    </div>
+
+    <div class="faq fi">
+
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          <div class="faq-q-left">
+            <span class="faq-label lbl-common">Common</span>
+            <span class="faq-text">Quickshell won't start / shows a blank screen</span>
+          </div>
+          <div class="faq-chev">▾</div>
+        </div>
+        <div class="faq-body">
+          <div class="faq-content">
+            <p>The best way to diagnose is to launch Quickshell from a terminal so you can see the full error output.</p>
+            <ul>
+              <li>Run <code>quickshell</code> directly in a terminal and read the error message carefully.</li>
+              <li>Verify it's installed: <code>which quickshell</code> (should return a path like <code>/usr/bin/quickshell</code>).</li>
+              <li>Try replacing the running instance: <code>quickshell --replace &amp;</code></li>
+              <li>Check the Quickshell config directory exists: <code>ls ~/.config/quickshell/</code></li>
+              <li>If Hyprland-related, ensure <code>WAYLAND_DISPLAY</code> and <code>HYPRLAND_INSTANCE_SIGNATURE</code> are set.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          <div class="faq-q-left">
+            <span class="faq-label lbl-common">Common</span>
+            <span class="faq-text">A package is missing / install.sh failed partway through</span>
+          </div>
+          <div class="faq-chev">▾</div>
+        </div>
+        <div class="faq-body">
+          <div class="faq-content">
+            <p>Install failures are usually caused by a temporary network issue, a changed AUR package URL, or a pacman database lock.</p>
+            <ul>
+              <li>Remove any pacman lock: <code>sudo rm /var/lib/pacman/db.lck</code></li>
+              <li>Update the package database: <code>sudo pacman -Sy</code></li>
+              <li>Re-run the installer — it is mostly idempotent and skips already-installed packages.</li>
+              <li>For a specific missing package: <code>sudo pacman -S &lt;package&gt;</code> or <code>yay -S &lt;aur-package&gt;</code></li>
+              <li>If mirrors are slow, refresh: <code>sudo reflector --latest 10 --save /etc/pacman.d/mirrorlist</code></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          <div class="faq-q-left">
+            <span class="faq-label lbl-gpu">GPU</span>
+            <span class="faq-text">NVIDIA: black screen, graphical glitches, or Wayland won't start</span>
+          </div>
+          <div class="faq-chev">▾</div>
+        </div>
+        <div class="faq-body">
+          <div class="faq-content">
+            <p>NVIDIA on Wayland requires specific kernel parameters and module configuration. The installer sets these up automatically, but here's what to check if something's off.</p>
+            <ul>
+              <li>Verify drivers: <code>nvidia-smi</code> should show your GPU. If not, the driver isn't loaded.</li>
+              <li>Check <code>/etc/mkinitcpio.conf</code> — <code>MODULES</code> should include <code>nvidia nvidia_modeset nvidia_uvm nvidia_drm</code>.</li>
+              <li>Rebuild initramfs: <code>sudo mkinitcpio -P</code> then reboot.</li>
+              <li>Check kernel parameters: <code>cat /proc/cmdline</code> — look for <code>nvidia-drm.modeset=1</code>.</li>
+              <li>Check <code>LIBVA_DRIVER_NAME</code>, <code>GBM_BACKEND</code>, and <code>__GLX_VENDOR_LIBRARY_NAME</code> env vars in <code>hypr/variables.conf</code>.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          <div class="faq-q-left">
+            <span class="faq-label lbl-theme">Theme</span>
+            <span class="faq-text">Theme switch didn't apply / colors look wrong after switching</span>
+          </div>
+          <div class="faq-chev">▾</div>
+        </div>
+        <div class="faq-body">
+          <div class="faq-content">
+            <p>Some applications need a restart to pick up new theme colors. Others sync live.</p>
+            <ul>
+              <li>Wait 30–45 seconds — some syncs (GTK, Kitty, Hyprlock) happen sequentially in the background.</li>
+              <li>Kitty and Thunar require a restart to apply new colors.</li>
+              <li>Check <code>~/.config/hypr/.current-theme</code> to see what theme is active.</li>
+              <li>Inspect <code>~/.config/quickshell/settings.json</code> — the <code>theme</code> field should match.</li>
+              <li>Re-run the theme sync manually: <code>~/.config/quickshell/switch-theme.sh Catppuccin</code></li>
+              <li>Restart Quickshell: <code>quickshell --replace &amp;</code></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          <div class="faq-q-left">
+            <span class="faq-label lbl-sddm">SDDM</span>
+            <span class="faq-text">SDDM login screen isn't updating with the theme</span>
+          </div>
+          <div class="faq-chev">▾</div>
+        </div>
+        <div class="faq-body">
+          <div class="faq-content">
+            <p>SDDM sync requires a sudoers rule created during installation. If you skipped SDDM installation, this rule won't exist.</p>
+            <ul>
+              <li>Check the sudoers rule exists: <code>sudo cat /etc/sudoers.d/sddm-sync-yahr</code></li>
+              <li>Manually trigger sync: <code>~/.config/quickshell/sync-sddm-theme.sh</code></li>
+              <li>Test the SDDM theme without logging out: <code>sddm-greeter-qt6 --test-mode --theme /usr/share/sddm/themes/yahr-theme</code></li>
+              <li>Ensure <code>/usr/share/sddm/themes/yahr-theme/</code> exists and is owned correctly.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          <div class="faq-q-left">
+            <span class="faq-label lbl-theme">Wallpaper</span>
+            <span class="faq-text">Wallpaper shows as black / won't load after reboot</span>
+          </div>
+          <div class="faq-chev">▾</div>
+        </div>
+        <div class="faq-body">
+          <div class="faq-content">
+            <p>YahrShell uses <code>awww</code> (not <code>swww</code>) as the wallpaper daemon. Make sure it's installed and that the last wallpaper path is valid.</p>
+            <ul>
+              <li>Check <code>awww</code> is installed: <code>which awww</code></li>
+              <li>Check the saved wallpaper path: <code>cat ~/.config/quickshell/last-wallpaper</code></li>
+              <li>Verify the file exists at that path.</li>
+              <li>Start the daemon manually: <code>awww-daemon &amp;</code> then <code>awww img &lt;path&gt;</code></li>
+              <li>The daemon is auto-started via <code>hypr/autostart.conf</code> — check that file if it's not starting on login.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          <div class="faq-q-left">
+            <span class="faq-label lbl-audio">Audio</span>
+            <span class="faq-text">No sound / audio devices not showing up</span>
+          </div>
+          <div class="faq-chev">▾</div>
+        </div>
+        <div class="faq-body">
+          <div class="faq-content">
+            <p>Audio is handled by PipeWire + WirePlumber. Check if the user services are running.</p>
+            <ul>
+              <li>Check status: <code>systemctl --user status pipewire pipewire-pulse wireplumber</code></li>
+              <li>Start if not running: <code>systemctl --user start pipewire pipewire-pulse wireplumber</code></li>
+              <li>Enable on login: <code>systemctl --user enable pipewire pipewire-pulse wireplumber</code></li>
+              <li>Open Pavucontrol (<code>pavucontrol</code>) to verify devices are listed.</li>
+              <li>Check <code>wpctl status</code> for WirePlumber device enumeration.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          <div class="faq-q-left">
+            <span class="faq-label lbl-gh">General</span>
+            <span class="faq-text">GTK apps (Thunar, Firefox) are using the wrong or light theme</span>
+          </div>
+          <div class="faq-chev">▾</div>
+        </div>
+        <div class="faq-body">
+          <div class="faq-content">
+            <p>GTK theme sync uses <code>gsettings</code> and <code>settings.ini</code>. Apps need to be restarted to pick up changes.</p>
+            <ul>
+              <li>Run GTK sync manually: <code>~/.config/quickshell/sync-gtk-theme.sh</code></li>
+              <li>Verify active GTK theme: <code>gsettings get org.gnome.desktop.interface gtk-theme</code></li>
+              <li>Use <code>nwg-look</code> to apply and test GTK themes interactively.</li>
+              <li>Restart Thunar fully: <code>thunar -q &amp;&amp; thunar &amp;</code></li>
+              <li>Firefox uses userChrome.css — sync via <code>~/.config/quickshell/sync-firefox-theme.sh</code></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /faq -->
+
+    <!-- Issue CTA -->
+    <div class="issue-cta fi">
+      <h3>🐛 Still stuck? Open a GitHub Issue</h3>
+      <p>The YahrShell community is happy to help. When filing an issue, please include the following so we can diagnose quickly:</p>
+
+      <div class="issue-checklist">
+        <div class="iss-item">Your GPU model and driver version</div>
+        <div class="iss-item">Arch Linux / kernel version (<code>uname -r</code>)</div>
+        <div class="iss-item">The exact error message or output</div>
+        <div class="iss-item">Steps to reproduce the problem</div>
+        <div class="iss-item">Contents of relevant config files</div>
+        <div class="iss-item">Quickshell / Hyprland version (<code>quickshell --version</code>)</div>
+        <div class="iss-item">Whether you used YOLO or Normal install mode</div>
+        <div class="iss-item">Screenshot or screen recording if visual</div>
+      </div>
+
+      <div class="issue-actions">
+        <a href="https://github.com/bgibson72/yahr-quickshell/issues/new" target="_blank" rel="noopener" class="btn btn-green btn-lg">
+          🐛 Open an Issue
+        </a>
+        <a href="https://github.com/bgibson72/yahr-quickshell/issues" target="_blank" rel="noopener" class="btn btn-outline btn-lg">
+          Browse Existing Issues
+        </a>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============================================================
+     FOOTER
+============================================================ -->
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+
+      <div class="footer-brand">
+        <a href="#hero" class="footer-logo">
+          <img src="https://raw.githubusercontent.com/bgibson72/yahr-quickshell/main/quickshell/yahr_logo.png" alt="YahrShell">
+          YahrShell
+        </a>
+        <p class="footer-desc">Yet Another Hyprland Rice — a complete, unified Arch Linux desktop environment with glassmorphism UI, 13 curated themes, and a one-command installer.</p>
+        <div class="footer-social">
+          <a href="https://github.com/bgibson72/yahr-quickshell" target="_blank" rel="noopener" class="social-btn" title="GitHub">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <div class="footer-col">
+        <h4>Navigate</h4>
+        <ul class="footer-links">
+          <li><a href="#features">Features</a></li>
+          <li><a href="#components">Components</a></li>
+          <li><a href="#themes">Themes</a></li>
+          <li><a href="#install">Installation</a></li>
+          <li><a href="#screenshots">Gallery</a></li>
+          <li><a href="#keybinds">Keybinds</a></li>
+          <li><a href="#troubleshoot">Troubleshoot</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>GitHub</h4>
+        <ul class="footer-links">
+          <li><a href="https://github.com/bgibson72/yahr-quickshell" target="_blank" rel="noopener">Repository</a></li>
+          <li><a href="https://github.com/bgibson72/yahr-quickshell/issues" target="_blank" rel="noopener">Issues</a></li>
+          <li><a href="https://github.com/bgibson72/yahr-quickshell/pulls" target="_blank" rel="noopener">Pull Requests</a></li>
+          <li><a href="https://github.com/bgibson72/yahr-quickshell/stargazers" target="_blank" rel="noopener">⭐ Star Us</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Built With</h4>
+        <ul class="footer-links">
+          <li><a href="https://quickshell.outfoxxed.me" target="_blank" rel="noopener">Quickshell</a></li>
+          <li><a href="https://hyprland.org" target="_blank" rel="noopener">Hyprland</a></li>
+          <li><a href="https://sw.kovidgoyal.net/kitty/" target="_blank" rel="noopener">Kitty</a></li>
+          <li><a href="https://github.com/emersion/mako" target="_blank" rel="noopener">Mako</a></li>
+          <li><a href="https://github.com/nicowillis/wofi" target="_blank" rel="noopener">Wofi</a></li>
+          <li><a href="https://starship.rs" target="_blank" rel="noopener">Starship</a></li>
+        </ul>
+      </div>
+
+    </div>
+
+    <div class="footer-bottom">
+      <p class="footer-copy">
+        &copy; 2026 <a href="https://github.com/bgibson72" target="_blank" rel="noopener">bgibson72</a> · Released under the MIT License
+      </p>
+      <p class="footer-made">Made with ❤️ for the Arch + Hyprland community</p>
+    </div>
+
+  </div>
+</footer>
+
+<!-- ============================================================
+     JAVASCRIPT
+============================================================ -->
+<script>
+/* ── THEME DATA ─────────────────────────────────────────────── */
+const THEMES = [
+  { name:'Catppuccin', bg:'#1e1e2e', fg:'#cdd6f4', preview:'catppuccin',
+    accent:'#89b4fa', green:'#a6e3a1', purple:'#cba6f7',
+    swatches:['#89b4fa','#cba6f7','#f5c2e7','#f38ba8','#fab387','#f9e2af','#a6e3a1','#94e2d5'] },
+  { name:'Dracula', bg:'#282a36', fg:'#f8f8f2', preview:'dracula',
+    accent:'#bd93f9', green:'#50fa7b', purple:'#ff79c6',
+    swatches:['#bd93f9','#ff79c6','#ff6e6e','#ffb86c','#f1fa8c','#50fa7b','#8be9fd','#6272a4'] },
+  { name:'TokyoNight', bg:'#1a1b26', fg:'#c0caf5', preview:'tokyo_night',
+    accent:'#7aa2f7', green:'#9ece6a', purple:'#bb9af7',
+    swatches:['#7aa2f7','#bb9af7','#f7768e','#ff9e64','#e0af68','#9ece6a','#73daca','#7dcfff'] },
+  { name:'Gruvbox', bg:'#282828', fg:'#ebdbb2', preview:'gruv_box',
+    accent:'#83a598', green:'#b8bb26', purple:'#d3869b',
+    swatches:['#fb4934','#fe8019','#fabd2f','#b8bb26','#8ec07c','#83a598','#d3869b','#689d6a'] },
+  { name:'Nord', bg:'#2e3440', fg:'#eceff4', preview:'nord',
+    accent:'#88c0d0', green:'#a3be8c', purple:'#b48ead',
+    swatches:['#88c0d0','#81a1c1','#5e81ac','#bf616a','#d08770','#ebcb8b','#a3be8c','#b48ead'] },
+  { name:'Kanagawa', bg:'#1f1f28', fg:'#dcd7ba', preview:'kanagawa',
+    accent:'#7fb4ca', green:'#98bb6c', purple:'#957fb8',
+    swatches:['#7fb4ca','#957fb8','#d27e99','#e46876','#dca561','#98bb6c','#7aa89f','#938aa9'] },
+  { name:'Eldritch', bg:'#212337', fg:'#ebfafa', preview:'eldritch',
+    accent:'#04d1f9', green:'#37f499', purple:'#a48cf2',
+    swatches:['#f16c75','#f265b5','#7081d0','#a48cf2','#37f499','#04d1f9','#ffd700','#323449'] },
+  { name:'Everforest', bg:'#374247', fg:'#d3c6aa', preview:'everforest',
+    accent:'#7fbbb3', green:'#a7c080', purple:'#d699b6',
+    swatches:['#e67e80','#e69875','#dbbc7f','#a7c080','#83c092','#7fbbb3','#d699b6','#9da9a0'] },
+  { name:'Material', bg:'#263238', fg:'#eeffff', preview:'material',
+    accent:'#82aaff', green:'#c3e88d', purple:'#c792ea',
+    swatches:['#82aaff','#c792ea','#f07178','#f78c6c','#ffcb6b','#c3e88d','#89ddff','#546e7a'] },
+  { name:'NightFox', bg:'#131a24', fg:'#cdcecf', preview:'night_fox',
+    accent:'#719cd6', green:'#63cdcf', purple:'#9d79d6',
+    swatches:['#719cd6','#9d79d6','#d67ad2','#f52a65','#f4a261','#dbc074','#63cdcf','#4d688e'] },
+  { name:'Rosepine', bg:'#191724', fg:'#e0def4', preview:'rose_pine',
+    accent:'#c4a7e7', green:'#9ccfd8', purple:'#c4a7e7',
+    swatches:['#c4a7e7','#ebbcba','#eb6f92','#f6c177','#ea9a97','#9ccfd8','#31748f','#907aa9'] },
+  { name:'Monochrome', bg:'#252525', fg:'#bebebe', preview:'monochrome',
+    accent:'#bebebe', green:'#999999', purple:'#a8a8a8',
+    swatches:['#bebebe','#a8a8a8','#999999','#888888','#777777','#666666','#555555','#444444'] },
+  { name:'Solarized', bg:'#002b36', fg:'#839496', preview:'solarized',
+    accent:'#268bd2', green:'#859900', purple:'#6c71c4',
+    swatches:['#268bd2','#6c71c4','#d33682','#dc322f','#cb4b16','#b58900','#859900','#2aa198'] },
+];
+
+/* ── THEME GRID ─────────────────────────────────────────────── */
+const RAW = 'https://raw.githubusercontent.com/bgibson72/yahr-quickshell/main/previews/';
+let activeTheme = null;
+
+function buildThemeGrid() {
+  const grid = document.getElementById('themes-grid');
+  THEMES.forEach((t, i) => {
+    const card = document.createElement('div');
+    card.className = 'theme-card';
+    card.style.cssText = `background:${t.bg};`;
+    card.dataset.idx = i;
+    card.innerHTML = `
+      <div class="theme-top">
+        <span class="theme-name" style="color:${t.fg}">${t.name}</span>
+        <span class="theme-check">✓</span>
+      </div>
+      <div class="theme-swatches">
+        ${t.swatches.map(c=>`<div class="swatch" style="background:${c}"></div>`).join('')}
+      </div>
+    `;
+    card.addEventListener('click', () => selectTheme(i, card));
+    grid.appendChild(card);
+  });
+}
+
+function selectTheme(idx, card) {
+  const t = THEMES[idx];
+  // deactivate others
+  document.querySelectorAll('.theme-card').forEach(c => c.classList.remove('active'));
+  card.classList.add('active');
+  activeTheme = idx;
+
+  // update preview
+  const wrap = document.getElementById('theme-preview-wrap');
+  const img  = document.getElementById('theme-preview-img');
+  const lbl  = document.getElementById('theme-preview-label');
+  const hint = document.getElementById('preview-hint');
+  const url  = RAW + t.preview + '.png';
+
+  hint.style.display = 'none';
+  img.style.opacity = '0';
+  img.style.display = 'block';
+  lbl.style.display = 'block';
+  lbl.textContent = t.name;
+
+  img.onload = () => { img.style.opacity = '1'; };
+  img.src = url;
+  img.alt = t.name;
+
+  // live-tint page accent colors
+  document.documentElement.style.setProperty('--accent',        t.accent);
+  document.documentElement.style.setProperty('--accent-green',  t.green);
+  document.documentElement.style.setProperty('--accent-purple', t.purple);
+  document.documentElement.style.setProperty('--border', `rgba(${hexToRgb(t.accent)},.12)`);
+  document.documentElement.style.setProperty('--border-hover', `rgba(${hexToRgb(t.accent)},.38)`);
+  document.documentElement.style.setProperty('--glow', `0 0 50px rgba(${hexToRgb(t.accent)},.18)`);
+}
+
+function hexToRgb(hex) {
+  const r = parseInt(hex.slice(1,3),16);
+  const g = parseInt(hex.slice(3,5),16);
+  const b = parseInt(hex.slice(5,7),16);
+  return `${r},${g},${b}`;
+}
+
+/* ── STAR CANVAS ────────────────────────────────────────────── */
+function initStars() {
+  const canvas = document.getElementById('stars-canvas');
+  const ctx = canvas.getContext('2d');
+
+  function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  const stars = Array.from({length:200}, () => ({
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height,
+    r: Math.random() * 1.4 + 0.3,
+    speed: Math.random() * 0.25 + 0.03,
+    tw: Math.random() * Math.PI * 2,
+    tws: 0.008 + Math.random() * 0.015,
+  }));
+
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    stars.forEach(s => {
+      s.tw += s.tws;
+      const alpha = 0.15 + 0.55 * Math.sin(s.tw);
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI*2);
+      ctx.fillStyle = `rgba(205,214,244,${alpha})`;
+      ctx.fill();
+      s.y += s.speed;
+      if (s.y > canvas.height + 4) {
+        s.y = -4;
+        s.x = Math.random() * canvas.width;
+      }
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+/* ── SCROLL ANIMATIONS ──────────────────────────────────────── */
+function initScrollAnimations() {
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('vis');
+        obs.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.12 });
+
+  document.querySelectorAll('.fi').forEach(el => obs.observe(el));
+}
+
+/* ── COUNTER ANIMATION ──────────────────────────────────────── */
+function initCounters() {
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        const el = e.target;
+        const target = parseInt(el.dataset.count);
+        const dur = 1200;
+        const step = 16;
+        const inc = target / (dur / step);
+        let val = 0;
+        const timer = setInterval(() => {
+          val = Math.min(val + inc, target);
+          el.textContent = (val >= target) ? target + (target === 65 ? '+' : '') : Math.floor(val);
+          if (val >= target) clearInterval(timer);
+        }, step);
+        obs.unobserve(el);
+      }
+    });
+  }, { threshold: 0.5 });
+
+  document.querySelectorAll('[data-count]').forEach(el => obs.observe(el));
+}
+
+/* ── NAVBAR SCROLL HIGHLIGHT ────────────────────────────────── */
+function initNavHighlight() {
+  const sections = document.querySelectorAll('section[id]');
+  const links = document.querySelectorAll('.nav-links a');
+
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        const id = e.target.id;
+        links.forEach(l => {
+          l.classList.toggle('active', l.getAttribute('href') === '#' + id);
+        });
+      }
+    });
+  }, { rootMargin:'-40% 0px -50% 0px' });
+
+  sections.forEach(s => obs.observe(s));
+}
+
+/* ── GALLERY TABS ───────────────────────────────────────────── */
+function switchGallery(tab, btn) {
+  document.querySelectorAll('.gallery-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.gtab').forEach(b => b.classList.remove('active'));
+  document.getElementById('gp-' + tab).classList.add('active');
+  btn.classList.add('active');
+}
+
+/* ── LIGHTBOX ───────────────────────────────────────────────── */
+function openLB(src, caption) {
+  const lb = document.getElementById('lightbox');
+  document.getElementById('lb-img').src = src;
+  document.getElementById('lb-cap').textContent = caption || '';
+  lb.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeLB() {
+  document.getElementById('lightbox').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+document.getElementById('lightbox').addEventListener('click', (e) => {
+  if (e.target === document.getElementById('lightbox')) closeLB();
+});
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeLB();
+});
+
+/* ── ACCORDION FAQ ──────────────────────────────────────────── */
+function toggleFaq(header) {
+  const item = header.closest('.faq-item');
+  const isOpen = item.classList.contains('open');
+  // close all
+  document.querySelectorAll('.faq-item.open').forEach(i => i.classList.remove('open'));
+  if (!isOpen) item.classList.add('open');
+}
+
+/* ── COPY BUTTONS ───────────────────────────────────────────── */
+function copyCode(btn, text) {
+  navigator.clipboard.writeText(text).then(() => {
+    const orig = btn.textContent;
+    btn.textContent = 'Copied!';
+    btn.classList.add('ok');
+    setTimeout(() => {
+      btn.textContent = orig;
+      btn.classList.remove('ok');
+    }, 2000);
+  });
+}
+
+/* ── MOBILE MENU ────────────────────────────────────────────── */
+function toggleMobile() {
+  const ham = document.getElementById('ham');
+  const menu = document.getElementById('mob-menu');
+  ham.classList.toggle('open');
+  menu.classList.toggle('open');
+}
+function closeMob() {
+  document.getElementById('ham').classList.remove('open');
+  document.getElementById('mob-menu').classList.remove('open');
+}
+
+/* ── INSTALL STEP ACTIVE NAV ────────────────────────────────── */
+function initInstallNav() {
+  const steps = document.querySelectorAll('.install-step[id]');
+  const navItems = document.querySelectorAll('.install-nav-item');
+
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        const id = e.target.id;
+        navItems.forEach(ni => {
+          const href = ni.querySelector('a').getAttribute('href');
+          ni.classList.toggle('active', href === '#' + id);
+        });
+      }
+    });
+  }, { rootMargin:'-30% 0px -60% 0px' });
+
+  steps.forEach(s => obs.observe(s));
+}
+
+/* ── INIT ───────────────────────────────────────────────────── */
+document.addEventListener('DOMContentLoaded', () => {
+  buildThemeGrid();
+  initStars();
+  initScrollAnimations();
+  initCounters();
+  initNavHighlight();
+  initInstallNav();
+});
+</script>
+
+</body>
+</html>
