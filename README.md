@@ -270,10 +270,6 @@ A full-featured settings panel organized into seven tabs:
 - **Window borders** — enable/disable and set border thickness
 
 **Monitors tab** — per-monitor resolution, refresh rate, and scale
-
-<!-- TODO: add updated settings screenshot -->
-<!-- ![settings.png](previews/settings.png) -->
-![settings.png](previews/settings.png)
 </details>
 
 <details>
@@ -323,47 +319,13 @@ Custom SDDM theme that automatically syncs colors and wallpaper with your select
 
 ### Bar Styles & Customization
 
-The quickshell bar is highly configurable through the built-in **Settings → Bar** tab. Mix and match layout presets, visual styles, size, position, and optional components to match your workflow.
-
-<details>
-<summary><b>Single Bar — Default Layout</b> - Compact continuous bar with numbered workspaces</summary>
-
-The default single-bar layout: a full-width continuous background with the Arch menu + numbered workspace buttons on the left, clock and media player in the center, and the system tray on the right. The quick-launch drawer (Kitty, Files, Firefox, Screenshot, Settings) is accessible via the chevron button.
+The bar is fully customizable — mix and match any combination of style, layout, size, position, and optional components to create your preferred setup.
 
 ![bar01.png](previews/bar01.png)
-</details>
-
-<details>
-<summary><b>Islands Style</b> - Separate floating pill sections for each bar zone</summary>
-
-Splits the bar into three independent floating islands — left (workspaces + quick launch), center (clock/weather), and right (system tray). Each island has its own rounded background. Workspace style is set to dot indicators here.
-
 ![bar02.png](previews/bar02.png)
-</details>
-
-<details>
-<summary><b>Floating Single Bar — Large Size</b> - Bar with edge margins, rounded corners, and full system tray details</summary>
-
-The floating option adds configurable margins from all screen edges, giving the bar a detached look with soft rounded corners. Paired with the large bar size, this layout shows the full system tray: network speed, volume percentage, and battery level alongside the weather widget.
-
 ![bar03.png](previews/bar03.png)
-</details>
-
-<details>
-<summary><b>Center-Menu Layout</b> - Arch app menu button moved to the center</summary>
-
-An alternative layout preset that repositions the Arch app-menu button to the horizontal center of the bar, with workspaces on the left and the clock, weather, and system tray on the right. Works with both single and floating bar modes.
-
 ![bar04.png](previews/bar04.png)
-</details>
-
-<details>
-<summary><b>Single Bar — Glass/Transparent Background</b> - Blended bar with translucent background</summary>
-
-The transparent background style lets the wallpaper show through the bar for a seamless, integrated look. All other layout and feature options remain fully functional with this style.
-
 ![bar05.png](previews/bar05.png)
-</details>
 
 **Bar configuration options (Settings → Bar tab):**
 - **Bar style** — single continuous bar or separate floating islands
