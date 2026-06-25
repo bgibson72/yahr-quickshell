@@ -24,7 +24,12 @@ Item {
     property int hyprRounding: 12  // Mirrors decoration:rounding from look-and-feel.conf
     property bool useIslands: bar.barStyle === "islands"
     property int islandHeight: ThemeManager.barLarge ? 43 : 36
-    visible: section === "full" ? !bar.useIslands : bar.useIslands
+    // Note: bar.visible is NOT bound to useIslands here. All child items already have their own
+    // visibility conditions (e.g. "section === 'full' && !bar.useIslands"). Keeping the Bar Item
+    // always in the Qt Quick scene graph ensures the Wayland layer-shell input region is properly
+    // updated when switching between island and single bar styles. A root-level visible:false
+    // removes the item from the scene graph, causing the input region to go stale and making
+    // the quick-launch chevron unresponsive after switching from islands → single.
     implicitWidth: {
         if (section === "left") {
             return (layoutPreset === "default" ? defaultIslandLeftRow.implicitWidth : centeredIslandLeftRow.implicitWidth) + 16
@@ -44,6 +49,12 @@ Item {
     signal toggleClipboard()
     signal toggleControlCenter()
     signal toggleSettings()
+
+    // Trigger an immediate settings reload (called from shell.qml onSettingsUpdated)
+    function reloadBarSettings() {
+        barSettingsLoader.running = true
+        hyprRoundingLoader.running = true
+    }
     
     // Load bar settings
     Process {

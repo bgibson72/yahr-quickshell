@@ -678,7 +678,11 @@ ShellRoot {
                 
                 onSettingsUpdated: {
                     console.log("Settings changed, notifying widgets...")
-                    // The calendar widget will reload settings on next timer tick
+                    // Immediately reload bar state so style/position changes apply at once
+                    // instead of waiting up to 1 second for the polling timers.
+                    shellBarSettingsLoader.running = true
+                    barPositionLoader.running = true
+                    singleBar.reloadBarSettings()
                 }
             }
         }
