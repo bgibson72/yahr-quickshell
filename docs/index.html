@@ -207,6 +207,7 @@
       backdrop-filter: blur(22px) saturate(1.4);
       border-bottom: 1px solid var(--border);
       transition: background var(--t);
+      overflow: visible;
     }
 
     .nav-inner {
@@ -227,8 +228,14 @@
       font-size: 17px;
       color: var(--fg-primary);
       text-decoration: none;
+      overflow: visible;
     }
-    .nav-logo img { width:34px; height:34px; border-radius:8px; }
+    .nav-logo img {
+      width: 100px; height: 100px;
+      position: relative;
+      z-index: 1;
+      flex-shrink: 0;
+    }
     .nav-logo:hover { color: var(--accent); }
 
     .nav-links {
