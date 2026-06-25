@@ -345,7 +345,6 @@ The bar is fully customizable — mix and match any combination of style, layout
 - System tray with audio, network, and updates
 - Notification system with glass styling: semi-transparent background, thin accent border, and compositor blur
 - GTK theme synchronization
-- **Glass/Liquid Glass UI** - All widgets use semi-transparent panels, frosted glass cards, specular highlights, and smooth hover transitions
 - **Glass window borders** - Hyprland borders use a 45° gradient (dark shadow → theme accent → white specular), adapting to each theme
 - **Configurable bar position** - Toggle between top and bottom placement
 - **SDDM theme synchronization** - Login screen automatically syncs with system theme
