@@ -6,7 +6,7 @@ Complete Arch Linux desktop environment featuring Hyprland + Quickshell with uni
 
 ## ✨ Features
 - 🎨 **13 Beautiful Themes** - Instant switching across all applications
-- 🖥️ **Quickshell Desktop** - Modern QML-based desktop environment with glass/liquid glass UI
+- 🖥️ **Quickshell Desktop** - Modern QML-based desktop environment with adjustable-opacity, flat UI
 - ⚡ **Unified Theme System** - Synced themes for Hyprland, GTK, Kitty, Firefox, VSCodium, Discord, and more
 - 🎯 **GPU-Aware Installation** - Auto-detects and installs appropriate drivers (NVIDIA/AMD/Intel/Hybrid)
 - 🚀 **Fully Automated Installer** - One command from minimal Arch to complete desktop
@@ -343,9 +343,9 @@ The bar is fully customizable — mix and match any combination of style, layout
 ### System Integration
 - Workspace management with visual indicators
 - System tray with audio, network, and updates
-- Notification system with glass styling: semi-transparent background, thin accent border, and compositor blur
+- Notification system with themed styling: adjustable-opacity background, thin accent border, and compositor blur
 - GTK theme synchronization
-- **Glass window borders** - Hyprland borders use a 45° gradient (dark shadow → theme accent → white specular), adapting to each theme
+- **Themed window borders** - Hyprland borders use a 45° gradient (dark shadow → theme accent → white specular), adapting to each theme
 - **Configurable bar position** - Toggle between top and bottom placement
 - **SDDM theme synchronization** - Login screen automatically syncs with system theme
 - **Firefox theme synchronization** - Automatic Firefox UI theming via userChrome.css
@@ -498,7 +498,7 @@ git push
 - **Papirus Icons** - Folder colors automatically match active theme
 - **Starship** - Color-only updates preserving custom glyphs
 - **Hyprlock** - Lock screen colors match active theme
-- **Mako** - Notification glass styling (background, border color, and progress bar) adapts to active theme
+- **Mako** - Notification styling (background, border color, and progress bar) adapts to active theme
 - **Fastfetch** - Logo updates to match theme
 
 ## Contributing
