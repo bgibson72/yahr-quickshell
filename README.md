@@ -321,6 +321,63 @@ Custom SDDM theme that automatically syncs colors and wallpaper with your select
 </details>
 
 
+### Bar Styles & Customization
+
+The quickshell bar is highly configurable through the built-in **Settings → Bar** tab. Mix and match layout presets, visual styles, size, position, and optional components to match your workflow.
+
+<details>
+<summary><b>Single Bar — Default Layout</b> - Compact continuous bar with numbered workspaces</summary>
+
+The default single-bar layout: a full-width continuous background with the Arch menu + numbered workspace buttons on the left, clock and media player in the center, and the system tray on the right. The quick-launch drawer (Kitty, Files, Firefox, Screenshot, Settings) is accessible via the chevron button.
+
+![bar01.png](previews/bar01.png)
+</details>
+
+<details>
+<summary><b>Islands Style</b> - Separate floating pill sections for each bar zone</summary>
+
+Splits the bar into three independent floating islands — left (workspaces + quick launch), center (clock/weather), and right (system tray). Each island has its own rounded background. Workspace style is set to dot indicators here.
+
+![bar02.png](previews/bar02.png)
+</details>
+
+<details>
+<summary><b>Floating Single Bar — Large Size</b> - Bar with edge margins, rounded corners, and full system tray details</summary>
+
+The floating option adds configurable margins from all screen edges, giving the bar a detached look with soft rounded corners. Paired with the large bar size, this layout shows the full system tray: network speed, volume percentage, and battery level alongside the weather widget.
+
+![bar03.png](previews/bar03.png)
+</details>
+
+<details>
+<summary><b>Center-Menu Layout</b> - Arch app menu button moved to the center</summary>
+
+An alternative layout preset that repositions the Arch app-menu button to the horizontal center of the bar, with workspaces on the left and the clock, weather, and system tray on the right. Works with both single and floating bar modes.
+
+![bar04.png](previews/bar04.png)
+</details>
+
+<details>
+<summary><b>Single Bar — Glass/Transparent Background</b> - Blended bar with translucent background</summary>
+
+The transparent background style lets the wallpaper show through the bar for a seamless, integrated look. All other layout and feature options remain fully functional with this style.
+
+![bar05.png](previews/bar05.png)
+</details>
+
+**Bar configuration options (Settings → Bar tab):**
+- **Bar style** — single continuous bar or separate floating islands
+- **Layout preset** — default (app menu left) or center-menu (app menu centered)
+- **Bar size** — compact or large
+- **Bar position** — top or bottom of screen
+- **Background style** — solid, translucent, or fully transparent
+- **Floating** — detach the bar from screen edges with rounded corners and margins
+- **Auto-hide** — bar hides until the cursor enters the bar zone
+- **Quick launch drawer** — toggle the expandable icon row (Kitty, Files, Firefox, Screenshot, Settings)
+- **Workspace style** — numbered labels or dot indicators
+- **Minimum workspaces** — set the minimum number of workspace buttons displayed
+
+
 ### System Integration
 - Workspace management with visual indicators
 - System tray with audio, network, and updates
