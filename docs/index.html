@@ -258,6 +258,52 @@
 
     .nav-right { display:flex; align-items:center; gap:10px; }
 
+    /* ── Palette Switcher ── */
+    .palette-wrap { position:relative; }
+    .palette-btn {
+      display:flex; align-items:center; gap:7px;
+      padding:0 12px; height:36px;
+      background:rgba(255,255,255,.06);
+      border:1px solid var(--border-hover);
+      border-radius:var(--rs);
+      color:var(--fg-secondary);
+      font-family:var(--font); font-size:13px;
+      cursor:pointer;
+      transition:all var(--t);
+    }
+    .palette-btn:hover { background:rgba(255,255,255,.10); color:var(--fg-primary); }
+    .palette-dot {
+      width:12px; height:12px; border-radius:3px;
+      background:var(--accent); flex-shrink:0;
+      transition:background var(--t);
+    }
+    .palette-chevron { transition:transform var(--t); }
+    .palette-btn.open .palette-chevron { transform:rotate(180deg); }
+    .palette-dropdown {
+      position:absolute; top:calc(100% + 10px); right:0;
+      min-width:200px;
+      background:var(--bg-surface0);
+      border:1px solid var(--border-hover);
+      border-radius:var(--r);
+      padding:6px;
+      box-shadow:var(--shadow);
+      display:none; z-index:2000;
+    }
+    .palette-dropdown.open { display:block; }
+    .palette-item {
+      display:flex; align-items:center; gap:10px;
+      padding:7px 10px; border-radius:var(--rs);
+      cursor:pointer; font-size:13px; color:var(--fg-primary);
+      transition:background var(--t);
+    }
+    .palette-item:hover { background:rgba(255,255,255,.07); }
+    .palette-item.active { background:rgba(255,255,255,.10); }
+    .pi-swatch {
+      width:16px; height:16px; border-radius:4px; flex-shrink:0;
+    }
+    .pi-check { margin-left:auto; font-size:11px; color:var(--accent-green); opacity:0; }
+    .palette-item.active .pi-check { opacity:1; }
+
     .hamburger {
       display: none;
       flex-direction: column;
@@ -1071,6 +1117,16 @@
         GitHub
       </a>
       <a href="#install" class="btn btn-primary">Install Now</a>
+
+      <!-- Palette Switcher -->
+      <div class="palette-wrap" id="palette-wrap">
+        <button class="palette-btn" id="palette-btn" onclick="togglePaletteMenu(event)" aria-label="Color palette">
+          <span class="palette-dot" id="palette-dot"></span>
+          <span id="palette-label">Theme</span>
+          <svg class="palette-chevron" width="10" height="6" viewBox="0 0 10 6" fill="currentColor"><path d="M0 0l5 6 5-6z"/></svg>
+        </button>
+        <div class="palette-dropdown" id="palette-dropdown"></div>
+      </div>
     </div>
 
     <div class="hamburger" id="ham" onclick="toggleMobile()">
@@ -2164,6 +2220,232 @@
      JAVASCRIPT
 ============================================================ -->
 <script>
+/* ── PALETTE SWITCHER ───────────────────────────────────────── */
+const PALETTES = {
+  Catppuccin: {
+    logo: 'logos/catppuccin_logo.png',
+    accent: '#c6d0f5',
+    vars: {
+      '--bg-crust':'#11111b','--bg-mantle':'#181825','--bg-base':'#1e1e2e',
+      '--bg-surface0':'#313244','--bg-surface1':'#45475a',
+      '--fg-primary':'#cdd6f4','--fg-secondary':'#bac2de','--fg-tertiary':'#a6adc8',
+      '--accent':'#89b4fa','--accent-purple':'#cba6f7','--accent-green':'#a6e3a1',
+      '--accent-red':'#f38ba8','--accent-yellow':'#f9e2af','--accent-pink':'#f5c2e7',
+      '--accent-teal':'#94e2d5','--accent-orange':'#fab387',
+      '--border':'rgba(137,180,250,.12)','--border-hover':'rgba(137,180,250,.35)',
+      '--glow':'0 0 50px rgba(137,180,250,.15)',
+    }
+  },
+  Dracula: {
+    logo: 'logos/dracula_logo.png',
+    accent: '#bd93f9',
+    vars: {
+      '--bg-crust':'#1a1b27','--bg-mantle':'#1e1f29','--bg-base':'#282a36',
+      '--bg-surface0':'#353747','--bg-surface1':'#414455',
+      '--fg-primary':'#f8f8f2','--fg-secondary':'#d4d0da','--fg-tertiary':'#9a98ac',
+      '--accent':'#bd93f9','--accent-purple':'#ff79c6','--accent-green':'#50fa7b',
+      '--accent-red':'#ff5555','--accent-yellow':'#f1fa8c','--accent-pink':'#ff79c6',
+      '--accent-teal':'#8be9fd','--accent-orange':'#ffb86c',
+      '--border':'rgba(189,147,249,.12)','--border-hover':'rgba(189,147,249,.35)',
+      '--glow':'0 0 50px rgba(189,147,249,.15)',
+    }
+  },
+  Eldritch: {
+    logo: 'logos/eldritch_logo.png',
+    accent: '#04d1f9',
+    vars: {
+      '--bg-crust':'#13141e','--bg-mantle':'#191a28','--bg-base':'#212337',
+      '--bg-surface0':'#2d2f45','--bg-surface1':'#393b52',
+      '--fg-primary':'#ebfafa','--fg-secondary':'#d5e8e8','--fg-tertiary':'#8f9abf',
+      '--accent':'#04d1f9','--accent-purple':'#a48cf2','--accent-green':'#37f499',
+      '--accent-red':'#f16c75','--accent-yellow':'#ffd700','--accent-pink':'#f265b5',
+      '--accent-teal':'#04d1f9','--accent-orange':'#f16c75',
+      '--border':'rgba(4,209,249,.12)','--border-hover':'rgba(4,209,249,.35)',
+      '--glow':'0 0 50px rgba(4,209,249,.15)',
+    }
+  },
+  Everforest: {
+    logo: 'logos/everforest_logo.png',
+    accent: '#7fbbb3',
+    vars: {
+      '--bg-crust':'#272e33','--bg-mantle':'#2e383c','--bg-base':'#374247',
+      '--bg-surface0':'#414b50','--bg-surface1':'#495156',
+      '--fg-primary':'#d3c6aa','--fg-secondary':'#c5b99f','--fg-tertiary':'#9da9a0',
+      '--accent':'#7fbbb3','--accent-purple':'#d699b6','--accent-green':'#a7c080',
+      '--accent-red':'#e67e80','--accent-yellow':'#dbbc7f','--accent-pink':'#d699b6',
+      '--accent-teal':'#7fbbb3','--accent-orange':'#e69875',
+      '--border':'rgba(127,187,179,.12)','--border-hover':'rgba(127,187,179,.35)',
+      '--glow':'0 0 50px rgba(127,187,179,.15)',
+    }
+  },
+  Gruvbox: {
+    logo: 'logos/gruvbox_logo.png',
+    accent: '#83a598',
+    vars: {
+      '--bg-crust':'#1d2021','--bg-mantle':'#282828','--bg-base':'#32302f',
+      '--bg-surface0':'#3c3836','--bg-surface1':'#504945',
+      '--fg-primary':'#ebdbb2','--fg-secondary':'#d5c4a1','--fg-tertiary':'#bdae93',
+      '--accent':'#83a598','--accent-purple':'#d3869b','--accent-green':'#b8bb26',
+      '--accent-red':'#fb4934','--accent-yellow':'#fabd2f','--accent-pink':'#d3869b',
+      '--accent-teal':'#8ec07c','--accent-orange':'#fe8019',
+      '--border':'rgba(131,165,152,.12)','--border-hover':'rgba(131,165,152,.35)',
+      '--glow':'0 0 50px rgba(131,165,152,.15)',
+    }
+  },
+  Kanagawa: {
+    logo: 'logos/kanagawa_logo.png',
+    accent: '#7fb4ca',
+    vars: {
+      '--bg-crust':'#0d0c0c','--bg-mantle':'#16161d','--bg-base':'#1f1f28',
+      '--bg-surface0':'#2a2a37','--bg-surface1':'#363646',
+      '--fg-primary':'#dcd7ba','--fg-secondary':'#c8c093','--fg-tertiary':'#938aa9',
+      '--accent':'#7fb4ca','--accent-purple':'#957fb8','--accent-green':'#98bb6c',
+      '--accent-red':'#e46876','--accent-yellow':'#dca561','--accent-pink':'#d27e99',
+      '--accent-teal':'#7aa89f','--accent-orange':'#ffa066',
+      '--border':'rgba(127,180,202,.12)','--border-hover':'rgba(127,180,202,.35)',
+      '--glow':'0 0 50px rgba(127,180,202,.15)',
+    }
+  },
+  Monochrome: {
+    logo: 'logos/monochrome_logo.png',
+    accent: '#bebebe',
+    vars: {
+      '--bg-crust':'#151515','--bg-mantle':'#1b1b1b','--bg-base':'#252525',
+      '--bg-surface0':'#303030','--bg-surface1':'#3a3a3a',
+      '--fg-primary':'#bebebe','--fg-secondary':'#a0a0a0','--fg-tertiary':'#808080',
+      '--accent':'#bebebe','--accent-purple':'#a8a8a8','--accent-green':'#999999',
+      '--accent-red':'#cccccc','--accent-yellow':'#aaaaaa','--accent-pink':'#b8b8b8',
+      '--accent-teal':'#909090','--accent-orange':'#c0c0c0',
+      '--border':'rgba(190,190,190,.12)','--border-hover':'rgba(190,190,190,.35)',
+      '--glow':'0 0 50px rgba(190,190,190,.12)',
+    }
+  },
+  NightFox: {
+    logo: 'logos/nightfox_logo.png',
+    accent: '#719cd6',
+    vars: {
+      '--bg-crust':'#0a0f17','--bg-mantle':'#0e131c','--bg-base':'#131a24',
+      '--bg-surface0':'#1e2533','--bg-surface1':'#29303e',
+      '--fg-primary':'#cdcecf','--fg-secondary':'#aeafb0','--fg-tertiary':'#738091',
+      '--accent':'#719cd6','--accent-purple':'#9d79d6','--accent-green':'#63cdcf',
+      '--accent-red':'#d67ad2','--accent-yellow':'#dbc074','--accent-pink':'#d67ad2',
+      '--accent-teal':'#63cdcf','--accent-orange':'#f4a261',
+      '--border':'rgba(113,156,214,.12)','--border-hover':'rgba(113,156,214,.35)',
+      '--glow':'0 0 50px rgba(113,156,214,.15)',
+    }
+  },
+  Nord: {
+    logo: 'logos/nord_logo.png',
+    accent: '#88c0d0',
+    vars: {
+      '--bg-crust':'#191d25','--bg-mantle':'#242933','--bg-base':'#2e3440',
+      '--bg-surface0':'#3b4252','--bg-surface1':'#434c5e',
+      '--fg-primary':'#eceff4','--fg-secondary':'#d8dee9','--fg-tertiary':'#9099ae',
+      '--accent':'#88c0d0','--accent-purple':'#b48ead','--accent-green':'#a3be8c',
+      '--accent-red':'#bf616a','--accent-yellow':'#ebcb8b','--accent-pink':'#b48ead',
+      '--accent-teal':'#8fbcbb','--accent-orange':'#d08770',
+      '--border':'rgba(136,192,208,.12)','--border-hover':'rgba(136,192,208,.35)',
+      '--glow':'0 0 50px rgba(136,192,208,.15)',
+    }
+  },
+  Rosepine: {
+    logo: 'logos/rosepine_logo.png',
+    accent: '#c4a7e7',
+    vars: {
+      '--bg-crust':'#0f0e17','--bg-mantle':'#141220','--bg-base':'#191724',
+      '--bg-surface0':'#26233a','--bg-surface1':'#312e49',
+      '--fg-primary':'#e0def4','--fg-secondary':'#c5c2de','--fg-tertiary':'#9893b8',
+      '--accent':'#c4a7e7','--accent-purple':'#c4a7e7','--accent-green':'#9ccfd8',
+      '--accent-red':'#eb6f92','--accent-yellow':'#f6c177','--accent-pink':'#ebbcba',
+      '--accent-teal':'#9ccfd8','--accent-orange':'#ea9a97',
+      '--border':'rgba(196,167,231,.12)','--border-hover':'rgba(196,167,231,.35)',
+      '--glow':'0 0 50px rgba(196,167,231,.15)',
+    }
+  },
+  Solarized: {
+    logo: 'logos/solarized_logo.png',
+    accent: '#268bd2',
+    vars: {
+      '--bg-crust':'#001c24','--bg-mantle':'#002330','--bg-base':'#002b36',
+      '--bg-surface0':'#073642','--bg-surface1':'#0f4f5e',
+      '--fg-primary':'#839496','--fg-secondary':'#738a94','--fg-tertiary':'#586e75',
+      '--accent':'#268bd2','--accent-purple':'#6c71c4','--accent-green':'#859900',
+      '--accent-red':'#dc322f','--accent-yellow':'#b58900','--accent-pink':'#d33682',
+      '--accent-teal':'#2aa198','--accent-orange':'#cb4b16',
+      '--border':'rgba(38,139,210,.12)','--border-hover':'rgba(38,139,210,.35)',
+      '--glow':'0 0 50px rgba(38,139,210,.15)',
+    }
+  },
+  TokyoNight: {
+    logo: 'logos/tokyonight_logo.png',
+    accent: '#7aa2f7',
+    vars: {
+      '--bg-crust':'#0d0e17','--bg-mantle':'#11121d','--bg-base':'#1a1b26',
+      '--bg-surface0':'#292a3d','--bg-surface1':'#32344a',
+      '--fg-primary':'#c0caf5','--fg-secondary':'#a9b1d6','--fg-tertiary':'#787c99',
+      '--accent':'#7aa2f7','--accent-purple':'#bb9af7','--accent-green':'#9ece6a',
+      '--accent-red':'#f7768e','--accent-yellow':'#e0af68','--accent-pink':'#ff007c',
+      '--accent-teal':'#73daca','--accent-orange':'#ff9e64',
+      '--border':'rgba(122,162,247,.12)','--border-hover':'rgba(122,162,247,.35)',
+      '--glow':'0 0 50px rgba(122,162,247,.15)',
+    }
+  },
+};
+
+let activePalette = localStorage.getItem('yahr-palette') || 'Catppuccin';
+
+function buildPaletteMenu() {
+  const dd = document.getElementById('palette-dropdown');
+  dd.innerHTML = Object.entries(PALETTES).map(([name, p]) => `
+    <div class="palette-item${name === activePalette ? ' active' : ''}" onclick="applyPalette('${name}')">
+      <div class="pi-swatch" style="background:${p.accent}"></div>
+      <span>${name}</span>
+      <span class="pi-check">✓</span>
+    </div>`).join('');
+}
+
+function applyPalette(name) {
+  const p = PALETTES[name];
+  if (!p) return;
+  const root = document.documentElement;
+  Object.entries(p.vars).forEach(([k,v]) => root.style.setProperty(k, v));
+
+  // Update logos
+  document.querySelectorAll('.hero-logo, .nav-logo img, .footer-logo img').forEach(el => {
+    el.src = p.logo;
+  });
+
+  // Update nav dot & label
+  document.getElementById('palette-dot').style.background = p.accent;
+  document.getElementById('palette-label').textContent = name;
+
+  // Update active state in menu
+  document.querySelectorAll('.palette-item').forEach(el => {
+    el.classList.toggle('active', el.querySelector('span')?.textContent === name);
+  });
+
+  activePalette = name;
+  localStorage.setItem('yahr-palette', name);
+  closePaletteMenu();
+}
+
+function togglePaletteMenu(e) {
+  e.stopPropagation();
+  const btn = document.getElementById('palette-btn');
+  const dd  = document.getElementById('palette-dropdown');
+  btn.classList.toggle('open');
+  dd.classList.toggle('open');
+}
+
+function closePaletteMenu() {
+  document.getElementById('palette-btn').classList.remove('open');
+  document.getElementById('palette-dropdown').classList.remove('open');
+}
+
+document.addEventListener('click', e => {
+  if (!document.getElementById('palette-wrap').contains(e.target)) closePaletteMenu();
+});
+
 /* ── THEME DATA ─────────────────────────────────────────────── */
 const THEMES = [
   { name:'Catppuccin', bg:'#1e1e2e', fg:'#cdd6f4', preview:'catppuccin',
@@ -2456,6 +2738,8 @@ function initInstallNav() {
 
 /* ── INIT ───────────────────────────────────────────────────── */
 document.addEventListener('DOMContentLoaded', () => {
+  buildPaletteMenu();
+  applyPalette(activePalette);
   buildThemeGrid();
   initStars();
   initScrollAnimations();
