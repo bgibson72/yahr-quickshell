@@ -32,6 +32,7 @@ Rectangle {
     property bool sddmAvatarExists: false
     property bool sddmAvatarSuccess: false
     property bool sddmOpacitySuccess: false
+    property bool sddmOpacityError: false
 
     // Hyprland live-settings
     property int hyprBorderSize: 1
@@ -647,11 +648,21 @@ SETTINGSEOF`
         id: sddmThemeWriter
         running: false
         command: ["sh", "-c", "true"]
+        property string buffer: ""
+        stdout: SplitParser {
+            onRead: data => { sddmThemeWriter.buffer += data }
+        }
         onRunningChanged: {
             if (!running) {
-                root.sddmOpacitySuccess = true
-                sddmOpacitySuccessTimer.start()
-            }
+                if (sddmThemeWriter.buffer.trim() === "OK") {
+                    root.sddmOpacityError = false
+                    root.sddmOpacitySuccess = true
+                    sddmOpacitySuccessTimer.start()
+                } else {
+                    root.sddmOpacityError = true
+                }
+                sddmThemeWriter.buffer = ""
+            } else if (running) { sddmThemeWriter.buffer = "" }
         }
     }
 
@@ -700,6 +711,41 @@ SETTINGSEOF`
         }
     }
 
+
+    Process {
+        id: sddmFilePicker
+        running: false
+        command: ["sh", "-c", "true"]
+        property string buffer: ""
+        stdout: SplitParser {
+            onRead: data => { sddmFilePicker.buffer += data }
+        }
+        onRunningChanged: {
+            if (!running && sddmFilePicker.buffer !== "") {
+                var picked = sddmFilePicker.buffer.trim()
+                if (picked.length > 0)
+                    sddmAvatarPathInput.text = picked
+                sddmFilePicker.buffer = ""
+            } else if (running) { sddmFilePicker.buffer = "" }
+        }
+    }
+
+    Process {
+        id: sddmSudoInstaller
+        running: false
+        command: ["sh", "-c", "true"]
+        property string buffer: ""
+        stdout: SplitParser {
+            onRead: data => { sddmSudoInstaller.buffer += data }
+        }
+        onRunningChanged: {
+            if (!running && sddmSudoInstaller.buffer !== "") {
+                if (sddmSudoInstaller.buffer.trim() === "OK")
+                    root.sddmOpacityError = false
+                sddmSudoInstaller.buffer = ""
+            } else if (running) { sddmSudoInstaller.buffer = "" }
+        }
+    }
     Row {
         anchors.fill: parent
         spacing: 0
@@ -5162,36 +5208,74 @@ MouseArea {
                                             }
                                         }
 
-                                        Rectangle {
-                                            width: 120; height: 32
-                                            radius: 7
-                                            color: sddmAvatarSetHover.containsMouse ? Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.22) : "transparent"
-                                            border.width: 1
-                                            border.color: Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.55)
-                                            Behavior on color { ColorAnimation { duration: 120 } }
+                                        Row {
+                                            spacing: 8
 
-                                            Text {
-                                                anchors.centerIn: parent
-                                                text: root.sddmAvatarSuccess ? "\uf00c  Set!" : "Set Avatar"
-                                                font.family: "Symbols Nerd Font, " + ThemeManager.uiFont
-                                                font.pixelSize: 13
-                                                color: root.sddmAvatarSuccess ? ThemeManager.accentGreen : ThemeManager.accentBlue
-                                                Behavior on color { ColorAnimation { duration: 150 } }
+                                            Rectangle {
+                                                width: 86; height: 32
+                                                radius: 7
+                                                color: sddmBrowseHover.containsMouse ? Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.15) : "transparent"
+                                                border.width: 1
+                                                border.color: Qt.rgba(1, 1, 1, 0.22)
+                                                Behavior on color { ColorAnimation { duration: 120 } }
+
+                                                Text {
+                                                    anchors.centerIn: parent
+                                                    text: "\uf07c  Browse"
+                                                    font.family: "Symbols Nerd Font, " + ThemeManager.uiFont
+                                                    font.pixelSize: 13
+                                                    color: ThemeManager.fgSecondary
+                                                }
+
+                                                MouseArea {
+                                                    id: sddmBrowseHover
+                                                    anchors.fill: parent
+                                                    hoverEnabled: true
+                                                    cursorShape: Qt.PointingHandCursor
+                                                    onClicked: {
+                                                        sddmFilePicker.command = ["sh", "-c",
+                                                            "if command -v zenity >/dev/null 2>&1; then " +
+                                                            "zenity --file-selection --title='Select Avatar Image' " +
+                                                            "--file-filter='Images | *.png *.jpg *.jpeg *.webp *.gif *.bmp' 2>/dev/null; " +
+                                                            "elif command -v yad >/dev/null 2>&1; then " +
+                                                            "yad --file-selection --title='Select Avatar' 2>/dev/null; " +
+                                                            "else thunar ~/Pictures >/dev/null 2>&1 & echo ''; fi"]
+                                                        sddmFilePicker.running = true
+                                                    }
+                                                }
                                             }
 
-                                            MouseArea {
-                                                id: sddmAvatarSetHover
-                                                anchors.fill: parent
-                                                hoverEnabled: true
-                                                cursorShape: Qt.PointingHandCursor
-                                                onClicked: {
-                                                    var path = sddmAvatarPathInput.text.trim()
-                                                    if (path === "") return
-                                                    if (path.startsWith("~"))
-                                                        path = Quickshell.env("HOME") + path.slice(1)
-                                                    sddmAvatarCopier.command = ["sh", "-c",
-                                                        "cp '" + path + "' ~/.face.icon && cp '" + path + "' ~/.face 2>/dev/null"]
-                                                    sddmAvatarCopier.running = true
+                                            Rectangle {
+                                                width: 120; height: 32
+                                                radius: 7
+                                                color: sddmAvatarSetHover.containsMouse ? Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.22) : "transparent"
+                                                border.width: 1
+                                                border.color: Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.55)
+                                                Behavior on color { ColorAnimation { duration: 120 } }
+
+                                                Text {
+                                                    anchors.centerIn: parent
+                                                    text: root.sddmAvatarSuccess ? "\uf00c  Set!" : "Set Avatar"
+                                                    font.family: "Symbols Nerd Font, " + ThemeManager.uiFont
+                                                    font.pixelSize: 13
+                                                    color: root.sddmAvatarSuccess ? ThemeManager.accentGreen : ThemeManager.accentBlue
+                                                    Behavior on color { ColorAnimation { duration: 150 } }
+                                                }
+
+                                                MouseArea {
+                                                    id: sddmAvatarSetHover
+                                                    anchors.fill: parent
+                                                    hoverEnabled: true
+                                                    cursorShape: Qt.PointingHandCursor
+                                                    onClicked: {
+                                                        var imgPath = sddmAvatarPathInput.text.trim()
+                                                        if (imgPath === "") return
+                                                        if (imgPath.startsWith("~"))
+                                                            imgPath = Quickshell.env("HOME") + imgPath.slice(1)
+                                                        sddmAvatarCopier.command = ["sh", "-c",
+                                                            "cp '" + imgPath + "' ~/.face.icon && cp '" + imgPath + "' ~/.face 2>/dev/null"]
+                                                        sddmAvatarCopier.running = true
+                                                    }
                                                 }
                                             }
                                         }
@@ -5338,11 +5422,67 @@ MouseArea {
                                             cursorShape: Qt.PointingHandCursor
                                             onClicked: {
                                                 var val = root.sddmLoginOpacity.toFixed(2)
+                                                root.sddmOpacityError = false
                                                 sddmThemeWriter.command = ["sh", "-c",
                                                     "sed 's/^WidgetOpacity=.*/WidgetOpacity=" + val + "/' " +
                                                     "/usr/share/sddm/themes/yahr-theme/theme.conf | " +
-                                                    "sudo tee /usr/share/sddm/themes/yahr-theme/theme.conf > /dev/null"]
+                                                    "sudo -n tee /usr/share/sddm/themes/yahr-theme/theme.conf >/dev/null 2>&1 && echo OK || echo FAIL"]
                                                 sddmThemeWriter.running = true
+                                            }
+                                        }
+                                    }
+                                }
+
+                                // Error + sudoers setup
+                                Column {
+                                    visible: root.sddmOpacityError
+                                    width: parent.width
+                                    spacing: 8
+
+                                    Rectangle {
+                                        width: parent.width
+                                        height: errorMsgText.implicitHeight + 16
+                                        radius: 7
+                                        color: Qt.rgba(ThemeManager.accentRed.r, ThemeManager.accentRed.g, ThemeManager.accentRed.b, 0.12)
+                                        border.width: 1
+                                        border.color: Qt.rgba(ThemeManager.accentRed.r, ThemeManager.accentRed.g, ThemeManager.accentRed.b, 0.35)
+
+                                        Text {
+                                            id: errorMsgText
+                                            anchors { left: parent.left; right: parent.right; top: parent.top; margins: 8 }
+                                            text: "\uf071  Sudo access required. The passwordless sudoers rule is not installed."
+                                            font.family: "Symbols Nerd Font, " + ThemeManager.uiFont
+                                            font.pixelSize: 12
+                                            color: ThemeManager.accentRed
+                                            wrapMode: Text.WordWrap
+                                        }
+                                    }
+
+                                    Rectangle {
+                                        width: 220; height: 32
+                                        radius: 7
+                                        color: sddmInstallRuleHover.containsMouse ? Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.22) : "transparent"
+                                        border.width: 1
+                                        border.color: Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.55)
+                                        Behavior on color { ColorAnimation { duration: 120 } }
+
+                                        Text {
+                                            anchors.centerIn: parent
+                                            text: "\uf023  Install Sudoers Rule"
+                                            font.family: "Symbols Nerd Font, " + ThemeManager.uiFont
+                                            font.pixelSize: 13
+                                            color: ThemeManager.accentBlue
+                                        }
+
+                                        MouseArea {
+                                            id: sddmInstallRuleHover
+                                            anchors.fill: parent
+                                            hoverEnabled: true
+                                            cursorShape: Qt.PointingHandCursor
+                                            onClicked: {
+                                                sddmSudoInstaller.command = ["sh", "-c",
+                                                    "pkexec sh -c \"echo '%wheel ALL=(ALL) NOPASSWD: /usr/bin/tee /usr/share/sddm/themes/yahr-theme/theme.conf' > /etc/sudoers.d/sddm-yahr-opacity && chmod 440 /etc/sudoers.d/sddm-yahr-opacity && echo OK\""]
+                                                sddmSudoInstaller.running = true
                                             }
                                         }
                                     }
