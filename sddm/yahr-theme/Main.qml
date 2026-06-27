@@ -159,7 +159,11 @@ Rectangle {
                         id: avatar
                         anchors.fill: parent
                         anchors.margins: 3
-                        source: userModel.lastUser !== "" ? userModel.icon : ""
+                        source: {
+                        if (!userModel.lastUser || userModel.lastUser === "") return "";
+                        if (userModel.icon && userModel.icon.length > 0) return userModel.icon;
+                        return "file:///home/" + userModel.lastUser + "/.face.icon";
+                    }
                         fillMode: Image.PreserveAspectCrop
                         
                         layer.enabled: true

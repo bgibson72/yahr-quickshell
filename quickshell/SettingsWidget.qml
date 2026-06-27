@@ -5293,8 +5293,12 @@ MouseArea {
                                                         if (imgPath === "") return
                                                         if (imgPath.startsWith("~"))
                                                             imgPath = Quickshell.env("HOME") + imgPath.slice(1)
+                                                        var repoMain = Quickshell.env("HOME") + "/yahr-quickshell/sddm/yahr-theme/Main.qml"
                                                         sddmAvatarCopier.command = ["sh", "-c",
-                                                            "cp '" + imgPath + "' ~/.face.icon && cp '" + imgPath + "' ~/.face 2>/dev/null"]
+                                                            "cp '" + imgPath + "' ~/.face.icon && " +
+                                                            "cp '" + imgPath + "' ~/.face 2>/dev/null && " +
+                                                            "pkexec cp '" + repoMain + "' /usr/share/sddm/themes/yahr-theme/Main.qml && " +
+                                                            "echo OK || echo FAIL"]
                                                         sddmAvatarCopier.running = true
                                                     }
                                                 }
@@ -5445,9 +5449,11 @@ MouseArea {
                                                 var val = root.sddmLoginOpacity.toFixed(2)
                                                 root.sddmOpacityError = false
                                                 sddmThemeWriter.command = ["sh", "-c",
+                                                    "TMP=$(mktemp) && " +
                                                     "sed 's/^WidgetOpacity=.*/WidgetOpacity=" + val + "/' " +
-                                                    "/usr/share/sddm/themes/yahr-theme/theme.conf | " +
-                                                    "pkexec tee /usr/share/sddm/themes/yahr-theme/theme.conf >/dev/null && echo OK || echo FAIL"]
+                                                    "/usr/share/sddm/themes/yahr-theme/theme.conf > \"$TMP\" && " +
+                                                    "pkexec cp \"$TMP\" /usr/share/sddm/themes/yahr-theme/theme.conf && " +
+                                                    "rm -f \"$TMP\" && echo OK || echo FAIL"]
                                                 sddmThemeWriter.running = true
                                             }
                                         }
