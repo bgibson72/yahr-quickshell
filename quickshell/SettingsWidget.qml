@@ -732,9 +732,9 @@ SETTINGSEOF`
                 Repeater {
                     model: 9
                     Rectangle {
-                        property int stackIdx:   [0, 1, 2, 4, 5, 3, 6, 7, 8][index]
-                        property string tabIcon: ["\uf013", "\uf030", "\uf0c9", "\uf1fc", "\uf03e", "\uf359", "\uf108", "\uf05a", "\uf2bd"][index]
-                        property string tabLabel: ["Quickshell", "Screenshots", "Bar", "Theme", "Wallpaper", "Hyprland", "Monitors", "About", "SDDM"][index]
+                        property int stackIdx:   [0, 1, 2, 4, 5, 3, 6, 8, 7][index]
+                        property string tabIcon: ["\uf013", "\uf030", "\uf0c9", "\uf1fc", "\uf03e", "\uf359", "\uf108", "\uf2bd", "\uf05a"][index]
+                        property string tabLabel: ["Quickshell", "Screenshots", "Bar", "Theme", "Wallpaper", "Hyprland", "Monitors", "SDDM", "About"][index]
                         property bool tabHovered: false
 
                         Layout.fillWidth: true
