@@ -27,6 +27,12 @@ Rectangle {
     property bool showWidgetBorders: true
     property int widgetBorderWidth: 1
 
+    // SDDM settings
+    property real sddmLoginOpacity: 0.75
+    property bool sddmAvatarExists: false
+    property bool sddmAvatarSuccess: false
+    property bool sddmOpacitySuccess: false
+
     // Hyprland live-settings
     property int hyprBorderSize: 1
     property int hyprGapsIn: 5
@@ -619,6 +625,81 @@ SETTINGSEOF`
         onTriggered: monitorLoader.running = true
     }
 
+    // ─── SDDM ────────────────────────────────────────────────────
+    Process {
+        id: sddmThemeReader
+        running: false
+        command: ["sh", "-c", "grep '^WidgetOpacity=' /usr/share/sddm/themes/yahr-theme/theme.conf 2>/dev/null | grep -oP '[0-9]+\\.?[0-9]*'"]
+        property string buffer: ""
+        stdout: SplitParser {
+            onRead: data => { sddmThemeReader.buffer += data }
+        }
+        onRunningChanged: {
+            if (!running && buffer !== "") {
+                var v = parseFloat(buffer.trim())
+                if (!isNaN(v)) root.sddmLoginOpacity = v
+                buffer = ""
+            } else if (running) { buffer = "" }
+        }
+    }
+
+    Process {
+        id: sddmThemeWriter
+        running: false
+        command: ["sh", "-c", "true"]
+        onRunningChanged: {
+            if (!running) {
+                root.sddmOpacitySuccess = true
+                sddmOpacitySuccessTimer.start()
+            }
+        }
+    }
+
+    Timer {
+        id: sddmOpacitySuccessTimer
+        interval: 1500; repeat: false
+        onTriggered: root.sddmOpacitySuccess = false
+    }
+
+    Process {
+        id: sddmAvatarCopier
+        running: false
+        command: ["sh", "-c", "true"]
+        onRunningChanged: {
+            if (!running) {
+                root.sddmAvatarSuccess = true
+                sddmAvatarSuccessTimer.start()
+                sddmAvatarChecker.running = true
+            }
+        }
+    }
+
+    Timer {
+        id: sddmAvatarSuccessTimer
+        interval: 1500; repeat: false
+        onTriggered: root.sddmAvatarSuccess = false
+    }
+
+    Process {
+        id: sddmAvatarChecker
+        running: false
+        command: ["sh", "-c", "[ -f ~/.face.icon ] && echo exists || echo missing"]
+        property string buffer: ""
+        stdout: SplitParser {
+            onRead: data => { sddmAvatarChecker.buffer += data }
+        }
+        onRunningChanged: {
+            if (!running && buffer !== "") {
+                root.sddmAvatarExists = buffer.trim() === "exists"
+                if (root.sddmAvatarExists) {
+                    sddmAvatarPreview.source = ""
+                    sddmAvatarPreview.source = "file://" + Quickshell.env("HOME") + "/.face.icon"
+                }
+                buffer = ""
+            } else if (running) { buffer = "" }
+        }
+    }
+
     Row {
         anchors.fill: parent
         spacing: 0
@@ -649,11 +730,11 @@ SETTINGSEOF`
 
                 // Tab navigation buttons
                 Repeater {
-                    model: 8
+                    model: 9
                     Rectangle {
-                        property int stackIdx:   [0, 1, 2, 4, 5, 3, 6, 7][index]
-                        property string tabIcon: ["\uf013", "\uf030", "\uf0c9", "\uf1fc", "\uf03e", "\uf359", "\uf108", "\uf05a"][index]
-                        property string tabLabel: ["Quickshell", "Screenshots", "Bar", "Theme", "Wallpaper", "Hyprland", "Monitors", "About"][index]
+                        property int stackIdx:   [0, 1, 2, 4, 5, 3, 6, 7, 8][index]
+                        property string tabIcon: ["\uf013", "\uf030", "\uf0c9", "\uf1fc", "\uf03e", "\uf359", "\uf108", "\uf05a", "\uf2bd"][index]
+                        property string tabLabel: ["Quickshell", "Screenshots", "Bar", "Theme", "Wallpaper", "Hyprland", "Monitors", "About", "SDDM"][index]
                         property bool tabHovered: false
 
                         Layout.fillWidth: true
@@ -702,7 +783,10 @@ SETTINGSEOF`
             QtObject {
                 id: sidebar
                 property int currentIndex: 0
-                onCurrentIndexChanged: { if (currentIndex === 6 && monitorsModel.count === 0) monitorLoader.running = true }
+                onCurrentIndexChanged: {
+                    if (currentIndex === 6 && monitorsModel.count === 0) monitorLoader.running = true
+                    if (currentIndex === 8) { sddmThemeReader.running = true; sddmAvatarChecker.running = true }
+                }
             }
             }
         }
@@ -4956,6 +5040,317 @@ MouseArea {
                         }
 
                         Item { Layout.fillWidth: true; height: 28 }
+                    }
+                }
+
+                // Tab 8: SDDM ──────────────────────────────────────────
+                ScrollView {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    clip: true
+                    ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
+
+                    ColumnLayout {
+                        width: parent.parent.width
+                        spacing: 32
+
+                        Item { Layout.fillWidth: true; height: 8 }
+
+                        // ========== USER AVATAR ==========
+                        Rectangle {
+                            Layout.fillWidth: true
+                            implicitHeight: sddmAvatarCard.implicitHeight + 32
+                            color: Qt.rgba(1, 1, 1, 0.05)
+                            radius: 10
+                            clip: true
+
+                            Column {
+                                id: sddmAvatarCard
+                                anchors.left: parent.left
+                                anchors.right: parent.right
+                                anchors.top: parent.top
+                                anchors.margins: 16
+                                spacing: 16
+
+                                Text {
+                                    text: "  User Avatar"
+                                    font.family: ThemeManager.uiFont
+                                    font.pixelSize: 18
+                                    font.weight: Font.Bold
+                                    color: ThemeManager.accentBlue
+                                }
+
+                                Text {
+                                    width: parent.width
+                                    text: "Sets a profile picture on the SDDM login screen instead of the first-letter initial. The image is saved to ~/.face.icon."
+                                    font.family: ThemeManager.uiFont
+                                    font.pixelSize: 12
+                                    color: ThemeManager.fgSecondary
+                                    wrapMode: Text.WordWrap
+                                }
+
+                                Row {
+                                    spacing: 16
+                                    width: parent.width
+
+                                    // Circular avatar preview
+                                    Rectangle {
+                                        width: 80; height: 80
+                                        radius: 40
+                                        color: Qt.rgba(1, 1, 1, 0.08)
+                                        border.width: 1
+                                        border.color: Qt.rgba(1, 1, 1, 0.18)
+                                        clip: true
+
+                                        Image {
+                                            id: sddmAvatarPreview
+                                            anchors.fill: parent
+                                            fillMode: Image.PreserveAspectCrop
+                                            visible: root.sddmAvatarExists
+                                            cache: false
+                                        }
+
+                                        Text {
+                                            anchors.centerIn: parent
+                                            text: "\uf007"
+                                            font.family: "Symbols Nerd Font"
+                                            font.pixelSize: 32
+                                            color: ThemeManager.fgTertiary
+                                            visible: !root.sddmAvatarExists
+                                        }
+                                    }
+
+                                    Column {
+                                        spacing: 10
+                                        width: parent.width - 96
+
+                                        Text {
+                                            text: root.sddmAvatarExists ? "Current: ~/.face.icon" : "No avatar set"
+                                            font.family: ThemeManager.uiFont
+                                            font.pixelSize: 12
+                                            color: root.sddmAvatarExists ? ThemeManager.accentGreen : ThemeManager.fgTertiary
+                                        }
+
+                                        Rectangle {
+                                            width: parent.width
+                                            height: 32
+                                            color: Qt.rgba(1, 1, 1, 0.07)
+                                            radius: 6
+                                            border.width: 1
+                                            border.color: sddmAvatarPathInput.activeFocus ? ThemeManager.accentBlue : Qt.rgba(1, 1, 1, 0.18)
+
+                                            TextInput {
+                                                id: sddmAvatarPathInput
+                                                anchors.fill: parent
+                                                anchors.margins: 8
+                                                font.family: ThemeManager.uiFont
+                                                font.pixelSize: 12
+                                                color: ThemeManager.fgPrimary
+                                                verticalAlignment: TextInput.AlignVCenter
+                                                selectByMouse: true
+                                                clip: true
+                                                Text {
+                                                    anchors.fill: parent
+                                                    anchors.leftMargin: 0
+                                                    verticalAlignment: Text.AlignVCenter
+                                                    text: "Path to image, e.g. ~/Pictures/avatar.png"
+                                                    font.family: ThemeManager.uiFont
+                                                    font.pixelSize: 12
+                                                    color: ThemeManager.fgTertiary
+                                                    visible: parent.text.length === 0
+                                                }
+                                            }
+                                        }
+
+                                        Rectangle {
+                                            width: 120; height: 32
+                                            radius: 7
+                                            color: sddmAvatarSetHover.containsMouse ? Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.22) : "transparent"
+                                            border.width: 1
+                                            border.color: Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.55)
+                                            Behavior on color { ColorAnimation { duration: 120 } }
+
+                                            Text {
+                                                anchors.centerIn: parent
+                                                text: root.sddmAvatarSuccess ? "\uf00c  Set!" : "Set Avatar"
+                                                font.family: "Symbols Nerd Font, " + ThemeManager.uiFont
+                                                font.pixelSize: 13
+                                                color: root.sddmAvatarSuccess ? ThemeManager.accentGreen : ThemeManager.accentBlue
+                                                Behavior on color { ColorAnimation { duration: 150 } }
+                                            }
+
+                                            MouseArea {
+                                                id: sddmAvatarSetHover
+                                                anchors.fill: parent
+                                                hoverEnabled: true
+                                                cursorShape: Qt.PointingHandCursor
+                                                onClicked: {
+                                                    var path = sddmAvatarPathInput.text.trim()
+                                                    if (path === "") return
+                                                    if (path.startsWith("~"))
+                                                        path = Quickshell.env("HOME") + path.slice(1)
+                                                    sddmAvatarCopier.command = ["sh", "-c",
+                                                        "cp '" + path + "' ~/.face.icon && cp '" + path + "' ~/.face 2>/dev/null"]
+                                                    sddmAvatarCopier.running = true
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        // ========== LOGIN WINDOW TRANSPARENCY ==========
+                        Rectangle {
+                            Layout.fillWidth: true
+                            implicitHeight: sddmOpacityCard.implicitHeight + 32
+                            color: Qt.rgba(1, 1, 1, 0.05)
+                            radius: 10
+                            clip: true
+
+                            Column {
+                                id: sddmOpacityCard
+                                anchors.left: parent.left
+                                anchors.right: parent.right
+                                anchors.top: parent.top
+                                anchors.margins: 16
+                                spacing: 16
+
+                                Text {
+                                    text: "  Login Window Transparency"
+                                    font.family: ThemeManager.uiFont
+                                    font.pixelSize: 18
+                                    font.weight: Font.Bold
+                                    color: ThemeManager.accentBlue
+                                }
+
+                                Text {
+                                    width: parent.width
+                                    text: "Controls the opacity of the login card on the SDDM screen. Requires the yahr-sddm sudoers rule to write without a password prompt."
+                                    font.family: ThemeManager.uiFont
+                                    font.pixelSize: 12
+                                    color: ThemeManager.fgSecondary
+                                    wrapMode: Text.WordWrap
+                                }
+
+                                // Slider row
+                                Row {
+                                    spacing: 0
+                                    width: parent.width
+
+                                    Item {
+                                        width: parent.width
+                                        height: 40
+
+                                        Rectangle {
+                                            id: sddmSliderTrack
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            width: parent.width
+                                            height: 6
+                                            radius: 3
+                                            color: Qt.rgba(1, 1, 1, 0.07)
+
+                                            Rectangle {
+                                                width: sddmSliderHandle.x + sddmSliderHandle.width / 2
+                                                height: parent.height
+                                                radius: parent.radius
+                                                color: ThemeManager.accentBlue
+                                            }
+                                        }
+
+                                        Rectangle {
+                                            id: sddmSliderHandle
+                                            width: 20; height: 20
+                                            radius: 10
+                                            color: sddmSliderMA.containsMouse || sddmSliderMA.pressed
+                                                ? ThemeManager.accentBlue : ThemeManager.fgPrimary
+                                            border.width: 2
+                                            border.color: ThemeManager.accentBlue
+                                            y: (parent.height - height) / 2
+                                            x: (sddmSliderTrack.width - width) * root.sddmLoginOpacity
+                                            Behavior on color { ColorAnimation { duration: 150 } }
+                                        }
+
+                                        MouseArea {
+                                            id: sddmSliderMA
+                                            anchors.fill: parent
+                                            hoverEnabled: true
+                                            cursorShape: Qt.PointingHandCursor
+                                            function updateValue(mouse) {
+                                                root.sddmLoginOpacity = Math.max(0.0, Math.min(1.0,
+                                                    Math.round(mouse.x / width * 20) / 20))
+                                            }
+                                            onPressed: updateValue(mouse)
+                                            onPositionChanged: if (pressed) updateValue(mouse)
+                                        }
+                                    }
+                                }
+
+                                Text {
+                                    text: "Drag slider: 0% = fully transparent, 100% = completely opaque"
+                                    font.family: ThemeManager.uiFont
+                                    font.pixelSize: 10
+                                    color: ThemeManager.fgTertiary
+                                    wrapMode: Text.WordWrap
+                                    width: parent.width
+                                }
+
+                                // Value display + apply button
+                                Row {
+                                    spacing: 10
+
+                                    Rectangle {
+                                        width: 56; height: 32
+                                        radius: 6
+                                        color: Qt.rgba(1, 1, 1, 0.08)
+                                        border.width: 1
+                                        border.color: Qt.rgba(1, 1, 1, 0.14)
+                                        Text {
+                                            anchors.centerIn: parent
+                                            text: Math.round(root.sddmLoginOpacity * 100) + "%"
+                                            font.family: ThemeManager.uiFont
+                                            font.pixelSize: 13
+                                            color: ThemeManager.fgPrimary
+                                        }
+                                    }
+
+                                    Rectangle {
+                                        width: 150; height: 32
+                                        radius: 7
+                                        color: sddmOpacityApplyHover.containsMouse ? Qt.rgba(ThemeManager.accentGreen.r, ThemeManager.accentGreen.g, ThemeManager.accentGreen.b, 0.22) : "transparent"
+                                        border.width: 1
+                                        border.color: Qt.rgba(ThemeManager.accentGreen.r, ThemeManager.accentGreen.g, ThemeManager.accentGreen.b, 0.55)
+                                        Behavior on color { ColorAnimation { duration: 120 } }
+
+                                        Text {
+                                            anchors.centerIn: parent
+                                            text: root.sddmOpacitySuccess ? "\uf00c  Applied!" : "Apply to SDDM"
+                                            font.family: "Symbols Nerd Font, " + ThemeManager.uiFont
+                                            font.pixelSize: 13
+                                            color: root.sddmOpacitySuccess ? ThemeManager.accentGreen : ThemeManager.accentGreen
+                                            Behavior on color { ColorAnimation { duration: 150 } }
+                                        }
+
+                                        MouseArea {
+                                            id: sddmOpacityApplyHover
+                                            anchors.fill: parent
+                                            hoverEnabled: true
+                                            cursorShape: Qt.PointingHandCursor
+                                            onClicked: {
+                                                var val = root.sddmLoginOpacity.toFixed(2)
+                                                sddmThemeWriter.command = ["sh", "-c",
+                                                    "sed 's/^WidgetOpacity=.*/WidgetOpacity=" + val + "/' " +
+                                                    "/usr/share/sddm/themes/yahr-theme/theme.conf | " +
+                                                    "sudo tee /usr/share/sddm/themes/yahr-theme/theme.conf > /dev/null"]
+                                                sddmThemeWriter.running = true
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        Item { Layout.fillWidth: true; height: 16 }
                     }
                 }
 
