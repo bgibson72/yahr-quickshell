@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import QtQuick.Dialogs
 import Quickshell
 import Quickshell.Io
 
@@ -746,6 +747,16 @@ SETTINGSEOF`
             } else if (running) { sddmSudoInstaller.buffer = "" }
         }
     }
+    FileDialog {
+        id: sddmAvatarDialog
+        title: "Select Avatar Image"
+        nameFilters: ["Images (*.png *.jpg *.jpeg *.webp *.gif *.bmp *.ico)", "All files (*)"]
+        onAccepted: {
+            var filePath = selectedFile.toString().replace(/^file:\/\//, "")
+            sddmAvatarPathInput.text = filePath
+        }
+    }
+
     Row {
         anchors.fill: parent
         spacing: 0
@@ -5233,14 +5244,7 @@ MouseArea {
                                                     hoverEnabled: true
                                                     cursorShape: Qt.PointingHandCursor
                                                     onClicked: {
-                                                        sddmFilePicker.command = ["sh", "-c",
-                                                            "if command -v zenity >/dev/null 2>&1; then " +
-                                                            "zenity --file-selection --title='Select Avatar Image' " +
-                                                            "--file-filter='Images | *.png *.jpg *.jpeg *.webp *.gif *.bmp' 2>/dev/null; " +
-                                                            "elif command -v yad >/dev/null 2>&1; then " +
-                                                            "yad --file-selection --title='Select Avatar' 2>/dev/null; " +
-                                                            "else thunar ~/Pictures >/dev/null 2>&1 & echo ''; fi"]
-                                                        sddmFilePicker.running = true
+                                                        sddmAvatarDialog.open()
                                                     }
                                                 }
                                             }
@@ -5426,7 +5430,7 @@ MouseArea {
                                                 sddmThemeWriter.command = ["sh", "-c",
                                                     "sed 's/^WidgetOpacity=.*/WidgetOpacity=" + val + "/' " +
                                                     "/usr/share/sddm/themes/yahr-theme/theme.conf | " +
-                                                    "sudo -n tee /usr/share/sddm/themes/yahr-theme/theme.conf >/dev/null 2>&1 && echo OK || echo FAIL"]
+                                                    "pkexec tee /usr/share/sddm/themes/yahr-theme/theme.conf >/dev/null && echo OK || echo FAIL"]
                                                 sddmThemeWriter.running = true
                                             }
                                         }
@@ -5450,40 +5454,11 @@ MouseArea {
                                         Text {
                                             id: errorMsgText
                                             anchors { left: parent.left; right: parent.right; top: parent.top; margins: 8 }
-                                            text: "\uf071  Sudo access required. The passwordless sudoers rule is not installed."
+                                            text: "\uf071  Authentication cancelled or failed. Ensure hyprpolkit is running."
                                             font.family: "Symbols Nerd Font, " + ThemeManager.uiFont
                                             font.pixelSize: 12
                                             color: ThemeManager.accentRed
                                             wrapMode: Text.WordWrap
-                                        }
-                                    }
-
-                                    Rectangle {
-                                        width: 220; height: 32
-                                        radius: 7
-                                        color: sddmInstallRuleHover.containsMouse ? Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.22) : "transparent"
-                                        border.width: 1
-                                        border.color: Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.55)
-                                        Behavior on color { ColorAnimation { duration: 120 } }
-
-                                        Text {
-                                            anchors.centerIn: parent
-                                            text: "\uf023  Install Sudoers Rule"
-                                            font.family: "Symbols Nerd Font, " + ThemeManager.uiFont
-                                            font.pixelSize: 13
-                                            color: ThemeManager.accentBlue
-                                        }
-
-                                        MouseArea {
-                                            id: sddmInstallRuleHover
-                                            anchors.fill: parent
-                                            hoverEnabled: true
-                                            cursorShape: Qt.PointingHandCursor
-                                            onClicked: {
-                                                sddmSudoInstaller.command = ["sh", "-c",
-                                                    "pkexec sh -c \"echo '%wheel ALL=(ALL) NOPASSWD: /usr/bin/tee /usr/share/sddm/themes/yahr-theme/theme.conf' > /etc/sudoers.d/sddm-yahr-opacity && chmod 440 /etc/sudoers.d/sddm-yahr-opacity && echo OK\""]
-                                                sddmSudoInstaller.running = true
-                                            }
                                         }
                                     }
                                 }
