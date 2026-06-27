@@ -1,7 +1,6 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
-import QtQuick.Dialogs
 import Quickshell
 import Quickshell.Io
 
@@ -747,14 +746,31 @@ SETTINGSEOF`
             } else if (running) { sddmSudoInstaller.buffer = "" }
         }
     }
-    FileDialog {
-        id: sddmAvatarDialog
-        title: "Select Avatar Image"
-        nameFilters: ["Images (*.png *.jpg *.jpeg *.webp *.gif *.bmp *.ico)", "All files (*)"]
-        onAccepted: {
-            var filePath = selectedFile.toString().replace(/^file:\/\//, "")
-            sddmAvatarPathInput.text = filePath
+    property bool sddmBrowseOpen: false
+    property string sddmBrowseDir: Quickshell.env("HOME") + "/Pictures"
+
+    ListModel { id: sddmFileModel }
+
+    Process {
+        id: sddmDirReader
+        running: false
+        command: ["sh", "-c", "true"]
+        stdout: SplitParser {
+            onRead: data => {
+                var name = data.trim()
+                if (name.length > 0) sddmFileModel.append({ name: name })
+            }
         }
+    }
+
+    function sddmLoadDir(dir) {
+        root.sddmBrowseDir = dir
+        sddmFileModel.clear()
+        var escaped = dir.replace(/'/g, "'\\''")
+        sddmDirReader.command = ["sh", "-c",
+            "{ ls -1p '" + escaped + "' 2>/dev/null | grep '/$' | sort; " +
+            "ls -1p '" + escaped + "' 2>/dev/null | grep -iE '\\.(png|jpg|jpeg|webp|gif|bmp|ico)$' | sort; }"]
+        sddmDirReader.running = true
     }
 
     Row {
@@ -5244,7 +5260,8 @@ MouseArea {
                                                     hoverEnabled: true
                                                     cursorShape: Qt.PointingHandCursor
                                                     onClicked: {
-                                                        sddmAvatarDialog.open()
+                                                        sddmLoadDir(root.sddmBrowseDir)
+                                                        root.sddmBrowseOpen = true
                                                     }
                                                 }
                                             }
@@ -5605,6 +5622,197 @@ MouseArea {
             }
         }
     }
+
+    // ── Inline SDDM file browser overlay ──────────────────────────────
+    Rectangle {
+        id: sddmFileBrowserOverlay
+        anchors.fill: parent
+        z: 200
+        visible: root.sddmBrowseOpen
+        color: Qt.rgba(0, 0, 0, 0.60)
+        radius: root.hyprRounding
+
+        Rectangle {
+            anchors.centerIn: parent
+            width: Math.min(parent.width - 80, 580)
+            height: Math.min(parent.height - 80, 460)
+            radius: 12
+            color: ThemeManager.bgBase
+            border.width: 1
+            border.color: Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.45)
+
+            ColumnLayout {
+                anchors.fill: parent
+                anchors.margins: 16
+                spacing: 10
+
+                // ── Header ──
+                RowLayout {
+                    Layout.fillWidth: true
+
+                    Text {
+                        text: "\uf07c  Select Avatar Image"
+                        font.family: "Symbols Nerd Font, " + ThemeManager.uiFont
+                        font.pixelSize: 16
+                        font.weight: Font.Bold
+                        color: ThemeManager.accentBlue
+                    }
+                    Item { Layout.fillWidth: true }
+                    Rectangle {
+                        width: 28; height: 28; radius: 6
+                        color: fbCloseHover.containsMouse
+                            ? Qt.rgba(ThemeManager.accentRed.r, ThemeManager.accentRed.g, ThemeManager.accentRed.b, 0.28)
+                            : Qt.rgba(1, 1, 1, 0.08)
+                        border.width: 1
+                        border.color: fbCloseHover.containsMouse
+                            ? Qt.rgba(ThemeManager.accentRed.r, ThemeManager.accentRed.g, ThemeManager.accentRed.b, 0.55)
+                            : Qt.rgba(1, 1, 1, 0.18)
+                        Behavior on color { ColorAnimation { duration: 120 } }
+                        Text {
+                            anchors.centerIn: parent
+                            text: "\u2715"
+                            font.pixelSize: 13
+                            color: fbCloseHover.containsMouse ? ThemeManager.accentRed : ThemeManager.fgSecondary
+                        }
+                        MouseArea {
+                            id: fbCloseHover
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: root.sddmBrowseOpen = false
+                        }
+                    }
+                }
+
+                // ── Path + Up button ──
+                RowLayout {
+                    Layout.fillWidth: true
+                    spacing: 6
+
+                    Rectangle {
+                        width: 32; height: 28; radius: 6
+                        color: fbUpHover.containsMouse ? Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.18) : Qt.rgba(1, 1, 1, 0.07)
+                        Behavior on color { ColorAnimation { duration: 100 } }
+                        Text {
+                            anchors.centerIn: parent
+                            text: "\uf062"
+                            font.family: "Symbols Nerd Font"
+                            font.pixelSize: 14
+                            color: ThemeManager.accentBlue
+                        }
+                        MouseArea {
+                            id: fbUpHover
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: {
+                                var parts = root.sddmBrowseDir.split("/").filter(function(p){ return p.length > 0 })
+                                if (parts.length > 0) parts.pop()
+                                sddmLoadDir(parts.length > 0 ? "/" + parts.join("/") : "/")
+                            }
+                        }
+                    }
+
+                    Rectangle {
+                        Layout.fillWidth: true
+                        height: 28; radius: 6
+                        color: Qt.rgba(1, 1, 1, 0.06)
+                        border.width: 1
+                        border.color: Qt.rgba(1, 1, 1, 0.12)
+                        Text {
+                            anchors.fill: parent
+                            anchors.margins: 6
+                            verticalAlignment: Text.AlignVCenter
+                            text: root.sddmBrowseDir
+                            font.family: ThemeManager.uiFont
+                            font.pixelSize: 11
+                            color: ThemeManager.fgSecondary
+                            elide: Text.ElideLeft
+                        }
+                    }
+                }
+
+                // ── File list ──
+                Rectangle {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    radius: 8
+                    color: Qt.rgba(1, 1, 1, 0.04)
+                    border.width: 1
+                    border.color: Qt.rgba(1, 1, 1, 0.10)
+                    clip: true
+
+                    ListView {
+                        id: sddmFileList
+                        anchors.fill: parent
+                        anchors.margins: 4
+                        model: sddmFileModel
+                        clip: true
+                        spacing: 1
+
+                        ScrollBar.vertical: ScrollBar { policy: ScrollBar.AsNeeded }
+
+                        delegate: Rectangle {
+                            width: ListView.view.width - 8
+                            height: 36
+                            radius: 6
+                            property bool isDir: model.name.endsWith("/")
+                            color: fbItemHover.containsMouse
+                                ? Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, isDir ? 0.15 : 0.22)
+                                : "transparent"
+                            Behavior on color { ColorAnimation { duration: 80 } }
+
+                            Row {
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: 10
+                                spacing: 10
+                                Text {
+                                    text: isDir ? "\uf07b" : "\uf03e"
+                                    font.family: "Symbols Nerd Font"
+                                    font.pixelSize: 15
+                                    color: isDir ? ThemeManager.accentBlue : ThemeManager.fgSecondary
+                                    anchors.verticalCenter: parent.verticalCenter
+                                }
+                                Text {
+                                    text: model.name
+                                    font.family: ThemeManager.uiFont
+                                    font.pixelSize: 13
+                                    color: isDir ? ThemeManager.fgPrimary : ThemeManager.accentGreen
+                                    anchors.verticalCenter: parent.verticalCenter
+                                }
+                            }
+
+                            MouseArea {
+                                id: fbItemHover
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: {
+                                    if (isDir) {
+                                        sddmLoadDir(root.sddmBrowseDir + "/" + model.name.slice(0, -1))
+                                    } else {
+                                        sddmAvatarPathInput.text = root.sddmBrowseDir + "/" + model.name
+                                        root.sddmBrowseOpen = false
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // ── Footer ──
+                Text {
+                    Layout.alignment: Qt.AlignHCenter
+                    text: "Click a file to select it  \u2022  Click a folder to navigate"
+                    font.family: ThemeManager.uiFont
+                    font.pixelSize: 11
+                    color: ThemeManager.fgTertiary
+                }
+            }
+        }
+    }
+
 
 }
 
