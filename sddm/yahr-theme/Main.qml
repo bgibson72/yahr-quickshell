@@ -161,8 +161,9 @@ Rectangle {
                         anchors.margins: 3
                         source: {
                         if (!userModel.lastUser || userModel.lastUser === "") return "";
-                        if (userModel.icon && userModel.icon.length > 0) return userModel.icon;
-                        return "file:///home/" + userModel.lastUser + "/.face.icon";
+                        // userModel.icon is a list role, not a Q_PROPERTY — always undefined here.
+                        // Use FacesDir directly; sddm user can read it even when home dir is 700.
+                        return "file:///usr/share/sddm/faces/" + userModel.lastUser + ".face.icon";
                     }
                         fillMode: Image.PreserveAspectCrop
                         
