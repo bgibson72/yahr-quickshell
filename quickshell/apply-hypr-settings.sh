@@ -18,8 +18,7 @@ try:
     with open(sys.argv[1]) as f:
         s = json.load(f)
     h = s.get("hypr", {})
-    if not h:
-        sys.exit(0)
+    g = s.get("general", {})
 
     if "borderSize" in h:
         ev("hl.config({general={border_size=" + str(int(h["borderSize"])) + "}})")
@@ -43,6 +42,14 @@ try:
         ev("hl.layer_rule({match={namespace='^mako'}, blur=" + v + "})")
     if "blurSize" in h:
         ev("hl.config({decoration={blur={size=" + str(int(h["blurSize"])) + "}}})")
+
+    # App window transparency (kitty, thunar, code)
+    if "appWindowTransparent" in g:
+        active_op   = "0.92" if g["appWindowTransparent"] else "1.0"
+        inactive_op = "0.88" if g["appWindowTransparent"] else "1.0"
+        for cls in ["kitty", "thunar", "code"]:
+            ev("hl.window_rule({ match = { class = '^" + cls + "$' }, opacity = '"
+               + active_op + " override " + inactive_op + " override' })")
 except Exception as e:
     print("apply-hypr-settings: " + str(e), file=sys.stderr)
     sys.exit(1)

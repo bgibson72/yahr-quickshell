@@ -11,7 +11,7 @@ Rectangle {
     height: 720
     // When embedded as a tab inside another widget, suppress the background
     property bool embedded: false
-    color: embedded ? "transparent" : ThemeManager.bgBase
+    color: embedded ? "transparent" : Qt.rgba(ThemeManager.bgBase.r, ThemeManager.bgBase.g, ThemeManager.bgBase.b, ThemeManager.widgetOpacity)
     radius: embedded ? 0 : root.hyprRounding
     border.width: embedded ? 0 : (ThemeManager.showWidgetBorders ? ThemeManager.widgetBorderWidth : 0)
     border.color: Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.35)
@@ -692,6 +692,12 @@ SETTINGSEOF`
     }
 
     Process {
+        id: hyprAppOpacity
+        running: false
+        command: ["true"]
+    }
+
+    Process {
         id: sddmAvatarChecker
         running: false
         command: ["sh", "-c", "[ -f ~/.face.icon ] && echo exists || echo missing"]
@@ -940,7 +946,16 @@ SETTINGSEOF`
                                             ThemeManager.widgetOpacity = widgetTransparentCheck.checked ? 0.75 : 1.0
                                             if (!root.settings.general) root.settings.general = {}
                                             root.settings.general.widgetTransparent = widgetTransparentCheck.checked
+                                            root.settings.general.appWindowTransparent = widgetTransparentCheck.checked
                                             saveSettings()
+                                            var op = widgetTransparentCheck.checked
+                                                ? "0.92 override 0.88 override"
+                                                : "1.0 override 1.0 override"
+                                            hyprAppOpacity.command = ["sh", "-c",
+                                                "hyprctl eval 'hl.window_rule({ match = { class = \"^kitty$\" }, opacity = \"" + op + "\" })' && " +
+                                                "hyprctl eval 'hl.window_rule({ match = { class = \"^thunar$\" }, opacity = \"" + op + "\" })' && " +
+                                                "hyprctl eval 'hl.window_rule({ match = { class = \"^code$\" }, opacity = \"" + op + "\" })'"]
+                                            hyprAppOpacity.running = true
                                         }
                                     }
                                 }
@@ -949,14 +964,14 @@ SETTINGSEOF`
                                     spacing: 2
 
                                     Text {
-                                        text: "Transparent widget backgrounds"
+                                        text: "Transparent backgrounds"
                                         font.family: ThemeManager.uiFont
                                         font.pixelSize: 12
                                         color: ThemeManager.fgPrimary
                                     }
 
                                     Text {
-                                        text: widgetTransparentCheck.checked ? "Widgets use semi-transparent backgrounds" : "Widgets use solid opaque backgrounds"
+                                        text: widgetTransparentCheck.checked ? "Widgets + kitty/thunar/code: semi-transparent" : "Widgets + kitty/thunar/code: solid opaque"
                                         font.family: ThemeManager.uiFont
                                         font.pixelSize: 10
                                         color: ThemeManager.fgTertiary

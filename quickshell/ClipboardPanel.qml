@@ -9,7 +9,7 @@ Rectangle {
     
     width: 500
     height: 600
-    color: ThemeManager.bgBase
+    color: Qt.rgba(ThemeManager.bgBase.r, ThemeManager.bgBase.g, ThemeManager.bgBase.b, ThemeManager.widgetOpacity)
     radius: ThemeManager.hyprRounding
     border.width: ThemeManager.showWidgetBorders ? ThemeManager.widgetBorderWidth : 0
     border.color: Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.35)
