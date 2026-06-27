@@ -13,3 +13,6 @@
 
 # Allow updating theme.conf
 %wheel ALL=(ALL) NOPASSWD: /usr/bin/tee /usr/share/sddm/themes/yahr-theme/theme.conf
+
+# Allow setting user face/avatar in SDDM system faces directory
+%wheel ALL=(ALL) NOPASSWD: /usr/bin/cp * /usr/share/sddm/faces/*
