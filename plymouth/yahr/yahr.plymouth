@@ -1,0 +1,8 @@
+[Plymouth Theme]
+Name=YAHR
+Description=Custom boot animation
+ModuleName=script
+
+[script]
+ImageDir=/usr/share/plymouth/themes/yahr/
+ScriptFile=/usr/share/plymouth/themes/yahr/yahr.script

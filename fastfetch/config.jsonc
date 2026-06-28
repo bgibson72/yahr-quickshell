@@ -52,7 +52,7 @@
     },
     {
       "type": "command",
-      "key": " ",
+      "key": " ",
       "keyColor": "34",
       "text": "grep 'themeName:' ~/.config/quickshell/ThemeManager.qml 2>/dev/null | sed -E 's/.*\"(.+)\".*/\\1/' || echo 'Unknown'"
     },

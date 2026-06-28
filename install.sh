@@ -170,8 +170,9 @@ preflight_check() {
         [ -d "$SCRIPT_DIR/fastfetch" ] && echo "  + Fastfetch system info"
         [ -d "$SCRIPT_DIR/wofi" ] && echo "  + Wofi launcher (fallback)"
         [ -d "$SCRIPT_DIR/hypremoji" ] && echo "  + Hypremoji picker"
-        [ -d "$SCRIPT_DIR/firefox" ] && echo "  - Firefox userChrome (optional)"
+        [ -f "$SCRIPT_DIR/firefox/userChrome.css" ] && echo "  - Firefox userChrome (optional)"
         [ -d "$SCRIPT_DIR/sddm" ] && echo "  - SDDM display manager (optional)"
+        [ -d "$SCRIPT_DIR/plymouth/yahr" ] && echo "  - Plymouth boot animation (optional)"
         [ -d "$SCRIPT_DIR/nvim" ] && echo "  - Neovim config (optional)"
         [ -d "$SCRIPT_DIR/vesktop" ] && echo "  - Vesktop/Discord (optional)"
         [ -d "$SCRIPT_DIR/VSCodium" ] && echo "  - VSCodium (optional)"
@@ -1194,6 +1195,114 @@ install_firefox() {
     echo "  4. Restart Firefox"
 }
 
+# Install and configure Plymouth boot animation
+install_plymouth() {
+    print_header "Plymouth Boot Animation Setup"
+
+    if [ ! -d "$SCRIPT_DIR/plymouth/yahr" ]; then
+        print_warning "Plymouth theme not found in repo, skipping..."
+        return
+    fi
+
+    local install_ply=false
+    if [ "$YOLO_MODE" = true ]; then
+        print_info "YOLO mode: Skipping optional Plymouth boot animation"
+        SKIPPED_COMPONENTS+=("Plymouth boot animation")
+        return
+    else
+        print_info "Plymouth replaces the kernel text scroll with an animated boot screen."
+        echo ""
+        read -p "Install Plymouth boot animation (yahr theme)? (y/n) " -n 1 -r
+        echo
+        [[ $REPLY =~ ^[Yy]$ ]] && install_ply=true
+    fi
+
+    if [ "$install_ply" = false ]; then
+        SKIPPED_COMPONENTS+=("Plymouth boot animation")
+        return
+    fi
+
+    # Install plymouth package
+    print_info "Installing Plymouth..."
+    if [ "$YOLO_MODE" = true ]; then
+        sudo pacman -S --needed --noconfirm plymouth
+    else
+        sudo pacman -S --needed plymouth
+    fi
+
+    if [ $? -ne 0 ]; then
+        print_error "Failed to install Plymouth"
+        return 1
+    fi
+    print_success "Plymouth installed"
+
+    # Install theme files
+    print_info "Installing yahr Plymouth theme..."
+    sudo mkdir -p /usr/share/plymouth/themes/yahr
+    sudo cp -r "$SCRIPT_DIR/plymouth/yahr/"* /usr/share/plymouth/themes/yahr/
+    print_success "Plymouth theme installed to /usr/share/plymouth/themes/yahr/"
+
+    # Configure mkinitcpio - add 'plymouth' hook after 'udev' (if not present)
+    print_info "Configuring mkinitcpio for Plymouth..."
+    local mkinitcpio_conf="/etc/mkinitcpio.conf"
+
+    if grep -q "^HOOKS=" "$mkinitcpio_conf"; then
+        if grep "^HOOKS=" "$mkinitcpio_conf" | grep -q "plymouth"; then
+            print_info "Plymouth hook already present in mkinitcpio.conf"
+        else
+            # Insert 'plymouth' after 'udev' in the active HOOKS line
+            sudo sed -i 's/^\(HOOKS=.*\budev\b\)/\1 plymouth/' "$mkinitcpio_conf"
+            print_success "Plymouth hook added to mkinitcpio.conf (after udev)"
+        fi
+    else
+        print_warning "Could not find HOOKS line in mkinitcpio.conf — add 'plymouth' manually after 'udev'"
+    fi
+
+    # Configure bootloader: ensure 'quiet splash' in kernel cmdline
+    # GRUB
+    if [ -f "/etc/default/grub" ]; then
+        print_info "Configuring GRUB for Plymouth..."
+        if grep -q "quiet.*splash\|splash.*quiet" /etc/default/grub; then
+            print_info "GRUB cmdline already contains 'quiet splash'"
+        else
+            sudo sed -i 's/^\(GRUB_CMDLINE_LINUX_DEFAULT="[^"]*\)"/\1 quiet splash"/' /etc/default/grub
+            print_success "Added 'quiet splash' to GRUB_CMDLINE_LINUX_DEFAULT"
+        fi
+        print_step "Regenerating GRUB configuration..."
+        sudo grub-mkconfig -o /boot/grub/grub.cfg
+        print_success "GRUB configuration updated"
+    fi
+
+    # systemd-boot
+    if ls /boot/loader/entries/*.conf &>/dev/null 2>&1; then
+        print_info "Configuring systemd-boot entries for Plymouth..."
+        for entry in /boot/loader/entries/*.conf; do
+            if grep -q "^options" "$entry"; then
+                if grep -q "splash" "$entry"; then
+                    print_info "$(basename "$entry") already has 'splash'"
+                else
+                    sudo sed -i '/^options/s/$/ quiet splash/' "$entry"
+                    print_success "Updated $(basename "$entry")"
+                fi
+            fi
+        done
+    fi
+
+    # Set theme and rebuild initramfs in one step
+    print_info "Setting yahr as default Plymouth theme and rebuilding initramfs..."
+    print_warning "This may take a minute..."
+    sudo plymouth-set-default-theme -R yahr
+
+    if [ $? -eq 0 ]; then
+        print_success "Initramfs rebuilt with Plymouth yahr theme"
+        INSTALLED_COMPONENTS+=("Plymouth boot animation")
+        print_info "The yahr boot animation will display on next boot"
+    else
+        print_error "plymouth-set-default-theme failed — run manually: sudo plymouth-set-default-theme -R yahr"
+        return 1
+    fi
+}
+
 # Install and configure SDDM
 install_sddm() {
     print_header "SDDM Display Manager Setup"
@@ -2001,6 +2110,7 @@ main() {
     if [ "$INSTALL_MODE" = "full" ]; then
         install_firefox
         install_sddm
+        install_plymouth
     fi
     
     install_gtk_themes

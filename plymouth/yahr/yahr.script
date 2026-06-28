@@ -1,0 +1,96 @@
+# background
+Window.SetBackgroundTopColor(0.04, 0.04, 0.06);
+Window.SetBackgroundBottomColor(0.0, 0.0, 0.0);
+
+screen_w = Window.GetWidth();
+screen_h = Window.GetHeight();
+
+# tiny PRNG — Plymouth's script has no built-in random
+seed = 2891;
+fun rand() {
+    seed = seed * 16807;
+    seed = seed - Math.Int(seed / 2147483647) * 2147483647;
+    return seed / 2147483647;
+}
+
+# logo, scaled to fit the screen, then sliced into horizontal bands
+logo   = Image("yahr_logo.png");
+logo_w = logo.GetWidth();
+logo_h = logo.GetHeight();
+
+# cap logo to a sane fraction of screen height so there's room for the bar below it
+max_logo_h = Math.Int(screen_h * 0.45);
+if (logo_h > max_logo_h) {
+    scale_factor = max_logo_h / logo_h;
+    logo = logo.Scale(Math.Int(logo_w * scale_factor), max_logo_h);
+    logo_w = logo.GetWidth();
+    logo_h = logo.GetHeight();
+}
+cx = Math.Int(screen_w / 2 - logo_w / 2);
+cy = Math.Int(screen_h / 2 - logo_h / 2);
+
+bands  = 14;
+band_h = Math.Int(logo_h / bands);
+
+for (i = 0; i < bands; i++) {
+    y = i * band_h;
+    h = band_h;
+    if (i == bands - 1) h = logo_h - y;   # last band absorbs the remainder
+    band_img[i] = logo.Crop(0, y, logo_w, h);
+    band[i] = Sprite(band_img[i]);
+    band[i].SetPosition(cx, cy + y, 10);
+}
+
+# glitch driver
+burst = 0;
+
+fun set_clean() {
+    for (i = 0; i < bands; i++) { band[i].SetX(cx); band[i].SetOpacity(1.0); }
+}
+
+fun glitch() {
+    if (burst > 0) {
+        burst--;
+        for (i = 0; i < bands; i++) {
+            if (rand() < 0.45) {
+                dx = Math.Int(rand() * 34) - 17;   # shove this band sideways
+                band[i].SetX(cx + dx);
+            } else {
+                band[i].SetX(cx);
+            }
+        }
+        if (rand() < 0.3) {                          # brightness flicker
+            for (i = 0; i < bands; i++) band[i].SetOpacity(0.55);
+        } else {
+            for (i = 0; i < bands; i++) band[i].SetOpacity(1.0);
+        }
+        if (burst == 0) set_clean();
+    } else {
+        if (rand() < 0.05) burst = Math.Int(rand() * 5) + 3;   # fire a new burst
+    }
+}
+Plymouth.SetRefreshFunction(glitch);
+
+# progress bar — revealed left-to-right with Crop
+bar_full = Image("bar.png");
+bar_w = bar_full.GetWidth();
+bar_h = bar_full.GetHeight();
+bar_x = Math.Int(screen_w / 2 - bar_w / 2);
+bar_y = cy + logo_h + 30;
+
+track = Sprite(bar_full);            # dim full bar as the track
+track.SetPosition(bar_x, bar_y, 1);
+track.SetOpacity(0.15);
+
+fill = Sprite();                     # bright portion grows with progress
+fill.SetPosition(bar_x, bar_y, 2);
+
+fun on_progress(time, progress) {
+    # progress is always 0..1; guard against the (progress, time) arg order
+    # that some builds use
+    if (time <= 1.0 && progress > 1.0) progress = time;
+    w = Math.Int(bar_w * progress);
+    if (w < 1) w = 1;
+    fill.SetImage(bar_full.Crop(0, 0, w, bar_h));
+}
+Plymouth.SetBootProgressFunction(on_progress);
