@@ -1,5 +1,5 @@
 -- ============================================
--- Material Deep Ocean Theme
+-- Material Dark Theme (Classic Material Dark)
 -- ============================================
 return {
     accent_rose     = "rgb(f78c6c)",
@@ -15,23 +15,23 @@ return {
     accent_cyan     = "rgb(89ddff)",
     accent_sapphire = "rgb(89ddff)",
     accent_blue     = "rgb(82aaff)",
-    accent_lavender = "rgb(b2ccd6)",
+    accent_lavender = "rgb(b0bec5)",
 
     fg_primary   = "rgb(eeffff)",
-    fg_secondary = "rgb(b2ccd6)",
+    fg_secondary = "rgb(b0bec5)",
     fg_tertiary  = "rgb(89ddff)",
 
-    border_2 = "rgb(676e95)",
-    border_1 = "rgb(4a5f7d)",
-    border_0 = "rgb(3b4f6c)",
+    border_2 = "rgb(546e7a)",
+    border_1 = "rgb(455a64)",
+    border_0 = "rgb(37474f)",
 
-    surface_2 = "rgb(303348)",
-    surface_1 = "rgb(212337)",
-    surface_0 = "rgb(1b1e2b)",
+    surface_2 = "rgb(455a64)",
+    surface_1 = "rgb(37474f)",
+    surface_0 = "rgb(2e3c43)",
 
-    bg_base   = "rgb(0f111a)",
-    bg_mantle = "rgb(090b10)",
-    bg_crust  = "rgb(000000)",
+    bg_base   = "rgb(263238)",
+    bg_mantle = "rgb(1e282e)",
+    bg_crust  = "rgb(171f24)",
 
     glass_accent = "rgba(82aaff59)",
 }
