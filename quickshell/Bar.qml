@@ -17,6 +17,7 @@ Item {
     property bool floating: false
     property bool showQuickLaunch: true
     property bool showSystemTray: true
+    property bool showMediaPlayer: true
     property int minWorkspaces: 4
     property string layoutPreset: "default"
     property string barStyle: "single"
@@ -36,7 +37,7 @@ Item {
         }
         if (section === "center") {
             return layoutPreset === "default"
-                ? islandDefaultClockComponent.width + 12
+                ? centerIslandRow.width + 12
                 : islandAltArchComponent.width + 12
         }
         if (section === "right") {
@@ -95,6 +96,9 @@ Item {
                         }
                         if (settings.bar.showSystemTray !== undefined) {
                             bar.showSystemTray = settings.bar.showSystemTray
+                        }
+                        if (settings.bar.showMediaPlayer !== undefined) {
+                            bar.showMediaPlayer = settings.bar.showMediaPlayer
                         }
                         if (settings.bar.minWorkspaces !== undefined) {
                             bar.minWorkspaces = settings.bar.minWorkspaces
@@ -426,7 +430,7 @@ Item {
         visible: bar.useIslands && section === "center" && bar.layoutPreset === "default"
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.verticalCenter: parent.verticalCenter
-        width: islandDefaultClockComponent.width + 12
+        width: centerIslandRow.width + 12
         height: bar.islandHeight
 
         Rectangle {
@@ -437,9 +441,42 @@ Item {
             border.color: islandStyle.border
         }
 
-        Clock {
-            id: islandDefaultClockComponent
+        Row {
+            id: centerIslandRow
             anchors.centerIn: parent
+            spacing: 12
+
+            // Wrapper gives Clock an explicit parent height, breaking the
+            // circular dependency Clock.height = parent.height - 10.
+            Item {
+                id: clockWrapper
+                width: islandDefaultClockComponent.width
+                height: bar.islandHeight
+
+                Clock {
+                    id: islandDefaultClockComponent
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+            }
+
+            // Divider shown only when MediaPlayer is visible
+            Rectangle {
+                visible: centerIslandMediaPlayer.visible
+                width: 1
+                height: Math.round(bar.islandHeight * 0.45)
+                color: ThemeManager.fgSecondary
+                opacity: 0.35
+                anchors.verticalCenter: parent.verticalCenter
+            }
+
+            // Pass showMediaPlayer as a property so MediaPlayer's own internal
+            // binding (visible: showMediaPlayer && hasPlayer) uses it correctly.
+            // This avoids the external-visible-override conflict entirely.
+            MediaPlayer {
+                id: centerIslandMediaPlayer
+                showMediaPlayer: bar.showMediaPlayer
+                anchors.verticalCenter: parent.verticalCenter
+            }
         }
     }
 
@@ -473,9 +510,9 @@ Item {
         }
     }
 
-    // CENTER-RIGHT SECTION - Media Player
+    // CENTER-RIGHT SECTION - Media Player (single bar)
     MediaPlayer {
-        visible: section === "full" && !bar.useIslands && bar.layoutPreset === "default"
+        visible: bar.showMediaPlayer && section === "full" && !bar.useIslands && bar.layoutPreset === "default"
         anchors.left: singleDefaultClockComponent.right
         anchors.leftMargin: 16
         anchors.verticalCenter: parent.verticalCenter

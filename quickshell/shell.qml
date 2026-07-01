@@ -23,6 +23,7 @@ ShellRoot {
     property string barLayoutPreset: "default"
     property bool barShowQuickLaunch: true
     property bool barShowSystemTray: true
+    property bool barShowMediaPlayer: true
     property bool barShowBorder: false
     property string barBackgroundStyle: "opaque"
     property real barOpacity: 0.70
@@ -55,10 +56,15 @@ ShellRoot {
                         if (settings.bar.autoHide !== undefined) shellRoot.barAutoHide = settings.bar.autoHide
                         if (settings.bar.floating !== undefined) shellRoot.barFloating = settings.bar.floating
                         if (settings.bar.barSize !== undefined) shellRoot.barSize = settings.bar.barSize
-                        if (settings.bar.barStyle !== undefined) shellRoot.barStyle = settings.bar.barStyle
+                        if (settings.bar.barStyle !== undefined) {
+                            shellRoot.barStyle = settings.bar.barStyle
+                            barSurfaceState.barStyle = settings.bar.barStyle
+                            try { singleBar.barStyle = settings.bar.barStyle } catch(e) {}
+                        }
                         if (settings.bar.layoutPreset !== undefined) shellRoot.barLayoutPreset = settings.bar.layoutPreset
                         if (settings.bar.showQuickLaunch !== undefined) shellRoot.barShowQuickLaunch = settings.bar.showQuickLaunch
                         if (settings.bar.showSystemTray !== undefined) shellRoot.barShowSystemTray = settings.bar.showSystemTray
+                        if (settings.bar.showMediaPlayer !== undefined) shellRoot.barShowMediaPlayer = settings.bar.showMediaPlayer
                         if (settings.bar.minWorkspaces !== undefined) shellRoot.barMinWorkspaces = settings.bar.minWorkspaces
                         if (settings.bar.showBorder !== undefined) shellRoot.barShowBorder = settings.bar.showBorder
                         if (settings.bar.backgroundStyle !== undefined) shellRoot.barBackgroundStyle = settings.bar.backgroundStyle
@@ -880,13 +886,14 @@ ShellRoot {
             implicitWidth: leftIslandBar.implicitWidth
             implicitHeight: barSurfaceState.barSize === "large" ? 53 : 42
             color: "transparent"
-            // Left island claims exclusive zone; its anchor config (top+left only) is
-            // insufficient for layer-shell exclusive zones — the single bar handles that.
-            exclusiveZone: 0
+            // -1 = anchor to full screen geometry, not usable area.
+            // The singleBar (transparent, full-width) holds the exclusive zone so windows
+            // don't overlap; islands just float at y=0 via full-screen anchoring.
+            exclusiveZone: -1
 
             margins {
-                top: barSurfaceState.barAutoHide && !barSurfaceState.barHovered ? (barSurfaceState.barAtBottom ? 0 : implicitHeight * -1) : (barSurfaceState.barFloating && !barSurfaceState.barAtBottom ? -implicitHeight : 0)
-                bottom: barSurfaceState.barAutoHide && !barSurfaceState.barHovered ? (barSurfaceState.barAtBottom ? implicitHeight * -1 : 0) : (barSurfaceState.barFloating && barSurfaceState.barAtBottom ? -implicitHeight : 0)
+                top: barSurfaceState.barAutoHide && !barSurfaceState.barHovered ? (barSurfaceState.barAtBottom ? 0 : implicitHeight * -1) : (barSurfaceState.barFloating && !barSurfaceState.barAtBottom ? 8 : 0)
+                bottom: barSurfaceState.barAutoHide && !barSurfaceState.barHovered ? (barSurfaceState.barAtBottom ? implicitHeight * -1 : 0) : (barSurfaceState.barFloating && barSurfaceState.barAtBottom ? 8 : 0)
                 left: barSurfaceState.barFloating ? 8 : 0
             }
 
@@ -946,11 +953,11 @@ ShellRoot {
             implicitWidth: centerIslandBar.implicitWidth
             implicitHeight: barSurfaceState.barSize === "large" ? 53 : 42
             color: "transparent"
-            exclusiveZone: 0
+            exclusiveZone: -1
 
             margins {
-                top: barSurfaceState.barAutoHide && !barSurfaceState.barHovered ? (barSurfaceState.barAtBottom ? 0 : implicitHeight * -1) : (barSurfaceState.barFloating && !barSurfaceState.barAtBottom ? -implicitHeight : 0)
-                bottom: barSurfaceState.barAutoHide && !barSurfaceState.barHovered ? (barSurfaceState.barAtBottom ? implicitHeight * -1 : 0) : (barSurfaceState.barFloating && barSurfaceState.barAtBottom ? -implicitHeight : 0)
+                top: barSurfaceState.barAutoHide && !barSurfaceState.barHovered ? (barSurfaceState.barAtBottom ? 0 : implicitHeight * -1) : (barSurfaceState.barFloating && !barSurfaceState.barAtBottom ? 8 : 0)
+                bottom: barSurfaceState.barAutoHide && !barSurfaceState.barHovered ? (barSurfaceState.barAtBottom ? implicitHeight * -1 : 0) : (barSurfaceState.barFloating && barSurfaceState.barAtBottom ? 8 : 0)
                 left: Math.max(0, Math.round((screen.width - implicitWidth) / 2))
             }
 
@@ -966,6 +973,7 @@ ShellRoot {
                 layoutPreset: shellRoot.barLayoutPreset
                 showQuickLaunch: shellRoot.barShowQuickLaunch
                 showSystemTray: shellRoot.barShowSystemTray
+                showMediaPlayer: shellRoot.barShowMediaPlayer
                 minWorkspaces: shellRoot.barMinWorkspaces
                 backgroundStyle: shellRoot.barBackgroundStyle
                 showBorder: shellRoot.barShowBorder
@@ -1010,11 +1018,11 @@ ShellRoot {
             implicitWidth: rightIslandBar.implicitWidth
             implicitHeight: barSurfaceState.barSize === "large" ? 53 : 42
             color: "transparent"
-            exclusiveZone: 0
+            exclusiveZone: -1
 
             margins {
-                top: barSurfaceState.barAutoHide && !barSurfaceState.barHovered ? (barSurfaceState.barAtBottom ? 0 : implicitHeight * -1) : (barSurfaceState.barFloating && !barSurfaceState.barAtBottom ? -implicitHeight : 0)
-                bottom: barSurfaceState.barAutoHide && !barSurfaceState.barHovered ? (barSurfaceState.barAtBottom ? implicitHeight * -1 : 0) : (barSurfaceState.barFloating && barSurfaceState.barAtBottom ? -implicitHeight : 0)
+                top: barSurfaceState.barAutoHide && !barSurfaceState.barHovered ? (barSurfaceState.barAtBottom ? 0 : implicitHeight * -1) : (barSurfaceState.barFloating && !barSurfaceState.barAtBottom ? 8 : 0)
+                bottom: barSurfaceState.barAutoHide && !barSurfaceState.barHovered ? (barSurfaceState.barAtBottom ? implicitHeight * -1 : 0) : (barSurfaceState.barFloating && barSurfaceState.barAtBottom ? 8 : 0)
                 right: barSurfaceState.barFloating ? 8 : 0
             }
 
@@ -1030,6 +1038,7 @@ ShellRoot {
                 layoutPreset: shellRoot.barLayoutPreset
                 showQuickLaunch: shellRoot.barShowQuickLaunch
                 showSystemTray: shellRoot.barShowSystemTray
+                showMediaPlayer: shellRoot.barShowMediaPlayer
                 minWorkspaces: shellRoot.barMinWorkspaces
                 backgroundStyle: shellRoot.barBackgroundStyle
                 showBorder: shellRoot.barShowBorder

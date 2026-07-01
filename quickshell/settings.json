@@ -26,6 +26,7 @@
     "transparentBackground": false,
     "showQuickLaunch": true,
     "showSystemTray": true,
+    "showMediaPlayer": true,
     "barSize": "small"
   }
 }

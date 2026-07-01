@@ -310,6 +310,7 @@ SETTINGSEOF`
             floatingBarCheck.checked = root.settings.bar.floating === true
             showQuickLaunchCheck.checked = root.settings.bar.showQuickLaunch !== false
             showSystemTrayCheck.checked = root.settings.bar.showSystemTray !== false
+            showMediaPlayerCheck.checked = root.settings.bar.showMediaPlayer !== false
             workspaceCountObj.value = root.settings.bar.minWorkspaces !== undefined ? root.settings.bar.minWorkspaces : 4
             ThemeManager.workspaceStyle = root.settings.bar.workspaceStyle || "numbers"
             barSizeLargeCheck.checked = root.settings.bar.barSize === "large"
@@ -3099,6 +3100,64 @@ MouseArea {
 
                                 QtObject {
                                     id: showSystemTrayCheck
+                                    property bool checked: true
+                                }
+                            }
+
+                            // Show Media Player Toggle
+                            Row {
+                                spacing: 12
+
+                                Rectangle {
+                                    width: 48
+                                    height: 24
+                                    radius: 12
+                                    color: showMediaPlayerCheck.checked ? ThemeManager.accentGreen : Qt.rgba(1, 1, 1, 0.07)
+                                    Behavior on color { ColorAnimation { duration: 150 } }
+
+                                    Rectangle {
+                                        width: 18
+                                        height: 18
+                                        radius: 9
+                                        color: ThemeManager.fgPrimary
+                                        x: showMediaPlayerCheck.checked ? parent.width - width - 3 : 3
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        Behavior on x { NumberAnimation { duration: 200 } }
+                                    }
+
+                                    MouseArea {
+                                        anchors.fill: parent
+                                        cursorShape: Qt.PointingHandCursor
+                                        onClicked: {
+                                            showMediaPlayerCheck.checked = !showMediaPlayerCheck.checked
+                                            if (!root.settings.bar) root.settings.bar = {}
+                                            root.settings.bar.showMediaPlayer = showMediaPlayerCheck.checked
+                                            saveSettings()
+                                        }
+                                    }
+                                }
+
+                                Column {
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    spacing: 2
+
+                                    Text {
+                                        text: "Show media player controls"
+                                        font.family: ThemeManager.uiFont
+                                        font.pixelSize: 12
+                                        color: ThemeManager.fgPrimary
+                                    }
+
+                                    Text {
+                                        text: "Track info and playback buttons in the bar"
+                                        font.family: ThemeManager.uiFont
+                                        font.pixelSize: 10
+                                        color: ThemeManager.fgSecondary
+                                    }
+                                }
+
+                                QtObject {
+                                    id: showMediaPlayerCheck
                                     property bool checked: true
                                 }
                             }

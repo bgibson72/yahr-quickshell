@@ -177,6 +177,7 @@ preflight_check() {
         [ -d "$SCRIPT_DIR/vesktop" ] && echo "  - Vesktop/Discord (optional)"
         [ -d "$SCRIPT_DIR/VSCodium" ] && echo "  - VSCodium (optional)"
         [ -d "$SCRIPT_DIR/thunar" ] && echo "  - Thunar file manager (optional)"
+        echo "  - Spotify + Spicetify (optional, requires AUR)"
         echo ""
     fi
     
@@ -1242,20 +1243,28 @@ install_plymouth() {
     sudo cp -r "$SCRIPT_DIR/plymouth/yahr/"* /usr/share/plymouth/themes/yahr/
     print_success "Plymouth theme installed to /usr/share/plymouth/themes/yahr/"
 
-    # Configure mkinitcpio - add 'plymouth' hook after 'udev' (if not present)
+    # Configure mkinitcpio - add 'plymouth' hook after 'kms' (or 'udev' fallback)
+    # IMPORTANT: Plymouth must load AFTER the kms hook so the DRM/KMS framebuffer
+    # is available; placing it before kms results in a blank/text-only boot screen.
     print_info "Configuring mkinitcpio for Plymouth..."
     local mkinitcpio_conf="/etc/mkinitcpio.conf"
 
     if grep -q "^HOOKS=" "$mkinitcpio_conf"; then
-        if grep "^HOOKS=" "$mkinitcpio_conf" | grep -q "plymouth"; then
-            print_info "Plymouth hook already present in mkinitcpio.conf"
+        # First remove any stale 'plymouth' entry to avoid duplicates
+        sudo sed -i 's/ \bplymouth\b//' "$mkinitcpio_conf"
+
+        if grep "^HOOKS=" "$mkinitcpio_conf" | grep -q '\bkms\b'; then
+            # Insert 'plymouth' immediately after 'kms'
+            sudo sed -i 's/\bkms\b/kms plymouth/' "$mkinitcpio_conf"
+            print_success "Plymouth hook added to mkinitcpio.conf (after kms)"
         else
-            # Insert 'plymouth' after 'udev' in the active HOOKS line
-            sudo sed -i 's/^\(HOOKS=.*\budev\b\)/\1 plymouth/' "$mkinitcpio_conf"
+            # Fallback: insert after 'udev' and warn
+            sudo sed -i 's/\budev\b/udev plymouth/' "$mkinitcpio_conf"
             print_success "Plymouth hook added to mkinitcpio.conf (after udev)"
+            print_warning "For best Plymouth graphics, add the 'kms' hook before 'plymouth' in mkinitcpio.conf"
         fi
     else
-        print_warning "Could not find HOOKS line in mkinitcpio.conf — add 'plymouth' manually after 'udev'"
+        print_warning "Could not find HOOKS line in mkinitcpio.conf — add 'plymouth' manually after 'kms'"
     fi
 
     # Configure bootloader: ensure 'quiet splash' in kernel cmdline
@@ -1273,7 +1282,7 @@ install_plymouth() {
         print_success "GRUB configuration updated"
     fi
 
-    # systemd-boot
+    # systemd-boot — classic entries
     if ls /boot/loader/entries/*.conf &>/dev/null 2>&1; then
         print_info "Configuring systemd-boot entries for Plymouth..."
         for entry in /boot/loader/entries/*.conf; do
@@ -1286,6 +1295,25 @@ install_plymouth() {
                 fi
             fi
         done
+    fi
+
+    # systemd-boot — UKI (Unified Kernel Image): cmdline lives in /etc/kernel/cmdline
+    if ls /boot/EFI/Linux/*.efi &>/dev/null 2>&1; then
+        print_info "UKI detected — checking /etc/kernel/cmdline for 'quiet splash'..."
+        if [ -f "/etc/kernel/cmdline" ]; then
+            if grep -q "quiet.*splash\|splash.*quiet" /etc/kernel/cmdline; then
+                print_info "/etc/kernel/cmdline already contains 'quiet splash'"
+            else
+                sudo sed -i 's/$/ quiet splash loglevel=3/' /etc/kernel/cmdline
+                print_success "Added 'quiet splash loglevel=3' to /etc/kernel/cmdline"
+            fi
+        else
+            # Inherit the current cmdline and append splash flags
+            local base_cmdline
+            base_cmdline=$(cat /proc/cmdline | sed 's/ quiet\| splash\| loglevel=[0-9]//g' | xargs)
+            echo "${base_cmdline} quiet splash loglevel=3" | sudo tee /etc/kernel/cmdline > /dev/null
+            print_success "Created /etc/kernel/cmdline with 'quiet splash loglevel=3'"
+        fi
     fi
 
     # Set theme and rebuild initramfs in one step
@@ -1369,11 +1397,18 @@ EOF
     print_success "SDDM configuration installed"
     
     # Copy sync script to quickshell directory
-    if [ -f "$SCRIPT_DIR/sddm/sync-sddm-theme.sh" ]; then
+    # Prefer the feature-complete version in quickshell/; fall back to sddm/
+    local sddm_sync_src=""
+    if [ -f "$SCRIPT_DIR/quickshell/sync-sddm-theme.sh" ]; then
+        sddm_sync_src="$SCRIPT_DIR/quickshell/sync-sddm-theme.sh"
+    elif [ -f "$SCRIPT_DIR/sddm/sync-sddm-theme.sh" ]; then
+        sddm_sync_src="$SCRIPT_DIR/sddm/sync-sddm-theme.sh"
+    fi
+    if [ -n "$sddm_sync_src" ]; then
         print_step "Installing SDDM theme sync script..."
-        cp "$SCRIPT_DIR/sddm/sync-sddm-theme.sh" "$HOME/.config/quickshell/sync-sddm-theme.sh"
+        cp "$sddm_sync_src" "$HOME/.config/quickshell/sync-sddm-theme.sh"
         chmod +x "$HOME/.config/quickshell/sync-sddm-theme.sh"
-        print_success "SDDM sync script installed"
+        print_success "SDDM sync script installed to ~/.config/quickshell/"
     fi
     
     # Create SDDM system faces directory so avatar picker works
@@ -1670,6 +1705,178 @@ verify_installation() {
     
     # Always return 0 to not trigger error trap
     return 0
+}
+
+# Install and configure Spotify + Spicetify
+install_spotify_spicetify() {
+    print_header "Spotify & Spicetify Setup"
+
+    local aur_helper=""
+    if command_exists "paru"; then
+        aur_helper="paru"
+    elif command_exists "yay"; then
+        aur_helper="yay"
+    else
+        print_error "AUR helper required for Spotify/Spicetify installation"
+        SKIPPED_COMPONENTS+=("Spotify/Spicetify")
+        return
+    fi
+
+    # ── Prompt ────────────────────────────────────────────────────────────────
+    local install_choice="n"
+    if [ "$YOLO_MODE" = true ]; then
+        install_choice="y"
+    else
+        echo ""
+        print_info "Spotify is a music streaming app.  Spicetify themes it to match YAHR."
+        echo ""
+        read -p "$(echo -e ${CYAN}?${NC}) Install / configure Spotify + Spicetify? (y/n): " install_choice
+    fi
+
+    if [[ ! "$install_choice" =~ ^[Yy]$ ]]; then
+        print_info "Skipping Spotify / Spicetify setup"
+        SKIPPED_COMPONENTS+=("Spotify/Spicetify")
+        return
+    fi
+
+    # ── Install Spotify ───────────────────────────────────────────────────────
+    if ! command_exists "spotify"; then
+        print_step "Installing Spotify (AUR)…"
+        if [ "$YOLO_MODE" = true ]; then
+            $aur_helper -S --needed --noconfirm spotify
+        else
+            $aur_helper -S --needed spotify
+        fi
+        if command_exists "spotify"; then
+            print_success "Spotify installed"
+            INSTALLED_COMPONENTS+=("Spotify")
+        else
+            print_error "Spotify installation failed – skipping Spicetify"
+            SKIPPED_COMPONENTS+=("Spicetify")
+            return
+        fi
+    else
+        print_info "Spotify already installed"
+    fi
+
+    # ── Install Spicetify CLI ─────────────────────────────────────────────────
+    if ! command_exists "spicetify"; then
+        print_step "Installing Spicetify CLI (AUR)…"
+        if [ "$YOLO_MODE" = true ]; then
+            $aur_helper -S --needed --noconfirm spicetify-cli
+        else
+            $aur_helper -S --needed spicetify-cli
+        fi
+    fi
+
+    if ! command_exists "spicetify"; then
+        print_error "Spicetify CLI not found after install attempt"
+        SKIPPED_COMPONENTS+=("Spicetify")
+        return
+    fi
+
+    print_success "Spicetify CLI ready"
+
+    # ── Fix Spotify directory permissions (required by Spicetify on AUR pkg) ──
+    print_step "Fixing Spotify directory permissions for Spicetify…"
+    if [ -d "/opt/spotify" ]; then
+        sudo chmod a+wr /opt/spotify
+        sudo chmod a+wr /opt/spotify/Apps -R
+        print_success "Permissions set on /opt/spotify"
+    else
+        print_warning "/opt/spotify not found – skipping permission fix"
+    fi
+
+    # ── Install community Spicetify themes ────────────────────────────────────
+    local themes_dir="$HOME/.config/spicetify/Themes"
+    mkdir -p "$themes_dir"
+
+    # Official community themes (Dribbblish, Sleek, Flow, etc.)
+    print_step "Installing Spicetify community themes…"
+    local tmp_themes
+    tmp_themes=$(mktemp -d)
+    if git clone --depth=1 https://github.com/spicetify/spicetify-themes.git "$tmp_themes/spicetify-themes" 2>/dev/null; then
+        # Copy each theme directory (skip README and non-directory items)
+        for theme_dir in "$tmp_themes/spicetify-themes"/*/; do
+            local tname
+            tname=$(basename "$theme_dir")
+            [[ "$tname" == "README.md" || "$tname" == "*.md" ]] && continue
+            [[ -d "$theme_dir" ]] || continue
+            cp -r "$theme_dir" "$themes_dir/$tname"
+        done
+        print_success "Community themes installed"
+    else
+        print_warning "Could not clone spicetify-themes (network issue?)"
+    fi
+    rm -rf "$tmp_themes"
+
+    # Official Catppuccin Spicetify theme
+    print_step "Installing Catppuccin Spicetify theme…"
+    local tmp_cat
+    tmp_cat=$(mktemp -d)
+    if git clone --depth=1 https://github.com/catppuccin/spicetify.git "$tmp_cat/catppuccin-spicetify" 2>/dev/null; then
+        mkdir -p "$themes_dir/catppuccin"
+        # Repo stores theme files directly at the root catppuccin/ directory
+        local src_dir
+        src_dir=$(find "$tmp_cat/catppuccin-spicetify" -name "color.ini" | head -1 | xargs dirname 2>/dev/null)
+        if [[ -n "$src_dir" ]]; then
+            cp "$src_dir/color.ini" "$src_dir/user.css" "$themes_dir/catppuccin/"
+            print_success "Catppuccin Spicetify theme installed"
+        else
+            print_warning "Could not locate color.ini in catppuccin/spicetify repo"
+        fi
+    else
+        print_warning "Could not clone catppuccin/spicetify (network issue?)"
+    fi
+    rm -rf "$tmp_cat"
+
+    # ── Generate default Spicetify config & run initial backup + apply ────────
+    print_step "Initialising Spicetify (backup + apply)…"
+
+    # Make sure prefs_path is set correctly
+    spicetify config prefs_path "$HOME/.config/spotify/prefs" 2>/dev/null
+
+    # Backup original Spotify files
+    spicetify backup 2>/dev/null
+
+    # Apply default theme (Catppuccin mocha – matches YAHR default)
+    local default_theme="catppuccin"
+    local default_scheme="mocha"
+
+    if [ ! -d "$themes_dir/$default_theme" ]; then
+        # Fallback to Dribbblish if Catppuccin theme wasn't cloned
+        default_theme="Dribbblish"
+        default_scheme="base"
+    fi
+
+    spicetify config current_theme "$default_theme" 2>/dev/null
+    spicetify config color_scheme "$default_scheme" 2>/dev/null
+    spicetify config inject_theme_js 1 2>/dev/null
+
+    # AUR spotify package requires explicit write permission on every apply
+    sudo chmod a+wr /opt/spotify /opt/spotify/Apps -R 2>/dev/null
+
+    if spicetify apply 2>/dev/null; then
+        print_success "Spicetify applied: $default_theme ($default_scheme)"
+    else
+        print_warning "spicetify apply returned non-zero – Spotify may need to be opened once first"
+        print_info "Re-run: spicetify backup apply"
+    fi
+
+    # ── Install sync script to live config ───────────────────────────────────
+    local qs_config="$HOME/.config/quickshell"
+    local sync_src="$SCRIPT_DIR/quickshell/sync-spicetify-theme.sh"
+    if [ -f "$sync_src" ]; then
+        cp "$sync_src" "$qs_config/sync-spicetify-theme.sh"
+        chmod +x "$qs_config/sync-spicetify-theme.sh"
+        print_success "Spicetify theme sync script installed"
+    fi
+
+    INSTALLED_COMPONENTS+=("Spotify + Spicetify")
+    echo ""
+    print_success "Spotify + Spicetify setup complete"
+    print_info "Theme will sync automatically whenever you switch themes in YAHR."
+    print_info "To re-apply manually: ~/.config/quickshell/sync-spicetify-theme.sh"
 }
 
 # Install optional extras
@@ -2115,6 +2322,7 @@ main() {
     
     install_gtk_themes
     install_extras
+    install_spotify_spicetify
     install_sip_startpage
     
     # Verify installation

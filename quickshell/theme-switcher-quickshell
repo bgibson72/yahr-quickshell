@@ -807,9 +807,10 @@ EOF
     fi
     
     # Update SDDM theme
-    if [[ -x "$HOME/.config/sddm/sync-sddm-theme.sh" ]]; then
+    # NOTE: the sync script lives alongside other quickshell sync scripts
+    if [[ -x "$QUICKSHELL_DIR/sync-sddm-theme.sh" ]]; then
         echo "Syncing SDDM theme..."
-        "$HOME/.config/sddm/sync-sddm-theme.sh"
+        "$QUICKSHELL_DIR/sync-sddm-theme.sh"
     fi
     
     # Update fastfetch logo
@@ -853,18 +854,24 @@ EOF
         echo "Syncing Neovim theme..."
         "$QUICKSHELL_DIR/sync-nvim-theme.sh" > /dev/null 2>&1
     fi
+
+    # Sync Spicetify (Spotify UI theme)
+    if [[ -x "$QUICKSHELL_DIR/sync-spicetify-theme.sh" ]]; then
+        echo "Syncing Spicetify theme..."
+        "$QUICKSHELL_DIR/sync-spicetify-theme.sh" "$theme_name" > /dev/null 2>&1
+    fi
     
     # Create completion marker file
     echo "done" > "$HOME/.config/quickshell/.theme-switch-complete"
     
     echo "Theme applied successfully: $theme_name"
-    echo "Updated: Quickshell, Hyprland, wofi, kitty, mako, hyprlock, GTK theme, wallpaper, Starship, Firefox, VS Code, VSCodium, Bento, Neovim"
+    echo "Updated: Quickshell, Hyprland, wofi, kitty, mako, hyprlock, GTK theme, wallpaper, Starship, Firefox, VS Code, VSCodium, Bento, Neovim, Spicetify"
     echo "GTK applications (Thunar, gnome-text-editor, waypaper) will now use matching theme"
     echo "Restart terminal (exec zsh), Neovim, Firefox/VS Code/VSCodium to see the new color scheme"
     
     # Send notification when complete
     if command -v notify-send &> /dev/null; then
-        notify-send "Theme Applied: $theme_name" "All applications synced. Restart Firefox/Neovim to see changes." -i preferences-desktop-theme -t 3000 2>/dev/null
+        notify-send "Theme Applied: $theme_name" "All applications synced. Restart Firefox/Neovim/Spotify to see changes." -i preferences-desktop-theme -t 3000 2>/dev/null
     fi
 }
 
