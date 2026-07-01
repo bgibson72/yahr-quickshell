@@ -328,6 +328,12 @@ set_theme_wallpaper() {
     fi
     
     echo "Setting wallpaper: $random_wallpaper"
+
+    # Record the exact path we just set so the caller can pass it directly
+    # to sync-sddm-theme.sh, avoiding any dependency on awww's transition
+    # timing. Also persist to last-wallpaper for the login-restore autostart.
+    SET_WALLPAPER_PATH="$random_wallpaper"
+    printf "%s" "$random_wallpaper" > "$HOME/.config/quickshell/last-wallpaper"
     
     # Use awww if available, otherwise try other wallpaper setters
     if command -v awww &> /dev/null; then
@@ -807,10 +813,12 @@ EOF
     fi
     
     # Update SDDM theme
-    # NOTE: the sync script lives alongside other quickshell sync scripts
+    # NOTE: the sync script lives alongside other quickshell sync scripts.
+    # Pass the wallpaper path set above explicitly, avoiding any dependency
+    # on awww's transition timing.
     if [[ -x "$QUICKSHELL_DIR/sync-sddm-theme.sh" ]]; then
         echo "Syncing SDDM theme..."
-        "$QUICKSHELL_DIR/sync-sddm-theme.sh"
+        "$QUICKSHELL_DIR/sync-sddm-theme.sh" "$SET_WALLPAPER_PATH"
     fi
     
     # Update fastfetch logo

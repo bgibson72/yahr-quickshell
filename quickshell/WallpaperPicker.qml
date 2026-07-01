@@ -507,7 +507,11 @@ PanelWindow {
         Quickshell.execDetached(["bash", "-c",
             'printf "%s" "$1" > ~/.config/quickshell/last-wallpaper', "--", path])
 
-        sddmSyncTimer.start()
+        // Sync SDDM background immediately, passing the path explicitly so
+        // there is no dependency on awww's transition state (which lags the
+        // actual wallpaper change by up to --transition-duration seconds).
+        Quickshell.execDetached(["bash",
+            Quickshell.env("HOME") + "/.config/quickshell/sync-sddm-theme.sh", path])
 
         Quickshell.execDetached([
             "notify-send", "Wallpaper Changed",
@@ -515,17 +519,6 @@ PanelWindow {
         ])
 
         wallpaperWindow.hide()
-    }
-    
-    Timer {
-        id: sddmSyncTimer
-        interval: 500  // Wait 500ms for swww to complete
-        repeat: false
-        onTriggered: {
-            // Sync SDDM theme with new wallpaper
-            const sddmSync = Quickshell.env("HOME") + "/.config/quickshell/sync-sddm-theme.sh"
-            Quickshell.execDetached(["sh", "-c", sddmSync])
-        }
     }
 
     // If awww-daemon wasn't running, give it time to initialize before applying

@@ -107,10 +107,11 @@ if [[ -n "$selected" ]]; then
         # previous wallpaper).
         printf "%s" "$wallpaper_path" > "$HOME/.config/quickshell/last-wallpaper"
 
-        # Sync SDDM theme with new wallpaper
+        # Sync SDDM theme with new wallpaper — pass the path explicitly so
+        # there is no dependency on awww's transition state.
         SDDM_SYNC="$HOME/.config/quickshell/sync-sddm-theme.sh"
         if [ -f "$SDDM_SYNC" ]; then
-            "$SDDM_SYNC" > /dev/null 2>&1
+            "$SDDM_SYNC" "$wallpaper_path" > /dev/null 2>&1
         fi
         
         notify-send "Wallpaper Changed" "$(basename "$wallpaper_path")"

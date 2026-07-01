@@ -84,15 +84,28 @@ widget_opacity="${widget_opacity:-0.75}"
 ui_font=$(grep 'property string uiFont' "$HOME/.config/quickshell/ThemeManager.qml" 2>/dev/null | head -1 | sed -E 's/.*"([^"]+)".*/\1/')
 ui_font="${ui_font:-Sen}"
 
-# Get current wallpaper. Prefer last-wallpaper (written synchronously by the
-# wallpaper picker the instant a wallpaper is selected) over `awww query`,
-# since awww doesn't report the new image until its transition animation
-# finishes (up to a couple seconds later) — querying it too early returns
-# the *previous* wallpaper and leaves SDDM's background one change behind.
+# Wallpaper resolution priority (highest to lowest):
+#   1. Explicit path passed as $1 — the caller (wallpaper picker, theme
+#      switcher, etc.) always knows the exact path it just set. This is
+#      the only source with zero ambiguity or timing dependency and should
+#      always be used when calling this script after a wallpaper change.
+#   2. ~/.config/quickshell/last-wallpaper — written synchronously by the
+#      wallpaper pickers as a fallback record of the last-set wallpaper.
+#   3. `awww query` — may lag behind by up to the transition duration
+#      (e.g. 2s), since awww doesn't report the new image until its
+#      transition animation finishes. Last resort only.
+#   4. Hardcoded default wallpaper.
 current_wallpaper=""
-LAST_WALLPAPER_FILE="$HOME/.config/quickshell/last-wallpaper"
-if [[ -f "$LAST_WALLPAPER_FILE" ]]; then
-    current_wallpaper=$(cat "$LAST_WALLPAPER_FILE" | xargs)
+
+if [[ -n "$1" && -f "$1" ]]; then
+    current_wallpaper="$1"
+fi
+
+if [[ -z "$current_wallpaper" ]]; then
+    LAST_WALLPAPER_FILE="$HOME/.config/quickshell/last-wallpaper"
+    if [[ -f "$LAST_WALLPAPER_FILE" ]]; then
+        current_wallpaper=$(cat "$LAST_WALLPAPER_FILE" | xargs)
+    fi
 fi
 
 if [[ -z "$current_wallpaper" || ! -f "$current_wallpaper" ]] && command -v awww &> /dev/null; then
@@ -105,7 +118,7 @@ if [[ -z "$current_wallpaper" || ! -f "$current_wallpaper" ]] && command -v awww
     fi
 fi
 
-# Fallback to a default wallpaper if neither source has one set
+# Fallback to a default wallpaper if no source has one set
 if [[ -z "$current_wallpaper" || ! -f "$current_wallpaper" ]]; then
     current_wallpaper="$HOME/.config/quickshell/themes/wallpapers/default.jpg"
 fi
