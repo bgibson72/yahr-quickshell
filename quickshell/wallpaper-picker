@@ -102,7 +102,7 @@ if [[ -n "$selected" ]]; then
         awww img "$wallpaper_path" --transition-type grow --transition-pos 0.5,0.5 --transition-duration 2
         
         # Sync SDDM theme with new wallpaper
-        SDDM_SYNC="$HOME/Dev/yahr-quickshell/sddm/sync-sddm-theme.sh"
+        SDDM_SYNC="$HOME/.config/quickshell/sync-sddm-theme.sh"
         if [ -f "$SDDM_SYNC" ]; then
             "$SDDM_SYNC" > /dev/null 2>&1
         fi

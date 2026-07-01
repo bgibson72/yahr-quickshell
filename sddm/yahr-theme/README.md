@@ -76,7 +76,7 @@ This will:
 Add this to your `~/.config/quickshell/switch-theme.sh` (after the theme switch):
 ```bash
 # Sync SDDM theme with new colors
-~/Dev/yahr-quickshell/sddm/sync-sddm-theme.sh
+~/.config/quickshell/sync-sddm-theme.sh
 ```
 
 #### Manual Configuration
