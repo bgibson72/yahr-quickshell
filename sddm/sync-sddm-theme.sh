@@ -54,9 +54,18 @@ widget_opacity="${widget_opacity:-0.75}"
 ui_font=$(grep 'property string uiFont' "$HOME/.config/quickshell/ThemeManager.qml" 2>/dev/null | head -1 | sed -E 's/.*"([^"]+)".*/\1/')
 ui_font="${ui_font:-Sen}"
 
-# Get current wallpaper from awww
+# Get current wallpaper. Prefer last-wallpaper (written synchronously by the
+# wallpaper picker the instant a wallpaper is selected) over `awww query`,
+# since awww doesn't report the new image until its transition animation
+# finishes (up to a couple seconds later) — querying it too early returns
+# the *previous* wallpaper and leaves SDDM's background one change behind.
 current_wallpaper=""
-if command -v awww &> /dev/null; then
+LAST_WALLPAPER_FILE="$HOME/.config/quickshell/last-wallpaper"
+if [[ -f "$LAST_WALLPAPER_FILE" ]]; then
+    current_wallpaper=$(cat "$LAST_WALLPAPER_FILE" | xargs)
+fi
+
+if [[ -z "$current_wallpaper" || ! -f "$current_wallpaper" ]] && command -v awww &> /dev/null; then
     # awww query returns format like: "eDP-1: ... image: /path/to/wallpaper"
     wallpaper_line=$(awww query | head -n1)
     if [[ $wallpaper_line =~ image:\ (.+)$ ]]; then
@@ -66,7 +75,7 @@ if command -v awww &> /dev/null; then
     fi
 fi
 
-# Fallback to a default wallpaper if swww doesn't have one set
+# Fallback to a default wallpaper if neither source has one set
 if [[ -z "$current_wallpaper" || ! -f "$current_wallpaper" ]]; then
     current_wallpaper="$HOME/.config/quickshell/themes/wallpapers/default.jpg"
 fi
