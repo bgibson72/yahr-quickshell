@@ -663,7 +663,7 @@ ShellRoot {
             // Panel positioned at top-right, slides in from right
             Item {
                 width: 420
-                height: 820
+                height: 760
                 anchors.top: parent.top
                 anchors.right: parent.right
                 anchors.topMargin: 6

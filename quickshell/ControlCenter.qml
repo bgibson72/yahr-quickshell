@@ -7,7 +7,7 @@ Rectangle {
     id: root
     
     width: 420
-    height: 820
+    height: 760
     color: Qt.rgba(ThemeManager.bgBase.r, ThemeManager.bgBase.g, ThemeManager.bgBase.b, ThemeManager.widgetOpacity)
     radius: ThemeManager.hyprRounding
     border.width: ThemeManager.showWidgetBorders ? ThemeManager.widgetBorderWidth : 0
@@ -84,7 +84,6 @@ Rectangle {
     Column {
         anchors.fill: parent
         anchors.margins: 16
-        anchors.bottomMargin: 26
         spacing: 16
 
         
