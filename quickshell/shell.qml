@@ -1175,17 +1175,24 @@ ShellRoot {
             // centering in other modes) is ignored for reserved-area purposes.
             // So "dodge" mode spans the full edge here; Dock.qml handles the
             // start/center/end alignment of its content internally instead.
-            readonly property bool dodgeSpansEdge: shellRoot.dockBehavior === "dodge"
+            // The window spans the full edge either because "dodge" mode
+            // requires it (wlr-layer-shell only honors exclusiveZone for
+            // full-edge-spanning surfaces) or because the user explicitly
+            // wants a taskbar-style full-width/height dock (spanFullWidth).
+            // Dock.qml's content still aligns per `alignment` internally in
+            // both cases; only its background chrome also spans when
+            // spanFullWidth is on (see Dock.qml).
+            readonly property bool windowSpansFull: shellRoot.dockBehavior === "dodge" || shellRoot.dockSpanFullWidth
 
             anchors {
-                top: shellRoot.dockPosition === "top" || (!isHorizontal && (shellRoot.dockAlignment === "start" || dodgeSpansEdge))
-                bottom: shellRoot.dockPosition === "bottom" || (!isHorizontal && (shellRoot.dockAlignment === "end" || dodgeSpansEdge))
-                left: shellRoot.dockPosition === "left" || (isHorizontal && (shellRoot.dockAlignment !== "end" || dodgeSpansEdge))
-                right: shellRoot.dockPosition === "right" || (isHorizontal && (shellRoot.dockAlignment === "end" || dodgeSpansEdge))
+                top: shellRoot.dockPosition === "top" || (!isHorizontal && (shellRoot.dockAlignment === "start" || windowSpansFull))
+                bottom: shellRoot.dockPosition === "bottom" || (!isHorizontal && (shellRoot.dockAlignment === "end" || windowSpansFull))
+                left: shellRoot.dockPosition === "left" || (isHorizontal && (shellRoot.dockAlignment !== "end" || windowSpansFull))
+                right: shellRoot.dockPosition === "right" || (isHorizontal && (shellRoot.dockAlignment === "end" || windowSpansFull))
             }
 
-            implicitWidth: isHorizontal ? (dodgeSpansEdge ? screen.width : dockContent.implicitWidth) : (shellRoot.dockIconSize + 20)
-            implicitHeight: isHorizontal ? (shellRoot.dockIconSize + 20) : (dodgeSpansEdge ? screen.height : dockContent.implicitHeight)
+            implicitWidth: isHorizontal ? (windowSpansFull ? screen.width : dockContent.implicitWidth) : (shellRoot.dockIconSize + 20)
+            implicitHeight: isHorizontal ? (shellRoot.dockIconSize + 20) : (windowSpansFull ? screen.height : dockContent.implicitHeight)
             color: "transparent"
             // Only "dodge" mode reserves screen space (shrinking/pushing windows
             // away from the dock). All other modes overlay windows (either above
@@ -1196,25 +1203,25 @@ ShellRoot {
 
             margins {
                 // Perpendicular-axis alignment (start/center/end) along the docked
-                // edge. Not applied in dodge mode — the window already spans the
-                // full edge there, and Dock.qml aligns its content internally.
-                left: (dodgeSpansEdge ? 0 : (shellRoot.dockPosition === "left"
+                // edge. Not applied when the window spans the full edge — Dock.qml
+                // aligns its content internally in that case.
+                left: (windowSpansFull ? 0 : (shellRoot.dockPosition === "left"
                     ? (shellRoot.dockFloating ? 8 : 0)
                     : (isHorizontal && shellRoot.dockAlignment === "center"
                         ? Math.max(0, Math.round((screen.width - implicitWidth) / 2))
                         : (isHorizontal && shellRoot.dockAlignment === "start" ? (shellRoot.dockFloating ? 8 : 0) : 0))))
                     + (shellRoot.dockPosition === "left" ? hideOffset : 0)
-                right: (dodgeSpansEdge ? 0 : (shellRoot.dockPosition === "right"
+                right: (windowSpansFull ? 0 : (shellRoot.dockPosition === "right"
                     ? (shellRoot.dockFloating ? 8 : 0)
                     : (isHorizontal && shellRoot.dockAlignment === "end" ? (shellRoot.dockFloating ? 8 : 0) : 0)))
                     + (shellRoot.dockPosition === "right" ? hideOffset : 0)
-                top: (dodgeSpansEdge ? 0 : (shellRoot.dockPosition === "top"
+                top: (windowSpansFull ? 0 : (shellRoot.dockPosition === "top"
                     ? (shellRoot.dockFloating ? 8 : 0)
                     : (!isHorizontal && shellRoot.dockAlignment === "center"
                         ? Math.max(0, Math.round((screen.height - implicitHeight) / 2))
                         : (!isHorizontal && shellRoot.dockAlignment === "start" ? (shellRoot.dockFloating ? 8 : 0) : 0))))
                     + (shellRoot.dockPosition === "top" ? hideOffset : 0)
-                bottom: (dodgeSpansEdge ? 0 : (shellRoot.dockPosition === "bottom"
+                bottom: (windowSpansFull ? 0 : (shellRoot.dockPosition === "bottom"
                     ? (shellRoot.dockFloating ? 8 : 0)
                     : (!isHorizontal && shellRoot.dockAlignment === "end" ? (shellRoot.dockFloating ? 8 : 0) : 0)))
                     + (shellRoot.dockPosition === "bottom" ? hideOffset : 0)

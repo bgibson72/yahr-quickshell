@@ -93,8 +93,10 @@ Item {
         // when the underlying window spans the full edge (dodge mode).
         width: dock.spanFullWidth ? undefined : (dock.isHorizontal ? contentRow.width + dock.padding * 2 : dock.iconSize + 20)
         height: dock.spanFullWidth ? undefined : (dock.isHorizontal ? dock.iconSize + 20 : contentColumn.height + dock.padding * 2)
-        anchors.verticalCenter: (!dock.spanFullWidth && dock.isHorizontal) ? parent.verticalCenter : undefined
-        anchors.horizontalCenter: (!dock.spanFullWidth && !dock.isHorizontal) ? parent.horizontalCenter : undefined
+        // Mirrors contentRow/contentColumn's alignment anchoring exactly below,
+        // so the background always matches where the icons actually are.
+        anchors.verticalCenter: (!dock.spanFullWidth && (dock.isHorizontal || dock.alignment === "center")) ? parent.verticalCenter : undefined
+        anchors.horizontalCenter: (!dock.spanFullWidth && (!dock.isHorizontal || dock.alignment === "center")) ? parent.horizontalCenter : undefined
         anchors.left: (!dock.spanFullWidth && dock.isHorizontal && dock.alignment === "start") ? parent.left : undefined
         anchors.right: (!dock.spanFullWidth && dock.isHorizontal && dock.alignment === "end") ? parent.right : undefined
         anchors.top: (!dock.spanFullWidth && !dock.isHorizontal && dock.alignment === "start") ? parent.top : undefined
