@@ -30,6 +30,43 @@ ShellRoot {
     property int barWidgetBorderWidth: 1
     property int barHyprRounding: 12
     property int barMinWorkspaces: 4
+
+    // ---- Dock ----
+    property bool dockEnabled: true
+    property string dockPosition: "bottom"     // "top" | "bottom" | "left" | "right"
+    property string dockAlignment: "center"    // "start" | "center" | "end"
+    property bool dockFloating: true
+    property string dockBackgroundStyle: "translucent"
+    property real dockOpacity: 0.70
+    property bool dockShowBorder: false
+    property int dockIconSize: 48
+    property var dockPinnedApps: []
+    property bool dockPickerVisible: false
+
+    // Persist the dock's pinned-apps list to settings.json without clobbering
+    // other settings keys — reads the file fresh, merges, writes it back.
+    function saveDockPinned(newPinnedArray) {
+        shellRoot.dockPinnedApps = newPinnedArray
+        const tmpFile = "/tmp/yahr-dock-pinned.json"
+        const json = JSON.stringify(newPinnedArray)
+        const writeTmp = `cat > ${tmpFile} << 'DOCKEOF'\n${json}\nDOCKEOF`
+        const mergeCmd = `python3 -c "` +
+            `import json` + "\\n" +
+            `p = '${Quickshell.env('HOME')}/.config/quickshell/settings.json'` + "\\n" +
+            `d = json.load(open(p))` + "\\n" +
+            `d.setdefault('dock', {})['pinned'] = json.load(open('${tmpFile}'))` + "\\n" +
+            `json.dump(d, open(p, 'w'), indent=2)` +
+            `"`
+        Quickshell.execDetached(["sh", "-c", writeTmp + " && " + mergeCmd])
+    }
+
+    function launchDockApp(execCmd, needsTerminal) {
+        if (needsTerminal)
+            Quickshell.execDetached(["kitty", "-e", "sh", "-c", execCmd])
+        else
+            Quickshell.execDetached(["sh", "-c", execCmd])
+    }
+
     
     // Make shellRoot globally accessible via objectName
     objectName: "shellRoot"
@@ -69,6 +106,17 @@ ShellRoot {
                         if (settings.bar.showBorder !== undefined) shellRoot.barShowBorder = settings.bar.showBorder
                         if (settings.bar.backgroundStyle !== undefined) shellRoot.barBackgroundStyle = settings.bar.backgroundStyle
                         if (settings.bar.barOpacity !== undefined) shellRoot.barOpacity = settings.bar.barOpacity
+                    }
+                    if (settings.dock) {
+                        if (settings.dock.enabled !== undefined) shellRoot.dockEnabled = settings.dock.enabled
+                        if (settings.dock.position !== undefined) shellRoot.dockPosition = settings.dock.position
+                        if (settings.dock.alignment !== undefined) shellRoot.dockAlignment = settings.dock.alignment
+                        if (settings.dock.floating !== undefined) shellRoot.dockFloating = settings.dock.floating
+                        if (settings.dock.backgroundStyle !== undefined) shellRoot.dockBackgroundStyle = settings.dock.backgroundStyle
+                        if (settings.dock.opacity !== undefined) shellRoot.dockOpacity = settings.dock.opacity
+                        if (settings.dock.showBorder !== undefined) shellRoot.dockShowBorder = settings.dock.showBorder
+                        if (settings.dock.iconSize !== undefined) shellRoot.dockIconSize = settings.dock.iconSize
+                        if (settings.dock.pinned !== undefined) shellRoot.dockPinnedApps = settings.dock.pinned
                     }
                     if (settings.general) {
                         const transparent = settings.general.widgetTransparent !== false
@@ -1073,6 +1121,122 @@ ShellRoot {
                     function onToggleSettings() {
                         shellRoot.settingsVisible = !shellRoot.settingsVisible
                     }
+                }
+            }
+        }
+    }
+
+    // ---- Dock ----
+    // A single dynamically-anchored PanelWindow so the dock can be moved to
+    // any screen edge (position) and aligned start/center/end along that
+    // edge, without needing four separate Variants blocks like the bars.
+    Variants {
+        model: Quickshell.screens
+
+        PanelWindow {
+            property var modelData
+            screen: modelData
+            WlrLayershell.namespace: "yahr-dock"
+
+            visible: shellRoot.dockEnabled
+
+            readonly property bool isHorizontal: shellRoot.dockPosition === "top" || shellRoot.dockPosition === "bottom"
+
+            anchors {
+                top: shellRoot.dockPosition === "top" || (!isHorizontal && shellRoot.dockAlignment === "start")
+                bottom: shellRoot.dockPosition === "bottom" || (!isHorizontal && shellRoot.dockAlignment === "end")
+                left: shellRoot.dockPosition === "left" || (isHorizontal && shellRoot.dockAlignment !== "end")
+                right: shellRoot.dockPosition === "right" || (isHorizontal && shellRoot.dockAlignment === "end")
+            }
+
+            implicitWidth: isHorizontal ? dockContent.implicitWidth : (shellRoot.dockIconSize + 20)
+            implicitHeight: isHorizontal ? (shellRoot.dockIconSize + 20) : dockContent.implicitHeight
+            color: "transparent"
+            exclusiveZone: shellRoot.dockPosition === "top" || shellRoot.dockPosition === "bottom"
+                ? implicitHeight + (shellRoot.dockFloating ? 8 : 0)
+                : implicitWidth + (shellRoot.dockFloating ? 8 : 0)
+
+            margins {
+                // Perpendicular-axis alignment (start/center/end) along the docked edge
+                left: shellRoot.dockPosition === "left"
+                    ? (shellRoot.dockFloating ? 8 : 0)
+                    : (isHorizontal && shellRoot.dockAlignment === "center"
+                        ? Math.max(0, Math.round((screen.width - implicitWidth) / 2))
+                        : (isHorizontal && shellRoot.dockAlignment === "start" ? (shellRoot.dockFloating ? 8 : 0) : 0))
+                right: shellRoot.dockPosition === "right"
+                    ? (shellRoot.dockFloating ? 8 : 0)
+                    : (isHorizontal && shellRoot.dockAlignment === "end" ? (shellRoot.dockFloating ? 8 : 0) : 0)
+                top: shellRoot.dockPosition === "top"
+                    ? (shellRoot.dockFloating ? 8 : 0)
+                    : (!isHorizontal && shellRoot.dockAlignment === "center"
+                        ? Math.max(0, Math.round((screen.height - implicitHeight) / 2))
+                        : (!isHorizontal && shellRoot.dockAlignment === "start" ? (shellRoot.dockFloating ? 8 : 0) : 0))
+                bottom: shellRoot.dockPosition === "bottom"
+                    ? (shellRoot.dockFloating ? 8 : 0)
+                    : (!isHorizontal && shellRoot.dockAlignment === "end" ? (shellRoot.dockFloating ? 8 : 0) : 0)
+            }
+
+            Behavior on margins.left { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
+            Behavior on margins.right { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
+            Behavior on margins.top { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
+            Behavior on margins.bottom { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
+
+            Dock {
+                id: dockContent
+                anchors.fill: parent
+                position: shellRoot.dockPosition
+                alignment: shellRoot.dockAlignment
+                floating: shellRoot.dockFloating
+                backgroundStyle: shellRoot.dockBackgroundStyle
+                dockOpacity: shellRoot.dockOpacity
+                showBorder: shellRoot.dockShowBorder
+                iconSize: shellRoot.dockIconSize
+                pinnedApps: shellRoot.dockPinnedApps
+
+                onLaunchRequested: (execCmd, needsTerminal) => shellRoot.launchDockApp(execCmd, needsTerminal)
+                onUnpinRequested: (desktopId) => {
+                    const updated = shellRoot.dockPinnedApps.filter(a => a.desktopId !== desktopId)
+                    shellRoot.saveDockPinned(updated)
+                }
+                onPinPickerRequested: shellRoot.dockPickerVisible = true
+            }
+        }
+    }
+
+    // Dock app picker popup
+    Variants {
+        model: Quickshell.screens
+
+        PanelWindow {
+            property var modelData
+            screen: modelData
+            WlrLayershell.namespace: "yahr-dock-picker"
+            WlrLayershell.layer: WlrLayer.Overlay
+            WlrLayershell.keyboardFocus: WlrKeyboardFocus.OnDemand
+
+            visible: shellRoot.dockPickerVisible
+
+            anchors { top: true; bottom: true; left: true; right: true }
+            margins { top: 0; bottom: 0; left: 0; right: 0 }
+            color: "transparent"
+            exclusiveZone: 0
+
+            MouseArea {
+                anchors.fill: parent
+                onClicked: shellRoot.dockPickerVisible = false
+            }
+
+            DockAppPicker {
+                anchors.centerIn: parent
+                pinnedIds: shellRoot.dockPinnedApps.map(a => a.desktopId)
+
+                onRequestClose: shellRoot.dockPickerVisible = false
+                onAppSelected: (desktopId, name, icon, exec, terminal) => {
+                    const updated = shellRoot.dockPinnedApps.concat([{
+                        desktopId: desktopId, name: name, icon: icon, exec: exec, terminal: terminal
+                    }])
+                    shellRoot.saveDockPinned(updated)
+                    shellRoot.dockPickerVisible = false
                 }
             }
         }

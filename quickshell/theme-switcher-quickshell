@@ -804,6 +804,12 @@ EOF
     update_mako_theme "$theme_file" "$theme_name"
     update_hyprlock_theme "$theme_file" "$theme_name"
     update_gtk_theme "$theme_name"
+    # Override the GTK theme's baked-in accent color to match this theme's
+    # actual accent (see sync-gtk-accent.sh for why this is necessary)
+    if [[ -x "$QUICKSHELL_DIR/sync-gtk-accent.sh" ]]; then
+        echo "Syncing GTK accent color..."
+        "$QUICKSHELL_DIR/sync-gtk-accent.sh"
+    fi
     set_theme_wallpaper "$theme_name"
     
     # Sync Papirus folder colors

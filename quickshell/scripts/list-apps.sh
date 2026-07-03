@@ -117,8 +117,10 @@ for dir in "${SEARCH_PATHS[@]}"; do
         # Default terminal to false if not set
         [ -z "$terminal" ] && terminal="false"
         
-        # Output in format: name|comment|icon_path|exec|terminal
-        echo "$name|$comment|$icon_path|$exec|$terminal"
+        # Output in format: name|comment|icon_path|exec|terminal|desktop_file_basename
+        # (6th field added for stable pin/dock identity — safe to append since
+        # existing consumers only check parts.length >= 4/5)
+        echo "$name|$comment|$icon_path|$exec|$terminal|$basename_file"
         
     done < <(find -L "$dir" -name "*.desktop" -type f 2>/dev/null)
 done | sort -u

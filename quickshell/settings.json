@@ -28,5 +28,16 @@
     "showSystemTray": true,
     "showMediaPlayer": true,
     "barSize": "small"
+  },
+  "dock": {
+    "enabled": true,
+    "position": "bottom",
+    "alignment": "center",
+    "floating": true,
+    "backgroundStyle": "translucent",
+    "opacity": 0.70,
+    "showBorder": false,
+    "iconSize": 48,
+    "pinned": []
   }
 }

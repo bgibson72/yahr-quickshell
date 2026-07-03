@@ -810,11 +810,11 @@ SETTINGSEOF`
 
                 // Tab navigation buttons
                 Repeater {
-                    model: 9
+                    model: 10
                     Rectangle {
-                        property int stackIdx:   [0, 1, 2, 4, 5, 3, 6, 8, 7][index]
-                        property string tabIcon: ["\uf013", "\uf030", "\uf0c9", "\uf1fc", "\uf03e", "\uf359", "\uf108", "\uf2bd", "\uf05a"][index]
-                        property string tabLabel: ["Quickshell", "Screenshots", "Bar", "Theme", "Wallpaper", "Hyprland", "Monitors", "SDDM", "About"][index]
+                        property int stackIdx:   [0, 1, 2, 4, 5, 3, 6, 8, 7, 9][index]
+                        property string tabIcon: ["\uf013", "\uf030", "\uf0c9", "\uf1fc", "\uf03e", "\uf359", "\uf108", "\uf2bd", "\uf05a", "\uf2d0"][index]
+                        property string tabLabel: ["Quickshell", "Screenshots", "Bar", "Theme", "Wallpaper", "Hyprland", "Monitors", "SDDM", "About", "Dock"][index]
                         property bool tabHovered: false
 
                         Layout.fillWidth: true
@@ -5889,6 +5889,539 @@ MouseArea {
                 }
             }
         }
+                // Tab 9: DOCK ──────────────────────────────────────────
+                ScrollView {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    clip: true
+
+                    ColumnLayout {
+                        width: parent.parent.width
+                        spacing: 32
+
+                        // ========== DOCK APPEARANCE ==========
+                        Rectangle {
+                            Layout.fillWidth: true
+                            implicitHeight: dockSectionCard.implicitHeight + 32
+                            color: Qt.rgba(1, 1, 1, 0.05)
+                            radius: 10
+                            clip: true
+                            Column {
+                                id: dockSectionCard
+                                anchors.left: parent.left
+                                anchors.right: parent.right
+                                anchors.top: parent.top
+                                anchors.margins: 16
+                                spacing: 16
+
+                                Text {
+                                    text: "  Dock"
+                                    font.family: ThemeManager.uiFont
+                                    font.pixelSize: 18
+                                    font.weight: Font.Bold
+                                    color: ThemeManager.accentBlue
+                                }
+
+                                // Enable dock toggle
+                                Row {
+                                    spacing: 12
+
+                                    Rectangle {
+                                        width: 48
+                                        height: 24
+                                        radius: 12
+                                        color: dockEnabledCheck.checked ? ThemeManager.accentGreen : Qt.rgba(1, 1, 1, 0.07)
+                                        Behavior on color { ColorAnimation { duration: 150 } }
+
+                                        Rectangle {
+                                            width: 18
+                                            height: 18
+                                            radius: 9
+                                            color: ThemeManager.fgPrimary
+                                            x: dockEnabledCheck.checked ? parent.width - width - 3 : 3
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            Behavior on x { NumberAnimation { duration: 200 } }
+                                        }
+
+                                        MouseArea {
+                                            anchors.fill: parent
+                                            cursorShape: Qt.PointingHandCursor
+                                            onClicked: {
+                                                dockEnabledCheck.checked = !dockEnabledCheck.checked
+                                                if (!root.settings.dock) root.settings.dock = {}
+                                                root.settings.dock.enabled = dockEnabledCheck.checked
+                                                saveSettings()
+                                            }
+                                        }
+                                    }
+
+                                    Column {
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        spacing: 2
+                                        Text {
+                                            text: "Show dock"
+                                            font.family: ThemeManager.uiFont
+                                            font.pixelSize: 12
+                                            color: ThemeManager.fgPrimary
+                                        }
+                                        Text {
+                                            text: "Pinned application launcher"
+                                            font.family: ThemeManager.uiFont
+                                            font.pixelSize: 10
+                                            color: ThemeManager.fgSecondary
+                                        }
+                                    }
+
+                                    QtObject {
+                                        id: dockEnabledCheck
+                                        property bool checked: root.settings.dock ? root.settings.dock.enabled !== false : true
+                                    }
+                                }
+
+                                // Docked vs Floating toggle
+                                Row {
+                                    spacing: 12
+
+                                    Rectangle {
+                                        width: 48
+                                        height: 24
+                                        radius: 12
+                                        color: dockFloatingCheck.checked ? ThemeManager.accentGreen : Qt.rgba(1, 1, 1, 0.07)
+                                        Behavior on color { ColorAnimation { duration: 150 } }
+
+                                        Rectangle {
+                                            width: 18
+                                            height: 18
+                                            radius: 9
+                                            color: ThemeManager.fgPrimary
+                                            x: dockFloatingCheck.checked ? parent.width - width - 3 : 3
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            Behavior on x { NumberAnimation { duration: 200 } }
+                                        }
+
+                                        MouseArea {
+                                            anchors.fill: parent
+                                            cursorShape: Qt.PointingHandCursor
+                                            onClicked: {
+                                                dockFloatingCheck.checked = !dockFloatingCheck.checked
+                                                if (!root.settings.dock) root.settings.dock = {}
+                                                root.settings.dock.floating = dockFloatingCheck.checked
+                                                saveSettings()
+                                            }
+                                        }
+                                    }
+
+                                    Column {
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        spacing: 2
+                                        Text {
+                                            text: "Floating dock"
+                                            font.family: ThemeManager.uiFont
+                                            font.pixelSize: 12
+                                            color: ThemeManager.fgPrimary
+                                        }
+                                        Text {
+                                            text: dockFloatingCheck.checked ? "Rounded, inset from the screen edge" : "Docked flush against the screen edge"
+                                            font.family: ThemeManager.uiFont
+                                            font.pixelSize: 10
+                                            color: ThemeManager.fgSecondary
+                                        }
+                                    }
+
+                                    QtObject {
+                                        id: dockFloatingCheck
+                                        property bool checked: root.settings.dock ? root.settings.dock.floating !== false : true
+                                    }
+                                }
+
+                                // Show border toggle
+                                Row {
+                                    spacing: 12
+
+                                    Rectangle {
+                                        width: 48
+                                        height: 24
+                                        radius: 12
+                                        color: dockBorderCheck.checked ? ThemeManager.accentGreen : Qt.rgba(1, 1, 1, 0.07)
+                                        Behavior on color { ColorAnimation { duration: 150 } }
+
+                                        Rectangle {
+                                            width: 18
+                                            height: 18
+                                            radius: 9
+                                            color: ThemeManager.fgPrimary
+                                            x: dockBorderCheck.checked ? parent.width - width - 3 : 3
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            Behavior on x { NumberAnimation { duration: 200 } }
+                                        }
+
+                                        MouseArea {
+                                            anchors.fill: parent
+                                            cursorShape: Qt.PointingHandCursor
+                                            onClicked: {
+                                                dockBorderCheck.checked = !dockBorderCheck.checked
+                                                if (!root.settings.dock) root.settings.dock = {}
+                                                root.settings.dock.showBorder = dockBorderCheck.checked
+                                                saveSettings()
+                                            }
+                                        }
+                                    }
+
+                                    Column {
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        spacing: 2
+                                        Text {
+                                            text: "Show border around dock"
+                                            font.family: ThemeManager.uiFont
+                                            font.pixelSize: 12
+                                            color: ThemeManager.fgPrimary
+                                        }
+                                        Text {
+                                            text: "Thickness follows the Hyprland border size setting"
+                                            font.family: ThemeManager.uiFont
+                                            font.pixelSize: 10
+                                            color: ThemeManager.fgSecondary
+                                        }
+                                    }
+
+                                    QtObject {
+                                        id: dockBorderCheck
+                                        property bool checked: root.settings.dock ? root.settings.dock.showBorder === true : false
+                                    }
+                                }
+
+                                // Transparency slider
+                                Column {
+                                    spacing: 8
+                                    width: parent.width
+
+                                    Row {
+                                        spacing: 12
+                                        width: parent.width
+
+                                        Text {
+                                            text: "Transparency: " + Math.round((1.0 - dockOpacitySlider.value) * 100) + "%"
+                                            font.family: ThemeManager.uiFont
+                                            font.pixelSize: 12
+                                            color: ThemeManager.fgPrimary
+                                            width: 180
+                                        }
+                                        Text {
+                                            text: "(Opacity: " + Math.round(dockOpacitySlider.value * 100) + "%)"
+                                            font.family: ThemeManager.uiFont
+                                            font.pixelSize: 11
+                                            color: ThemeManager.fgSecondary
+                                        }
+                                    }
+
+                                    Item {
+                                        width: parent.width
+                                        height: 40
+
+                                        Rectangle {
+                                            id: dockOpacityTrack
+                                            anchors.centerIn: parent
+                                            width: parent.width
+                                            height: 6
+                                            radius: 3
+                                            color: Qt.rgba(1, 1, 1, 0.07)
+
+                                            Rectangle {
+                                                width: dockOpacityHandle.x + dockOpacityHandle.width / 2
+                                                height: parent.height
+                                                radius: parent.radius
+                                                color: ThemeManager.accentBlue
+                                            }
+                                        }
+
+                                        Rectangle {
+                                            id: dockOpacityHandle
+                                            width: 20
+                                            height: 20
+                                            radius: 10
+                                            color: dockOpacityArea.containsMouse || dockOpacityArea.pressed
+                                                ? ThemeManager.accentBlue : ThemeManager.fgPrimary
+                                            border.width: 2
+                                            border.color: ThemeManager.accentBlue
+                                            y: (parent.height - height) / 2
+                                            x: (dockOpacityTrack.width - width) * dockOpacitySlider.value
+                                            Behavior on color { ColorAnimation { duration: 150 } }
+                                        }
+
+                                        MouseArea {
+                                            id: dockOpacityArea
+                                            anchors.fill: parent
+                                            hoverEnabled: true
+                                            cursorShape: Qt.PointingHandCursor
+
+                                            function updateValue(mouse) {
+                                                var newValue = Math.max(0.0, Math.min(1.0, mouse.x / width))
+                                                dockOpacitySlider.value = newValue
+                                                if (!root.settings.dock) root.settings.dock = {}
+                                                root.settings.dock.opacity = newValue
+                                                saveSettings()
+                                            }
+
+                                            onPressed: updateValue(mouse)
+                                            onPositionChanged: if (pressed) updateValue(mouse)
+                                        }
+                                    }
+
+                                    QtObject {
+                                        id: dockOpacitySlider
+                                        property real value: root.settings.dock && root.settings.dock.opacity !== undefined ? root.settings.dock.opacity : 0.70
+                                    }
+                                }
+                            }
+                        }
+
+                        // ========== DOCK POSITION ==========
+                        Rectangle {
+                            Layout.fillWidth: true
+                            implicitHeight: dockPositionCard.implicitHeight + 32
+                            color: Qt.rgba(1, 1, 1, 0.05)
+                            radius: 10
+                            clip: true
+                            Column {
+                                id: dockPositionCard
+                                anchors.left: parent.left
+                                anchors.right: parent.right
+                                anchors.top: parent.top
+                                anchors.margins: 16
+                                spacing: 16
+
+                                Text {
+                                    text: "  Position"
+                                    font.family: ThemeManager.uiFont
+                                    font.pixelSize: 18
+                                    font.weight: Font.Bold
+                                    color: ThemeManager.accentBlue
+                                }
+
+                                // Primary edge picker
+                                Column {
+                                    spacing: 10
+                                    width: parent.width
+
+                                    Text {
+                                        text: "Screen edge"
+                                        font.family: ThemeManager.uiFont
+                                        font.pixelSize: 12
+                                        color: ThemeManager.fgSecondary
+                                    }
+
+                                    Row {
+                                        spacing: 10
+
+                                        Repeater {
+                                            model: [
+                                                { value: "top", label: "Top" },
+                                                { value: "bottom", label: "Bottom" },
+                                                { value: "left", label: "Left" },
+                                                { value: "right", label: "Right" }
+                                            ]
+
+                                            Rectangle {
+                                                width: 90
+                                                height: 34
+                                                radius: 8
+                                                property bool active: dockPositionValue.value === modelData.value
+                                                color: active
+                                                    ? Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.30)
+                                                    : Qt.rgba(1, 1, 1, 0.07)
+                                                border.width: 1
+                                                border.color: active
+                                                    ? Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.55)
+                                                    : Qt.rgba(1, 1, 1, 0.12)
+
+                                                Text {
+                                                    anchors.centerIn: parent
+                                                    text: modelData.label
+                                                    font.family: ThemeManager.uiFont
+                                                    font.pixelSize: 12
+                                                    font.weight: Font.Medium
+                                                    color: ThemeManager.fgPrimary
+                                                }
+
+                                                MouseArea {
+                                                    anchors.fill: parent
+                                                    cursorShape: Qt.PointingHandCursor
+                                                    onClicked: {
+                                                        if (!root.settings.dock) root.settings.dock = {}
+                                                        dockPositionValue.value = modelData.value
+                                                        root.settings.dock.position = modelData.value
+                                                        saveSettings()
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    QtObject {
+                                        id: dockPositionValue
+                                        property string value: root.settings.dock && root.settings.dock.position ? root.settings.dock.position : "bottom"
+                                    }
+                                }
+
+                                // Alignment picker
+                                Column {
+                                    spacing: 10
+                                    width: parent.width
+
+                                    Text {
+                                        text: "Alignment along that edge"
+                                        font.family: ThemeManager.uiFont
+                                        font.pixelSize: 12
+                                        color: ThemeManager.fgSecondary
+                                    }
+
+                                    Row {
+                                        spacing: 10
+
+                                        Repeater {
+                                            model: [
+                                                { value: "start", label: "Start" },
+                                                { value: "center", label: "Center" },
+                                                { value: "end", label: "End" }
+                                            ]
+
+                                            Rectangle {
+                                                width: 90
+                                                height: 34
+                                                radius: 8
+                                                property bool active: dockAlignmentValue.value === modelData.value
+                                                color: active
+                                                    ? Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.30)
+                                                    : Qt.rgba(1, 1, 1, 0.07)
+                                                border.width: 1
+                                                border.color: active
+                                                    ? Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.55)
+                                                    : Qt.rgba(1, 1, 1, 0.12)
+
+                                                Text {
+                                                    anchors.centerIn: parent
+                                                    text: modelData.label
+                                                    font.family: ThemeManager.uiFont
+                                                    font.pixelSize: 12
+                                                    font.weight: Font.Medium
+                                                    color: ThemeManager.fgPrimary
+                                                }
+
+                                                MouseArea {
+                                                    anchors.fill: parent
+                                                    cursorShape: Qt.PointingHandCursor
+                                                    onClicked: {
+                                                        if (!root.settings.dock) root.settings.dock = {}
+                                                        dockAlignmentValue.value = modelData.value
+                                                        root.settings.dock.alignment = modelData.value
+                                                        saveSettings()
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    Text {
+                                        text: "\"Start\" is the left edge for a top/bottom dock, or the top edge for a left/right dock."
+                                        font.family: ThemeManager.uiFont
+                                        font.pixelSize: 10
+                                        color: ThemeManager.fgTertiary
+                                        wrapMode: Text.WordWrap
+                                        width: parent.width
+                                    }
+
+                                    QtObject {
+                                        id: dockAlignmentValue
+                                        property string value: root.settings.dock && root.settings.dock.alignment ? root.settings.dock.alignment : "center"
+                                    }
+                                }
+                            }
+                        }
+
+                        // ========== PINNED APPLICATIONS ==========
+                        Rectangle {
+                            Layout.fillWidth: true
+                            implicitHeight: dockPinnedCard.implicitHeight + 32
+                            color: Qt.rgba(1, 1, 1, 0.05)
+                            radius: 10
+                            clip: true
+                            Column {
+                                id: dockPinnedCard
+                                anchors.left: parent.left
+                                anchors.right: parent.right
+                                anchors.top: parent.top
+                                anchors.margins: 16
+                                spacing: 12
+
+                                Text {
+                                    text: "  Pinned Applications"
+                                    font.family: ThemeManager.uiFont
+                                    font.pixelSize: 18
+                                    font.weight: Font.Bold
+                                    color: ThemeManager.accentBlue
+                                }
+
+                                Text {
+                                    text: "Use the \u201c+\u201d button on the dock itself to add applications. Right-click a pinned icon to unpin it."
+                                    font.family: ThemeManager.uiFont
+                                    font.pixelSize: 11
+                                    color: ThemeManager.fgSecondary
+                                    wrapMode: Text.WordWrap
+                                    width: parent.width
+                                }
+
+                                Flow {
+                                    width: parent.width
+                                    spacing: 8
+
+                                    Repeater {
+                                        model: root.settings.dock && root.settings.dock.pinned ? root.settings.dock.pinned : []
+
+                                        Rectangle {
+                                            width: pinnedLabel.implicitWidth + 40
+                                            height: 32
+                                            radius: 16
+                                            color: Qt.rgba(1, 1, 1, 0.07)
+                                            border.width: 1
+                                            border.color: Qt.rgba(1, 1, 1, 0.12)
+
+                                            Row {
+                                                anchors.centerIn: parent
+                                                spacing: 6
+
+                                                Text {
+                                                    id: pinnedLabel
+                                                    text: modelData.name
+                                                    font.family: ThemeManager.uiFont
+                                                    font.pixelSize: 11
+                                                    color: ThemeManager.fgPrimary
+                                                    anchors.verticalCenter: parent.verticalCenter
+                                                }
+                                                Text {
+                                                    text: "✕"
+                                                    font.pixelSize: 10
+                                                    color: ThemeManager.fgTertiary
+                                                    anchors.verticalCenter: parent.verticalCenter
+
+                                                    MouseArea {
+                                                        anchors.fill: parent
+                                                        anchors.margins: -6
+                                                        cursorShape: Qt.PointingHandCursor
+                                                        onClicked: {
+                                                            const updated = root.settings.dock.pinned.filter(a => a.desktopId !== modelData.desktopId)
+                                                            root.settings.dock.pinned = updated
+                                                            saveSettings()
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
     }
 
 
