@@ -42,6 +42,27 @@ try:
         ev("hl.layer_rule({match={namespace='^mako'}, blur=" + v + "})")
     if "blurSize" in h:
         ev("hl.config({decoration={blur={size=" + str(int(h["blurSize"])) + "}}})")
+    if "shadowRange" in h:
+        ev("hl.config({decoration={shadow={range=" + str(int(h["shadowRange"])) + "}}})")
+    if "shadowAlpha" in h:
+        use_accent = h.get("shadowUseAccent", False)
+        rgb = "000000"
+        if use_accent:
+            try:
+                theme_name = open(
+                    __import__("os").path.expanduser("~/.config/hypr/.current-theme")
+                ).read().strip()
+                theme_conf = __import__("os").path.expanduser(
+                    "~/.config/hypr/themes/" + theme_name + ".conf")
+                with open(theme_conf) as tf:
+                    for line in tf:
+                        if line.strip().startswith("$accent-blue"):
+                            rgb = line.split("rgb(")[1].split(")")[0]
+                            break
+            except Exception:
+                pass
+        alpha_hex = format(round(h["shadowAlpha"] / 100 * 255), "02x")
+        ev('hl.config({decoration={shadow={color="rgba(' + rgb + alpha_hex + ')"}}})')
 
     # App window transparency (kitty, thunar, code)
     if "appWindowTransparent" in g:
