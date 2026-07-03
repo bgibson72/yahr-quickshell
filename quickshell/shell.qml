@@ -47,8 +47,15 @@ ShellRoot {
 
     // Persist the dock's pinned-apps list to settings.json without clobbering
     // other settings keys — reads the file fresh, merges, writes it back.
+    // dockPinnedSaveGuardUntil suppresses the periodic settings poll (below)
+    // from re-reading and overwriting dockPinnedApps with a stale on-disk
+    // value while this async write is still in flight — otherwise a newly
+    // pinned/unpinned app can visibly flash and then revert.
+    property real dockPinnedSaveGuardUntil: 0
+
     function saveDockPinned(newPinnedArray) {
         shellRoot.dockPinnedApps = newPinnedArray
+        shellRoot.dockPinnedSaveGuardUntil = Date.now() + 2000
         const tmpFile = "/tmp/yahr-dock-pinned.json"
         const json = JSON.stringify(newPinnedArray)
         const writeTmp = `cat > ${tmpFile} << 'DOCKEOF'\n${json}\nDOCKEOF`
@@ -129,7 +136,9 @@ ShellRoot {
                         if (settings.dock.opacity !== undefined) shellRoot.dockOpacity = settings.dock.opacity
                         if (settings.dock.showBorder !== undefined) shellRoot.dockShowBorder = settings.dock.showBorder
                         if (settings.dock.iconSize !== undefined) shellRoot.dockIconSize = settings.dock.iconSize
-                        if (settings.dock.pinned !== undefined) shellRoot.dockPinnedApps = settings.dock.pinned
+                        if (settings.dock.pinned !== undefined && Date.now() >= shellRoot.dockPinnedSaveGuardUntil) {
+                            shellRoot.dockPinnedApps = settings.dock.pinned
+                        }
                         if (settings.dock.behavior !== undefined) shellRoot.dockBehavior = settings.dock.behavior
                     }
                     if (settings.general) {
