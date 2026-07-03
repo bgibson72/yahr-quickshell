@@ -7,7 +7,7 @@ Rectangle {
     id: root
     
     width: 420
-    height: 760
+    height: 740
     color: Qt.rgba(ThemeManager.bgBase.r, ThemeManager.bgBase.g, ThemeManager.bgBase.b, ThemeManager.widgetOpacity)
     radius: ThemeManager.hyprRounding
     border.width: ThemeManager.showWidgetBorders ? ThemeManager.widgetBorderWidth : 0
