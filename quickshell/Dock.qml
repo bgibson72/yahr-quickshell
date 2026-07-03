@@ -84,23 +84,30 @@ Item {
         border.width: dock.showBorder ? dock.hyprBorderSize : 0
         border.color: Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.45)
 
-        // Full-span chrome: fills the whole window (taskbar-style)
-        anchors.fill: dock.spanFullWidth ? parent : undefined
-
-        // Compact chrome: sized to wrap just the content, positioned per
-        // `alignment` — mirrors the Row/Column anchoring below exactly, so
-        // the background always matches where the icons actually are, even
-        // when the underlying window spans the full edge (dodge mode).
-        width: dock.spanFullWidth ? undefined : (dock.isHorizontal ? contentRow.width + dock.padding * 2 : dock.iconSize + 20)
-        height: dock.spanFullWidth ? undefined : (dock.isHorizontal ? dock.iconSize + 20 : contentColumn.height + dock.padding * 2)
-        // Mirrors contentRow/contentColumn's alignment anchoring exactly below,
-        // so the background always matches where the icons actually are.
-        anchors.verticalCenter: (!dock.spanFullWidth && (dock.isHorizontal || dock.alignment === "center")) ? parent.verticalCenter : undefined
-        anchors.horizontalCenter: (!dock.spanFullWidth && (!dock.isHorizontal || dock.alignment === "center")) ? parent.horizontalCenter : undefined
-        anchors.left: (!dock.spanFullWidth && dock.isHorizontal && dock.alignment === "start") ? parent.left : undefined
-        anchors.right: (!dock.spanFullWidth && dock.isHorizontal && dock.alignment === "end") ? parent.right : undefined
-        anchors.top: (!dock.spanFullWidth && !dock.isHorizontal && dock.alignment === "start") ? parent.top : undefined
-        anchors.bottom: (!dock.spanFullWidth && !dock.isHorizontal && dock.alignment === "end") ? parent.bottom : undefined
+        // Chrome sizing/positioning: full-span (taskbar-style) or compact,
+        // wrapping just the content and positioned per `alignment`. Always
+        // anchored to left+top with a computed margin (never switching to a
+        // different anchor line like right/horizontalCenter at runtime) --
+        // switching anchor LINES dynamically (e.g. left -> right -> center)
+        // was found to leave stale geometry after a couple of transitions,
+        // whereas changing a margin VALUE on a fixed anchor always re-lays-out
+        // reliably. Mirrors contentRow/contentColumn's positioning exactly.
+        anchors.left: parent.left
+        anchors.top: parent.top
+        width: dock.spanFullWidth ? parent.width : (dock.isHorizontal ? contentRow.width + dock.padding * 2 : dock.iconSize + 20)
+        height: dock.spanFullWidth ? parent.height : (dock.isHorizontal ? dock.iconSize + 20 : contentColumn.height + dock.padding * 2)
+        anchors.leftMargin: {
+            if (dock.spanFullWidth || !dock.isHorizontal) return 0
+            if (dock.alignment === "start") return 0
+            if (dock.alignment === "end") return Math.max(0, parent.width - width)
+            return Math.max(0, Math.round((parent.width - width) / 2))
+        }
+        anchors.topMargin: {
+            if (dock.spanFullWidth || dock.isHorizontal) return 0
+            if (dock.alignment === "start") return 0
+            if (dock.alignment === "end") return Math.max(0, parent.height - height)
+            return Math.max(0, Math.round((parent.height - height) / 2))
+        }
 
         // Accent line when docked (edge-to-edge) without a border, matching Bar.qml's convention
         Rectangle {
@@ -121,12 +128,16 @@ Item {
     Row {
         id: contentRow
         visible: dock.isHorizontal
+        anchors.left: parent.left
         anchors.verticalCenter: parent.verticalCenter
-        anchors.left: dock.alignment === "start" ? parent.left : undefined
-        anchors.right: dock.alignment === "end" ? parent.right : undefined
-        anchors.horizontalCenter: dock.alignment === "center" ? parent.horizontalCenter : undefined
-        anchors.leftMargin: dock.alignment === "start" ? dock.padding : 0
-        anchors.rightMargin: dock.alignment === "end" ? dock.padding : 0
+        // Always anchored left with a computed margin (see background's
+        // comment above for why this is more reliable than switching
+        // between left/right/horizontalCenter anchor lines at runtime).
+        anchors.leftMargin: {
+            if (dock.alignment === "start") return dock.padding
+            if (dock.alignment === "end") return Math.max(dock.padding, parent.width - width - dock.padding)
+            return Math.max(dock.padding, Math.round((parent.width - width) / 2))
+        }
         spacing: dock.itemSpacing
 
         Repeater {
@@ -144,12 +155,16 @@ Item {
     Column {
         id: contentColumn
         visible: !dock.isHorizontal
+        anchors.top: parent.top
         anchors.horizontalCenter: parent.horizontalCenter
-        anchors.top: dock.alignment === "start" ? parent.top : undefined
-        anchors.bottom: dock.alignment === "end" ? parent.bottom : undefined
-        anchors.verticalCenter: dock.alignment === "center" ? parent.verticalCenter : undefined
-        anchors.topMargin: dock.alignment === "start" ? dock.padding : 0
-        anchors.bottomMargin: dock.alignment === "end" ? dock.padding : 0
+        // Always anchored top with a computed margin (see background's
+        // comment above for why this is more reliable than switching
+        // between top/bottom/verticalCenter anchor lines at runtime).
+        anchors.topMargin: {
+            if (dock.alignment === "start") return dock.padding
+            if (dock.alignment === "end") return Math.max(dock.padding, parent.height - height - dock.padding)
+            return Math.max(dock.padding, Math.round((parent.height - height) / 2))
+        }
         spacing: dock.itemSpacing
 
         Repeater {
