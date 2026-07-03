@@ -17,6 +17,8 @@ Rectangle {
     border.color: Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.35)
     antialiasing: true
     clip: true
+    layer.enabled: !embedded
+    layer.effect: WidgetShadowEffect {}
     
     property bool isVisible: false
     property var settings: ({})
@@ -509,6 +511,9 @@ SETTINGSEOF`
                 root.hyprRounding = value
                 ThemeManager.hyprRounding = value
             }
+            if (field === "shadowRange") {
+                ThemeManager.hyprShadowRange = value
+            }
         }
     }
 
@@ -537,6 +542,8 @@ SETTINGSEOF`
         root.settings.hypr.shadowAlpha = hyprShadowAlphaObj.value
         root.settings.hypr.shadowUseAccent = hyprShadowAccentCheck.checked
         saveSettings()
+        ThemeManager.hyprShadowAlpha = hyprShadowAlphaObj.value
+        ThemeManager.hyprShadowUseAccent = hyprShadowAccentCheck.checked
     }
     
     function applyTheme(themeName) {

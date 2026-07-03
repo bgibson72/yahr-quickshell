@@ -57,6 +57,9 @@ QtObject {
     property bool barLarge: true
     property string uiFont: "Inter"
     property int hyprRounding: 12
+    property int hyprShadowRange: 20
+    property int hyprShadowAlpha: 33
+    property bool hyprShadowUseAccent: false
     property bool showWidgetBorders: false
     property int widgetBorderWidth: 3
     property string workspaceStyle: "dots"

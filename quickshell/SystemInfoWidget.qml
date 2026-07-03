@@ -12,6 +12,8 @@ Rectangle {
     border.width: ThemeManager.showWidgetBorders ? ThemeManager.widgetBorderWidth : 0
     border.color: Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.35)
     antialiasing: true
+    layer.enabled: true
+    layer.effect: WidgetShadowEffect {}
     
     property bool isVisible: false
     property bool enableBlur: false

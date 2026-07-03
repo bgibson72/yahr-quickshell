@@ -59,6 +59,9 @@ HYPR_ROUNDING="12"
 SHOW_WIDGET_BORDERS="true"
 WIDGET_BORDER_WIDTH="1"
 WORKSPACE_STYLE="numbers"
+SHADOW_RANGE="20"
+SHADOW_ALPHA="33"
+SHADOW_USE_ACCENT="false"
 if [[ -f "$SETTINGS_FILE" ]]; then
     wo=$(python3 -c "import json; d=json.load(open('$SETTINGS_FILE')); print(d.get('general',{}).get('widgetTransparent', True) and 0.75 or 1.0)" 2>/dev/null)
     [[ -n "$wo" ]] && WIDGET_OPACITY="$wo"
@@ -74,6 +77,12 @@ if [[ -f "$SETTINGS_FILE" ]]; then
     [[ -n "$wbw" ]] && WIDGET_BORDER_WIDTH="$wbw"
     ws=$(python3 -c "import json; d=json.load(open('$SETTINGS_FILE')); print(d.get('bar',{}).get('workspaceStyle','numbers'))" 2>/dev/null)
     [[ -n "$ws" ]] && WORKSPACE_STYLE="$ws"
+    sr=$(python3 -c "import json; d=json.load(open('$SETTINGS_FILE')); print(d.get('hypr',{}).get('shadowRange',20))" 2>/dev/null)
+    [[ -n "$sr" ]] && SHADOW_RANGE="$sr"
+    sa=$(python3 -c "import json; d=json.load(open('$SETTINGS_FILE')); print(d.get('hypr',{}).get('shadowAlpha',33))" 2>/dev/null)
+    [[ -n "$sa" ]] && SHADOW_ALPHA="$sa"
+    sua=$(python3 -c "import json; d=json.load(open('$SETTINGS_FILE')); print('true' if d.get('hypr',{}).get('shadowUseAccent',False) else 'false')" 2>/dev/null)
+    [[ -n "$sua" ]] && SHADOW_USE_ACCENT="$sua"
 fi
 # Append properties if not already present, or update them
 if grep -q "widgetOpacity" "$TARGET"; then
@@ -110,6 +119,21 @@ if grep -q "workspaceStyle" "$TARGET"; then
     sed -i "s/property string workspaceStyle:.*/property string workspaceStyle: \"$WORKSPACE_STYLE\"/" "$TARGET"
 else
     sed -i "/^}$/i\\    property string workspaceStyle: \"$WORKSPACE_STYLE\"" "$TARGET"
+fi
+if grep -q "hyprShadowRange" "$TARGET"; then
+    sed -i "s/property int hyprShadowRange:.*/property int hyprShadowRange: $SHADOW_RANGE/" "$TARGET"
+else
+    sed -i "/^}$/i\\    property int hyprShadowRange: $SHADOW_RANGE" "$TARGET"
+fi
+if grep -q "hyprShadowAlpha" "$TARGET"; then
+    sed -i "s/property int hyprShadowAlpha:.*/property int hyprShadowAlpha: $SHADOW_ALPHA/" "$TARGET"
+else
+    sed -i "/^}$/i\\    property int hyprShadowAlpha: $SHADOW_ALPHA" "$TARGET"
+fi
+if grep -q "hyprShadowUseAccent" "$TARGET"; then
+    sed -i "s/property bool hyprShadowUseAccent:.*/property bool hyprShadowUseAccent: $SHADOW_USE_ACCENT/" "$TARGET"
+else
+    sed -i "/^}$/i\\    property bool hyprShadowUseAccent: $SHADOW_USE_ACCENT" "$TARGET"
 fi
 
 echo -e "${GREEN}✓ Theme switched to: $THEME${NC}"

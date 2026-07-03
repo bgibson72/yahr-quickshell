@@ -127,6 +127,15 @@ Item {
                         bar.hyprRounding = settings.hypr.rounding
                         ThemeManager.hyprRounding = settings.hypr.rounding
                     }
+                    if (settings.hypr && settings.hypr.shadowRange !== undefined) {
+                        ThemeManager.hyprShadowRange = settings.hypr.shadowRange
+                    }
+                    if (settings.hypr && settings.hypr.shadowAlpha !== undefined) {
+                        ThemeManager.hyprShadowAlpha = settings.hypr.shadowAlpha
+                    }
+                    if (settings.hypr && settings.hypr.shadowUseAccent !== undefined) {
+                        ThemeManager.hyprShadowUseAccent = settings.hypr.shadowUseAccent
+                    }
                 } catch (e) {
                     console.log("🎨 Error parsing bar settings:", e)
                 }
