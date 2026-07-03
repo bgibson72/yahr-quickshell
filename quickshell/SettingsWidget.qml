@@ -5719,6 +5719,64 @@ MouseArea {
                                         property string value: root.settings.dock && root.settings.dock.alignment ? root.settings.dock.alignment : "center"
                                     }
                                 }
+
+                                // Span full width toggle
+                                Row {
+                                    spacing: 12
+
+                                    Rectangle {
+                                        width: 48
+                                        height: 24
+                                        radius: 12
+                                        color: dockSpanCheck.checked ? ThemeManager.accentGreen : Qt.rgba(1, 1, 1, 0.07)
+                                        Behavior on color { ColorAnimation { duration: 150 } }
+
+                                        Rectangle {
+                                            width: 18
+                                            height: 18
+                                            radius: 9
+                                            color: ThemeManager.fgPrimary
+                                            x: dockSpanCheck.checked ? parent.width - width - 3 : 3
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            Behavior on x { NumberAnimation { duration: 200 } }
+                                        }
+
+                                        MouseArea {
+                                            anchors.fill: parent
+                                            cursorShape: Qt.PointingHandCursor
+                                            onClicked: {
+                                                dockSpanCheck.checked = !dockSpanCheck.checked
+                                                if (!root.settings.dock) root.settings.dock = {}
+                                                root.settings.dock.spanFullWidth = dockSpanCheck.checked
+                                                saveSettings()
+                                            }
+                                        }
+                                    }
+
+                                    Column {
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        spacing: 2
+                                        Text {
+                                            text: "Span full width/height"
+                                            font.family: ThemeManager.uiFont
+                                            font.pixelSize: 12
+                                            color: ThemeManager.fgPrimary
+                                        }
+                                        Text {
+                                            text: "Taskbar-style background across the whole edge, instead of hugging just the icons"
+                                            font.family: ThemeManager.uiFont
+                                            font.pixelSize: 10
+                                            color: ThemeManager.fgSecondary
+                                            wrapMode: Text.WordWrap
+                                            width: 260
+                                        }
+                                    }
+
+                                    QtObject {
+                                        id: dockSpanCheck
+                                        property bool checked: root.settings.dock ? root.settings.dock.spanFullWidth === true : false
+                                    }
+                                }
                             }
                         }
 

@@ -39,6 +39,7 @@
     "showBorder": false,
     "iconSize": 48,
     "behavior": "always-on-top",
+    "spanFullWidth": false,
     "pinned": []
   }
 }

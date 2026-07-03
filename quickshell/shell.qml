@@ -40,10 +40,18 @@ ShellRoot {
     property real dockOpacity: 0.70
     property bool dockShowBorder: false
     property int dockIconSize: 48
+    property bool dockSpanFullWidth: false
     property var dockPinnedApps: []
     property bool dockPickerVisible: false
     property string dockBehavior: "always-on-top"  // "always-on-top" | "behind-windows" | "dodge" | "auto-hide"
     property bool dockHovered: false
+    // Timestamp (Date.now()) at which the dock should auto-hide again after
+    // the cursor moves away; 0 means no hide is scheduled. Using a plain
+    // property + timestamp (checked each poll) instead of a shared Timer id,
+    // since Timer ids declared at shellRoot scope are not reliably reachable
+    // via shellRoot.<id> from inside Variants-generated PanelWindow instances
+    // (confirmed via a runtime TypeError: "Cannot read property of undefined").
+    property real dockHideAt: 0
 
     // Persist the dock's pinned-apps list to settings.json without clobbering
     // other settings keys — reads the file fresh, merges, writes it back.
@@ -75,17 +83,6 @@ ShellRoot {
             Quickshell.execDetached(["kitty", "-e", "sh", "-c", execCmd])
         else
             Quickshell.execDetached(["sh", "-c", execCmd])
-    }
-
-    // Debounced hide timer for dock auto-hide — keeps the dock revealed
-    // briefly after the cursor leaves, so moving from the reveal strip onto
-    // the dock itself (or briefly off it) doesn't cause flicker. Shared at
-    // shellRoot scope since the main dock and its reveal strip are separate
-    // PanelWindow instances (in separate Variants blocks).
-    Timer {
-        id: dockHideTimer
-        interval: 400
-        onTriggered: shellRoot.dockHovered = false
     }
 
     
@@ -137,6 +134,7 @@ ShellRoot {
                         if (settings.dock.opacity !== undefined) shellRoot.dockOpacity = settings.dock.opacity
                         if (settings.dock.showBorder !== undefined) shellRoot.dockShowBorder = settings.dock.showBorder
                         if (settings.dock.iconSize !== undefined) shellRoot.dockIconSize = settings.dock.iconSize
+                        if (settings.dock.spanFullWidth !== undefined) shellRoot.dockSpanFullWidth = settings.dock.spanFullWidth
                         if (settings.dock.pinned !== undefined && Date.now() >= shellRoot.dockPinnedSaveGuardUntil) {
                             shellRoot.dockPinnedApps = settings.dock.pinned
                         }
@@ -1237,6 +1235,7 @@ ShellRoot {
                 dockOpacity: shellRoot.dockOpacity
                 showBorder: shellRoot.dockShowBorder
                 iconSize: shellRoot.dockIconSize
+                spanFullWidth: shellRoot.dockSpanFullWidth
                 pinnedApps: shellRoot.dockPinnedApps
 
                 onLaunchRequested: (execCmd, needsTerminal) => shellRoot.launchDockApp(execCmd, needsTerminal)
@@ -1247,55 +1246,70 @@ ShellRoot {
                 onPinPickerRequested: shellRoot.dockPickerVisible = true
             }
 
-            MouseArea {
-                anchors.fill: parent
-                hoverEnabled: true
-                enabled: shellRoot.dockBehavior === "auto-hide"
-                propagateComposedEvents: true
-                z: 100
-                onEntered: { shellRoot.dockHideTimer.stop(); shellRoot.dockHovered = true }
-                onExited: shellRoot.dockHideTimer.start()
-                onClicked: function(mouse) { mouse.accepted = false }
+            // Auto-hide reveal detection via polling the compositor's actual
+            // cursor position (hyprctl cursorpos) rather than relying on
+            // Wayland layer-shell surface hover events. This sidesteps any
+            // input-region/z-order edge cases with a paper-thin always-on-top
+            // reveal strip and reliably detects proximity to the dock's edge
+            // even while it's fully off-screen and other windows are focused.
+            Process {
+                id: cursorPosChecker
+                running: false
+                command: ["hyprctl", "cursorpos", "-j"]
+                property string buffer: ""
+                stdout: SplitParser {
+                    onRead: data => { cursorPosChecker.buffer += data }
+                }
+                onRunningChanged: {
+                    if (!running && buffer !== "") {
+                        try {
+                            const pos = JSON.parse(buffer)
+                            const thickness = (shellRoot.dockIconSize + 20)
+                            const revealThreshold = 20
+                            const hideThreshold = thickness + 40
+                            let distanceFromEdge
+                            switch (shellRoot.dockPosition) {
+                                case "top": distanceFromEdge = pos.y; break
+                                case "bottom": distanceFromEdge = screen.height - pos.y; break
+                                case "left": distanceFromEdge = pos.x; break
+                                case "right": distanceFromEdge = screen.width - pos.x; break
+                                default: distanceFromEdge = 9999
+                            }
+                            if (distanceFromEdge <= revealThreshold) {
+                                // Close/approaching — reveal immediately and
+                                // cancel any pending hide.
+                                shellRoot.dockHideAt = 0
+                                shellRoot.dockHovered = true
+                            } else if (shellRoot.dockHovered && distanceFromEdge > hideThreshold) {
+                                // Far enough away — schedule a debounced hide
+                                // (only once; don't keep pushing it back).
+                                if (shellRoot.dockHideAt === 0) {
+                                    shellRoot.dockHideAt = Date.now() + 400
+                                }
+                            } else if (distanceFromEdge <= hideThreshold) {
+                                // Still within the dock's own footprint — stay revealed.
+                                shellRoot.dockHideAt = 0
+                            }
+                            if (shellRoot.dockHideAt !== 0 && Date.now() >= shellRoot.dockHideAt) {
+                                shellRoot.dockHovered = false
+                                shellRoot.dockHideAt = 0
+                            }
+                        } catch (e) {}
+                        buffer = ""
+                    } else if (running) {
+                        buffer = ""
+                    }
+                }
+            }
+
+            Timer {
+                interval: 150
+                running: shellRoot.dockBehavior === "auto-hide" && shellRoot.dockEnabled
+                repeat: true
+                onTriggered: cursorPosChecker.running = true
             }
         }
     }
-
-    // Thin always-visible reveal strip for auto-hide mode — since the main
-    // dock PanelWindow slides fully off-screen when hidden, a persistent
-    // strip at the true screen edge is needed to detect approach and
-    // trigger the reveal.
-    Variants {
-        model: Quickshell.screens
-
-        PanelWindow {
-            property var modelData
-            screen: modelData
-            WlrLayershell.namespace: "yahr-dock-reveal"
-            WlrLayershell.layer: WlrLayer.Overlay
-            visible: shellRoot.dockEnabled && shellRoot.dockBehavior === "auto-hide" && !shellRoot.dockHovered
-            color: "transparent"
-            exclusiveZone: 0
-
-            readonly property bool isHorizontal: shellRoot.dockPosition === "top" || shellRoot.dockPosition === "bottom"
-
-            anchors {
-                top: shellRoot.dockPosition === "top" || !isHorizontal
-                bottom: shellRoot.dockPosition === "bottom" || !isHorizontal
-                left: shellRoot.dockPosition === "left" || isHorizontal
-                right: shellRoot.dockPosition === "right" || isHorizontal
-            }
-
-            implicitWidth: isHorizontal ? undefined : 6
-            implicitHeight: isHorizontal ? 6 : undefined
-
-            MouseArea {
-                anchors.fill: parent
-                hoverEnabled: true
-                onEntered: { shellRoot.dockHideTimer.stop(); shellRoot.dockHovered = true }
-            }
-        }
-    }
-
 
     // Dock app picker popup
     Variants {

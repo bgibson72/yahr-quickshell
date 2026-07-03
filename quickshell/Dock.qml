@@ -17,6 +17,13 @@ Item {
     property real dockOpacity: 0.70
     property bool showBorder: false
     property int iconSize: 48
+    // When true, the dock's visible background/chrome spans the full length
+    // of its screen edge (taskbar-style) regardless of alignment. When
+    // false (default), the chrome hugs just the pinned icons, positioned
+    // per `alignment` — independent of whether the underlying window itself
+    // happens to span the full edge (required in "dodge" mode for Hyprland
+    // to honor the reserved space, per the wlr-layer-shell protocol).
+    property bool spanFullWidth: false
     // Each entry: { name, icon, exec, terminal, desktopId }
     property var pinnedApps: []
 
@@ -68,7 +75,6 @@ Item {
     // ---- Background ----
     Rectangle {
         id: background
-        anchors.fill: parent
         radius: dock.floating ? dock.hyprBorderSize + 11 : 0
         color: {
             if (dock.backgroundStyle === "transparent") return "transparent"
@@ -77,6 +83,22 @@ Item {
         }
         border.width: dock.showBorder ? dock.hyprBorderSize : 0
         border.color: Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.45)
+
+        // Full-span chrome: fills the whole window (taskbar-style)
+        anchors.fill: dock.spanFullWidth ? parent : undefined
+
+        // Compact chrome: sized to wrap just the content, positioned per
+        // `alignment` — mirrors the Row/Column anchoring below exactly, so
+        // the background always matches where the icons actually are, even
+        // when the underlying window spans the full edge (dodge mode).
+        width: dock.spanFullWidth ? undefined : (dock.isHorizontal ? contentRow.width + dock.padding * 2 : dock.iconSize + 20)
+        height: dock.spanFullWidth ? undefined : (dock.isHorizontal ? dock.iconSize + 20 : contentColumn.height + dock.padding * 2)
+        anchors.verticalCenter: (!dock.spanFullWidth && dock.isHorizontal) ? parent.verticalCenter : undefined
+        anchors.horizontalCenter: (!dock.spanFullWidth && !dock.isHorizontal) ? parent.horizontalCenter : undefined
+        anchors.left: (!dock.spanFullWidth && dock.isHorizontal && dock.alignment === "start") ? parent.left : undefined
+        anchors.right: (!dock.spanFullWidth && dock.isHorizontal && dock.alignment === "end") ? parent.right : undefined
+        anchors.top: (!dock.spanFullWidth && !dock.isHorizontal && dock.alignment === "start") ? parent.top : undefined
+        anchors.bottom: (!dock.spanFullWidth && !dock.isHorizontal && dock.alignment === "end") ? parent.bottom : undefined
 
         // Accent line when docked (edge-to-edge) without a border, matching Bar.qml's convention
         Rectangle {
