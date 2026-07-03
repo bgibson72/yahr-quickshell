@@ -12,18 +12,19 @@ import QtQuick.Effects
 // values) reads as a fairly dense, saturated band close to the window edge
 // rather than a soft, spread-out blur. Qt's MultiEffect shadow is a gaussian
 // blur by nature, so to look consistent with Hyprland's windows at the same
-// settings we intentionally keep the blur radius tight (a smaller fraction
-// of shadowRange than the raw pixel distance) and boost the color's
-// perceived density, rather than mapping range/alpha 1:1 into blur/opacity.
+// settings we boost the color's perceived density a bit rather than mapping
+// alpha 1:1. shadowScale is intentionally left at its default (1.0) — scaling
+// the silhouette up before blurring produces a hard-edged enlarged outline
+// (looks like a solid thick border) instead of a soft gradient fading outward
+// from the widget's actual edge.
 MultiEffect {
     shadowEnabled: true
     shadowColor: Qt.rgba(
         ThemeManager.hyprShadowUseAccent ? ThemeManager.accentBlue.r : 0,
         ThemeManager.hyprShadowUseAccent ? ThemeManager.accentBlue.g : 0,
         ThemeManager.hyprShadowUseAccent ? ThemeManager.accentBlue.b : 0,
-        Math.min(1, ThemeManager.hyprShadowAlpha / 100 * 1.6))
-    shadowBlur: Math.min(0.65, ThemeManager.hyprShadowRange / 110)
-    shadowScale: 1 + ThemeManager.hyprShadowRange / 150
+        Math.min(1, ThemeManager.hyprShadowAlpha / 100 * 1.15))
+    shadowBlur: Math.min(1, 0.55 + ThemeManager.hyprShadowRange / 70)
     shadowHorizontalOffset: 0
     shadowVerticalOffset: 0
 }
