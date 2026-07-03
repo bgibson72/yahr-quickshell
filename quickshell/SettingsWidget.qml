@@ -43,6 +43,9 @@ Rectangle {
     property bool hyprShadow: true
     property bool hyprBlur: true
     property int hyprBlurSize: 10
+    property int hyprShadowRange: 20
+    property int hyprShadowAlpha: 33
+    property bool hyprShadowUseAccent: false
     
     signal closeRequested()
     signal settingsUpdated()  // Signal to notify when settings change
@@ -349,6 +352,9 @@ SETTINGSEOF`
             if (h.shadow     !== undefined) hyprShadowCheck.checked   = h.shadow
             if (h.blur       !== undefined) hyprBlurCheck.checked     = h.blur
             if (h.blurSize   !== undefined) hyprBlurSizeObj.value     = h.blurSize
+            if (h.shadowRange     !== undefined) hyprShadowRangeObj.value = h.shadowRange
+            if (h.shadowAlpha     !== undefined) hyprShadowAlphaObj.value = h.shadowAlpha
+            if (h.shadowUseAccent !== undefined) hyprShadowAccentCheck.checked = h.shadowUseAccent
         }
     }
     
@@ -492,7 +498,8 @@ SETTINGSEOF`
             "decoration:rounding":   "rounding",
             "general:gaps_in":       "gapsIn",
             "general:gaps_out":      "gapsOut",
-            "decoration:blur:size":  "blurSize"
+            "decoration:blur:size":  "blurSize",
+            "decoration:shadow:range": "shadowRange"
         }
         var field = keyMap[hyprKey]
         if (field !== undefined) {
@@ -503,6 +510,33 @@ SETTINGSEOF`
                 ThemeManager.hyprRounding = value
             }
         }
+    }
+
+    // Builds a Hyprland "rgba(RRGGBBAA)" color string — this Lua-config setup
+    // (see appearance.lua) represents colors as plain strings containing this
+    // syntax, which the Lua config layer parses specially.
+    function colorToHex(c) {
+        const r = Math.round(c.r * 255).toString(16).padStart(2, "0")
+        const g = Math.round(c.g * 255).toString(16).padStart(2, "0")
+        const b = Math.round(c.b * 255).toString(16).padStart(2, "0")
+        return r + g + b
+    }
+
+    function buildShadowColor(useAccent, alphaPct) {
+        const rgb = useAccent ? colorToHex(ThemeManager.accentBlue) : "000000"
+        const alphaHex = Math.round((alphaPct / 100) * 255).toString(16).padStart(2, "0")
+        return "rgba(" + rgb + alphaHex + ")"
+    }
+
+    // Applies the shadow's color (glow color + transparency) live and
+    // persists both components to settings.json.
+    function applyShadowColor() {
+        const colorStr = buildShadowColor(hyprShadowAccentCheck.checked, hyprShadowAlphaObj.value)
+        Quickshell.execDetached(["hyprctl", "eval", 'hl.config({decoration={shadow={color="' + colorStr + '"}}})'])
+        if (!root.settings.hypr) root.settings.hypr = {}
+        root.settings.hypr.shadowAlpha = hyprShadowAlphaObj.value
+        root.settings.hypr.shadowUseAccent = hyprShadowAccentCheck.checked
+        saveSettings()
     }
     
     function applyTheme(themeName) {
@@ -4079,6 +4113,200 @@ MouseArea {
                                 QtObject {
                                     id: hyprShadowCheck
                                     property bool checked: true
+                                }
+                            }
+
+                            // Shadow glow color
+                            Row {
+                                spacing: 12
+
+                                Rectangle {
+                                    width: 48
+                                    height: 24
+                                    radius: 12
+                                    color: hyprShadowAccentCheck.checked ? ThemeManager.accentGreen : Qt.rgba(1, 1, 1, 0.07)
+                                    Behavior on color { ColorAnimation { duration: 150 } }
+
+                                    Rectangle {
+                                        width: 18
+                                        height: 18
+                                        radius: 9
+                                        color: ThemeManager.fgPrimary
+                                        x: hyprShadowAccentCheck.checked ? parent.width - width - 3 : 3
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        Behavior on x { NumberAnimation { duration: 200 } }
+                                    }
+
+                                    MouseArea {
+                                        anchors.fill: parent
+                                        cursorShape: Qt.PointingHandCursor
+                                        onClicked: {
+                                            hyprShadowAccentCheck.checked = !hyprShadowAccentCheck.checked
+                                            applyShadowColor()
+                                        }
+                                    }
+                                }
+
+                                Column {
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    spacing: 2
+                                    Text {
+                                        text: "Colored glow (use theme accent)"
+                                        font.family: ThemeManager.uiFont
+                                        font.pixelSize: 12
+                                        color: ThemeManager.fgPrimary
+                                    }
+                                    Text {
+                                        text: "Hyprland shadows accept any color \u2014 this tints the shadow with the current theme's accent instead of plain black, for a glow-like effect"
+                                        font.family: ThemeManager.uiFont
+                                        font.pixelSize: 10
+                                        color: ThemeManager.fgSecondary
+                                        wrapMode: Text.WordWrap
+                                        width: 280
+                                    }
+                                }
+
+                                QtObject {
+                                    id: hyprShadowAccentCheck
+                                    property bool checked: false
+                                }
+                            }
+
+                            // Shadow distance
+                            Column {
+                                spacing: 8
+                                width: parent.width - 20
+
+                                Text {
+                                    text: "Shadow distance: " + hyprShadowRangeObj.value + "px"
+                                    font.family: ThemeManager.uiFont
+                                    font.pixelSize: 12
+                                    color: ThemeManager.fgPrimary
+                                }
+
+                                Item {
+                                    width: parent.width - 40
+                                    height: 32
+
+                                    Rectangle {
+                                        id: shadowRangeTrack
+                                        anchors.centerIn: parent
+                                        width: parent.width
+                                        height: 6
+                                        radius: 3
+                                        color: Qt.rgba(1, 1, 1, 0.07)
+
+                                        Rectangle {
+                                            width: shadowRangeHandle.x + shadowRangeHandle.width / 2
+                                            height: parent.height
+                                            radius: parent.radius
+                                            color: ThemeManager.accentBlue
+                                        }
+                                    }
+
+                                    Rectangle {
+                                        id: shadowRangeHandle
+                                        width: 20
+                                        height: 20
+                                        radius: 10
+                                        color: shadowRangeMA.containsMouse || shadowRangeMA.pressed ? ThemeManager.accentBlue : ThemeManager.fgPrimary
+                                        border.width: 2
+                                        border.color: ThemeManager.accentBlue
+                                        y: (parent.height - height) / 2
+                                        x: (shadowRangeTrack.width - width) * (hyprShadowRangeObj.value / 60.0)
+                                        Behavior on color { ColorAnimation { duration: 150 } }
+                                    }
+
+                                    MouseArea {
+                                        id: shadowRangeMA
+                                        anchors.fill: parent
+                                        hoverEnabled: true
+                                        cursorShape: Qt.PointingHandCursor
+
+                                        function updateVal(mouse) {
+                                            const norm = Math.max(0, Math.min(1, mouse.x / width))
+                                            const val = Math.round(norm * 60)
+                                            hyprShadowRangeObj.value = val
+                                            root.applyHypr("decoration:shadow:range", val,
+                                                `sed -i -E 's/range = [0-9]+/range = ${val}/'`)
+                                        }
+
+                                        onPressed: updateVal(mouse)
+                                        onPositionChanged: if (pressed) updateVal(mouse)
+                                    }
+                                }
+
+                                QtObject {
+                                    id: hyprShadowRangeObj
+                                    property int value: 20
+                                }
+                            }
+
+                            // Shadow transparency
+                            Column {
+                                spacing: 8
+                                width: parent.width - 20
+
+                                Text {
+                                    text: "Shadow transparency: " + hyprShadowAlphaObj.value + "%"
+                                    font.family: ThemeManager.uiFont
+                                    font.pixelSize: 12
+                                    color: ThemeManager.fgPrimary
+                                }
+
+                                Item {
+                                    width: parent.width - 40
+                                    height: 32
+
+                                    Rectangle {
+                                        id: shadowAlphaTrack
+                                        anchors.centerIn: parent
+                                        width: parent.width
+                                        height: 6
+                                        radius: 3
+                                        color: Qt.rgba(1, 1, 1, 0.07)
+
+                                        Rectangle {
+                                            width: shadowAlphaHandle.x + shadowAlphaHandle.width / 2
+                                            height: parent.height
+                                            radius: parent.radius
+                                            color: ThemeManager.accentBlue
+                                        }
+                                    }
+
+                                    Rectangle {
+                                        id: shadowAlphaHandle
+                                        width: 20
+                                        height: 20
+                                        radius: 10
+                                        color: shadowAlphaMA.containsMouse || shadowAlphaMA.pressed ? ThemeManager.accentBlue : ThemeManager.fgPrimary
+                                        border.width: 2
+                                        border.color: ThemeManager.accentBlue
+                                        y: (parent.height - height) / 2
+                                        x: (shadowAlphaTrack.width - width) * (hyprShadowAlphaObj.value / 100.0)
+                                        Behavior on color { ColorAnimation { duration: 150 } }
+                                    }
+
+                                    MouseArea {
+                                        id: shadowAlphaMA
+                                        anchors.fill: parent
+                                        hoverEnabled: true
+                                        cursorShape: Qt.PointingHandCursor
+
+                                        function updateVal(mouse) {
+                                            const norm = Math.max(0, Math.min(1, mouse.x / width))
+                                            hyprShadowAlphaObj.value = Math.round(norm * 100)
+                                            applyShadowColor()
+                                        }
+
+                                        onPressed: updateVal(mouse)
+                                        onPositionChanged: if (pressed) updateVal(mouse)
+                                    }
+                                }
+
+                                QtObject {
+                                    id: hyprShadowAlphaObj
+                                    property int value: 33
                                 }
                             }
 
