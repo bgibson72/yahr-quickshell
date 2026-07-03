@@ -41,9 +41,18 @@ Rectangle {
     property int brightness: 50
     
     focus: true
-    
+
     Keys.onEscapePressed: {
         root.requestClose()
+    }
+
+    // Consume clicks anywhere within the panel so they don't propagate
+    // through to the full-screen background overlay's click-to-close
+    // handler (see shell.qml) — otherwise clicking empty/non-interactive
+    // space inside the panel would immediately close it.
+    MouseArea {
+        anchors.fill: parent
+        onClicked: {}
     }
 
     onIsVisibleChanged: {
@@ -77,58 +86,7 @@ Rectangle {
         anchors.margins: 16
         anchors.bottomMargin: 26
         spacing: 16
-        
-        // Header
-        Item {
-            width: parent.width
-            height: 44
-            
-            Text {
-                anchors.left: parent.left
-                anchors.verticalCenter: parent.verticalCenter
-                text: "Control Center"
-                font.family: ThemeManager.uiFont
-                font.pixelSize: 20
-                font.weight: Font.Bold
-                color: ThemeManager.fgPrimary
-            }
-            
-            // Close button
-            Rectangle {
-                anchors.right: parent.right
-                anchors.verticalCenter: parent.verticalCenter
-                width: 32
-                height: 32
-                radius: 6
-                color: closeMouseArea.containsMouse ? Qt.rgba(ThemeManager.accentRed.r, ThemeManager.accentRed.g, ThemeManager.accentRed.b, 0.30) : Qt.rgba(1,1,1,0.08)
-                border.width: 1
-                border.color: closeMouseArea.containsMouse ? Qt.rgba(ThemeManager.accentRed.r, ThemeManager.accentRed.g, ThemeManager.accentRed.b, 0.5) : Qt.rgba(1,1,1,0.18)
-                z: 1000
 
-                Behavior on color { ColorAnimation { duration: 150 } }
-
-                Text {
-                    anchors.centerIn: parent
-                    text: "\u2715"
-                    font.family: "Symbols Nerd Font"
-                    font.pixelSize: 13
-                    color: closeMouseArea.containsMouse ? ThemeManager.accentRed : ThemeManager.fgSecondary
-                    Behavior on color { ColorAnimation { duration: 150 } }
-                }
-
-                MouseArea {
-                    id: closeMouseArea
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
-                    propagateComposedEvents: false
-                    onClicked: {
-                        console.log("Close button clicked")
-                        root.requestClose()
-                    }
-                }
-            }
-        }
         
         // WiFi Section
         Rectangle {
@@ -330,8 +288,9 @@ Rectangle {
                     }
                 }
                 
-                // Volume slider
+                // Volume slider — click or drag to set an absolute level
                 Rectangle {
+                    id: volumeSliderTrack
                     width: parent.width
                     height: 8
                     color: Qt.rgba(1, 1, 1, 0.07)
@@ -342,6 +301,23 @@ Rectangle {
                         height: parent.height
                         color: root.muted ? ThemeManager.fgTertiary : ThemeManager.accentBlue
                         radius: 4
+                    }
+
+                    MouseArea {
+                        anchors.fill: parent
+                        anchors.topMargin: -8
+                        anchors.bottomMargin: -8
+                        cursorShape: Qt.PointingHandCursor
+
+                        function updateVolume(mx) {
+                            const pct = Math.max(0, Math.min(100, Math.round((mx / volumeSliderTrack.width) * 100)))
+                            root.volume = pct
+                            setVolumeProcess.command = ["sh", "-c", "pactl set-sink-volume @DEFAULT_SINK@ " + pct + "%"]
+                            setVolumeProcess.running = true
+                        }
+
+                        onPressed: mouse => updateVolume(mouse.x)
+                        onPositionChanged: mouse => { if (pressed) updateVolume(mouse.x) }
                     }
                 }
                 
@@ -602,8 +578,9 @@ Rectangle {
                     }
                 }
                 
-                // Brightness slider
+                // Brightness slider — click or drag to set an absolute level
                 Rectangle {
+                    id: brightnessSliderTrack
                     width: parent.width
                     height: 8
                     color: Qt.rgba(1, 1, 1, 0.07)
@@ -614,6 +591,23 @@ Rectangle {
                         height: parent.height
                         color: ThemeManager.accentYellow
                         radius: 4
+                    }
+
+                    MouseArea {
+                        anchors.fill: parent
+                        anchors.topMargin: -8
+                        anchors.bottomMargin: -8
+                        cursorShape: Qt.PointingHandCursor
+
+                        function updateBrightness(mx) {
+                            const pct = Math.max(1, Math.min(100, Math.round((mx / brightnessSliderTrack.width) * 100)))
+                            root.brightness = pct
+                            setBrightnessProcess.command = ["sh", "-c", "brightnessctl set " + pct + "%"]
+                            setBrightnessProcess.running = true
+                        }
+
+                        onPressed: mouse => updateBrightness(mouse.x)
+                        onPositionChanged: mouse => { if (pressed) updateBrightness(mouse.x) }
                     }
                 }
                 
@@ -792,6 +786,14 @@ Rectangle {
         id: volumeMuteProcess
         running: false
         command: ["sh", "-c", "pactl set-sink-mute @DEFAULT_SINK@ toggle"]
+        onRunningChanged: if (!running) volumeUpdateTimer.restart()
+    }
+
+    // Set an absolute volume level (used by the draggable slider)
+    Process {
+        id: setVolumeProcess
+        running: false
+        command: ["sh", "-c", "pactl set-sink-volume @DEFAULT_SINK@ 50%"]
         onRunningChanged: if (!running) volumeUpdateTimer.restart()
     }
     
@@ -1194,6 +1196,14 @@ Rectangle {
         id: brightnessDownProcess
         running: false
         command: ["sh", "-c", "brightnessctl set 5%-"]
+        onRunningChanged: if (!running) brightnessUpdateTimer.restart()
+    }
+
+    // Set an absolute brightness level (used by the draggable slider)
+    Process {
+        id: setBrightnessProcess
+        running: false
+        command: ["sh", "-c", "brightnessctl set 50%"]
         onRunningChanged: if (!running) brightnessUpdateTimer.restart()
     }
     
