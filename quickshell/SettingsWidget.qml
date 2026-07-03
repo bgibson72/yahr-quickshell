@@ -5335,6 +5335,89 @@ MouseArea {
                                     }
                                 }
 
+                                // Dock behavior picker
+                                Column {
+                                    spacing: 10
+                                    width: parent.width
+
+                                    Text {
+                                        text: "Window behavior"
+                                        font.family: ThemeManager.uiFont
+                                        font.pixelSize: 12
+                                        color: ThemeManager.fgSecondary
+                                    }
+
+                                    Flow {
+                                        width: parent.width
+                                        spacing: 10
+
+                                        Repeater {
+                                            model: [
+                                                { value: "always-on-top", label: "Always on Top", desc: "Dock stays above app windows" },
+                                                { value: "behind-windows", label: "Behind Windows", desc: "App windows can cover the dock" },
+                                                { value: "dodge", label: "Dodge", desc: "Windows shrink to avoid the dock" },
+                                                { value: "auto-hide", label: "Auto-Hide", desc: "Dock hides until you hover the edge" }
+                                            ]
+
+                                            Rectangle {
+                                                width: 150
+                                                height: 52
+                                                radius: 8
+                                                property bool active: dockBehaviorValue.value === modelData.value
+                                                color: active
+                                                    ? Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.30)
+                                                    : Qt.rgba(1, 1, 1, 0.07)
+                                                border.width: 1
+                                                border.color: active
+                                                    ? Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.55)
+                                                    : Qt.rgba(1, 1, 1, 0.12)
+
+                                                Column {
+                                                    anchors.centerIn: parent
+                                                    anchors.margins: 8
+                                                    width: parent.width - 16
+                                                    spacing: 3
+
+                                                    Text {
+                                                        width: parent.width
+                                                        text: modelData.label
+                                                        font.family: ThemeManager.uiFont
+                                                        font.pixelSize: 12
+                                                        font.weight: Font.Medium
+                                                        color: ThemeManager.fgPrimary
+                                                        horizontalAlignment: Text.AlignHCenter
+                                                    }
+                                                    Text {
+                                                        width: parent.width
+                                                        text: modelData.desc
+                                                        font.family: ThemeManager.uiFont
+                                                        font.pixelSize: 9
+                                                        color: ThemeManager.fgTertiary
+                                                        horizontalAlignment: Text.AlignHCenter
+                                                        wrapMode: Text.WordWrap
+                                                    }
+                                                }
+
+                                                MouseArea {
+                                                    anchors.fill: parent
+                                                    cursorShape: Qt.PointingHandCursor
+                                                    onClicked: {
+                                                        if (!root.settings.dock) root.settings.dock = {}
+                                                        dockBehaviorValue.value = modelData.value
+                                                        root.settings.dock.behavior = modelData.value
+                                                        saveSettings()
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    QtObject {
+                                        id: dockBehaviorValue
+                                        property string value: root.settings.dock && root.settings.dock.behavior ? root.settings.dock.behavior : "always-on-top"
+                                    }
+                                }
+
                                 // Show border toggle
                                 Row {
                                     spacing: 12

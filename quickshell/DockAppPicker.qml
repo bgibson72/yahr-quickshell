@@ -171,28 +171,24 @@ Item {
         }
     }
 
-    Component.onCompleted: appLoader.running = true
+    Component.onCompleted: {
+        root.allApps = []
+        appLoader.running = true
+    }
 
     Process {
         id: appLoader
         running: false
         command: [Quickshell.env("HOME") + "/.config/quickshell/scripts/list-apps.sh"]
 
-        property string buffer: ""
-
         stdout: SplitParser {
-            onRead: data => { appLoader.buffer += data }
-        }
-
-        onRunningChanged: {
-            if (!running && buffer !== "") {
-                const lines = buffer.split('\n')
-                const apps = []
+            onRead: data => {
+                const lines = data.split('\n')
                 for (const line of lines) {
                     if (line.trim().length === 0) continue
                     const parts = line.split('|')
                     if (parts.length >= 6) {
-                        apps.push({
+                        root.allApps.push({
                             name: parts[0],
                             icon: parts[2],
                             exec: parts[3],
@@ -201,11 +197,7 @@ Item {
                         })
                     }
                 }
-                root.allApps = apps
                 root.filterApps()
-                buffer = ""
-            } else if (running) {
-                buffer = ""
             }
         }
     }

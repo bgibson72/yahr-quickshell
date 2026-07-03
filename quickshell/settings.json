@@ -38,6 +38,7 @@
     "opacity": 0.70,
     "showBorder": false,
     "iconSize": 48,
+    "behavior": "always-on-top",
     "pinned": []
   }
 }

@@ -42,6 +42,8 @@ ShellRoot {
     property int dockIconSize: 48
     property var dockPinnedApps: []
     property bool dockPickerVisible: false
+    property string dockBehavior: "always-on-top"  // "always-on-top" | "behind-windows" | "dodge" | "auto-hide"
+    property bool dockHovered: false
 
     // Persist the dock's pinned-apps list to settings.json without clobbering
     // other settings keys — reads the file fresh, merges, writes it back.
@@ -65,6 +67,17 @@ ShellRoot {
             Quickshell.execDetached(["kitty", "-e", "sh", "-c", execCmd])
         else
             Quickshell.execDetached(["sh", "-c", execCmd])
+    }
+
+    // Debounced hide timer for dock auto-hide — keeps the dock revealed
+    // briefly after the cursor leaves, so moving from the reveal strip onto
+    // the dock itself (or briefly off it) doesn't cause flicker. Shared at
+    // shellRoot scope since the main dock and its reveal strip are separate
+    // PanelWindow instances (in separate Variants blocks).
+    Timer {
+        id: dockHideTimer
+        interval: 400
+        onTriggered: shellRoot.dockHovered = false
     }
 
     
@@ -117,6 +130,7 @@ ShellRoot {
                         if (settings.dock.showBorder !== undefined) shellRoot.dockShowBorder = settings.dock.showBorder
                         if (settings.dock.iconSize !== undefined) shellRoot.dockIconSize = settings.dock.iconSize
                         if (settings.dock.pinned !== undefined) shellRoot.dockPinnedApps = settings.dock.pinned
+                        if (settings.dock.behavior !== undefined) shellRoot.dockBehavior = settings.dock.behavior
                     }
                     if (settings.general) {
                         const transparent = settings.general.widgetTransparent !== false
@@ -1137,10 +1151,15 @@ ShellRoot {
             property var modelData
             screen: modelData
             WlrLayershell.namespace: "yahr-dock"
+            WlrLayershell.layer: shellRoot.dockBehavior === "behind-windows" ? WlrLayer.Bottom : WlrLayer.Top
 
             visible: shellRoot.dockEnabled
 
             readonly property bool isHorizontal: shellRoot.dockPosition === "top" || shellRoot.dockPosition === "bottom"
+            readonly property bool autoHideActive: shellRoot.dockBehavior === "auto-hide" && !shellRoot.dockHovered
+            // How far to push the dock off-screen when auto-hidden — its own
+            // thickness plus a bit extra so no sliver remains visible.
+            readonly property int hideOffset: autoHideActive ? -((isHorizontal ? implicitHeight : implicitWidth) + 20) : 0
 
             anchors {
                 top: shellRoot.dockPosition === "top" || (!isHorizontal && shellRoot.dockAlignment === "start")
@@ -1152,28 +1171,35 @@ ShellRoot {
             implicitWidth: isHorizontal ? dockContent.implicitWidth : (shellRoot.dockIconSize + 20)
             implicitHeight: isHorizontal ? (shellRoot.dockIconSize + 20) : dockContent.implicitHeight
             color: "transparent"
-            exclusiveZone: shellRoot.dockPosition === "top" || shellRoot.dockPosition === "bottom"
-                ? implicitHeight + (shellRoot.dockFloating ? 8 : 0)
-                : implicitWidth + (shellRoot.dockFloating ? 8 : 0)
+            // Only "dodge" mode reserves screen space (shrinking/pushing windows
+            // away from the dock). All other modes overlay windows (either above
+            // or below them, per the layer setting) without reserving space.
+            exclusiveZone: shellRoot.dockBehavior === "dodge"
+                ? (isHorizontal ? implicitHeight : implicitWidth) + (shellRoot.dockFloating ? 8 : 0)
+                : 0
 
             margins {
                 // Perpendicular-axis alignment (start/center/end) along the docked edge
-                left: shellRoot.dockPosition === "left"
+                left: (shellRoot.dockPosition === "left"
                     ? (shellRoot.dockFloating ? 8 : 0)
                     : (isHorizontal && shellRoot.dockAlignment === "center"
                         ? Math.max(0, Math.round((screen.width - implicitWidth) / 2))
-                        : (isHorizontal && shellRoot.dockAlignment === "start" ? (shellRoot.dockFloating ? 8 : 0) : 0))
-                right: shellRoot.dockPosition === "right"
+                        : (isHorizontal && shellRoot.dockAlignment === "start" ? (shellRoot.dockFloating ? 8 : 0) : 0)))
+                    + (shellRoot.dockPosition === "left" ? hideOffset : 0)
+                right: (shellRoot.dockPosition === "right"
                     ? (shellRoot.dockFloating ? 8 : 0)
-                    : (isHorizontal && shellRoot.dockAlignment === "end" ? (shellRoot.dockFloating ? 8 : 0) : 0)
-                top: shellRoot.dockPosition === "top"
+                    : (isHorizontal && shellRoot.dockAlignment === "end" ? (shellRoot.dockFloating ? 8 : 0) : 0))
+                    + (shellRoot.dockPosition === "right" ? hideOffset : 0)
+                top: (shellRoot.dockPosition === "top"
                     ? (shellRoot.dockFloating ? 8 : 0)
                     : (!isHorizontal && shellRoot.dockAlignment === "center"
                         ? Math.max(0, Math.round((screen.height - implicitHeight) / 2))
-                        : (!isHorizontal && shellRoot.dockAlignment === "start" ? (shellRoot.dockFloating ? 8 : 0) : 0))
-                bottom: shellRoot.dockPosition === "bottom"
+                        : (!isHorizontal && shellRoot.dockAlignment === "start" ? (shellRoot.dockFloating ? 8 : 0) : 0)))
+                    + (shellRoot.dockPosition === "top" ? hideOffset : 0)
+                bottom: (shellRoot.dockPosition === "bottom"
                     ? (shellRoot.dockFloating ? 8 : 0)
-                    : (!isHorizontal && shellRoot.dockAlignment === "end" ? (shellRoot.dockFloating ? 8 : 0) : 0)
+                    : (!isHorizontal && shellRoot.dockAlignment === "end" ? (shellRoot.dockFloating ? 8 : 0) : 0))
+                    + (shellRoot.dockPosition === "bottom" ? hideOffset : 0)
             }
 
             Behavior on margins.left { NumberAnimation { duration: 200; easing.type: Easing.OutCubic } }
@@ -1200,8 +1226,56 @@ ShellRoot {
                 }
                 onPinPickerRequested: shellRoot.dockPickerVisible = true
             }
+
+            MouseArea {
+                anchors.fill: parent
+                hoverEnabled: true
+                enabled: shellRoot.dockBehavior === "auto-hide"
+                propagateComposedEvents: true
+                z: 100
+                onEntered: { shellRoot.dockHideTimer.stop(); shellRoot.dockHovered = true }
+                onExited: shellRoot.dockHideTimer.start()
+                onClicked: function(mouse) { mouse.accepted = false }
+            }
         }
     }
+
+    // Thin always-visible reveal strip for auto-hide mode — since the main
+    // dock PanelWindow slides fully off-screen when hidden, a persistent
+    // strip at the true screen edge is needed to detect approach and
+    // trigger the reveal.
+    Variants {
+        model: Quickshell.screens
+
+        PanelWindow {
+            property var modelData
+            screen: modelData
+            WlrLayershell.namespace: "yahr-dock-reveal"
+            WlrLayershell.layer: WlrLayer.Top
+            visible: shellRoot.dockEnabled && shellRoot.dockBehavior === "auto-hide" && !shellRoot.dockHovered
+            color: "transparent"
+            exclusiveZone: 0
+
+            readonly property bool isHorizontal: shellRoot.dockPosition === "top" || shellRoot.dockPosition === "bottom"
+
+            anchors {
+                top: shellRoot.dockPosition === "top" || !isHorizontal
+                bottom: shellRoot.dockPosition === "bottom" || !isHorizontal
+                left: shellRoot.dockPosition === "left" || isHorizontal
+                right: shellRoot.dockPosition === "right" || isHorizontal
+            }
+
+            implicitWidth: isHorizontal ? undefined : 6
+            implicitHeight: isHorizontal ? 6 : undefined
+
+            MouseArea {
+                anchors.fill: parent
+                hoverEnabled: true
+                onEntered: { shellRoot.dockHideTimer.stop(); shellRoot.dockHovered = true }
+            }
+        }
+    }
+
 
     // Dock app picker popup
     Variants {
