@@ -1198,32 +1198,35 @@ ShellRoot {
             // away from the dock). All other modes overlay windows (either above
             // or below them, per the layer setting) without reserving space.
             exclusiveZone: shellRoot.dockBehavior === "dodge"
-                ? (isHorizontal ? implicitHeight : implicitWidth) + (shellRoot.dockFloating ? 8 : 0)
+                ? (isHorizontal ? implicitHeight : implicitWidth) + (shellRoot.dockFloating ? 16 : 0)
                 : 0
 
             margins {
                 // Perpendicular-axis alignment (start/center/end) along the docked
                 // edge. Not applied when the window spans the full edge — Dock.qml
-                // aligns its content internally in that case.
-                left: (windowSpansFull ? 0 : (shellRoot.dockPosition === "left"
-                    ? (shellRoot.dockFloating ? 8 : 0)
+                // aligns its content internally in that case. The floating gap on
+                // the dock's own docked edge still applies even when spanning, so
+                // a floating full-width/height dock is still visibly inset from
+                // the screen edge rather than flush against it.
+                left: (windowSpansFull ? (shellRoot.dockPosition === "left" && shellRoot.dockFloating ? 16 : 0) : (shellRoot.dockPosition === "left"
+                    ? (shellRoot.dockFloating ? 16 : 0)
                     : (isHorizontal && shellRoot.dockAlignment === "center"
                         ? Math.max(0, Math.round((screen.width - implicitWidth) / 2))
-                        : (isHorizontal && shellRoot.dockAlignment === "start" ? (shellRoot.dockFloating ? 8 : 0) : 0))))
+                        : (isHorizontal && shellRoot.dockAlignment === "start" ? (shellRoot.dockFloating ? 16 : 0) : 0))))
                     + (shellRoot.dockPosition === "left" ? hideOffset : 0)
-                right: (windowSpansFull ? 0 : (shellRoot.dockPosition === "right"
-                    ? (shellRoot.dockFloating ? 8 : 0)
-                    : (isHorizontal && shellRoot.dockAlignment === "end" ? (shellRoot.dockFloating ? 8 : 0) : 0)))
+                right: (windowSpansFull ? (shellRoot.dockPosition === "right" && shellRoot.dockFloating ? 16 : 0) : (shellRoot.dockPosition === "right"
+                    ? (shellRoot.dockFloating ? 16 : 0)
+                    : (isHorizontal && shellRoot.dockAlignment === "end" ? (shellRoot.dockFloating ? 16 : 0) : 0)))
                     + (shellRoot.dockPosition === "right" ? hideOffset : 0)
-                top: (windowSpansFull ? 0 : (shellRoot.dockPosition === "top"
-                    ? (shellRoot.dockFloating ? 8 : 0)
+                top: (windowSpansFull ? (shellRoot.dockPosition === "top" && shellRoot.dockFloating ? 16 : 0) : (shellRoot.dockPosition === "top"
+                    ? (shellRoot.dockFloating ? 16 : 0)
                     : (!isHorizontal && shellRoot.dockAlignment === "center"
                         ? Math.max(0, Math.round((screen.height - implicitHeight) / 2))
-                        : (!isHorizontal && shellRoot.dockAlignment === "start" ? (shellRoot.dockFloating ? 8 : 0) : 0))))
+                        : (!isHorizontal && shellRoot.dockAlignment === "start" ? (shellRoot.dockFloating ? 16 : 0) : 0))))
                     + (shellRoot.dockPosition === "top" ? hideOffset : 0)
-                bottom: (windowSpansFull ? 0 : (shellRoot.dockPosition === "bottom"
-                    ? (shellRoot.dockFloating ? 8 : 0)
-                    : (!isHorizontal && shellRoot.dockAlignment === "end" ? (shellRoot.dockFloating ? 8 : 0) : 0)))
+                bottom: (windowSpansFull ? (shellRoot.dockPosition === "bottom" && shellRoot.dockFloating ? 16 : 0) : (shellRoot.dockPosition === "bottom"
+                    ? (shellRoot.dockFloating ? 16 : 0)
+                    : (!isHorizontal && shellRoot.dockAlignment === "end" ? (shellRoot.dockFloating ? 16 : 0) : 0)))
                     + (shellRoot.dockPosition === "bottom" ? hideOffset : 0)
             }
 

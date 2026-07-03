@@ -35,10 +35,13 @@ Item {
     signal unpinRequested(string desktopId)
     signal pinPickerRequested()
 
-    // Hyprland's actual border thickness — the dock's border (when enabled)
-    // follows this rather than the separate per-widget border setting used
-    // elsewhere, per the design requirement.
+    // Hyprland's actual border thickness and corner rounding — the dock's
+    // border/radius (when shown) follows these rather than a separate
+    // per-widget setting, and applies consistently regardless of the
+    // floating/docked or position/behavior state (only the dock's position
+    // and the gap from the screen edge should change with those settings).
     property int hyprBorderSize: 1
+    property int hyprRounding: 12
 
     Process {
         id: hyprBorderLoader
@@ -61,12 +64,36 @@ Item {
         }
     }
 
+    Process {
+        id: hyprRoundingLoader
+        running: false
+        command: ["hyprctl", "getoption", "decoration:rounding", "-j"]
+        property string buffer: ""
+        stdout: SplitParser {
+            onRead: data => { hyprRoundingLoader.buffer += data }
+        }
+        onRunningChanged: {
+            if (!running && buffer !== "") {
+                try {
+                    const result = JSON.parse(buffer)
+                    if (result.int !== undefined) dock.hyprRounding = result.int
+                } catch (e) {}
+                buffer = ""
+            } else if (running) {
+                buffer = ""
+            }
+        }
+    }
+
     Timer {
         interval: 1000
         running: true
         repeat: true
         triggeredOnStart: true
-        onTriggered: hyprBorderLoader.running = true
+        onTriggered: {
+            hyprBorderLoader.running = true
+            hyprRoundingLoader.running = true
+        }
     }
 
     implicitWidth: isHorizontal ? contentRow.width + padding * 2 : contentColumn.width + padding * 2
@@ -75,7 +102,7 @@ Item {
     // ---- Background ----
     Rectangle {
         id: background
-        radius: dock.floating ? dock.hyprBorderSize + 11 : 0
+        radius: dock.hyprRounding
         color: {
             if (dock.backgroundStyle === "transparent") return "transparent"
             if (dock.backgroundStyle === "opaque") return ThemeManager.bgBase
@@ -107,20 +134,6 @@ Item {
             if (dock.alignment === "start") return 0
             if (dock.alignment === "end") return Math.max(0, parent.height - height)
             return Math.max(0, Math.round((parent.height - height) / 2))
-        }
-
-        // Accent line when docked (edge-to-edge) without a border, matching Bar.qml's convention
-        Rectangle {
-            visible: !dock.showBorder && !dock.floating
-            color: Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.35)
-            anchors {
-                left: dock.position !== "left" ? parent.left : undefined
-                right: dock.position !== "right" ? parent.right : undefined
-                top: dock.position !== "top" ? parent.top : undefined
-                bottom: dock.position !== "bottom" ? parent.bottom : undefined
-            }
-            width: dock.isHorizontal ? parent.width : 1
-            height: dock.isHorizontal ? 1 : parent.height
         }
     }
 
