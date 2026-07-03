@@ -1161,7 +1161,8 @@ ShellRoot {
             property var modelData
             screen: modelData
             WlrLayershell.namespace: "yahr-dock"
-            WlrLayershell.layer: shellRoot.dockBehavior === "behind-windows" ? WlrLayer.Bottom : WlrLayer.Top
+            WlrLayershell.layer: shellRoot.dockBehavior === "behind-windows" ? WlrLayer.Bottom
+                : (shellRoot.dockBehavior === "auto-hide" ? WlrLayer.Overlay : WlrLayer.Top)
 
             visible: shellRoot.dockEnabled
 
@@ -1170,16 +1171,23 @@ ShellRoot {
             // How far to push the dock off-screen when auto-hidden — its own
             // thickness plus a bit extra so no sliver remains visible.
             readonly property int hideOffset: autoHideActive ? -((isHorizontal ? implicitHeight : implicitWidth) + 20) : 0
+            // wlr-layer-shell only honors exclusiveZone (reserving screen space)
+            // when a surface spans the FULL length of the edge it's anchored to
+            // — a corner-anchored, content-sized window (used for visual
+            // centering in other modes) is ignored for reserved-area purposes.
+            // So "dodge" mode spans the full edge here; Dock.qml handles the
+            // start/center/end alignment of its content internally instead.
+            readonly property bool dodgeSpansEdge: shellRoot.dockBehavior === "dodge"
 
             anchors {
-                top: shellRoot.dockPosition === "top" || (!isHorizontal && shellRoot.dockAlignment === "start")
-                bottom: shellRoot.dockPosition === "bottom" || (!isHorizontal && shellRoot.dockAlignment === "end")
-                left: shellRoot.dockPosition === "left" || (isHorizontal && shellRoot.dockAlignment !== "end")
-                right: shellRoot.dockPosition === "right" || (isHorizontal && shellRoot.dockAlignment === "end")
+                top: shellRoot.dockPosition === "top" || (!isHorizontal && (shellRoot.dockAlignment === "start" || dodgeSpansEdge))
+                bottom: shellRoot.dockPosition === "bottom" || (!isHorizontal && (shellRoot.dockAlignment === "end" || dodgeSpansEdge))
+                left: shellRoot.dockPosition === "left" || (isHorizontal && (shellRoot.dockAlignment !== "end" || dodgeSpansEdge))
+                right: shellRoot.dockPosition === "right" || (isHorizontal && (shellRoot.dockAlignment === "end" || dodgeSpansEdge))
             }
 
-            implicitWidth: isHorizontal ? dockContent.implicitWidth : (shellRoot.dockIconSize + 20)
-            implicitHeight: isHorizontal ? (shellRoot.dockIconSize + 20) : dockContent.implicitHeight
+            implicitWidth: isHorizontal ? (dodgeSpansEdge ? screen.width : dockContent.implicitWidth) : (shellRoot.dockIconSize + 20)
+            implicitHeight: isHorizontal ? (shellRoot.dockIconSize + 20) : (dodgeSpansEdge ? screen.height : dockContent.implicitHeight)
             color: "transparent"
             // Only "dodge" mode reserves screen space (shrinking/pushing windows
             // away from the dock). All other modes overlay windows (either above
@@ -1189,26 +1197,28 @@ ShellRoot {
                 : 0
 
             margins {
-                // Perpendicular-axis alignment (start/center/end) along the docked edge
-                left: (shellRoot.dockPosition === "left"
+                // Perpendicular-axis alignment (start/center/end) along the docked
+                // edge. Not applied in dodge mode — the window already spans the
+                // full edge there, and Dock.qml aligns its content internally.
+                left: (dodgeSpansEdge ? 0 : (shellRoot.dockPosition === "left"
                     ? (shellRoot.dockFloating ? 8 : 0)
                     : (isHorizontal && shellRoot.dockAlignment === "center"
                         ? Math.max(0, Math.round((screen.width - implicitWidth) / 2))
-                        : (isHorizontal && shellRoot.dockAlignment === "start" ? (shellRoot.dockFloating ? 8 : 0) : 0)))
+                        : (isHorizontal && shellRoot.dockAlignment === "start" ? (shellRoot.dockFloating ? 8 : 0) : 0))))
                     + (shellRoot.dockPosition === "left" ? hideOffset : 0)
-                right: (shellRoot.dockPosition === "right"
+                right: (dodgeSpansEdge ? 0 : (shellRoot.dockPosition === "right"
                     ? (shellRoot.dockFloating ? 8 : 0)
-                    : (isHorizontal && shellRoot.dockAlignment === "end" ? (shellRoot.dockFloating ? 8 : 0) : 0))
+                    : (isHorizontal && shellRoot.dockAlignment === "end" ? (shellRoot.dockFloating ? 8 : 0) : 0)))
                     + (shellRoot.dockPosition === "right" ? hideOffset : 0)
-                top: (shellRoot.dockPosition === "top"
+                top: (dodgeSpansEdge ? 0 : (shellRoot.dockPosition === "top"
                     ? (shellRoot.dockFloating ? 8 : 0)
                     : (!isHorizontal && shellRoot.dockAlignment === "center"
                         ? Math.max(0, Math.round((screen.height - implicitHeight) / 2))
-                        : (!isHorizontal && shellRoot.dockAlignment === "start" ? (shellRoot.dockFloating ? 8 : 0) : 0)))
+                        : (!isHorizontal && shellRoot.dockAlignment === "start" ? (shellRoot.dockFloating ? 8 : 0) : 0))))
                     + (shellRoot.dockPosition === "top" ? hideOffset : 0)
-                bottom: (shellRoot.dockPosition === "bottom"
+                bottom: (dodgeSpansEdge ? 0 : (shellRoot.dockPosition === "bottom"
                     ? (shellRoot.dockFloating ? 8 : 0)
-                    : (!isHorizontal && shellRoot.dockAlignment === "end" ? (shellRoot.dockFloating ? 8 : 0) : 0))
+                    : (!isHorizontal && shellRoot.dockAlignment === "end" ? (shellRoot.dockFloating ? 8 : 0) : 0)))
                     + (shellRoot.dockPosition === "bottom" ? hideOffset : 0)
             }
 
@@ -1261,7 +1271,7 @@ ShellRoot {
             property var modelData
             screen: modelData
             WlrLayershell.namespace: "yahr-dock-reveal"
-            WlrLayershell.layer: WlrLayer.Top
+            WlrLayershell.layer: WlrLayer.Overlay
             visible: shellRoot.dockEnabled && shellRoot.dockBehavior === "auto-hide" && !shellRoot.dockHovered
             color: "transparent"
             exclusiveZone: 0

@@ -97,7 +97,12 @@ Item {
     Row {
         id: contentRow
         visible: dock.isHorizontal
-        anchors.centerIn: parent
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.left: dock.alignment === "start" ? parent.left : undefined
+        anchors.right: dock.alignment === "end" ? parent.right : undefined
+        anchors.horizontalCenter: dock.alignment === "center" ? parent.horizontalCenter : undefined
+        anchors.leftMargin: dock.alignment === "start" ? dock.padding : 0
+        anchors.rightMargin: dock.alignment === "end" ? dock.padding : 0
         spacing: dock.itemSpacing
 
         Repeater {
@@ -115,7 +120,12 @@ Item {
     Column {
         id: contentColumn
         visible: !dock.isHorizontal
-        anchors.centerIn: parent
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.top: dock.alignment === "start" ? parent.top : undefined
+        anchors.bottom: dock.alignment === "end" ? parent.bottom : undefined
+        anchors.verticalCenter: dock.alignment === "center" ? parent.verticalCenter : undefined
+        anchors.topMargin: dock.alignment === "start" ? dock.padding : 0
+        anchors.bottomMargin: dock.alignment === "end" ? dock.padding : 0
         spacing: dock.itemSpacing
 
         Repeater {
