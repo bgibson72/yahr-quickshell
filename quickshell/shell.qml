@@ -56,17 +56,18 @@ ShellRoot {
     function saveDockPinned(newPinnedArray) {
         shellRoot.dockPinnedApps = newPinnedArray
         shellRoot.dockPinnedSaveGuardUntil = Date.now() + 2000
-        const tmpFile = "/tmp/yahr-dock-pinned.json"
+        // Base64-encode the JSON payload to sidestep shell quoting/heredoc
+        // fragility entirely (app names/paths can contain quotes, and a
+        // heredoc-based approach was found to silently fail when embedded
+        // inside a larger `sh -c "..."` invocation via execDetached).
         const json = JSON.stringify(newPinnedArray)
-        const writeTmp = `cat > ${tmpFile} << 'DOCKEOF'\n${json}\nDOCKEOF`
-        const mergeCmd = `python3 -c "` +
-            `import json` + "\\n" +
-            `p = '${Quickshell.env('HOME')}/.config/quickshell/settings.json'` + "\\n" +
-            `d = json.load(open(p))` + "\\n" +
-            `d.setdefault('dock', {})['pinned'] = json.load(open('${tmpFile}'))` + "\\n" +
-            `json.dump(d, open(p, 'w'), indent=2)` +
-            `"`
-        Quickshell.execDetached(["sh", "-c", writeTmp + " && " + mergeCmd])
+        const base64Json = Qt.btoa(json)
+        const mergeCmd = "python3 -c \"import json,base64; p='" +
+            Quickshell.env('HOME') + "/.config/quickshell/settings.json'; " +
+            "d=json.load(open(p)); " +
+            "d.setdefault('dock',{})['pinned']=json.loads(base64.b64decode('" + base64Json + "').decode()); " +
+            "json.dump(d,open(p,'w'),indent=2)\""
+        Quickshell.execDetached(["sh", "-c", mergeCmd])
     }
 
     function launchDockApp(execCmd, needsTerminal) {
