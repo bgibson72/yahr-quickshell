@@ -4739,6 +4739,7 @@ MouseArea {
 
                     Column {
                         anchors.fill: parent
+                        anchors.margins: 16
                         spacing: 0
 
                         // ── Sub-tab bar ──────────────────────────────────
@@ -4749,7 +4750,6 @@ MouseArea {
 
                             Row {
                                 anchors.fill: parent
-                                anchors.leftMargin: 12
                                 spacing: 4
 
                                 Repeater {
@@ -6495,15 +6495,28 @@ MouseArea {
         topRightRadius: Math.max(0, root.hyprRounding - root.border.width)
 
         // Title
-        Text {
+        Row {
             anchors.left: parent.left
             anchors.leftMargin: 20
             anchors.verticalCenter: parent.verticalCenter
-            text: "YAHR Settings"
-            font.family: ThemeManager.uiFont
-            font.pixelSize: 16
-            font.weight: Font.Bold
-            color: ThemeManager.fgPrimary
+            spacing: 12
+
+            Text {
+                text: "\uf013"
+                font.family: "Symbols Nerd Font"
+                font.pixelSize: 22
+                color: ThemeManager.fgPrimary
+                anchors.verticalCenter: parent.verticalCenter
+            }
+
+            Text {
+                text: "YAHR Settings"
+                font.family: ThemeManager.uiFont
+                font.pixelSize: 20
+                font.weight: Font.Bold
+                color: ThemeManager.fgPrimary
+                anchors.verticalCenter: parent.verticalCenter
+            }
         }
 
         // Close button
