@@ -1272,8 +1272,12 @@ ShellRoot {
             // Only "dodge" mode reserves screen space (shrinking/pushing windows
             // away from the dock). All other modes overlay windows (either above
             // or below them, per the layer setting) without reserving space.
+            // The floating gap (8px) matches the Bar's own floating gap exactly
+            // (see barSurfaceState's PanelWindow margins/exclusiveZone above) so
+            // the dodge reserved-space gap, the dock's floating inset, and the
+            // bar's floating inset are all visually identical.
             exclusiveZone: shellRoot.dockBehavior === "dodge"
-                ? (isHorizontal ? implicitHeight : implicitWidth) + (shellRoot.dockFloating ? 16 : 0)
+                ? (isHorizontal ? implicitHeight : implicitWidth) + (shellRoot.dockFloating ? 8 : 0)
                 : 0
 
             margins {
@@ -1283,25 +1287,25 @@ ShellRoot {
                 // the dock's own docked edge still applies even when spanning, so
                 // a floating full-width/height dock is still visibly inset from
                 // the screen edge rather than flush against it.
-                left: (windowSpansFull ? (shellRoot.dockPosition === "left" && shellRoot.dockFloating ? 16 : 0) : (shellRoot.dockPosition === "left"
-                    ? (shellRoot.dockFloating ? 16 : 0)
+                left: (windowSpansFull ? (shellRoot.dockPosition === "left" && shellRoot.dockFloating ? 8 : 0) : (shellRoot.dockPosition === "left"
+                    ? (shellRoot.dockFloating ? 8 : 0)
                     : (isHorizontal && shellRoot.dockAlignment === "center"
                         ? Math.max(0, Math.round((screen.width - implicitWidth) / 2))
-                        : (isHorizontal && shellRoot.dockAlignment === "start" ? (shellRoot.dockFloating ? 16 : 0) : 0))))
+                        : (isHorizontal && shellRoot.dockAlignment === "start" ? (shellRoot.dockFloating ? 8 : 0) : 0))))
                     + (shellRoot.dockPosition === "left" ? hideOffset : 0)
-                right: (windowSpansFull ? (shellRoot.dockPosition === "right" && shellRoot.dockFloating ? 16 : 0) : (shellRoot.dockPosition === "right"
-                    ? (shellRoot.dockFloating ? 16 : 0)
-                    : (isHorizontal && shellRoot.dockAlignment === "end" ? (shellRoot.dockFloating ? 16 : 0) : 0)))
+                right: (windowSpansFull ? (shellRoot.dockPosition === "right" && shellRoot.dockFloating ? 8 : 0) : (shellRoot.dockPosition === "right"
+                    ? (shellRoot.dockFloating ? 8 : 0)
+                    : (isHorizontal && shellRoot.dockAlignment === "end" ? (shellRoot.dockFloating ? 8 : 0) : 0)))
                     + (shellRoot.dockPosition === "right" ? hideOffset : 0)
-                top: (windowSpansFull ? (shellRoot.dockPosition === "top" && shellRoot.dockFloating ? 16 : 0) : (shellRoot.dockPosition === "top"
-                    ? (shellRoot.dockFloating ? 16 : 0)
+                top: (windowSpansFull ? (shellRoot.dockPosition === "top" && shellRoot.dockFloating ? 8 : 0) : (shellRoot.dockPosition === "top"
+                    ? (shellRoot.dockFloating ? 8 : 0)
                     : (!isHorizontal && shellRoot.dockAlignment === "center"
                         ? Math.max(0, Math.round((screen.height - implicitHeight) / 2))
-                        : (!isHorizontal && shellRoot.dockAlignment === "start" ? (shellRoot.dockFloating ? 16 : 0) : 0))))
+                        : (!isHorizontal && shellRoot.dockAlignment === "start" ? (shellRoot.dockFloating ? 8 : 0) : 0))))
                     + (shellRoot.dockPosition === "top" ? hideOffset : 0)
-                bottom: (windowSpansFull ? (shellRoot.dockPosition === "bottom" && shellRoot.dockFloating ? 16 : 0) : (shellRoot.dockPosition === "bottom"
-                    ? (shellRoot.dockFloating ? 16 : 0)
-                    : (!isHorizontal && shellRoot.dockAlignment === "end" ? (shellRoot.dockFloating ? 16 : 0) : 0)))
+                bottom: (windowSpansFull ? (shellRoot.dockPosition === "bottom" && shellRoot.dockFloating ? 8 : 0) : (shellRoot.dockPosition === "bottom"
+                    ? (shellRoot.dockFloating ? 8 : 0)
+                    : (!isHorizontal && shellRoot.dockAlignment === "end" ? (shellRoot.dockFloating ? 8 : 0) : 0)))
                     + (shellRoot.dockPosition === "bottom" ? hideOffset : 0)
             }
 
@@ -1421,17 +1425,45 @@ ShellRoot {
                 onClicked: shellRoot.dockPickerVisible = false
             }
 
-            DockAppPicker {
-                anchors.centerIn: parent
-                pinnedIds: shellRoot.dockPinnedApps.map(a => a.desktopId)
+            // Panel positioned at center, slides down from top (matches
+            // ClipboardPanel/TrashWidget's open animation).
+            Item {
+                width: 360
+                height: 440
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.verticalCenterOffset: shellRoot.dockPickerVisible ? 0 : -800
+                z: 1
 
-                onRequestClose: shellRoot.dockPickerVisible = false
-                onAppSelected: (desktopId, name, icon, exec, terminal) => {
-                    const updated = shellRoot.dockPinnedApps.concat([{
-                        desktopId: desktopId, name: name, icon: icon, exec: exec, terminal: terminal
-                    }])
-                    shellRoot.saveDockPinned(updated)
-                    shellRoot.dockPickerVisible = false
+                Behavior on anchors.verticalCenterOffset {
+                    NumberAnimation { duration: 300; easing.type: Easing.OutCubic }
+                }
+
+                // Stop background clicks from closing the picker
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: {}
+                    propagateComposedEvents: true
+                }
+
+                DockAppPicker {
+                    anchors.fill: parent
+                    pinnedIds: shellRoot.dockPinnedApps.map(a => a.desktopId)
+                    opacity: shellRoot.dockPickerVisible ? 1 : 0
+                    z: 2
+
+                    Behavior on opacity {
+                        NumberAnimation { duration: 250 }
+                    }
+
+                    onRequestClose: shellRoot.dockPickerVisible = false
+                    onAppSelected: (desktopId, name, icon, exec, terminal) => {
+                        const updated = shellRoot.dockPinnedApps.concat([{
+                            desktopId: desktopId, name: name, icon: icon, exec: exec, terminal: terminal
+                        }])
+                        shellRoot.saveDockPinned(updated)
+                        shellRoot.dockPickerVisible = false
+                    }
                 }
             }
         }
