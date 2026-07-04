@@ -161,11 +161,20 @@ Rectangle {
             Item { Layout.fillWidth: true }
 
             Rectangle {
-                width: 36
-                height: 36
-                radius: 8
-                color: closeMouseArea.containsMouse ? ThemeManager.surface1 : "transparent"
+                id: headerCloseBtn
+                width: 28
+                height: 28
+                radius: 6
                 Layout.alignment: Qt.AlignVCenter
+                color: closeMouseArea.containsMouse
+                    ? Qt.rgba(ThemeManager.accentRed.r, ThemeManager.accentRed.g, ThemeManager.accentRed.b, 0.28)
+                    : Qt.rgba(1, 1, 1, 0.08)
+                border.width: 1
+                border.color: closeMouseArea.containsMouse
+                    ? Qt.rgba(ThemeManager.accentRed.r, ThemeManager.accentRed.g, ThemeManager.accentRed.b, 0.55)
+                    : Qt.rgba(1, 1, 1, 0.18)
+                Behavior on color { ColorAnimation { duration: 150 } }
+                Behavior on border.color { ColorAnimation { duration: 150 } }
 
                 MouseArea {
                     id: closeMouseArea
@@ -178,8 +187,10 @@ Rectangle {
                 Text {
                     anchors.centerIn: parent
                     text: "\u2715"
-                    font.pixelSize: 16
-                    color: ThemeManager.fgPrimary
+                    font.family: "Symbols Nerd Font"
+                    font.pixelSize: 13
+                    color: closeMouseArea.containsMouse ? ThemeManager.accentRed : ThemeManager.fgSecondary
+                    Behavior on color { ColorAnimation { duration: 150 } }
                 }
             }
         }
