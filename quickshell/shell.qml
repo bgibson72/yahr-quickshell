@@ -14,6 +14,7 @@ ShellRoot {
     property bool settingsVisible: false
     property bool clipboardVisible: false
     property bool controlCenterVisible: false
+    property bool trashVisible: false
     property var wallpaperPicker: wallpaperPickerWindow
     property bool barAtBottom: false
     property bool barAutoHide: false
@@ -532,6 +533,80 @@ ShellRoot {
                         console.log("PowerMenu requested close")
                         shellRoot.powerMenuVisible = false
                     }
+                }
+            }
+        }
+    }
+    
+    // Trash Panel
+    Variants {
+        model: Quickshell.screens
+
+        PanelWindow {
+            property var modelData
+            screen: modelData
+
+            visible: shellRoot.trashVisible
+
+            anchors {
+                top: true
+                left: true
+                right: true
+                bottom: true
+            }
+
+            margins {
+                top: 0
+                left: 0
+                right: 0
+                bottom: 0
+            }
+
+            color: "transparent"
+            exclusiveZone: 0
+
+            WlrLayershell.layer: WlrLayer.Overlay
+            WlrLayershell.keyboardFocus: WlrKeyboardFocus.OnDemand
+
+            // Background overlay - click to close
+            MouseArea {
+                anchors.fill: parent
+                onClicked: shellRoot.trashVisible = false
+                propagateComposedEvents: true
+            }
+
+            // Panel positioned at center, slides down from top
+            Item {
+                width: 480
+                height: 620
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.verticalCenterOffset: shellRoot.trashVisible ? 0 : -800
+                z: 1
+
+                Behavior on anchors.verticalCenterOffset {
+                    NumberAnimation { duration: 300; easing.type: Easing.OutCubic }
+                }
+
+                // Stop background clicks from closing panel
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: {}
+                    propagateComposedEvents: true
+                }
+
+                TrashWidget {
+                    id: trashPanel
+                    anchors.fill: parent
+                    isVisible: shellRoot.trashVisible
+                    opacity: shellRoot.trashVisible ? 1 : 0
+                    z: 2
+
+                    Behavior on opacity {
+                        NumberAnimation { duration: 250 }
+                    }
+
+                    onRequestClose: shellRoot.trashVisible = false
                 }
             }
         }
@@ -1254,6 +1329,8 @@ ShellRoot {
                     shellRoot.saveDockPinned(updated)
                 }
                 onPinPickerRequested: shellRoot.dockPickerVisible = true
+                onSettingsRequested: shellRoot.settingsVisible = !shellRoot.settingsVisible
+                onTrashRequested: shellRoot.trashVisible = !shellRoot.trashVisible
             }
 
             // Auto-hide reveal detection via polling the compositor's actual

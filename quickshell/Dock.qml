@@ -34,6 +34,8 @@ Item {
     signal launchRequested(string execCmd, bool needsTerminal)
     signal unpinRequested(string desktopId)
     signal pinPickerRequested()
+    signal settingsRequested()
+    signal trashRequested()
 
     // Hyprland's actual border thickness and corner rounding — the dock's
     // border/radius (when shown) follows these rather than a separate
@@ -158,6 +160,29 @@ Item {
             delegate: dockItemDelegate
         }
 
+        Rectangle {
+            width: 1
+            height: dock.iconSize * 0.6
+            anchors.verticalCenter: parent.verticalCenter
+            color: Qt.rgba(1, 1, 1, 0.15)
+        }
+
+        DockUtilityButton {
+            iconSize: dock.iconSize
+            glyph: "\uf013"
+            tooltip: "Settings"
+            dockPosition: dock.position
+            onClicked: dock.settingsRequested()
+        }
+
+        DockUtilityButton {
+            iconSize: dock.iconSize
+            glyph: "\uf1f8"
+            tooltip: "Trash"
+            dockPosition: dock.position
+            onClicked: dock.trashRequested()
+        }
+
         DockAddButton {
             iconSize: dock.iconSize
             onClicked: dock.pinPickerRequested()
@@ -183,6 +208,29 @@ Item {
         Repeater {
             model: dock.pinnedApps
             delegate: dockItemDelegate
+        }
+
+        Rectangle {
+            width: dock.iconSize * 0.6
+            height: 1
+            anchors.horizontalCenter: parent.horizontalCenter
+            color: Qt.rgba(1, 1, 1, 0.15)
+        }
+
+        DockUtilityButton {
+            iconSize: dock.iconSize
+            glyph: "\uf013"
+            tooltip: "Settings"
+            dockPosition: dock.position
+            onClicked: dock.settingsRequested()
+        }
+
+        DockUtilityButton {
+            iconSize: dock.iconSize
+            glyph: "\uf1f8"
+            tooltip: "Trash"
+            dockPosition: dock.position
+            onClicked: dock.trashRequested()
         }
 
         DockAddButton {
