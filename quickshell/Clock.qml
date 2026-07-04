@@ -25,8 +25,30 @@ Rectangle {
     property string barWeatherIcon: "\ue302"
     property string barWeatherTemp: "--"
 
+    // Weather source settings -- mirrors WeatherTab.qml exactly so the bar's
+    // temperature/conditions always match the Weather tab (same location,
+    // same unit preference, same provider -- OpenWeather when an API key is
+    // configured, wttr.in otherwise).
+    property string weatherLat: ""
+    property string weatherLon: ""
+    property string weatherApiKey: ""
+    property bool useFahrenheit: true
+
     Behavior on color { ColorAnimation { duration: 200 } }
     Behavior on border.width { NumberAnimation { duration: 200 } }
+
+    function getOpenWeatherIcon(conditionId) {
+        if (conditionId >= 200 && conditionId < 300) return "\u26c8\ufe0f" // Thunderstorm
+        if (conditionId >= 300 && conditionId < 400) return "\ud83c\udf26\ufe0f" // Drizzle
+        if (conditionId >= 500 && conditionId < 600) return "\ud83c\udf27\ufe0f" // Rain
+        if (conditionId >= 600 && conditionId < 700) return "\u2744\ufe0f" // Snow
+        if (conditionId >= 700 && conditionId < 800) return "\ud83c\udf2b\ufe0f" // Atmosphere (fog, mist, etc)
+        if (conditionId === 800) return "\u2600\ufe0f" // Clear
+        if (conditionId === 801) return "\u26c5" // Few clouds
+        if (conditionId === 802) return "\u26c5" // Scattered clouds
+        if (conditionId === 803 || conditionId === 804) return "\u2601\ufe0f" // Broken/overcast clouds
+        return "\ud83c\udf21\ufe0f" // Default
+    }
 
     function getWeatherNFIcon(emoji) {
         if (!emoji) return "\ue30d"
@@ -124,11 +146,15 @@ Rectangle {
                         clockArea.dateFormatDMY = settings.general.dateFormat === "DMY"
                         clockArea.dateLong = settings.general.dateLong === true
                         clockArea.showDayOfWeek = settings.general.showDayOfWeek === true
+                        clockArea.weatherLat = settings.general.weatherLatitude || ""
+                        clockArea.weatherLon = settings.general.weatherLongitude || ""
+                        clockArea.weatherApiKey = settings.general.openWeatherApiKey || ""
+                        clockArea.useFahrenheit = settings.general.useFahrenheit !== false
                     }
                     if (settings.bar) {
                         const newShowWeather = settings.bar.showWeatherInBar === true
                         if (newShowWeather && !clockArea.showWeatherInBar) {
-                            weatherProcess.running = true
+                            clockArea.fetchWeather()
                         }
                         clockArea.showWeatherInBar = newShowWeather
                     }
@@ -149,14 +175,37 @@ Rectangle {
         running: clockArea.showWeatherInBar
         repeat: true
         triggeredOnStart: true
-        onTriggered: { weatherProcess.running = true }
+        onTriggered: { clockArea.fetchWeather() }
+    }
+
+    // Builds and runs the same query WeatherTab.qml uses for current
+    // conditions: OpenWeather when an API key + coordinates are set,
+    // otherwise wttr.in with the same location/unit preference -- so the
+    // bar's temperature/icon always match the Weather tab exactly.
+    function fetchWeather() {
+        const tempUnit = clockArea.useFahrenheit ? "u" : "m"
+        const location = (clockArea.weatherLat && clockArea.weatherLon)
+            ? `${clockArea.weatherLat},${clockArea.weatherLon}` : ""
+
+        if (clockArea.weatherApiKey && clockArea.weatherLat && clockArea.weatherLon) {
+            const units = clockArea.useFahrenheit ? "imperial" : "metric"
+            const cmd = `curl -s "https://api.openweathermap.org/data/2.5/weather?lat=${clockArea.weatherLat}&lon=${clockArea.weatherLon}&units=${units}&appid=${clockArea.weatherApiKey}"`
+            weatherProcess.usingOpenWeather = true
+            weatherProcess.command = ["sh", "-c", cmd]
+        } else {
+            const cmd = `curl -s "wttr.in/${location}?${tempUnit}&format=%c|%t"`
+            weatherProcess.usingOpenWeather = false
+            weatherProcess.command = ["sh", "-c", cmd]
+        }
+        weatherProcess.running = true
     }
 
     Process {
         id: weatherProcess
-        command: ["sh", "-c", "curl -s 'wttr.in/?u&format=%c|%t'"]
+        command: ["sh", "-c", "echo"]
         running: false
         property string buffer: ""
+        property bool usingOpenWeather: false
 
         stdout: SplitParser {
             onRead: data => { weatherProcess.buffer += data }
@@ -164,11 +213,24 @@ Rectangle {
 
         onRunningChanged: {
             if (!running && buffer !== "") {
-                const parts = weatherProcess.buffer.trim().split("|")
-                if (parts.length >= 2) {
-                    clockArea.barWeatherIcon = clockArea.getWeatherNFIcon(parts[0].trim())
-                    clockArea.barWeatherTemp = parts[1].trim().replace(/^\+/, "")
-                }
+                try {
+                    if (weatherProcess.usingOpenWeather) {
+                        const data = JSON.parse(weatherProcess.buffer)
+                        if (data.weather && data.weather[0]) {
+                            clockArea.barWeatherIcon = clockArea.getWeatherNFIcon(clockArea.getOpenWeatherIcon(data.weather[0].id))
+                        }
+                        if (data.main) {
+                            const tempSymbol = clockArea.useFahrenheit ? "°F" : "°C"
+                            clockArea.barWeatherTemp = Math.round(data.main.temp) + tempSymbol
+                        }
+                    } else {
+                        const parts = weatherProcess.buffer.trim().split("|")
+                        if (parts.length >= 2) {
+                            clockArea.barWeatherIcon = clockArea.getWeatherNFIcon(parts[0].trim())
+                            clockArea.barWeatherTemp = parts[1].trim().replace(/^\+/, "")
+                        }
+                    }
+                } catch (e) {}
                 buffer = ""
             } else if (running) {
                 buffer = ""
