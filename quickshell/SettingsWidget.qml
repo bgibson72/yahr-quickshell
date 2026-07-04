@@ -4740,7 +4740,7 @@ MouseArea {
                     Column {
                         anchors.fill: parent
                         anchors.margins: 16
-                        spacing: 0
+                        spacing: 8
 
                         // ── Sub-tab bar ──────────────────────────────────
                         Rectangle {
@@ -4757,7 +4757,8 @@ MouseArea {
 
                                     Rectangle {
                                         width: 150
-                                        height: parent.height
+                                        height: 34
+                                        anchors.verticalCenter: parent.verticalCenter
                                         radius: 6
                                         color: wallpaperTabItem.wallSubTab === index
                                             ? Qt.rgba(ThemeManager.accentBlue.r, ThemeManager.accentBlue.g, ThemeManager.accentBlue.b, 0.20)
@@ -4801,7 +4802,7 @@ MouseArea {
                         // ── Content ──────────────────────────────────────
                         Item {
                             width: parent.width
-                            height: parent.height - 45
+                            height: parent.height - 52
 
                             // Theme Wallpaper sub-tab
                             GridView {
