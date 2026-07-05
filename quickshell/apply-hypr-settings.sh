@@ -29,8 +29,8 @@ def current_accent_rgb():
         pass
     return "000000"
 
-def apply_border_alpha(border_alpha):
-    """Window border color is a structured Lua-table gradient (see
+def apply_border_gradient(transparency_pct, angle_deg):
+    """Window border color/angle is a structured Lua-table gradient (see
     hypr/appearance.lua's col.active_border/inactive_border) baked into the
     on-disk config, not a plain hl.config-settable value -- confirmed that
     `hyprctl eval` DOES update the stored option (hyprctl getoption reflects
@@ -41,8 +41,13 @@ def apply_border_alpha(border_alpha):
     so it stays idempotent across repeated changes) and reloads, BEFORE the
     rest of this script's eval-based settings run (which apply fine live
     without a reload and must come after, or the reload would revert them
-    to their file defaults)."""
-    scale = (border_alpha / 100) * (255 / 0x59)
+    to their file defaults).
+
+    transparency_pct: 0 = fully solid/opaque border, 100 = fully invisible
+    (the inverse of opacity -- converted to opacity here for the actual
+    alpha-byte math, since that's what the color stops represent)."""
+    opacity_pct = 100 - transparency_pct
+    scale = (opacity_pct / 100) * (255 / 0x59)
     def hexa(base):
         return format(max(0, min(255, round(base * scale))), "02x")
     a_black, a_accent, a_white = hexa(0x40), hexa(0x59), hexa(0x26)
@@ -57,9 +62,11 @@ def apply_border_alpha(border_alpha):
             if "inactive_border" in line:
                 line = re.sub(r"rgba\(000000[0-9a-fA-F]{2}\)", "rgba(000000" + i_black + ")", line)
                 line = re.sub(r"rgba\(ffffff[0-9a-fA-F]{2}\)", "rgba(ffffff" + i_white + ")", line)
+                line = re.sub(r"angle\s*=\s*\d+", "angle = " + str(int(angle_deg)), line)
             elif "active_border" in line:
                 line = re.sub(r"rgba\(000000[0-9a-fA-F]{2}\)", "rgba(000000" + a_black + ")", line)
                 line = re.sub(r"rgba\(ffffff[0-9a-fA-F]{2}\)", "rgba(ffffff" + a_white + ")", line)
+                line = re.sub(r"angle\s*=\s*\d+", "angle = " + str(int(angle_deg)), line)
             out.append(line)
         with open(appearance_path, "w") as f:
             f.writelines(out)
@@ -90,8 +97,8 @@ try:
 
     # Must run first -- writes files + reloads, which would otherwise wipe
     # out the eval-based settings applied below.
-    if "borderAlpha" in h:
-        apply_border_alpha(h["borderAlpha"])
+    if "borderTransparency" in h or "borderAngle" in h:
+        apply_border_gradient(h.get("borderTransparency", 65), h.get("borderAngle", 45))
 
     if "borderSize" in h:
         ev("hl.config({general={border_size=" + str(int(h["borderSize"])) + "}})")

@@ -48,7 +48,8 @@ Rectangle {
     property int hyprShadowRange: 20
     property int hyprShadowAlpha: 33
     property bool hyprShadowUseAccent: false
-    property int hyprBorderAlpha: 35
+    property int hyprBorderTransparency: 65
+    property int hyprBorderAngle: 45
     
     signal closeRequested()
     signal settingsUpdated()  // Signal to notify when settings change
@@ -358,7 +359,8 @@ SETTINGSEOF`
             if (h.shadowRange     !== undefined) hyprShadowRangeObj.value = h.shadowRange
             if (h.shadowAlpha     !== undefined) hyprShadowAlphaObj.value = h.shadowAlpha
             if (h.shadowUseAccent !== undefined) hyprShadowAccentCheck.checked = h.shadowUseAccent
-            if (h.borderAlpha     !== undefined) hyprBorderAlphaObj.value = h.borderAlpha
+            if (h.borderTransparency !== undefined) hyprBorderTransparencyObj.value = h.borderTransparency
+            if (h.borderAngle     !== undefined) hyprBorderAngleObj.value = h.borderAngle
         }
     }
     
@@ -558,11 +560,23 @@ SETTINGSEOF`
     // refresh. So changing this needs to persist to disk and reload, unlike
     // every other Hyprland setting here which applies instantly via eval
     // alone. apply-hypr-settings.sh (also used for theme-switch/login
-    // persistence) does the actual file-editing + reload; this just saves
-    // the value and invokes it.
-    function applyBorderAlpha(val) {
+    // persistence) does the actual file-editing + reload; these just save
+    // the value(s) and invoke it.
+    //
+    // Note: this is a TRANSPARENCY value (0 = fully solid/opaque border,
+    // 100 = fully invisible) -- the inverse of opacity/alpha, matching how
+    // "transparency" reads intuitively to a user. apply-hypr-settings.sh
+    // does the opacity = 100 - transparency conversion internally.
+    function applyBorderTransparency(val) {
         if (!root.settings.hypr) root.settings.hypr = {}
-        root.settings.hypr.borderAlpha = val
+        root.settings.hypr.borderTransparency = val
+        saveSettings()
+        Quickshell.execDetached(["bash", Quickshell.env("HOME") + "/.config/quickshell/apply-hypr-settings.sh"])
+    }
+
+    function applyBorderAngle(val) {
+        if (!root.settings.hypr) root.settings.hypr = {}
+        root.settings.hypr.borderAngle = val
         saveSettings()
         Quickshell.execDetached(["bash", Quickshell.env("HOME") + "/.config/quickshell/apply-hypr-settings.sh"])
     }
@@ -3771,7 +3785,7 @@ MouseArea {
                                 opacity: hyprBorderEnabledCheck.checked ? 1.0 : 0.5
 
                                 Text {
-                                    text: "Border transparency: " + hyprBorderAlphaObj.value + "%"
+                                    text: "Border transparency: " + hyprBorderTransparencyObj.value + "%"
                                     font.family: ThemeManager.uiFont
                                     font.pixelSize: 12
                                     color: ThemeManager.fgPrimary
@@ -3782,7 +3796,7 @@ MouseArea {
                                     height: 32
 
                                     Rectangle {
-                                        id: borderAlphaTrack
+                                        id: borderTransparencyTrack
                                         anchors.centerIn: parent
                                         width: parent.width
                                         height: 6
@@ -3790,7 +3804,7 @@ MouseArea {
                                         color: Qt.rgba(1, 1, 1, 0.07)
 
                                         Rectangle {
-                                            width: borderAlphaHandle.x + borderAlphaHandle.width / 2
+                                            width: borderTransparencyHandle.x + borderTransparencyHandle.width / 2
                                             height: parent.height
                                             radius: parent.radius
                                             color: ThemeManager.accentBlue
@@ -3798,20 +3812,20 @@ MouseArea {
                                     }
 
                                     Rectangle {
-                                        id: borderAlphaHandle
+                                        id: borderTransparencyHandle
                                         width: 20
                                         height: 20
                                         radius: 10
-                                        color: borderAlphaMA.containsMouse || borderAlphaMA.pressed ? ThemeManager.accentBlue : ThemeManager.fgPrimary
+                                        color: borderTransparencyMA.containsMouse || borderTransparencyMA.pressed ? ThemeManager.accentBlue : ThemeManager.fgPrimary
                                         border.width: 2
                                         border.color: ThemeManager.accentBlue
                                         y: (parent.height - height) / 2
-                                        x: (borderAlphaTrack.width - width) * (hyprBorderAlphaObj.value / 100.0)
+                                        x: (borderTransparencyTrack.width - width) * (hyprBorderTransparencyObj.value / 100.0)
                                         Behavior on color { ColorAnimation { duration: 150 } }
                                     }
 
                                     MouseArea {
-                                        id: borderAlphaMA
+                                        id: borderTransparencyMA
                                         anchors.fill: parent
                                         hoverEnabled: true
                                         cursorShape: Qt.PointingHandCursor
@@ -3820,17 +3834,17 @@ MouseArea {
                                         function updateVal(mouse) {
                                             const norm = Math.max(0, Math.min(1, mouse.x / width))
                                             const val = Math.round(norm * 100)
-                                            hyprBorderAlphaObj.value = val
+                                            hyprBorderTransparencyObj.value = val
                                         }
 
                                         onPressed: updateVal(mouse)
                                         onPositionChanged: if (pressed) updateVal(mouse)
-                                        onReleased: root.applyBorderAlpha(hyprBorderAlphaObj.value)
+                                        onReleased: root.applyBorderTransparency(hyprBorderTransparencyObj.value)
                                     }
                                 }
 
                                 Text {
-                                    text: "Hyprland's window border is always somewhat translucent by design (a soft black/accent/white gradient); this controls how opaque that gradient is overall"
+                                    text: "0% is a fully solid/opaque border; 100% is fully invisible. Hyprland's border is a black/accent/white gradient, so this scales all three stops together"
                                     font.family: ThemeManager.uiFont
                                     font.pixelSize: 10
                                     color: ThemeManager.fgTertiary
@@ -3839,8 +3853,89 @@ MouseArea {
                                 }
 
                                 QtObject {
-                                    id: hyprBorderAlphaObj
-                                    property int value: 35
+                                    id: hyprBorderTransparencyObj
+                                    property int value: 65
+                                }
+                            }
+
+                            // Border gradient angle
+                            Column {
+                                spacing: 8
+                                width: parent.width - 40
+                                leftPadding: 20
+                                opacity: hyprBorderEnabledCheck.checked ? 1.0 : 0.5
+
+                                Text {
+                                    text: "Border gradient angle: " + hyprBorderAngleObj.value + "\u00b0"
+                                    font.family: ThemeManager.uiFont
+                                    font.pixelSize: 12
+                                    color: ThemeManager.fgPrimary
+                                }
+
+                                Item {
+                                    width: parent.width - 40
+                                    height: 32
+
+                                    Rectangle {
+                                        id: borderAngleTrack
+                                        anchors.centerIn: parent
+                                        width: parent.width
+                                        height: 6
+                                        radius: 3
+                                        color: Qt.rgba(1, 1, 1, 0.07)
+
+                                        Rectangle {
+                                            width: borderAngleHandle.x + borderAngleHandle.width / 2
+                                            height: parent.height
+                                            radius: parent.radius
+                                            color: ThemeManager.accentBlue
+                                        }
+                                    }
+
+                                    Rectangle {
+                                        id: borderAngleHandle
+                                        width: 20
+                                        height: 20
+                                        radius: 10
+                                        color: borderAngleMA.containsMouse || borderAngleMA.pressed ? ThemeManager.accentBlue : ThemeManager.fgPrimary
+                                        border.width: 2
+                                        border.color: ThemeManager.accentBlue
+                                        y: (parent.height - height) / 2
+                                        x: (borderAngleTrack.width - width) * (hyprBorderAngleObj.value / 360.0)
+                                        Behavior on color { ColorAnimation { duration: 150 } }
+                                    }
+
+                                    MouseArea {
+                                        id: borderAngleMA
+                                        anchors.fill: parent
+                                        hoverEnabled: true
+                                        cursorShape: Qt.PointingHandCursor
+                                        enabled: hyprBorderEnabledCheck.checked
+
+                                        function updateVal(mouse) {
+                                            const norm = Math.max(0, Math.min(1, mouse.x / width))
+                                            const val = Math.round(norm * 360)
+                                            hyprBorderAngleObj.value = val
+                                        }
+
+                                        onPressed: updateVal(mouse)
+                                        onPositionChanged: if (pressed) updateVal(mouse)
+                                        onReleased: root.applyBorderAngle(hyprBorderAngleObj.value)
+                                    }
+                                }
+
+                                Text {
+                                    text: "The direction the black/accent/white gradient sweeps across the border (0-360\u00b0)"
+                                    font.family: ThemeManager.uiFont
+                                    font.pixelSize: 10
+                                    color: ThemeManager.fgTertiary
+                                    wrapMode: Text.WordWrap
+                                    width: parent.width
+                                }
+
+                                QtObject {
+                                    id: hyprBorderAngleObj
+                                    property int value: 45
                                 }
                             }
 
