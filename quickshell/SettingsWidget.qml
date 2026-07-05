@@ -48,6 +48,7 @@ Rectangle {
     property int hyprShadowRange: 20
     property int hyprShadowAlpha: 33
     property bool hyprShadowUseAccent: false
+    property int hyprBorderAlpha: 35
     
     signal closeRequested()
     signal settingsUpdated()  // Signal to notify when settings change
@@ -357,6 +358,7 @@ SETTINGSEOF`
             if (h.shadowRange     !== undefined) hyprShadowRangeObj.value = h.shadowRange
             if (h.shadowAlpha     !== undefined) hyprShadowAlphaObj.value = h.shadowAlpha
             if (h.shadowUseAccent !== undefined) hyprShadowAccentCheck.checked = h.shadowUseAccent
+            if (h.borderAlpha     !== undefined) hyprBorderAlphaObj.value = h.borderAlpha
         }
     }
     
@@ -544,6 +546,37 @@ SETTINGSEOF`
         saveSettings()
         ThemeManager.hyprShadowAlpha = hyprShadowAlphaObj.value
         ThemeManager.hyprShadowUseAccent = hyprShadowAccentCheck.checked
+    }
+
+    // Hyprland's window border is a 3-stop gradient (black / accent / white)
+    // defined in hypr/appearance.lua as a structured Lua table
+    // (col.active_border = { colors = {...}, angle = N }) rather than a
+    // single color string -- confirmed the flat "rgba(...) rgba(...) Ndeg"
+    // string form that decoration:shadow:color accepts does NOT work here;
+    // only the nested {colors={...}, angle=N} table is accepted by hl.config
+    // for gradient variables. alphaPct scales all stops together relative to
+    // their original baked-in ratios (using the accent stop, originally 0x59
+    // = 89/255, as the anchor so alphaPct=100 makes it fully opaque).
+    function buildBorderGradients(alphaPct) {
+        const scale = (alphaPct / 100) * (255 / 0x59)
+        function hexAlpha(base) {
+            return Math.max(0, Math.min(255, Math.round(base * scale))).toString(16).padStart(2, "0")
+        }
+        const accentHex = colorToHex(ThemeManager.accentBlue)
+        return {
+            active: '{"rgba(000000' + hexAlpha(0x40) + ')","rgba(' + accentHex + hexAlpha(0x59) + ')","rgba(ffffff' + hexAlpha(0x26) + ')"}',
+            inactive: '{"rgba(000000' + hexAlpha(0x1a) + ')","rgba(ffffff' + hexAlpha(0x12) + ')"}'
+        }
+    }
+
+    function applyBorderAlpha(val) {
+        const g = buildBorderGradients(val)
+        const lua = 'hl.config({general={col={active_border={colors=' + g.active + ',angle=45},'
+            + 'inactive_border={colors=' + g.inactive + ',angle=45}}}})'
+        Quickshell.execDetached(["hyprctl", "eval", lua])
+        if (!root.settings.hypr) root.settings.hypr = {}
+        root.settings.hypr.borderAlpha = val
+        saveSettings()
     }
     
     function applyTheme(themeName) {
@@ -3739,6 +3772,87 @@ MouseArea {
                                 QtObject {
                                     id: hyprBorderThicknessObj
                                     property int value: 1
+                                }
+                            }
+
+                            // Border transparency
+                            Column {
+                                spacing: 8
+                                width: parent.width - 40
+                                leftPadding: 20
+                                opacity: hyprBorderEnabledCheck.checked ? 1.0 : 0.5
+
+                                Text {
+                                    text: "Border transparency: " + hyprBorderAlphaObj.value + "%"
+                                    font.family: ThemeManager.uiFont
+                                    font.pixelSize: 12
+                                    color: ThemeManager.fgPrimary
+                                }
+
+                                Item {
+                                    width: parent.width - 40
+                                    height: 32
+
+                                    Rectangle {
+                                        id: borderAlphaTrack
+                                        anchors.centerIn: parent
+                                        width: parent.width
+                                        height: 6
+                                        radius: 3
+                                        color: Qt.rgba(1, 1, 1, 0.07)
+
+                                        Rectangle {
+                                            width: borderAlphaHandle.x + borderAlphaHandle.width / 2
+                                            height: parent.height
+                                            radius: parent.radius
+                                            color: ThemeManager.accentBlue
+                                        }
+                                    }
+
+                                    Rectangle {
+                                        id: borderAlphaHandle
+                                        width: 20
+                                        height: 20
+                                        radius: 10
+                                        color: borderAlphaMA.containsMouse || borderAlphaMA.pressed ? ThemeManager.accentBlue : ThemeManager.fgPrimary
+                                        border.width: 2
+                                        border.color: ThemeManager.accentBlue
+                                        y: (parent.height - height) / 2
+                                        x: (borderAlphaTrack.width - width) * (hyprBorderAlphaObj.value / 100.0)
+                                        Behavior on color { ColorAnimation { duration: 150 } }
+                                    }
+
+                                    MouseArea {
+                                        id: borderAlphaMA
+                                        anchors.fill: parent
+                                        hoverEnabled: true
+                                        cursorShape: Qt.PointingHandCursor
+                                        enabled: hyprBorderEnabledCheck.checked
+
+                                        function updateVal(mouse) {
+                                            const norm = Math.max(0, Math.min(1, mouse.x / width))
+                                            const val = Math.round(norm * 100)
+                                            hyprBorderAlphaObj.value = val
+                                            root.applyBorderAlpha(val)
+                                        }
+
+                                        onPressed: updateVal(mouse)
+                                        onPositionChanged: if (pressed) updateVal(mouse)
+                                    }
+                                }
+
+                                Text {
+                                    text: "Hyprland's window border is always somewhat translucent by design (a soft black/accent/white gradient); this controls how opaque that gradient is overall"
+                                    font.family: ThemeManager.uiFont
+                                    font.pixelSize: 10
+                                    color: ThemeManager.fgTertiary
+                                    wrapMode: Text.WordWrap
+                                    width: parent.width
+                                }
+
+                                QtObject {
+                                    id: hyprBorderAlphaObj
+                                    property int value: 35
                                 }
                             }
 
