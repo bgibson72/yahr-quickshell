@@ -388,7 +388,7 @@ SETTINGSEOF`
         running: false
         command: ["sh", "-c",
             "[ -f ~/.config/hypr/themes/Custom.conf ] || bash ~/.config/quickshell/generate-custom-theme.sh 1e1e2e 89b4fa cba6f7 f5c2e7 f38ba8 fab387 f9e2af a6e3a1 94e2d5 >/dev/null 2>&1; " +
-            "ls ~/.config/hypr/themes/*.conf 2>/dev/null | xargs -n1 basename | sed 's/.conf$//' | grep -v '^active-theme$' | sort"]
+            "{ ls ~/.config/hypr/themes/*.conf 2>/dev/null | xargs -n1 basename | sed 's/.conf$//' | grep -v '^active-theme$' | grep -v '^Custom$' | sort; echo Custom; }"]
         
         stdout: SplitParser {
             onRead: data => {
@@ -4778,10 +4778,13 @@ MouseArea {
 
 
                 // Tab 4: THEME ──────────────────────────────────────
-                ScrollView {
+                Item {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
-                    clip: true
+
+                    ScrollView {
+                        anchors.fill: parent
+                        clip: true
                     
                     Column {
                         width: parent.parent.width
@@ -4816,7 +4819,7 @@ MouseArea {
                                     }
 
                                     property string cardBg: {
-                                        if (model.name === "Custom") return "#" + root.customColors.bg
+                                        if (model.name === "Custom") return "#2a2a35"
                                         var m = {
                                             "Catppuccin":"#1e1e2e","Dracula":"#282a36","Eldritch":"#212337",
                                             "Everforest":"#374247","Gruvbox":"#282828","Kanagawa":"#1f1f28",
@@ -4828,7 +4831,7 @@ MouseArea {
                                     }
 
                                     property string cardFg: {
-                                        if (model.name === "Custom") return "#ffffff"
+                                        if (model.name === "Custom") return "#9a9aa8"
                                         var m = {
                                             "Catppuccin":"#cdd6f4","Dracula":"#f8f8f2","Eldritch":"#ebfafa",
                                             "Everforest":"#d3c6aa","Gruvbox":"#ebdbb2","Kanagawa":"#dcd7ba",
@@ -4840,12 +4843,7 @@ MouseArea {
                                     }
 
                                     property var cardAccents: {
-                                        if (model.name === "Custom") return [
-                                            "#" + root.customColors.blue, "#" + root.customColors.purple,
-                                            "#" + root.customColors.pink, "#" + root.customColors.red,
-                                            "#" + root.customColors.orange, "#" + root.customColors.yellow,
-                                            "#" + root.customColors.green, "#" + root.customColors.teal
-                                        ]
+                                        if (model.name === "Custom") return []
                                         var m = {
                                             "Catppuccin":["#89b4fa","#cba6f7","#f5c2e7","#f38ba8","#fab387","#f9e2af","#a6e3a1","#94e2d5"],
                                             "Dracula":   ["#bd93f9","#ff79c6","#ff6e6e","#ffb86c","#f1fa8c","#50fa7b","#8be9fd","#6272a4"],
@@ -4914,9 +4912,9 @@ MouseArea {
                                         Text {
                                             visible: model.name === "Custom"
                                             anchors.horizontalCenter: parent.horizontalCenter
-                                            text: "\uf1fc"
+                                            text: "\uf067"
                                             font.family: "Symbols Nerd Font"
-                                            font.pixelSize: 56
+                                            font.pixelSize: 40
                                             color: themeCard.cardFg
                                         }
 
@@ -4932,6 +4930,7 @@ MouseArea {
                                         // Accent color band strip
                                         Rectangle {
                                             id: accentBarWrap
+                                            visible: model.name !== "Custom"
                                             anchors.horizontalCenter: parent.horizontalCenter
                                             width: parent.width
                                             height: 10
@@ -4969,22 +4968,34 @@ MouseArea {
                                 }
                             }
                         }
+                    }
+                    }
 
-                        // Custom theme color editor -- appears below the grid when
-                        // the Custom card is clicked. 9 user-editable colors (1
-                        // background + 8 accents), each a plain hex TextInput with
-                        // a live swatch preview.
-                        Rectangle {
-                            width: parent.width
-                            height: root.editingCustomTheme ? customEditorColumn.implicitHeight + 32 : 0
-                            visible: height > 0
-                            clip: true
-                            radius: 12
-                            color: Qt.rgba(1, 1, 1, 0.05)
-                            border.width: 1
-                            border.color: Qt.rgba(1, 1, 1, 0.15)
+                    // Custom theme color editor -- floats as an overlay over the
+                    // grid (instead of being appended inline, which required
+                    // scrolling all the way past every theme card to reach it).
+                    // Appears when the Custom card is clicked. 9 user-editable
+                    // colors (1 background + 8 accents), each a plain hex
+                    // TextInput with a live swatch preview.
+                    MouseArea {
+                        anchors.fill: parent
+                        visible: root.editingCustomTheme
+                        enabled: root.editingCustomTheme
+                        onClicked: root.editingCustomTheme = false
+                    }
 
-                            Behavior on height { NumberAnimation { duration: 150 } }
+                    Rectangle {
+                        anchors.centerIn: parent
+                        width: Math.min(parent.width - 40, 560)
+                        height: customEditorColumn.implicitHeight + 32
+                        visible: root.editingCustomTheme
+                        clip: true
+                        radius: 12
+                        color: ThemeManager.bgBase
+                        border.width: 1
+                        border.color: Qt.rgba(1, 1, 1, 0.20)
+                        layer.enabled: true
+                        layer.effect: WidgetShadowEffect {}
 
                             Column {
                                 id: customEditorColumn
@@ -5323,8 +5334,7 @@ MouseArea {
                                 }
                             }
                         }
-                    }
-                }
+                    } // end Tab 4 Item wrapper
 
                 // Tab 5: WALLPAPER ────────────────────────────────
                 Item {
