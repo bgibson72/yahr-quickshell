@@ -29,7 +29,22 @@ def current_accent_rgb():
         pass
     return "000000"
 
-def apply_border_gradient(transparency_pct, angle_deg):
+def current_border0_rgb():
+    """Reads the active theme's neutral border-0 color (e.g. "565f89"),
+    used for the inactive-window border in solid-accent mode. Falls back
+    to a mid-gray on any failure."""
+    try:
+        theme_name = open(os.path.expanduser("~/.config/hypr/.current-theme")).read().strip()
+        theme_conf = os.path.expanduser("~/.config/hypr/themes/" + theme_name + ".conf")
+        with open(theme_conf) as tf:
+            for line in tf:
+                if line.strip().startswith("$border-0"):
+                    return line.split("rgb(")[1].split(")")[0]
+    except Exception:
+        pass
+    return "6c7086"
+
+def apply_border_gradient(transparency_pct, angle_deg, solid_accent):
     """Window border color/angle is a structured Lua-table gradient (see
     hypr/appearance.lua's col.active_border/inactive_border) baked into the
     on-disk config, not a plain hl.config-settable value -- confirmed that
@@ -37,21 +52,46 @@ def apply_border_gradient(transparency_pct, angle_deg):
     it) but Hyprland never actually repaints existing window borders with
     it; only a full `hyprctl reload` (re-reading the Lua files from disk)
     forces a real visual refresh. So this patches the live Lua files
-    in place (regex-matched by pattern, not by the original literal alpha,
-    so it stays idempotent across repeated changes) and reloads, BEFORE the
-    rest of this script's eval-based settings run (which apply fine live
-    without a reload and must come after, or the reload would revert them
-    to their file defaults).
+    in place and reloads, BEFORE the rest of this script's eval-based
+    settings run (which apply fine live without a reload and must come
+    after, or the reload would revert them to their file defaults).
 
     transparency_pct: 0 = fully solid/opaque border, 100 = fully invisible
     (the inverse of opacity -- converted to opacity here for the actual
-    alpha-byte math, since that's what the color stops represent)."""
+    alpha-byte math, since that's what the color stops represent).
+
+    solid_accent: when true, use a single solid theme-accent color all the
+    way around the active window's border (and the neutral border-0 color,
+    dimmer, for inactive windows) instead of the black/accent/white glass
+    gradient -- this used to be the default before the Lua config migration
+    (see the pre-migration hyprland-backup conf: col.active_border =
+    $accent-blue, col.inactive_border = $border-0).
+
+    The entire `colors = { ... }` array is replaced wholesale (not just
+    alpha bytes within fixed-position stops), since solid mode has a
+    different number of stops than gradient mode -- this also means the
+    replacement is idempotent regardless of which mode/values were
+    previously written, and always uses the CURRENT theme's accent (so
+    switching themes doesn't leave a stale color baked in from before)."""
     opacity_pct = 100 - transparency_pct
-    scale = (opacity_pct / 100) * (255 / 0x59)
-    def hexa(base):
-        return format(max(0, min(255, round(base * scale))), "02x")
-    a_black, a_accent, a_white = hexa(0x40), hexa(0x59), hexa(0x26)
-    i_black, i_white = hexa(0x1a), hexa(0x12)
+
+    def alpha_byte(pct):
+        return format(max(0, min(255, round(pct / 100 * 255))), "02x")
+
+    accent = current_accent_rgb()
+
+    if solid_accent:
+        active_a = alpha_byte(opacity_pct)
+        inactive_a = alpha_byte(opacity_pct * 0.5)
+        active_colors = '{ "rgba(' + accent + active_a + ')" }'
+        inactive_colors = '{ "rgba(' + current_border0_rgb() + inactive_a + ')" }'
+    else:
+        scale = (opacity_pct / 100) * (255 / 0x59)
+        def hexa(base):
+            return format(max(0, min(255, round(base * scale))), "02x")
+        active_colors = ('{ "rgba(000000' + hexa(0x40) + ')", "rgba(' + accent + hexa(0x59)
+            + ')", "rgba(ffffff' + hexa(0x26) + ')" }')
+        inactive_colors = '{ "rgba(000000' + hexa(0x1a) + ')", "rgba(ffffff' + hexa(0x12) + ')" }'
 
     try:
         appearance_path = os.path.expanduser("~/.config/hypr/appearance.lua")
@@ -60,30 +100,14 @@ def apply_border_gradient(transparency_pct, angle_deg):
         out = []
         for line in lines:
             if "inactive_border" in line:
-                line = re.sub(r"rgba\(000000[0-9a-fA-F]{2}\)", "rgba(000000" + i_black + ")", line)
-                line = re.sub(r"rgba\(ffffff[0-9a-fA-F]{2}\)", "rgba(ffffff" + i_white + ")", line)
+                line = re.sub(r"colors\s*=\s*\{[^}]*\}", "colors = " + inactive_colors, line)
                 line = re.sub(r"angle\s*=\s*\d+", "angle = " + str(int(angle_deg)), line)
             elif "active_border" in line:
-                line = re.sub(r"rgba\(000000[0-9a-fA-F]{2}\)", "rgba(000000" + a_black + ")", line)
-                line = re.sub(r"rgba\(ffffff[0-9a-fA-F]{2}\)", "rgba(ffffff" + a_white + ")", line)
+                line = re.sub(r"colors\s*=\s*\{[^}]*\}", "colors = " + active_colors, line)
                 line = re.sub(r"angle\s*=\s*\d+", "angle = " + str(int(angle_deg)), line)
             out.append(line)
         with open(appearance_path, "w") as f:
             f.writelines(out)
-    except Exception:
-        pass
-
-    try:
-        theme_name = open(os.path.expanduser("~/.config/hypr/.current-theme")).read().strip()
-        theme_lua = os.path.expanduser("~/.config/hypr/themes/" + theme_name + ".lua")
-        with open(theme_lua) as f:
-            tcontent = f.read()
-        tcontent = re.sub(
-            r'(glass_accent\s*=\s*"rgba\([0-9a-fA-F]{6})[0-9a-fA-F]{2}(\)")',
-            lambda m: m.group(1) + a_accent + m.group(2),
-            tcontent)
-        with open(theme_lua, "w") as f:
-            f.write(tcontent)
     except Exception:
         pass
 
@@ -97,8 +121,9 @@ try:
 
     # Must run first -- writes files + reloads, which would otherwise wipe
     # out the eval-based settings applied below.
-    if "borderTransparency" in h or "borderAngle" in h:
-        apply_border_gradient(h.get("borderTransparency", 65), h.get("borderAngle", 45))
+    if "borderTransparency" in h or "borderAngle" in h or "borderSolidAccent" in h:
+        apply_border_gradient(h.get("borderTransparency", 65), h.get("borderAngle", 45),
+            h.get("borderSolidAccent", False))
 
     if "borderSize" in h:
         ev("hl.config({general={border_size=" + str(int(h["borderSize"])) + "}})")

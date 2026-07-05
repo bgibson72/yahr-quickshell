@@ -50,6 +50,7 @@ Rectangle {
     property bool hyprShadowUseAccent: false
     property int hyprBorderTransparency: 65
     property int hyprBorderAngle: 45
+    property bool hyprBorderSolidAccent: false
     
     signal closeRequested()
     signal settingsUpdated()  // Signal to notify when settings change
@@ -361,6 +362,7 @@ SETTINGSEOF`
             if (h.shadowUseAccent !== undefined) hyprShadowAccentCheck.checked = h.shadowUseAccent
             if (h.borderTransparency !== undefined) hyprBorderTransparencyObj.value = h.borderTransparency
             if (h.borderAngle     !== undefined) hyprBorderAngleObj.value = h.borderAngle
+            if (h.borderSolidAccent !== undefined) hyprBorderSolidAccentCheck.checked = h.borderSolidAccent
         }
     }
     
@@ -577,6 +579,13 @@ SETTINGSEOF`
     function applyBorderAngle(val) {
         if (!root.settings.hypr) root.settings.hypr = {}
         root.settings.hypr.borderAngle = val
+        saveSettings()
+        Quickshell.execDetached(["bash", Quickshell.env("HOME") + "/.config/quickshell/apply-hypr-settings.sh"])
+    }
+
+    function applyBorderSolidAccent(checked) {
+        if (!root.settings.hypr) root.settings.hypr = {}
+        root.settings.hypr.borderSolidAccent = checked
         saveSettings()
         Quickshell.execDetached(["bash", Quickshell.env("HOME") + "/.config/quickshell/apply-hypr-settings.sh"])
     }
@@ -3936,6 +3945,65 @@ MouseArea {
                                 QtObject {
                                     id: hyprBorderAngleObj
                                     property int value: 45
+                                }
+                            }
+
+                            // Solid accent border (pre-migration classic style:
+                            // a plain accent-colored border with no black/white gradient)
+                            Row {
+                                spacing: 12
+                                opacity: hyprBorderEnabledCheck.checked ? 1.0 : 0.5
+
+                                Rectangle {
+                                    width: 48
+                                    height: 24
+                                    radius: 12
+                                    color: hyprBorderSolidAccentCheck.checked ? ThemeManager.accentGreen : Qt.rgba(1, 1, 1, 0.07)
+                                    Behavior on color { ColorAnimation { duration: 150 } }
+
+                                    Rectangle {
+                                        width: 18
+                                        height: 18
+                                        radius: 9
+                                        color: ThemeManager.fgPrimary
+                                        x: hyprBorderSolidAccentCheck.checked ? parent.width - width - 3 : 3
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        Behavior on x { NumberAnimation { duration: 200 } }
+                                    }
+
+                                    MouseArea {
+                                        anchors.fill: parent
+                                        cursorShape: Qt.PointingHandCursor
+                                        enabled: hyprBorderEnabledCheck.checked
+                                        onClicked: {
+                                            hyprBorderSolidAccentCheck.checked = !hyprBorderSolidAccentCheck.checked
+                                            root.applyBorderSolidAccent(hyprBorderSolidAccentCheck.checked)
+                                        }
+                                    }
+                                }
+
+                                Column {
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    spacing: 2
+                                    Text {
+                                        text: "Solid accent border"
+                                        font.family: ThemeManager.uiFont
+                                        font.pixelSize: 12
+                                        color: ThemeManager.fgPrimary
+                                    }
+                                    Text {
+                                        text: "A plain accent-colored border with no gradient (the classic pre-migration look), instead of the black/accent/white glass gradient above. The angle slider has no effect in this mode"
+                                        font.family: ThemeManager.uiFont
+                                        font.pixelSize: 10
+                                        color: ThemeManager.fgSecondary
+                                        wrapMode: Text.WordWrap
+                                        width: 320
+                                    }
+                                }
+
+                                QtObject {
+                                    id: hyprBorderSolidAccentCheck
+                                    property bool checked: false
                                 }
                             }
 
