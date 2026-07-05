@@ -4618,109 +4618,89 @@ MouseArea {
                             }
                         }
                         
-                        Repeater {
-                            model: themeModel
-                            
-                            Rectangle {
-                                id: themeCard
-                                width: Math.min(parent.width - 40, 520)
-                                x: (parent.width - width) / 2
-                                height: 72
-                                radius: 10
-                                clip: true
-                                color: cardBg
+                        Flow {
+                            width: parent.width
+                            spacing: 16
 
-                                property bool isActive: model.name === root.currentTheme
+                            Repeater {
+                                model: themeModel
 
-                                border.width: isActive ? 2 : (themeMouseArea.containsMouse ? 1 : 0)
-                                border.color: isActive ? "#a6e3a1" : Qt.rgba(1, 1, 1, 0.22)
-
-                                Behavior on border.width {
-                                    NumberAnimation { duration: 150 }
-                                }
-
-                                property string cardBg: {
-                                    var m = {
-                                        "Catppuccin":"#1e1e2e","Dracula":"#282a36","Eldritch":"#212337",
-                                        "Everforest":"#374247","Gruvbox":"#282828","Kanagawa":"#1f1f28",
-                                        "Material":"#263238","Monochrome":"#252525","NightFox":"#131a24",
-                                        "Nord":"#2e3440","Rosepine":"#191724","Solarized":"#002b36",
-                                        "TokyoNight":"#1a1b26"
-                                    };
-                                    return m[model.name] || "#1e1e2e";
-                                }
-
-                                property string cardFg: {
-                                    var m = {
-                                        "Catppuccin":"#cdd6f4","Dracula":"#f8f8f2","Eldritch":"#ebfafa",
-                                        "Everforest":"#d3c6aa","Gruvbox":"#ebdbb2","Kanagawa":"#dcd7ba",
-                                        "Material":"#eeffff","Monochrome":"#bebebe","NightFox":"#cdcecf",
-                                        "Nord":"#eceff4","Rosepine":"#e0def4","Solarized":"#839496",
-                                        "TokyoNight":"#c0caf5"
-                                    };
-                                    return m[model.name] || "#cdd6f4";
-                                }
-
-                                property var cardAccents: {
-                                    var m = {
-                                        "Catppuccin":["#89b4fa","#cba6f7","#f5c2e7","#f38ba8","#fab387","#f9e2af","#a6e3a1","#94e2d5"],
-                                        "Dracula":   ["#bd93f9","#ff79c6","#ff6e6e","#ffb86c","#f1fa8c","#50fa7b","#8be9fd","#6272a4"],
-                                        "Eldritch":  ["#f16c75","#f265b5","#7081d0","#a48cf2","#37f499","#04d1f9","#ffd700","#323449"],
-                                        "Everforest":["#e67e80","#e69875","#dbbc7f","#a7c080","#83c092","#7fbbb3","#d699b6","#9da9a0"],
-                                        "Gruvbox":   ["#fb4934","#fe8019","#fabd2f","#b8bb26","#8ec07c","#83a598","#d3869b","#689d6a"],
-                                        "Kanagawa":  ["#7fb4ca","#957fb8","#d27e99","#e46876","#dca561","#98bb6c","#7aa89f","#938aa9"],
-                                        "Material":  ["#82aaff","#c792ea","#f07178","#f78c6c","#ffcb6b","#c3e88d","#89ddff","#546e7a"],
-                                        "Monochrome":["#bebebe","#a8a8a8","#999999","#888888","#777777","#666666","#555555","#444444"],
-                                        "NightFox":  ["#719cd6","#9d79d6","#d67ad2","#f52a65","#f4a261","#dbc074","#63cdcf","#4d688e"],
-                                        "Nord":      ["#88c0d0","#81a1c1","#5e81ac","#bf616a","#d08770","#ebcb8b","#a3be8c","#b48ead"],
-                                        "Rosepine":  ["#c4a7e7","#ebbcba","#eb6f92","#f6c177","#ea9a97","#9ccfd8","#31748f","#907aa9"],
-                                        "Solarized": ["#268bd2","#6c71c4","#d33682","#dc322f","#cb4b16","#b58900","#859900","#2aa198"],
-                                        "TokyoNight":["#7aa2f7","#bb9af7","#f7768e","#ff9e64","#e0af68","#9ece6a","#73daca","#7dcfff"]
-                                    };
-                                    return m[model.name] || ["#89b4fa","#cba6f7","#f38ba8","#fab387","#f9e2af","#a6e3a1","#94e2d5","#74c7ec"];
-                                }
-
-                                // Top band — theme bg color with name and current badge
                                 Rectangle {
-                                    id: topBand
-                                    anchors.top: parent.top
-                                    anchors.topMargin: themeCard.border.width
-                                    anchors.left: parent.left
-                                    anchors.leftMargin: themeCard.border.width
-                                    anchors.right: parent.right
-                                    anchors.rightMargin: themeCard.border.width
-                                    anchors.bottom: accentBarWrap.top
-                                    color: themeCard.cardBg
-                                    topLeftRadius: Math.max(0, themeCard.radius - themeCard.border.width)
-                                    topRightRadius: Math.max(0, themeCard.radius - themeCard.border.width)
+                                    id: themeCard
+                                    width: 160
+                                    height: 172
+                                    radius: 14
+                                    clip: true
+                                    color: cardBg
+
+                                    property bool isActive: model.name === root.currentTheme
+
+                                    border.width: isActive ? 2 : (themeMouseArea.containsMouse ? 1 : 0)
+                                    border.color: isActive ? "#a6e3a1" : Qt.rgba(1, 1, 1, 0.22)
+
+                                    Behavior on border.width {
+                                        NumberAnimation { duration: 150 }
+                                    }
+
+                                    property string cardBg: {
+                                        var m = {
+                                            "Catppuccin":"#1e1e2e","Dracula":"#282a36","Eldritch":"#212337",
+                                            "Everforest":"#374247","Gruvbox":"#282828","Kanagawa":"#1f1f28",
+                                            "Material":"#263238","Monochrome":"#252525","NightFox":"#131a24",
+                                            "Nord":"#2e3440","Rosepine":"#191724","Solarized":"#002b36",
+                                            "TokyoNight":"#1a1b26"
+                                        };
+                                        return m[model.name] || "#1e1e2e";
+                                    }
+
+                                    property string cardFg: {
+                                        var m = {
+                                            "Catppuccin":"#cdd6f4","Dracula":"#f8f8f2","Eldritch":"#ebfafa",
+                                            "Everforest":"#d3c6aa","Gruvbox":"#ebdbb2","Kanagawa":"#dcd7ba",
+                                            "Material":"#eeffff","Monochrome":"#bebebe","NightFox":"#cdcecf",
+                                            "Nord":"#eceff4","Rosepine":"#e0def4","Solarized":"#839496",
+                                            "TokyoNight":"#c0caf5"
+                                        };
+                                        return m[model.name] || "#cdd6f4";
+                                    }
+
+                                    property var cardAccents: {
+                                        var m = {
+                                            "Catppuccin":["#89b4fa","#cba6f7","#f5c2e7","#f38ba8","#fab387","#f9e2af","#a6e3a1","#94e2d5"],
+                                            "Dracula":   ["#bd93f9","#ff79c6","#ff6e6e","#ffb86c","#f1fa8c","#50fa7b","#8be9fd","#6272a4"],
+                                            "Eldritch":  ["#f16c75","#f265b5","#7081d0","#a48cf2","#37f499","#04d1f9","#ffd700","#323449"],
+                                            "Everforest":["#e67e80","#e69875","#dbbc7f","#a7c080","#83c092","#7fbbb3","#d699b6","#9da9a0"],
+                                            "Gruvbox":   ["#fb4934","#fe8019","#fabd2f","#b8bb26","#8ec07c","#83a598","#d3869b","#689d6a"],
+                                            "Kanagawa":  ["#7fb4ca","#957fb8","#d27e99","#e46876","#dca561","#98bb6c","#7aa89f","#938aa9"],
+                                            "Material":  ["#82aaff","#c792ea","#f07178","#f78c6c","#ffcb6b","#c3e88d","#89ddff","#546e7a"],
+                                            "Monochrome":["#bebebe","#a8a8a8","#999999","#888888","#777777","#666666","#555555","#444444"],
+                                            "NightFox":  ["#719cd6","#9d79d6","#d67ad2","#f52a65","#f4a261","#dbc074","#63cdcf","#4d688e"],
+                                            "Nord":      ["#88c0d0","#81a1c1","#5e81ac","#bf616a","#d08770","#ebcb8b","#a3be8c","#b48ead"],
+                                            "Rosepine":  ["#c4a7e7","#ebbcba","#eb6f92","#f6c177","#ea9a97","#9ccfd8","#31748f","#907aa9"],
+                                            "Solarized": ["#268bd2","#6c71c4","#d33682","#dc322f","#cb4b16","#b58900","#859900","#2aa198"],
+                                            "TokyoNight":["#7aa2f7","#bb9af7","#f7768e","#ff9e64","#e0af68","#9ece6a","#73daca","#7dcfff"]
+                                        };
+                                        return m[model.name] || ["#89b4fa","#cba6f7","#f38ba8","#fab387","#f9e2af","#a6e3a1","#94e2d5","#74c7ec"];
+                                    }
 
                                     // Subtle hover brightening
                                     Rectangle {
                                         anchors.fill: parent
+                                        radius: parent.radius
                                         color: themeMouseArea.containsMouse ? Qt.rgba(1, 1, 1, 0.05) : "transparent"
                                         Behavior on color { ColorAnimation { duration: 150 } }
                                     }
 
-                                    Text {
-                                        id: cardThemeName
-                                        anchors.left: parent.left
-                                        anchors.leftMargin: 18
-                                        anchors.verticalCenter: parent.verticalCenter
-                                        text: model.name
-                                        font.family: ThemeManager.uiFont
-                                        font.pixelSize: 15
-                                        font.weight: Font.Medium
-                                        color: themeCard.cardFg
-                                    }
-
+                                    // "Current" badge, top-right corner
                                     Rectangle {
                                         visible: themeCard.isActive
-                                        anchors.left: cardThemeName.right
-                                        anchors.leftMargin: 10
-                                        anchors.verticalCenter: parent.verticalCenter
-                                        width: currentBadge.implicitWidth + 12
-                                        height: 18
+                                        anchors.top: parent.top
+                                        anchors.right: parent.right
+                                        anchors.margins: 8
+                                        width: currentBadge.implicitWidth + 10
+                                        height: 16
                                         radius: 4
+                                        z: 2
                                         color: Qt.rgba(0.651, 0.890, 0.631, 0.18)
 
                                         Text {
@@ -4728,44 +4708,68 @@ MouseArea {
                                             anchors.centerIn: parent
                                             text: "● Current"
                                             font.family: ThemeManager.uiFont
-                                            font.pixelSize: 9
+                                            font.pixelSize: 8
                                             color: "#a6e3a1"
                                         }
                                     }
-                                }
 
-                                // Accent color band strip at bottom
-                                Rectangle {
-                                    id: accentBarWrap
-                                    anchors.bottom: parent.bottom
-                                    anchors.bottomMargin: 8
-                                    anchors.horizontalCenter: parent.horizontalCenter
-                                    width: Math.min(parent.width - 80, 480)
-                                    height: 8
-                                    radius: 4
-                                    clip: true
+                                    // Arch logo + theme name + accent palette bar
+                                    Column {
+                                        anchors.centerIn: parent
+                                        spacing: 10
+                                        width: parent.width - 24
 
-                                    Row {
-                                        anchors.fill: parent
-                                        Repeater {
-                                            model: themeCard.cardAccents
-                                            Rectangle {
-                                                width: accentBarWrap.width / themeCard.cardAccents.length
-                                                height: accentBarWrap.height
-                                                color: modelData
+                                        Image {
+                                            width: 48
+                                            height: 48
+                                            anchors.horizontalCenter: parent.horizontalCenter
+                                            source: "file://" + Quickshell.env("HOME") + "/.config/fastfetch/logos/" + model.name.toLowerCase() + "_arch.png"
+                                            fillMode: Image.PreserveAspectFit
+                                            smooth: true
+                                            asynchronous: true
+                                        }
+
+                                        Text {
+                                            anchors.horizontalCenter: parent.horizontalCenter
+                                            text: model.name
+                                            font.family: ThemeManager.uiFont
+                                            font.pixelSize: 13
+                                            font.weight: Font.Medium
+                                            color: themeCard.cardFg
+                                        }
+
+                                        // Accent color band strip
+                                        Rectangle {
+                                            id: accentBarWrap
+                                            anchors.horizontalCenter: parent.horizontalCenter
+                                            width: parent.width
+                                            height: 8
+                                            radius: 4
+                                            clip: true
+
+                                            Row {
+                                                anchors.fill: parent
+                                                Repeater {
+                                                    model: themeCard.cardAccents
+                                                    Rectangle {
+                                                        width: accentBarWrap.width / themeCard.cardAccents.length
+                                                        height: accentBarWrap.height
+                                                        color: modelData
+                                                    }
+                                                }
                                             }
                                         }
                                     }
-                                }
 
-                                MouseArea {
-                                    id: themeMouseArea
-                                    anchors.fill: parent
-                                    hoverEnabled: true
-                                    cursorShape: Qt.PointingHandCursor
+                                    MouseArea {
+                                        id: themeMouseArea
+                                        anchors.fill: parent
+                                        hoverEnabled: true
+                                        cursorShape: Qt.PointingHandCursor
 
-                                    onClicked: {
-                                        applyTheme(model.name)
+                                        onClicked: {
+                                            applyTheme(model.name)
+                                        }
                                     }
                                 }
                             }
