@@ -4596,28 +4596,6 @@ MouseArea {
                             }
                         }
 
-                        // App restart note
-                        Rectangle {
-                            width: parent.width
-                            height: restartNoteText.implicitHeight + 20
-                            color: Qt.rgba(ThemeManager.accentYellow.r, ThemeManager.accentYellow.g, ThemeManager.accentYellow.b, 0.08)
-                            radius: 8
-                            border.width: 1
-                            border.color: Qt.rgba(ThemeManager.accentYellow.r, ThemeManager.accentYellow.g, ThemeManager.accentYellow.b, 0.30)
-
-                            Text {
-                                id: restartNoteText
-                                anchors.centerIn: parent
-                                width: parent.width - 24
-                                text: "⚠  Some applications need to be relaunched before theme changes take full effect, including Kitty terminal and Thunar file manager."
-                                font.family: ThemeManager.uiFont
-                                font.pixelSize: 11
-                                font.italic: true
-                                color: ThemeManager.accentYellow
-                                wrapMode: Text.WordWrap
-                            }
-                        }
-                        
                         Flow {
                             width: parent.width
                             spacing: 16
