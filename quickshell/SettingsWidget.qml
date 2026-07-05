@@ -28,6 +28,15 @@ Rectangle {
     property bool enableBlur: false
     property bool showWidgetBorders: true
     property int widgetBorderWidth: 1
+    // Custom theme's 9 user-editable colors (1 background + 8 accents).
+    // Loaded from settings.json's theme.custom, defaults to a Catppuccin-like
+    // starting palette. Kept reactive so the Custom card's preview always
+    // reflects the current values, even before the user has saved anything.
+    property var customColors: ({
+        bg: "1e1e2e", blue: "89b4fa", purple: "cba6f7", pink: "f5c2e7",
+        red: "f38ba8", orange: "fab387", yellow: "f9e2af", green: "a6e3a1", teal: "94e2d5"
+    })
+    property bool editingCustomTheme: false
 
     // SDDM settings
     property real sddmLoginOpacity: 0.75
@@ -156,6 +165,9 @@ Rectangle {
                     
                     // Update the reactive currentTheme property
                     root.currentTheme = root.settings.theme.current || "TokyoNight"
+                    if (root.settings.theme && root.settings.theme.custom) {
+                        root.customColors = root.settings.theme.custom
+                    }
                     
                     console.log("Settings loaded:", JSON.stringify(root.settings))
                     updateUI()
@@ -374,7 +386,9 @@ SETTINGSEOF`
     Process {
         id: themeLoader
         running: false
-        command: ["sh", "-c", "ls ~/.config/hypr/themes/*.conf 2>/dev/null | xargs -n1 basename | sed 's/.conf$//' | grep -v '^active-theme$' | sort"]
+        command: ["sh", "-c",
+            "[ -f ~/.config/hypr/themes/Custom.conf ] || bash ~/.config/quickshell/generate-custom-theme.sh 1e1e2e 89b4fa cba6f7 f5c2e7 f38ba8 fab387 f9e2af a6e3a1 94e2d5 >/dev/null 2>&1; " +
+            "ls ~/.config/hypr/themes/*.conf 2>/dev/null | xargs -n1 basename | sed 's/.conf$//' | grep -v '^active-theme$' | sort"]
         
         stdout: SplitParser {
             onRead: data => {
@@ -614,6 +628,48 @@ SETTINGSEOF`
         
         // Theme switch happens in background, no need to reload Quickshell
         // The theme-switcher-quickshell script handles all necessary updates
+    }
+
+    // Validates a hex field's text (must be exactly 6 hex digits), falling
+    // back to the previous value for that slot if left blank/invalid so a
+    // partially-filled form doesn't corrupt other colors.
+    function validHex(text, fallback) {
+        return /^[0-9a-fA-F]{6}$/.test(text) ? text.toLowerCase() : fallback
+    }
+
+    function saveCustomTheme(bg, blue, purple, pink, red, orange, yellow, green, teal) {
+        const colors = {
+            bg: validHex(bg, root.customColors.bg),
+            blue: validHex(blue, root.customColors.blue),
+            purple: validHex(purple, root.customColors.purple),
+            pink: validHex(pink, root.customColors.pink),
+            red: validHex(red, root.customColors.red),
+            orange: validHex(orange, root.customColors.orange),
+            yellow: validHex(yellow, root.customColors.yellow),
+            green: validHex(green, root.customColors.green),
+            teal: validHex(teal, root.customColors.teal)
+        }
+        root.customColors = colors
+        if (!root.settings.theme) root.settings.theme = {}
+        root.settings.theme.custom = colors
+        saveSettings()
+
+        customThemeGenProcess.command = ["bash", Quickshell.env("HOME") + "/.config/quickshell/generate-custom-theme.sh",
+            colors.bg, colors.blue, colors.purple, colors.pink, colors.red, colors.orange, colors.yellow, colors.green, colors.teal]
+        customThemeGenProcess.running = true
+
+        root.editingCustomTheme = false
+    }
+
+    // Regenerates Custom.conf/.lua from the saved colors, then applies the
+    // theme once that finishes (so theme-switcher-quickshell reads the
+    // freshly-written files, not stale ones).
+    Process {
+        id: customThemeGenProcess
+        running: false
+        onRunningChanged: {
+            if (!running) applyTheme("Custom")
+        }
     }
     
 
@@ -4760,6 +4816,7 @@ MouseArea {
                                     }
 
                                     property string cardBg: {
+                                        if (model.name === "Custom") return "#" + root.customColors.bg
                                         var m = {
                                             "Catppuccin":"#1e1e2e","Dracula":"#282a36","Eldritch":"#212337",
                                             "Everforest":"#374247","Gruvbox":"#282828","Kanagawa":"#1f1f28",
@@ -4771,6 +4828,7 @@ MouseArea {
                                     }
 
                                     property string cardFg: {
+                                        if (model.name === "Custom") return "#ffffff"
                                         var m = {
                                             "Catppuccin":"#cdd6f4","Dracula":"#f8f8f2","Eldritch":"#ebfafa",
                                             "Everforest":"#d3c6aa","Gruvbox":"#ebdbb2","Kanagawa":"#dcd7ba",
@@ -4782,6 +4840,12 @@ MouseArea {
                                     }
 
                                     property var cardAccents: {
+                                        if (model.name === "Custom") return [
+                                            "#" + root.customColors.blue, "#" + root.customColors.purple,
+                                            "#" + root.customColors.pink, "#" + root.customColors.red,
+                                            "#" + root.customColors.orange, "#" + root.customColors.yellow,
+                                            "#" + root.customColors.green, "#" + root.customColors.teal
+                                        ]
                                         var m = {
                                             "Catppuccin":["#89b4fa","#cba6f7","#f5c2e7","#f38ba8","#fab387","#f9e2af","#a6e3a1","#94e2d5"],
                                             "Dracula":   ["#bd93f9","#ff79c6","#ff6e6e","#ffb86c","#f1fa8c","#50fa7b","#8be9fd","#6272a4"],
@@ -4837,13 +4901,23 @@ MouseArea {
                                         width: parent.width - 32
 
                                         Image {
+                                            visible: model.name !== "Custom"
                                             width: 72
                                             height: 72
                                             anchors.horizontalCenter: parent.horizontalCenter
-                                            source: "file://" + Quickshell.env("HOME") + "/.config/fastfetch/logos/" + model.name.toLowerCase() + "_arch.png"
+                                            source: model.name !== "Custom" ? ("file://" + Quickshell.env("HOME") + "/.config/fastfetch/logos/" + model.name.toLowerCase() + "_arch.png") : ""
                                             fillMode: Image.PreserveAspectFit
                                             smooth: true
                                             asynchronous: true
+                                        }
+
+                                        Text {
+                                            visible: model.name === "Custom"
+                                            anchors.horizontalCenter: parent.horizontalCenter
+                                            text: "\uf1fc"
+                                            font.family: "Symbols Nerd Font"
+                                            font.pixelSize: 56
+                                            color: themeCard.cardFg
                                         }
 
                                         Text {
@@ -4885,7 +4959,365 @@ MouseArea {
                                         cursorShape: Qt.PointingHandCursor
 
                                         onClicked: {
-                                            applyTheme(model.name)
+                                            if (model.name === "Custom") {
+                                                root.editingCustomTheme = true
+                                            } else {
+                                                applyTheme(model.name)
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        // Custom theme color editor -- appears below the grid when
+                        // the Custom card is clicked. 9 user-editable colors (1
+                        // background + 8 accents), each a plain hex TextInput with
+                        // a live swatch preview.
+                        Rectangle {
+                            width: parent.width
+                            height: root.editingCustomTheme ? customEditorColumn.implicitHeight + 32 : 0
+                            visible: height > 0
+                            clip: true
+                            radius: 12
+                            color: Qt.rgba(1, 1, 1, 0.05)
+                            border.width: 1
+                            border.color: Qt.rgba(1, 1, 1, 0.15)
+
+                            Behavior on height { NumberAnimation { duration: 150 } }
+
+                            Column {
+                                id: customEditorColumn
+                                x: 16
+                                y: 16
+                                width: parent.width - 32
+                                spacing: 12
+
+                                Text {
+                                    text: "Custom Theme Colors"
+                                    font.family: ThemeManager.uiFont
+                                    font.pixelSize: 15
+                                    font.weight: Font.Bold
+                                    color: ThemeManager.fgPrimary
+                                }
+
+                                Text {
+                                    text: "6-digit hex values, no '#' needed. Use as many or as few of the 8 accent slots as you like -- everything else (text/border/surface colors) is derived automatically from the background color."
+                                    font.family: ThemeManager.uiFont
+                                    font.pixelSize: 11
+                                    color: ThemeManager.fgSecondary
+                                    wrapMode: Text.WordWrap
+                                    width: parent.width
+                                }
+
+                                Flow {
+                                    width: parent.width
+                                    spacing: 16
+
+                                    Column {
+                                        width: 130
+                                        spacing: 6
+                                        Text { text: "Background"; font.family: ThemeManager.uiFont; font.pixelSize: 11; color: ThemeManager.fgSecondary }
+                                        Row {
+                                            spacing: 8
+                                            Rectangle {
+                                                width: 30; height: 30; radius: 6; anchors.verticalCenter: parent.verticalCenter
+                                                color: "#" + (bgHexField.text.length === 6 ? bgHexField.text : root.customColors.bg)
+                                                border.width: 1; border.color: Qt.rgba(1,1,1,0.25)
+                                            }
+                                            Rectangle {
+                                                width: 84; height: 30; radius: 6; color: Qt.rgba(1,1,1,0.06)
+                                                border.width: bgHexField.activeFocus ? 1 : 0; border.color: ThemeManager.accentBlue
+                                                anchors.verticalCenter: parent.verticalCenter
+                                                TextInput {
+                                                    id: bgHexField
+                                                    anchors.fill: parent; anchors.margins: 8
+                                                    font.family: ThemeManager.uiFont; font.pixelSize: 12; color: ThemeManager.fgPrimary
+                                                    text: root.customColors.bg
+                                                    maximumLength: 6
+                                                    validator: RegularExpressionValidator { regularExpression: /[0-9a-fA-F]{0,6}/ }
+                                                    selectByMouse: true
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    Column {
+                                        width: 130
+                                        spacing: 6
+                                        Text { text: "Accent: Blue"; font.family: ThemeManager.uiFont; font.pixelSize: 11; color: ThemeManager.fgSecondary }
+                                        Row {
+                                            spacing: 8
+                                            Rectangle {
+                                                width: 30; height: 30; radius: 6; anchors.verticalCenter: parent.verticalCenter
+                                                color: "#" + (blueHexField.text.length === 6 ? blueHexField.text : root.customColors.blue)
+                                                border.width: 1; border.color: Qt.rgba(1,1,1,0.25)
+                                            }
+                                            Rectangle {
+                                                width: 84; height: 30; radius: 6; color: Qt.rgba(1,1,1,0.06)
+                                                border.width: blueHexField.activeFocus ? 1 : 0; border.color: ThemeManager.accentBlue
+                                                anchors.verticalCenter: parent.verticalCenter
+                                                TextInput {
+                                                    id: blueHexField
+                                                    anchors.fill: parent; anchors.margins: 8
+                                                    font.family: ThemeManager.uiFont; font.pixelSize: 12; color: ThemeManager.fgPrimary
+                                                    text: root.customColors.blue
+                                                    maximumLength: 6
+                                                    validator: RegularExpressionValidator { regularExpression: /[0-9a-fA-F]{0,6}/ }
+                                                    selectByMouse: true
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    Column {
+                                        width: 130
+                                        spacing: 6
+                                        Text { text: "Accent: Purple"; font.family: ThemeManager.uiFont; font.pixelSize: 11; color: ThemeManager.fgSecondary }
+                                        Row {
+                                            spacing: 8
+                                            Rectangle {
+                                                width: 30; height: 30; radius: 6; anchors.verticalCenter: parent.verticalCenter
+                                                color: "#" + (purpleHexField.text.length === 6 ? purpleHexField.text : root.customColors.purple)
+                                                border.width: 1; border.color: Qt.rgba(1,1,1,0.25)
+                                            }
+                                            Rectangle {
+                                                width: 84; height: 30; radius: 6; color: Qt.rgba(1,1,1,0.06)
+                                                border.width: purpleHexField.activeFocus ? 1 : 0; border.color: ThemeManager.accentBlue
+                                                anchors.verticalCenter: parent.verticalCenter
+                                                TextInput {
+                                                    id: purpleHexField
+                                                    anchors.fill: parent; anchors.margins: 8
+                                                    font.family: ThemeManager.uiFont; font.pixelSize: 12; color: ThemeManager.fgPrimary
+                                                    text: root.customColors.purple
+                                                    maximumLength: 6
+                                                    validator: RegularExpressionValidator { regularExpression: /[0-9a-fA-F]{0,6}/ }
+                                                    selectByMouse: true
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    Column {
+                                        width: 130
+                                        spacing: 6
+                                        Text { text: "Accent: Pink"; font.family: ThemeManager.uiFont; font.pixelSize: 11; color: ThemeManager.fgSecondary }
+                                        Row {
+                                            spacing: 8
+                                            Rectangle {
+                                                width: 30; height: 30; radius: 6; anchors.verticalCenter: parent.verticalCenter
+                                                color: "#" + (pinkHexField.text.length === 6 ? pinkHexField.text : root.customColors.pink)
+                                                border.width: 1; border.color: Qt.rgba(1,1,1,0.25)
+                                            }
+                                            Rectangle {
+                                                width: 84; height: 30; radius: 6; color: Qt.rgba(1,1,1,0.06)
+                                                border.width: pinkHexField.activeFocus ? 1 : 0; border.color: ThemeManager.accentBlue
+                                                anchors.verticalCenter: parent.verticalCenter
+                                                TextInput {
+                                                    id: pinkHexField
+                                                    anchors.fill: parent; anchors.margins: 8
+                                                    font.family: ThemeManager.uiFont; font.pixelSize: 12; color: ThemeManager.fgPrimary
+                                                    text: root.customColors.pink
+                                                    maximumLength: 6
+                                                    validator: RegularExpressionValidator { regularExpression: /[0-9a-fA-F]{0,6}/ }
+                                                    selectByMouse: true
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    Column {
+                                        width: 130
+                                        spacing: 6
+                                        Text { text: "Accent: Red"; font.family: ThemeManager.uiFont; font.pixelSize: 11; color: ThemeManager.fgSecondary }
+                                        Row {
+                                            spacing: 8
+                                            Rectangle {
+                                                width: 30; height: 30; radius: 6; anchors.verticalCenter: parent.verticalCenter
+                                                color: "#" + (redHexField.text.length === 6 ? redHexField.text : root.customColors.red)
+                                                border.width: 1; border.color: Qt.rgba(1,1,1,0.25)
+                                            }
+                                            Rectangle {
+                                                width: 84; height: 30; radius: 6; color: Qt.rgba(1,1,1,0.06)
+                                                border.width: redHexField.activeFocus ? 1 : 0; border.color: ThemeManager.accentBlue
+                                                anchors.verticalCenter: parent.verticalCenter
+                                                TextInput {
+                                                    id: redHexField
+                                                    anchors.fill: parent; anchors.margins: 8
+                                                    font.family: ThemeManager.uiFont; font.pixelSize: 12; color: ThemeManager.fgPrimary
+                                                    text: root.customColors.red
+                                                    maximumLength: 6
+                                                    validator: RegularExpressionValidator { regularExpression: /[0-9a-fA-F]{0,6}/ }
+                                                    selectByMouse: true
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    Column {
+                                        width: 130
+                                        spacing: 6
+                                        Text { text: "Accent: Orange"; font.family: ThemeManager.uiFont; font.pixelSize: 11; color: ThemeManager.fgSecondary }
+                                        Row {
+                                            spacing: 8
+                                            Rectangle {
+                                                width: 30; height: 30; radius: 6; anchors.verticalCenter: parent.verticalCenter
+                                                color: "#" + (orangeHexField.text.length === 6 ? orangeHexField.text : root.customColors.orange)
+                                                border.width: 1; border.color: Qt.rgba(1,1,1,0.25)
+                                            }
+                                            Rectangle {
+                                                width: 84; height: 30; radius: 6; color: Qt.rgba(1,1,1,0.06)
+                                                border.width: orangeHexField.activeFocus ? 1 : 0; border.color: ThemeManager.accentBlue
+                                                anchors.verticalCenter: parent.verticalCenter
+                                                TextInput {
+                                                    id: orangeHexField
+                                                    anchors.fill: parent; anchors.margins: 8
+                                                    font.family: ThemeManager.uiFont; font.pixelSize: 12; color: ThemeManager.fgPrimary
+                                                    text: root.customColors.orange
+                                                    maximumLength: 6
+                                                    validator: RegularExpressionValidator { regularExpression: /[0-9a-fA-F]{0,6}/ }
+                                                    selectByMouse: true
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    Column {
+                                        width: 130
+                                        spacing: 6
+                                        Text { text: "Accent: Yellow"; font.family: ThemeManager.uiFont; font.pixelSize: 11; color: ThemeManager.fgSecondary }
+                                        Row {
+                                            spacing: 8
+                                            Rectangle {
+                                                width: 30; height: 30; radius: 6; anchors.verticalCenter: parent.verticalCenter
+                                                color: "#" + (yellowHexField.text.length === 6 ? yellowHexField.text : root.customColors.yellow)
+                                                border.width: 1; border.color: Qt.rgba(1,1,1,0.25)
+                                            }
+                                            Rectangle {
+                                                width: 84; height: 30; radius: 6; color: Qt.rgba(1,1,1,0.06)
+                                                border.width: yellowHexField.activeFocus ? 1 : 0; border.color: ThemeManager.accentBlue
+                                                anchors.verticalCenter: parent.verticalCenter
+                                                TextInput {
+                                                    id: yellowHexField
+                                                    anchors.fill: parent; anchors.margins: 8
+                                                    font.family: ThemeManager.uiFont; font.pixelSize: 12; color: ThemeManager.fgPrimary
+                                                    text: root.customColors.yellow
+                                                    maximumLength: 6
+                                                    validator: RegularExpressionValidator { regularExpression: /[0-9a-fA-F]{0,6}/ }
+                                                    selectByMouse: true
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    Column {
+                                        width: 130
+                                        spacing: 6
+                                        Text { text: "Accent: Green"; font.family: ThemeManager.uiFont; font.pixelSize: 11; color: ThemeManager.fgSecondary }
+                                        Row {
+                                            spacing: 8
+                                            Rectangle {
+                                                width: 30; height: 30; radius: 6; anchors.verticalCenter: parent.verticalCenter
+                                                color: "#" + (greenHexField.text.length === 6 ? greenHexField.text : root.customColors.green)
+                                                border.width: 1; border.color: Qt.rgba(1,1,1,0.25)
+                                            }
+                                            Rectangle {
+                                                width: 84; height: 30; radius: 6; color: Qt.rgba(1,1,1,0.06)
+                                                border.width: greenHexField.activeFocus ? 1 : 0; border.color: ThemeManager.accentBlue
+                                                anchors.verticalCenter: parent.verticalCenter
+                                                TextInput {
+                                                    id: greenHexField
+                                                    anchors.fill: parent; anchors.margins: 8
+                                                    font.family: ThemeManager.uiFont; font.pixelSize: 12; color: ThemeManager.fgPrimary
+                                                    text: root.customColors.green
+                                                    maximumLength: 6
+                                                    validator: RegularExpressionValidator { regularExpression: /[0-9a-fA-F]{0,6}/ }
+                                                    selectByMouse: true
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    Column {
+                                        width: 130
+                                        spacing: 6
+                                        Text { text: "Accent: Teal"; font.family: ThemeManager.uiFont; font.pixelSize: 11; color: ThemeManager.fgSecondary }
+                                        Row {
+                                            spacing: 8
+                                            Rectangle {
+                                                width: 30; height: 30; radius: 6; anchors.verticalCenter: parent.verticalCenter
+                                                color: "#" + (tealHexField.text.length === 6 ? tealHexField.text : root.customColors.teal)
+                                                border.width: 1; border.color: Qt.rgba(1,1,1,0.25)
+                                            }
+                                            Rectangle {
+                                                width: 84; height: 30; radius: 6; color: Qt.rgba(1,1,1,0.06)
+                                                border.width: tealHexField.activeFocus ? 1 : 0; border.color: ThemeManager.accentBlue
+                                                anchors.verticalCenter: parent.verticalCenter
+                                                TextInput {
+                                                    id: tealHexField
+                                                    anchors.fill: parent; anchors.margins: 8
+                                                    font.family: ThemeManager.uiFont; font.pixelSize: 12; color: ThemeManager.fgPrimary
+                                                    text: root.customColors.teal
+                                                    maximumLength: 6
+                                                    validator: RegularExpressionValidator { regularExpression: /[0-9a-fA-F]{0,6}/ }
+                                                    selectByMouse: true
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+
+                                Row {
+                                    spacing: 12
+                                    anchors.right: parent.right
+
+                                    Rectangle {
+                                        width: cancelLabel.implicitWidth + 24
+                                        height: 32
+                                        radius: 8
+                                        color: cancelMA.containsMouse ? Qt.rgba(1, 1, 1, 0.10) : Qt.rgba(1, 1, 1, 0.05)
+                                        Text {
+                                            id: cancelLabel
+                                            anchors.centerIn: parent
+                                            text: "Cancel"
+                                            font.family: ThemeManager.uiFont
+                                            font.pixelSize: 12
+                                            color: ThemeManager.fgPrimary
+                                        }
+                                        MouseArea {
+                                            id: cancelMA
+                                            anchors.fill: parent
+                                            hoverEnabled: true
+                                            cursorShape: Qt.PointingHandCursor
+                                            onClicked: root.editingCustomTheme = false
+                                        }
+                                    }
+
+                                    Rectangle {
+                                        width: applyLabel.implicitWidth + 24
+                                        height: 32
+                                        radius: 8
+                                        color: applyMA.containsMouse
+                                            ? ThemeManager.accentGreen
+                                            : Qt.rgba(ThemeManager.accentGreen.r, ThemeManager.accentGreen.g, ThemeManager.accentGreen.b, 0.25)
+                                        Text {
+                                            id: applyLabel
+                                            anchors.centerIn: parent
+                                            text: "Save & Apply"
+                                            font.family: ThemeManager.uiFont
+                                            font.pixelSize: 12
+                                            font.weight: Font.Medium
+                                            color: applyMA.containsMouse ? ThemeManager.bgBase : ThemeManager.fgPrimary
+                                        }
+                                        MouseArea {
+                                            id: applyMA
+                                            anchors.fill: parent
+                                            hoverEnabled: true
+                                            cursorShape: Qt.PointingHandCursor
+                                            onClicked: root.saveCustomTheme(
+                                                bgHexField.text, blueHexField.text, purpleHexField.text,
+                                                pinkHexField.text, redHexField.text, orangeHexField.text,
+                                                yellowHexField.text, greenHexField.text, tealHexField.text)
                                         }
                                     }
                                 }
