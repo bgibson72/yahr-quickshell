@@ -1,6 +1,6 @@
 #!/bin/bash
 # generate-custom-theme.sh
-# Generates ~/.config/hypr/themes/Custom.conf and Custom.lua from the 9
+# Generates ~/.config/hypr/themes/<Name>.conf and <Name>.lua from the 9
 # user-editable colors exposed in the Settings widget's Theme tab (1
 # background + 8 accents: blue, purple, pink, red, orange, yellow, green,
 # teal). The other 6 named accent slots that exist in every theme file
@@ -10,17 +10,28 @@
 # mako, wallpaper picker, etc.) keeps working unmodified for the Custom
 # theme too.
 #
-# Usage: generate-custom-theme.sh <bg> <blue> <purple> <pink> <red> <orange> <yellow> <green> <teal>
-# All colors are 6-digit hex, no '#' prefix.
+# Also generates a matching fastfetch Arch-logo tinted with the palette's
+# primary accent (blue), via ImageMagick, so `fastfetch` shows a logo in
+# the new theme's color when it's active (matches the convention used by
+# every other bundled theme's <name>_arch.png).
+#
+# Usage: generate-custom-theme.sh <bg> <blue> <purple> <pink> <red> <orange> <yellow> <green> <teal> [name]
+# All colors are 6-digit hex, no '#' prefix. [name] defaults to "Custom"
+# and is used as the theme's filename/display name (e.g. a "Save As" name).
 
 THEMES_DIR="$HOME/.config/hypr/themes"
+LOGOS_DIR="$HOME/.config/fastfetch/logos"
+TEMPLATE_LOGO="$LOGOS_DIR/catppuccin_arch.png"
 mkdir -p "$THEMES_DIR"
 
-python3 - "$THEMES_DIR" "$@" << 'PYEOF'
+THEME_NAME="${10:-Custom}"
+
+python3 - "$THEMES_DIR" "$THEME_NAME" "$@" << 'PYEOF'
 import sys
 
 themes_dir = sys.argv[1]
-bg, blue, purple, pink, red, orange, yellow, green, teal = sys.argv[2:11]
+theme_name = sys.argv[2]
+bg, blue, purple, pink, red, orange, yellow, green, teal = sys.argv[3:12]
 
 def clamp(v):
     return max(0, min(255, int(round(v))))
@@ -62,7 +73,7 @@ a = {
 }
 
 conf = """# ============================================
-# Custom Theme (user-defined)
+# {theme_name} Theme (user-defined)
 # ============================================
 
 # Accent colors
@@ -133,10 +144,10 @@ $glass-accent-rgba = rgba({blue}59)
            surface_0=surface_0, surface_1=surface_1, surface_2=surface_2,
            border_0=border_0, border_1=border_1, border_2=border_2,
            fg_primary=fg_primary, fg_secondary=fg_secondary, fg_tertiary=fg_tertiary,
-           **a)
+           theme_name=theme_name, **a)
 
 lua = """-- ============================================
--- Custom Theme (user-defined)
+-- {theme_name} Theme (user-defined)
 -- ============================================
 return {{
     accent_rose     = "rgb({rose})",
@@ -176,12 +187,35 @@ return {{
            surface_0=surface_0, surface_1=surface_1, surface_2=surface_2,
            border_0=border_0, border_1=border_1, border_2=border_2,
            fg_primary=fg_primary, fg_secondary=fg_secondary, fg_tertiary=fg_tertiary,
-           **a)
+           theme_name=theme_name, **a)
 
-with open(themes_dir + "/Custom.conf", "w") as f:
+with open(themes_dir + "/" + theme_name + ".conf", "w") as f:
     f.write(conf)
-with open(themes_dir + "/Custom.lua", "w") as f:
+with open(themes_dir + "/" + theme_name + ".lua", "w") as f:
     f.write(lua)
 
 print("ok")
 PYEOF
+
+# ── Generate a matching fastfetch Arch logo ──────────────────────────────────
+# Every bundled theme has a <name>_arch.png (the Arch Linux logo tinted to
+# that theme's primary accent color). Reproduce that here for the
+# user-generated theme so `fastfetch` shows a matching logo when it's active.
+# All bundled logos are the same silhouette; ImageMagick's -colorize fully
+# replaces RGB while preserving the original alpha channel/anti-aliasing, so
+# any existing logo works as the shape "template" regardless of its color.
+BLUE_HEX="$2"
+THEME_NAME_LOWER=$(echo "$THEME_NAME" | tr '[:upper:]' '[:lower:]')
+
+if command -v magick &>/dev/null; then
+    if [ -f "$TEMPLATE_LOGO" ]; then
+        mkdir -p "$LOGOS_DIR"
+        magick "$TEMPLATE_LOGO" -fill "#$BLUE_HEX" -colorize 100% \
+            -define png:color-type=6 "$LOGOS_DIR/${THEME_NAME_LOWER}_arch.png"
+        echo "Generated fastfetch logo: $LOGOS_DIR/${THEME_NAME_LOWER}_arch.png"
+    else
+        echo "Warning: template logo not found at $TEMPLATE_LOGO -- skipping fastfetch logo generation" >&2
+    fi
+else
+    echo "Warning: ImageMagick ('magick') not found -- skipping fastfetch logo generation" >&2
+fi

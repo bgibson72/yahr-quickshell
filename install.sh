@@ -805,6 +805,10 @@ check_dependencies() {
     if ! command_exists "fastfetch"; then
         missing_recommended+=("fastfetch")
     fi
+
+    if ! command_exists "magick"; then
+        missing_recommended+=("imagemagick")
+    fi
     
     if ! command_exists "starship"; then
         missing_recommended+=("starship")

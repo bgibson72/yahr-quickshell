@@ -91,14 +91,13 @@ sudo chmod a+wr /opt/spotify /opt/spotify/Apps -R 2>/dev/null
 if spicetify apply 2>/dev/null; then
     echo -e "${GREEN}✓ Spicetify theme applied: $SPIC_THEME${SPIC_SCHEME:+ ($SPIC_SCHEME)}${NC}"
 
-    # Restart Spotify if it is currently open so the new theme is loaded
+    # Note: Spotify is intentionally NOT killed/restarted here. Spicetify's
+    # injected CSS/theme files are picked up the next time Spotify is
+    # launched (or manually reloaded via Ctrl+Shift+R inside the client) --
+    # forcibly restarting it on every theme switch was disruptive (it kept
+    # popping open a new window even when the user wasn't using it).
     if pgrep -x spotify &>/dev/null; then
-        echo "  Restarting Spotify to apply new theme…"
-        killall spotify 2>/dev/null
-        sleep 0.8
-        spotify &>/dev/null &
-        disown
-        echo -e "${GREEN}  ✓ Spotify restarted${NC}"
+        echo "  Spotify is currently running -- reload it manually (Ctrl+Shift+R) or restart it to see the new theme"
     fi
 else
     echo -e "${YELLOW}⚠ spicetify apply failed${NC}"

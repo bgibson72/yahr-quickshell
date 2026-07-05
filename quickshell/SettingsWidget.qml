@@ -37,6 +37,8 @@ Rectangle {
         red: "f38ba8", orange: "fab387", yellow: "f9e2af", green: "a6e3a1", teal: "94e2d5"
     })
     property bool editingCustomTheme: false
+    property bool savingThemeAs: false
+    property string saveAsError: ""
 
     // SDDM settings
     property real sddmLoginOpacity: 0.75
@@ -659,6 +661,84 @@ SETTINGSEOF`
         customThemeGenProcess.running = true
 
         root.editingCustomTheme = false
+    }
+
+    // Built-in theme names that ship with YAHR -- a saved custom theme
+    // can't reuse one of these (or "Custom", the scratch/working slot).
+    readonly property var reservedThemeNames: [
+        "custom", "catppuccin", "dracula", "eldritch", "everforest", "gruvbox",
+        "kanagawa", "material", "monochrome", "nightfox", "nord", "rosepine",
+        "solarized", "tokyonight"
+    ]
+
+    // Strips a user-typed "Save As" name down to safe filename characters
+    // (letters/digits only, no spaces/symbols) so it can be used directly
+    // as <name>.conf / <name>.lua / <name>_arch.png without any shell or
+    // filesystem quoting concerns.
+    function sanitizeThemeName(name) {
+        return (name || "").replace(/[^A-Za-z0-9]/g, "")
+    }
+
+    // Saves the current 9 editor colors as a brand-new, permanently
+    // recallable theme named `name` (distinct from the "Custom" scratch
+    // slot) -- it gets its own <name>.conf/.lua + fastfetch logo and shows
+    // up in the theme grid from then on, exactly like a bundled theme.
+    function saveCustomThemeAs(name, bg, blue, purple, pink, red, orange, yellow, green, teal) {
+        const cleanName = sanitizeThemeName(name)
+        if (cleanName.length === 0) {
+            root.saveAsError = "Enter a name"
+            return
+        }
+        if (root.reservedThemeNames.indexOf(cleanName.toLowerCase()) !== -1) {
+            root.saveAsError = "That name is reserved -- pick another"
+            return
+        }
+
+        const colors = {
+            bg: validHex(bg, root.customColors.bg),
+            blue: validHex(blue, root.customColors.blue),
+            purple: validHex(purple, root.customColors.purple),
+            pink: validHex(pink, root.customColors.pink),
+            red: validHex(red, root.customColors.red),
+            orange: validHex(orange, root.customColors.orange),
+            yellow: validHex(yellow, root.customColors.yellow),
+            green: validHex(green, root.customColors.green),
+            teal: validHex(teal, root.customColors.teal)
+        }
+
+        // Keep the "Custom" scratch slot in sync too, so reopening the
+        // editor later still shows what was last edited/saved.
+        root.customColors = colors
+        if (!root.settings.theme) root.settings.theme = {}
+        root.settings.theme.custom = colors
+        saveSettings()
+
+        root.saveAsError = ""
+        savedThemeGenProcess.pendingName = cleanName
+        savedThemeGenProcess.command = ["bash", Quickshell.env("HOME") + "/.config/quickshell/generate-custom-theme.sh",
+            colors.bg, colors.blue, colors.purple, colors.pink, colors.red, colors.orange, colors.yellow, colors.green, colors.teal, cleanName]
+        savedThemeGenProcess.running = true
+
+        root.editingCustomTheme = false
+        root.savingThemeAs = false
+    }
+
+    // Regenerates <name>.conf/.lua (+ fastfetch logo) for a saved custom
+    // theme, refreshes the theme grid so the new card appears, then
+    // applies it immediately.
+    Process {
+        id: savedThemeGenProcess
+        property string pendingName: ""
+        running: false
+        onRunningChanged: {
+            if (!running && pendingName !== "") {
+                themeModel.clear()
+                root.themes = []
+                loadThemes()
+                applyTheme(pendingName)
+                pendingName = ""
+            }
+        }
     }
 
     // Regenerates Custom.conf/.lua from the saved colors, then applies the
@@ -5305,6 +5385,34 @@ MouseArea {
                                     }
 
                                     Rectangle {
+                                        width: saveAsLabel.implicitWidth + 24
+                                        height: 32
+                                        radius: 8
+                                        color: saveAsMA.containsMouse ? Qt.rgba(1, 1, 1, 0.10) : Qt.rgba(1, 1, 1, 0.05)
+                                        border.width: 1
+                                        border.color: Qt.rgba(1, 1, 1, 0.20)
+                                        Text {
+                                            id: saveAsLabel
+                                            anchors.centerIn: parent
+                                            text: "Save As…"
+                                            font.family: ThemeManager.uiFont
+                                            font.pixelSize: 12
+                                            color: ThemeManager.fgPrimary
+                                        }
+                                        MouseArea {
+                                            id: saveAsMA
+                                            anchors.fill: parent
+                                            hoverEnabled: true
+                                            cursorShape: Qt.PointingHandCursor
+                                            onClicked: {
+                                                root.saveAsError = ""
+                                                root.savingThemeAs = true
+                                                Qt.callLater(function() { saveAsNameField.forceActiveFocus() })
+                                            }
+                                        }
+                                    }
+
+                                    Rectangle {
                                         width: applyLabel.implicitWidth + 24
                                         height: 32
                                         radius: 8
@@ -5329,6 +5437,132 @@ MouseArea {
                                                 bgHexField.text, blueHexField.text, purpleHexField.text,
                                                 pinkHexField.text, redHexField.text, orangeHexField.text,
                                                 yellowHexField.text, greenHexField.text, tealHexField.text)
+                                        }
+                                    }
+                                }
+
+                                // "Save As" name-entry mini-panel -- appears under the
+                                // buttons row when "Save As…" is clicked. Saves the
+                                // current 9 colors as a brand-new, permanently
+                                // recallable theme (its own grid card) rather than
+                                // overwriting the "Custom" scratch slot.
+                                Rectangle {
+                                    width: parent.width
+                                    height: root.savingThemeAs ? saveAsColumn.implicitHeight + 24 : 0
+                                    visible: height > 0
+                                    clip: true
+                                    radius: 10
+                                    color: Qt.rgba(1, 1, 1, 0.05)
+                                    border.width: 1
+                                    border.color: Qt.rgba(1, 1, 1, 0.15)
+
+                                    Behavior on height { NumberAnimation { duration: 120 } }
+
+                                    Column {
+                                        id: saveAsColumn
+                                        x: 12
+                                        y: 12
+                                        width: parent.width - 24
+                                        spacing: 8
+
+                                        Text {
+                                            text: "Save this palette as a new theme"
+                                            font.family: ThemeManager.uiFont
+                                            font.pixelSize: 12
+                                            font.weight: Font.Medium
+                                            color: ThemeManager.fgPrimary
+                                        }
+
+                                        Row {
+                                            spacing: 8
+                                            width: parent.width
+
+                                            Rectangle {
+                                                width: 200; height: 32; radius: 8
+                                                color: Qt.rgba(1, 1, 1, 0.06)
+                                                border.width: saveAsNameField.activeFocus ? 1 : 0
+                                                border.color: ThemeManager.accentBlue
+                                                TextInput {
+                                                    id: saveAsNameField
+                                                    anchors.fill: parent
+                                                    anchors.margins: 8
+                                                    font.family: ThemeManager.uiFont
+                                                    font.pixelSize: 12
+                                                    color: ThemeManager.fgPrimary
+                                                    maximumLength: 24
+                                                    selectByMouse: true
+                                                    validator: RegularExpressionValidator { regularExpression: /[A-Za-z0-9]{0,24}/ }
+                                                    onAccepted: root.saveCustomThemeAs(
+                                                        saveAsNameField.text, bgHexField.text, blueHexField.text, purpleHexField.text,
+                                                        pinkHexField.text, redHexField.text, orangeHexField.text,
+                                                        yellowHexField.text, greenHexField.text, tealHexField.text)
+
+                                                    Text {
+                                                        visible: saveAsNameField.text.length === 0 && !saveAsNameField.activeFocus
+                                                        text: "Theme name…"
+                                                        font: saveAsNameField.font
+                                                        color: ThemeManager.fgSecondary
+                                                    }
+                                                }
+                                            }
+
+                                            Rectangle {
+                                                width: saveAsCancelLabel.implicitWidth + 20
+                                                height: 32
+                                                radius: 8
+                                                color: saveAsCancelMA.containsMouse ? Qt.rgba(1, 1, 1, 0.10) : Qt.rgba(1, 1, 1, 0.05)
+                                                Text {
+                                                    id: saveAsCancelLabel
+                                                    anchors.centerIn: parent
+                                                    text: "Cancel"
+                                                    font.family: ThemeManager.uiFont
+                                                    font.pixelSize: 12
+                                                    color: ThemeManager.fgPrimary
+                                                }
+                                                MouseArea {
+                                                    id: saveAsCancelMA
+                                                    anchors.fill: parent
+                                                    hoverEnabled: true
+                                                    cursorShape: Qt.PointingHandCursor
+                                                    onClicked: { root.savingThemeAs = false; root.saveAsError = "" }
+                                                }
+                                            }
+
+                                            Rectangle {
+                                                width: saveAsConfirmLabel.implicitWidth + 20
+                                                height: 32
+                                                radius: 8
+                                                color: saveAsConfirmMA.containsMouse
+                                                    ? ThemeManager.accentGreen
+                                                    : Qt.rgba(ThemeManager.accentGreen.r, ThemeManager.accentGreen.g, ThemeManager.accentGreen.b, 0.25)
+                                                Text {
+                                                    id: saveAsConfirmLabel
+                                                    anchors.centerIn: parent
+                                                    text: "Save"
+                                                    font.family: ThemeManager.uiFont
+                                                    font.pixelSize: 12
+                                                    font.weight: Font.Medium
+                                                    color: saveAsConfirmMA.containsMouse ? ThemeManager.bgBase : ThemeManager.fgPrimary
+                                                }
+                                                MouseArea {
+                                                    id: saveAsConfirmMA
+                                                    anchors.fill: parent
+                                                    hoverEnabled: true
+                                                    cursorShape: Qt.PointingHandCursor
+                                                    onClicked: root.saveCustomThemeAs(
+                                                        saveAsNameField.text, bgHexField.text, blueHexField.text, purpleHexField.text,
+                                                        pinkHexField.text, redHexField.text, orangeHexField.text,
+                                                        yellowHexField.text, greenHexField.text, tealHexField.text)
+                                                }
+                                            }
+                                        }
+
+                                        Text {
+                                            visible: root.saveAsError.length > 0
+                                            text: root.saveAsError
+                                            font.family: ThemeManager.uiFont
+                                            font.pixelSize: 11
+                                            color: ThemeManager.accentRed
                                         }
                                     }
                                 }
