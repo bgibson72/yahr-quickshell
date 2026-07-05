@@ -4580,22 +4580,6 @@ MouseArea {
                         width: parent.parent.width
                         spacing: 12
                         
-                        // Info text at top
-                        Rectangle {
-                            width: parent.width
-                            height: 40
-                            color: "transparent"
-                            
-                            Text {
-                                anchors.centerIn: parent
-                                text: "Please allow 30-45 seconds for the theme to propagate to all UI elements once selected"
-                                font.family: ThemeManager.uiFont
-                                font.pixelSize: 11
-                                font.italic: true
-                                color: ThemeManager.fgSecondary
-                            }
-                        }
-
                         Flow {
                             width: parent.width
                             spacing: 16
