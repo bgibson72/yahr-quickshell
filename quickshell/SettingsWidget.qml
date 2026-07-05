@@ -4580,6 +4580,8 @@ MouseArea {
                         width: parent.parent.width
                         spacing: 12
                         
+                        Item { height: 4; width: 1 }
+
                         Flow {
                             id: themeGrid
                             width: parent.width
