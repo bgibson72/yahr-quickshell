@@ -551,32 +551,20 @@ SETTINGSEOF`
     // Hyprland's window border is a 3-stop gradient (black / accent / white)
     // defined in hypr/appearance.lua as a structured Lua table
     // (col.active_border = { colors = {...}, angle = N }) rather than a
-    // single color string -- confirmed the flat "rgba(...) rgba(...) Ndeg"
-    // string form that decoration:shadow:color accepts does NOT work here;
-    // only the nested {colors={...}, angle=N} table is accepted by hl.config
-    // for gradient variables. alphaPct scales all stops together relative to
-    // their original baked-in ratios (using the accent stop, originally 0x59
-    // = 89/255, as the anchor so alphaPct=100 makes it fully opaque).
-    function buildBorderGradients(alphaPct) {
-        const scale = (alphaPct / 100) * (255 / 0x59)
-        function hexAlpha(base) {
-            return Math.max(0, Math.min(255, Math.round(base * scale))).toString(16).padStart(2, "0")
-        }
-        const accentHex = colorToHex(ThemeManager.accentBlue)
-        return {
-            active: '{"rgba(000000' + hexAlpha(0x40) + ')","rgba(' + accentHex + hexAlpha(0x59) + ')","rgba(ffffff' + hexAlpha(0x26) + ')"}',
-            inactive: '{"rgba(000000' + hexAlpha(0x1a) + ')","rgba(ffffff' + hexAlpha(0x12) + ')"}'
-        }
-    }
-
+    // single color string. Setting it live via `hyprctl eval` DOES update
+    // the stored config value (confirmed via hyprctl getoption) but Hyprland
+    // never actually repaints existing window borders with it -- only a full
+    // `hyprctl reload` (re-reading the on-disk Lua files) forces a visual
+    // refresh. So changing this needs to persist to disk and reload, unlike
+    // every other Hyprland setting here which applies instantly via eval
+    // alone. apply-hypr-settings.sh (also used for theme-switch/login
+    // persistence) does the actual file-editing + reload; this just saves
+    // the value and invokes it.
     function applyBorderAlpha(val) {
-        const g = buildBorderGradients(val)
-        const lua = 'hl.config({general={col={active_border={colors=' + g.active + ',angle=45},'
-            + 'inactive_border={colors=' + g.inactive + ',angle=45}}}})'
-        Quickshell.execDetached(["hyprctl", "eval", lua])
         if (!root.settings.hypr) root.settings.hypr = {}
         root.settings.hypr.borderAlpha = val
         saveSettings()
+        Quickshell.execDetached(["bash", Quickshell.env("HOME") + "/.config/quickshell/apply-hypr-settings.sh"])
     }
     
     function applyTheme(themeName) {
@@ -3833,11 +3821,11 @@ MouseArea {
                                             const norm = Math.max(0, Math.min(1, mouse.x / width))
                                             const val = Math.round(norm * 100)
                                             hyprBorderAlphaObj.value = val
-                                            root.applyBorderAlpha(val)
                                         }
 
                                         onPressed: updateVal(mouse)
                                         onPositionChanged: if (pressed) updateVal(mouse)
+                                        onReleased: root.applyBorderAlpha(hyprBorderAlphaObj.value)
                                     }
                                 }
 
