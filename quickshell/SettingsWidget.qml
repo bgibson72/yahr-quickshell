@@ -4581,6 +4581,7 @@ MouseArea {
                         spacing: 12
                         
                         Flow {
+                            id: themeGrid
                             width: parent.width
                             spacing: 16
 
@@ -4589,8 +4590,9 @@ MouseArea {
 
                                 Rectangle {
                                     id: themeCard
-                                    width: 160
-                                    height: 172
+                                    readonly property int columns: 3
+                                    width: (themeGrid.width - themeGrid.spacing * (columns - 1)) / columns
+                                    height: width * 1.075
                                     radius: 14
                                     clip: true
                                     color: cardBg
@@ -4658,10 +4660,10 @@ MouseArea {
                                         visible: themeCard.isActive
                                         anchors.top: parent.top
                                         anchors.right: parent.right
-                                        anchors.margins: 8
-                                        width: currentBadge.implicitWidth + 10
-                                        height: 16
-                                        radius: 4
+                                        anchors.margins: 10
+                                        width: currentBadge.implicitWidth + 12
+                                        height: 20
+                                        radius: 5
                                         z: 2
                                         color: Qt.rgba(0.651, 0.890, 0.631, 0.18)
 
@@ -4670,7 +4672,7 @@ MouseArea {
                                             anchors.centerIn: parent
                                             text: "● Current"
                                             font.family: ThemeManager.uiFont
-                                            font.pixelSize: 8
+                                            font.pixelSize: 10
                                             color: "#a6e3a1"
                                         }
                                     }
@@ -4678,12 +4680,12 @@ MouseArea {
                                     // Arch logo + theme name + accent palette bar
                                     Column {
                                         anchors.centerIn: parent
-                                        spacing: 10
-                                        width: parent.width - 24
+                                        spacing: 14
+                                        width: parent.width - 32
 
                                         Image {
-                                            width: 48
-                                            height: 48
+                                            width: 72
+                                            height: 72
                                             anchors.horizontalCenter: parent.horizontalCenter
                                             source: "file://" + Quickshell.env("HOME") + "/.config/fastfetch/logos/" + model.name.toLowerCase() + "_arch.png"
                                             fillMode: Image.PreserveAspectFit
@@ -4695,7 +4697,7 @@ MouseArea {
                                             anchors.horizontalCenter: parent.horizontalCenter
                                             text: model.name
                                             font.family: ThemeManager.uiFont
-                                            font.pixelSize: 13
+                                            font.pixelSize: 16
                                             font.weight: Font.Medium
                                             color: themeCard.cardFg
                                         }
@@ -4705,8 +4707,8 @@ MouseArea {
                                             id: accentBarWrap
                                             anchors.horizontalCenter: parent.horizontalCenter
                                             width: parent.width
-                                            height: 8
-                                            radius: 4
+                                            height: 10
+                                            radius: 5
                                             clip: true
 
                                             Row {
