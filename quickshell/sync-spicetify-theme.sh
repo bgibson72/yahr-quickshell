@@ -77,7 +77,7 @@ if [[ ! -d "$SPICETIFY_THEMES_DIR/$SPIC_THEME" ]]; then
 fi
 
 # ── Apply ─────────────────────────────────────────────────────────────────────
-echo "Applying Spicetify theme: $SPIC_THEME${SPIC_SCHEME:+ ($SPIC_SCHEME)}"
+echo "Setting Spicetify theme: $SPIC_THEME${SPIC_SCHEME:+ ($SPIC_SCHEME)}"
 
 spicetify config current_theme "$SPIC_THEME" 2>/dev/null
 
@@ -85,23 +85,20 @@ if [[ -n "$SPIC_SCHEME" ]]; then
     spicetify config color_scheme "$SPIC_SCHEME" 2>/dev/null
 fi
 
-# Ensure Spotify app directory is writable (required for AUR spotify package)
-sudo chmod a+wr /opt/spotify /opt/spotify/Apps -R 2>/dev/null
-
-if spicetify apply 2>/dev/null; then
-    echo -e "${GREEN}✓ Spicetify theme applied: $SPIC_THEME${SPIC_SCHEME:+ ($SPIC_SCHEME)}${NC}"
-
-    # Note: Spotify is intentionally NOT killed/restarted here. Spicetify's
-    # injected CSS/theme files are picked up the next time Spotify is
-    # launched (or manually reloaded via Ctrl+Shift+R inside the client) --
-    # forcibly restarting it on every theme switch was disruptive (it kept
-    # popping open a new window even when the user wasn't using it).
-    if pgrep -x spotify &>/dev/null; then
-        echo "  Spotify is currently running -- reload it manually (Ctrl+Shift+R) or restart it to see the new theme"
-    fi
+# Note: we intentionally do NOT run `spicetify apply` here. Its config is
+# updated above so the right theme/scheme is ready, but `spicetify apply`
+# itself restarts Spotify as an internal side effect (confirmed: Spotify's
+# PID changes immediately after `apply` runs, even though this script
+# never touches the Spotify process directly) -- that meant Spotify kept
+# popping open a disruptive new window on every single theme switch. Run
+# `spicetify apply` yourself (or `spicetify apply && true`) whenever you
+# actually want Spotify's look refreshed; that's a deliberate action so
+# the restart it causes is expected rather than a surprise side effect of
+# switching your desktop theme.
+if pgrep -x spotify &>/dev/null; then
+    echo -e "${GREEN}✓ Spicetify config updated: $SPIC_THEME${SPIC_SCHEME:+ ($SPIC_SCHEME)}${NC}"
+    echo "  Run 'spicetify apply' (restarts Spotify) whenever you want this reflected in the open client"
 else
-    echo -e "${YELLOW}⚠ spicetify apply failed${NC}"
-    echo "  If this is a fresh install, run:"
-    echo "    sudo chmod a+wr /opt/spotify && sudo chmod a+wr /opt/spotify/Apps -R"
-    echo "    spicetify backup apply"
+    echo -e "${GREEN}✓ Spicetify config updated: $SPIC_THEME${SPIC_SCHEME:+ ($SPIC_SCHEME)}${NC}"
+    echo "  Will take effect next time Spotify is launched (run 'spicetify apply' first if needed)"
 fi

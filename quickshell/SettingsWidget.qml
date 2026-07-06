@@ -384,7 +384,15 @@ SETTINGSEOF`
     function loadThemes() {
         themeLoader.running = true
     }
-    
+
+    // Theme names with hand-tuned card colors in cardBg/cardFg/cardAccents
+    // below -- anything else (a user-saved custom theme) gets its palette
+    // read from its own .conf file instead (see backfillCustomThemeColors).
+    readonly property var bundledThemeNames: [
+        "Catppuccin", "Dracula", "Eldritch", "Everforest", "Gruvbox", "Kanagawa",
+        "Material", "Monochrome", "NightFox", "Nord", "Rosepine", "Solarized", "TokyoNight"
+    ]
+
     Process {
         id: themeLoader
         running: false
@@ -400,6 +408,65 @@ SETTINGSEOF`
                     themeModel.append({name: themeName})
                 }
             }
+        }
+
+        onRunningChanged: {
+            if (!running) root.backfillCustomThemeColors()
+        }
+    }
+
+    // Any theme that isn't a bundled one and doesn't already have a saved
+    // palette (e.g. one created via "Save As" before that feature stored
+    // colors, or a theme file added/edited outside the Settings UI) gets
+    // its 9 colors read directly from its .conf file here, so its grid
+    // card shows its own real colors instead of a fallback palette.
+    function backfillCustomThemeColors() {
+        const saved = (root.settings.theme && root.settings.theme.savedCustoms) ? root.settings.theme.savedCustoms : {}
+        const needed = root.themes.filter(n =>
+            n !== "Custom" && root.bundledThemeNames.indexOf(n) === -1 && !saved[n])
+        if (needed.length === 0) return
+
+        const script =
+            'for n in "$@"; do ' +
+            'f="$HOME/.config/hypr/themes/$n.conf"; [ -f "$f" ] || continue; ' +
+            'get() { grep "^\\$accent-$1 = rgb(" "$f" 2>/dev/null | head -1 | sed -E "s/.*rgb\\(([0-9a-fA-F]+)\\).*/\\1/"; }; ' +
+            'bg=$(grep "^\\$bg-base = rgb(" "$f" | head -1 | sed -E "s/.*rgb\\(([0-9a-fA-F]+)\\).*/\\1/"); ' +
+            'echo "$n|$bg|$(get blue)|$(get purple)|$(get pink)|$(get red)|$(get orange)|$(get yellow)|$(get green)|$(get teal)"; ' +
+            'done'
+        themeColorBackfillProcess.command = ["bash", "-c", script, "_"].concat(needed)
+        themeColorBackfillProcess.pendingResults = {}
+        themeColorBackfillProcess.running = true
+    }
+
+    Process {
+        id: themeColorBackfillProcess
+        running: false
+        property var pendingResults: ({})
+
+        stdout: SplitParser {
+            onRead: data => {
+                const parts = data.trim().split("|")
+                if (parts.length !== 10) return
+                const [name, bg, blue, purple, pink, red, orange, yellow, green, teal] = parts
+                if (!bg || bg.length !== 6) return
+                themeColorBackfillProcess.pendingResults[name] = {
+                    bg: bg,
+                    blue: blue || bg, purple: purple || bg, pink: pink || bg, red: red || bg,
+                    orange: orange || bg, yellow: yellow || bg, green: green || bg, teal: teal || bg
+                }
+            }
+        }
+
+        onRunningChanged: {
+            if (running) return
+            const results = pendingResults
+            const names = Object.keys(results)
+            if (names.length === 0) return
+            if (!root.settings.theme) root.settings.theme = {}
+            if (!root.settings.theme.savedCustoms) root.settings.theme.savedCustoms = {}
+            for (const n of names) root.settings.theme.savedCustoms[n] = results[n]
+            root.settings = JSON.parse(JSON.stringify(root.settings))
+            saveSettings()
         }
     }
     
@@ -679,6 +746,21 @@ SETTINGSEOF`
         return (name || "").replace(/[^A-Za-z0-9]/g, "")
     }
 
+    // Mixes a 6-digit hex color toward white by `amount` (0-1). Used to
+    // derive a readable foreground color from a saved custom theme's
+    // background for its theme-grid card preview (mirrors the same
+    // formula generate-custom-theme.sh uses for fg_primary).
+    function lightenHex(hex, amount) {
+        var r = parseInt(hex.substring(0, 2), 16)
+        var g = parseInt(hex.substring(2, 4), 16)
+        var b = parseInt(hex.substring(4, 6), 16)
+        r = Math.max(0, Math.min(255, Math.round(r + (255 - r) * amount)))
+        g = Math.max(0, Math.min(255, Math.round(g + (255 - g) * amount)))
+        b = Math.max(0, Math.min(255, Math.round(b + (255 - b) * amount)))
+        function h(v) { var s = v.toString(16); return s.length === 1 ? "0" + s : s }
+        return h(r) + h(g) + h(b)
+    }
+
     // Saves the current 9 editor colors as a brand-new, permanently
     // recallable theme named `name` (distinct from the "Custom" scratch
     // slot) -- it gets its own <name>.conf/.lua + fastfetch logo and shows
@@ -711,6 +793,15 @@ SETTINGSEOF`
         root.customColors = colors
         if (!root.settings.theme) root.settings.theme = {}
         root.settings.theme.custom = colors
+
+        // Persist this palette keyed by name so the Theme tab's grid can
+        // render this card with its own real colors (background/accent
+        // bar) instead of falling back to a generic/wrong palette.
+        if (!root.settings.theme.savedCustoms) root.settings.theme.savedCustoms = {}
+        root.settings.theme.savedCustoms[cleanName] = colors
+        // Force property-change notification (mutating a nested object in
+        // place doesn't trigger QML bindings that read root.settings).
+        root.settings = JSON.parse(JSON.stringify(root.settings))
         saveSettings()
 
         root.saveAsError = ""
@@ -4900,6 +4991,9 @@ MouseArea {
 
                                     property string cardBg: {
                                         if (model.name === "Custom") return "#2a2a35"
+                                        var saved = root.settings.theme && root.settings.theme.savedCustoms
+                                            ? root.settings.theme.savedCustoms[model.name] : null
+                                        if (saved) return "#" + saved.bg
                                         var m = {
                                             "Catppuccin":"#1e1e2e","Dracula":"#282a36","Eldritch":"#212337",
                                             "Everforest":"#374247","Gruvbox":"#282828","Kanagawa":"#1f1f28",
@@ -4912,6 +5006,9 @@ MouseArea {
 
                                     property string cardFg: {
                                         if (model.name === "Custom") return "#9a9aa8"
+                                        var saved = root.settings.theme && root.settings.theme.savedCustoms
+                                            ? root.settings.theme.savedCustoms[model.name] : null
+                                        if (saved) return "#" + root.lightenHex(saved.bg, 0.90)
                                         var m = {
                                             "Catppuccin":"#cdd6f4","Dracula":"#f8f8f2","Eldritch":"#ebfafa",
                                             "Everforest":"#d3c6aa","Gruvbox":"#ebdbb2","Kanagawa":"#dcd7ba",
@@ -4924,6 +5021,12 @@ MouseArea {
 
                                     property var cardAccents: {
                                         if (model.name === "Custom") return []
+                                        var saved = root.settings.theme && root.settings.theme.savedCustoms
+                                            ? root.settings.theme.savedCustoms[model.name] : null
+                                        if (saved) return [
+                                            "#" + saved.blue, "#" + saved.purple, "#" + saved.pink, "#" + saved.red,
+                                            "#" + saved.orange, "#" + saved.yellow, "#" + saved.green, "#" + saved.teal
+                                        ]
                                         var m = {
                                             "Catppuccin":["#89b4fa","#cba6f7","#f5c2e7","#f38ba8","#fab387","#f9e2af","#a6e3a1","#94e2d5"],
                                             "Dracula":   ["#bd93f9","#ff79c6","#ff6e6e","#ffb86c","#f1fa8c","#50fa7b","#8be9fd","#6272a4"],
