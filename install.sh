@@ -929,7 +929,7 @@ install_configs() {
             if ! grep -q "fastfetch" "$HOME/.bashrc"; then
                 echo "" >> "$HOME/.bashrc"
                 echo "# Display system info with fastfetch" >> "$HOME/.bashrc"
-                echo "fastfetch" >> "$HOME/.bashrc"
+                echo "bash \"\$HOME/.config/fastfetch/run-fastfetch-kitty.sh\"" >> "$HOME/.bashrc"
                 print_info "Added fastfetch to .bashrc"
             fi
         fi

@@ -34,7 +34,9 @@ fi
 # Run fastfetch on new terminal (but not in tmux/screen)
 if [[ -z "$TMUX" && -z "$STY" ]]; then
     if command -v fastfetch >/dev/null 2>&1; then
-        if [[ -f ~/.config/fastfetch/config.jsonc ]]; then
+        if [[ -f ~/.config/fastfetch/run-fastfetch-kitty.sh ]]; then
+            bash ~/.config/fastfetch/run-fastfetch-kitty.sh
+        elif [[ -f ~/.config/fastfetch/config.jsonc ]]; then
             fastfetch --config ~/.config/fastfetch/config.jsonc
         else
             fastfetch
