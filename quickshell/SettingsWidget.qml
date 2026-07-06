@@ -39,6 +39,12 @@ Rectangle {
     property bool editingCustomTheme: false
     property bool savingThemeAs: false
     property string saveAsError: ""
+    // Non-empty while the editor is open for an existing saved custom
+    // theme (via its card's edit button) rather than the "Custom" scratch
+    // slot -- lets "Save Changes" overwrite that theme in place.
+    property string editingThemeName: ""
+    // Non-empty while a delete confirmation is showing for that theme name.
+    property string confirmingDeleteTheme: ""
 
     // SDDM settings
     property real sddmLoginOpacity: 0.75
@@ -812,6 +818,71 @@ SETTINGSEOF`
 
         root.editingCustomTheme = false
         root.savingThemeAs = false
+    }
+
+    // Opens the editor pre-filled with an existing saved custom theme's
+    // colors (triggered by a card's edit-pencil button), so tweaking and
+    // re-saving updates that theme in place rather than the "Custom"
+    // scratch slot.
+    function beginEditSavedTheme(name) {
+        const saved = root.settings.theme && root.settings.theme.savedCustoms
+            ? root.settings.theme.savedCustoms[name] : null
+        if (!saved) return
+
+        bgHexField.text = saved.bg
+        blueHexField.text = saved.blue
+        purpleHexField.text = saved.purple
+        pinkHexField.text = saved.pink
+        redHexField.text = saved.red
+        orangeHexField.text = saved.orange
+        yellowHexField.text = saved.yellow
+        greenHexField.text = saved.green
+        tealHexField.text = saved.teal
+
+        root.editingThemeName = name
+        root.savingThemeAs = false
+        root.saveAsError = ""
+        root.editingCustomTheme = true
+    }
+
+    // Overwrites an existing saved custom theme's colors/files in place
+    // (used by the editor's "Save Changes" button when editingThemeName
+    // is set) -- functionally identical to saveCustomThemeAs with the
+    // same name, since that already regenerates/overwrites by name.
+    function saveEditedTheme(bg, blue, purple, pink, red, orange, yellow, green, teal) {
+        root.saveCustomThemeAs(root.editingThemeName, bg, blue, purple, pink, red, orange, yellow, green, teal)
+        root.editingThemeName = ""
+    }
+
+    // Deletes a saved custom theme's files and grid entry. If it was the
+    // active theme, falls back to TokyoNight so the user isn't left on a
+    // theme that no longer exists on disk.
+    function deleteCustomTheme(name) {
+        const safeName = sanitizeThemeName(name)
+        if (safeName.length === 0) return
+
+        Quickshell.execDetached(["bash", "-c",
+            'rm -f "$HOME/.config/hypr/themes/' + safeName + '.conf" ' +
+            '"$HOME/.config/hypr/themes/' + safeName + '.lua" ' +
+            '"$HOME/.config/fastfetch/logos/' + safeName.toLowerCase() + '_arch.png"'])
+
+        for (var i = themeModel.count - 1; i >= 0; i--) {
+            if (themeModel.get(i).name === safeName) themeModel.remove(i)
+        }
+        const idx = root.themes.indexOf(safeName)
+        if (idx !== -1) root.themes.splice(idx, 1)
+
+        if (root.settings.theme && root.settings.theme.savedCustoms && root.settings.theme.savedCustoms[safeName]) {
+            delete root.settings.theme.savedCustoms[safeName]
+            root.settings = JSON.parse(JSON.stringify(root.settings))
+            saveSettings()
+        }
+
+        root.confirmingDeleteTheme = ""
+
+        if (root.currentTheme === safeName) {
+            applyTheme("TokyoNight")
+        }
     }
 
     // Regenerates <name>.conf/.lua (+ fastfetch logo) for a saved custom
@@ -4981,6 +5052,9 @@ MouseArea {
                                     color: cardBg
 
                                     property bool isActive: model.name === root.currentTheme
+                                    property bool isSavedCustom: model.name !== "Custom" &&
+                                        root.settings.theme && root.settings.theme.savedCustoms &&
+                                        !!root.settings.theme.savedCustoms[model.name]
 
                                     border.width: isActive ? 2 : (themeMouseArea.containsMouse ? 1 : 0)
                                     border.color: isActive ? "#a6e3a1" : Qt.rgba(1, 1, 1, 0.22)
@@ -5075,6 +5149,56 @@ MouseArea {
                                         }
                                     }
 
+                                    // Edit / Delete icon buttons, top-left corner -- only
+                                    // shown on user-saved custom themes (not bundled themes,
+                                    // not the "Custom" scratch tile itself).
+                                    Row {
+                                        visible: themeCard.isSavedCustom
+                                        anchors.top: parent.top
+                                        anchors.left: parent.left
+                                        anchors.margins: 8
+                                        spacing: 6
+                                        z: 2
+
+                                        Rectangle {
+                                            width: 24; height: 24; radius: 6
+                                            color: editThemeMA.containsMouse ? Qt.rgba(1, 1, 1, 0.25) : Qt.rgba(0, 0, 0, 0.35)
+                                            Text {
+                                                anchors.centerIn: parent
+                                                text: "\uf044"
+                                                font.family: "Symbols Nerd Font"
+                                                font.pixelSize: 12
+                                                color: themeCard.cardFg
+                                            }
+                                            MouseArea {
+                                                id: editThemeMA
+                                                anchors.fill: parent
+                                                hoverEnabled: true
+                                                cursorShape: Qt.PointingHandCursor
+                                                onClicked: root.beginEditSavedTheme(model.name)
+                                            }
+                                        }
+
+                                        Rectangle {
+                                            width: 24; height: 24; radius: 6
+                                            color: deleteThemeMA.containsMouse ? Qt.rgba(0.918, 0.290, 0.290, 0.55) : Qt.rgba(0, 0, 0, 0.35)
+                                            Text {
+                                                anchors.centerIn: parent
+                                                text: "\uf1f8"
+                                                font.family: "Symbols Nerd Font"
+                                                font.pixelSize: 12
+                                                color: themeCard.cardFg
+                                            }
+                                            MouseArea {
+                                                id: deleteThemeMA
+                                                anchors.fill: parent
+                                                hoverEnabled: true
+                                                cursorShape: Qt.PointingHandCursor
+                                                onClicked: root.confirmingDeleteTheme = model.name
+                                            }
+                                        }
+                                    }
+
                                     // Arch logo + theme name + accent palette bar
                                     Column {
                                         anchors.centerIn: parent
@@ -5164,7 +5288,7 @@ MouseArea {
                         anchors.fill: parent
                         visible: root.editingCustomTheme
                         enabled: root.editingCustomTheme
-                        onClicked: root.editingCustomTheme = false
+                        onClicked: { root.editingCustomTheme = false; root.editingThemeName = "" }
                     }
 
                     Rectangle {
@@ -5188,7 +5312,7 @@ MouseArea {
                                 spacing: 12
 
                                 Text {
-                                    text: "Custom Theme Colors"
+                                    text: root.editingThemeName !== "" ? ("Editing: " + root.editingThemeName) : "Custom Theme Colors"
                                     font.family: ThemeManager.uiFont
                                     font.pixelSize: 15
                                     font.weight: Font.Bold
@@ -5483,7 +5607,7 @@ MouseArea {
                                             anchors.fill: parent
                                             hoverEnabled: true
                                             cursorShape: Qt.PointingHandCursor
-                                            onClicked: root.editingCustomTheme = false
+                                            onClicked: { root.editingCustomTheme = false; root.editingThemeName = "" }
                                         }
                                     }
 
@@ -5525,7 +5649,7 @@ MouseArea {
                                         Text {
                                             id: applyLabel
                                             anchors.centerIn: parent
-                                            text: "Save & Apply"
+                                            text: root.editingThemeName !== "" ? "Save Changes" : "Save & Apply"
                                             font.family: ThemeManager.uiFont
                                             font.pixelSize: 12
                                             font.weight: Font.Medium
@@ -5536,10 +5660,19 @@ MouseArea {
                                             anchors.fill: parent
                                             hoverEnabled: true
                                             cursorShape: Qt.PointingHandCursor
-                                            onClicked: root.saveCustomTheme(
-                                                bgHexField.text, blueHexField.text, purpleHexField.text,
-                                                pinkHexField.text, redHexField.text, orangeHexField.text,
-                                                yellowHexField.text, greenHexField.text, tealHexField.text)
+                                            onClicked: {
+                                                if (root.editingThemeName !== "") {
+                                                    root.saveEditedTheme(
+                                                        bgHexField.text, blueHexField.text, purpleHexField.text,
+                                                        pinkHexField.text, redHexField.text, orangeHexField.text,
+                                                        yellowHexField.text, greenHexField.text, tealHexField.text)
+                                                } else {
+                                                    root.saveCustomTheme(
+                                                        bgHexField.text, blueHexField.text, purpleHexField.text,
+                                                        pinkHexField.text, redHexField.text, orangeHexField.text,
+                                                        yellowHexField.text, greenHexField.text, tealHexField.text)
+                                                }
+                                            }
                                         }
                                     }
                                 }
@@ -5671,6 +5804,107 @@ MouseArea {
                                 }
                             }
                         }
+
+                    // Delete-confirmation overlay for a saved custom theme's
+                    // card (its trash icon button). Sits above everything
+                    // else in this tab; clicking the backdrop cancels.
+                    MouseArea {
+                        anchors.fill: parent
+                        visible: root.confirmingDeleteTheme.length > 0
+                        enabled: root.confirmingDeleteTheme.length > 0
+                        onClicked: root.confirmingDeleteTheme = ""
+                    }
+
+                    Rectangle {
+                        anchors.centerIn: parent
+                        width: Math.min(parent.width - 40, 360)
+                        height: deleteConfirmColumn.implicitHeight + 32
+                        visible: root.confirmingDeleteTheme.length > 0
+                        clip: true
+                        radius: 12
+                        color: ThemeManager.bgBase
+                        border.width: 1
+                        border.color: Qt.rgba(0.918, 0.290, 0.290, 0.35)
+                        layer.enabled: true
+                        layer.effect: WidgetShadowEffect {}
+
+                        Column {
+                            id: deleteConfirmColumn
+                            x: 16
+                            y: 16
+                            width: parent.width - 32
+                            spacing: 14
+
+                            Text {
+                                text: "Delete \u201c" + root.confirmingDeleteTheme + "\u201d?"
+                                font.family: ThemeManager.uiFont
+                                font.pixelSize: 15
+                                font.weight: Font.Bold
+                                color: ThemeManager.fgPrimary
+                            }
+
+                            Text {
+                                text: "This permanently removes its theme files and fastfetch logo. This can't be undone."
+                                font.family: ThemeManager.uiFont
+                                font.pixelSize: 11
+                                color: ThemeManager.fgSecondary
+                                wrapMode: Text.WordWrap
+                                width: parent.width
+                            }
+
+                            Row {
+                                spacing: 12
+                                anchors.right: parent.right
+
+                                Rectangle {
+                                    width: deleteCancelLabel.implicitWidth + 24
+                                    height: 32
+                                    radius: 8
+                                    color: deleteCancelMA.containsMouse ? Qt.rgba(1, 1, 1, 0.10) : Qt.rgba(1, 1, 1, 0.05)
+                                    Text {
+                                        id: deleteCancelLabel
+                                        anchors.centerIn: parent
+                                        text: "Cancel"
+                                        font.family: ThemeManager.uiFont
+                                        font.pixelSize: 12
+                                        color: ThemeManager.fgPrimary
+                                    }
+                                    MouseArea {
+                                        id: deleteCancelMA
+                                        anchors.fill: parent
+                                        hoverEnabled: true
+                                        cursorShape: Qt.PointingHandCursor
+                                        onClicked: root.confirmingDeleteTheme = ""
+                                    }
+                                }
+
+                                Rectangle {
+                                    width: deleteConfirmLabel.implicitWidth + 24
+                                    height: 32
+                                    radius: 8
+                                    color: deleteConfirmMA.containsMouse
+                                        ? ThemeManager.accentRed
+                                        : Qt.rgba(ThemeManager.accentRed.r, ThemeManager.accentRed.g, ThemeManager.accentRed.b, 0.25)
+                                    Text {
+                                        id: deleteConfirmLabel
+                                        anchors.centerIn: parent
+                                        text: "Delete"
+                                        font.family: ThemeManager.uiFont
+                                        font.pixelSize: 12
+                                        font.weight: Font.Medium
+                                        color: deleteConfirmMA.containsMouse ? ThemeManager.bgBase : ThemeManager.fgPrimary
+                                    }
+                                    MouseArea {
+                                        id: deleteConfirmMA
+                                        anchors.fill: parent
+                                        hoverEnabled: true
+                                        cursorShape: Qt.PointingHandCursor
+                                        onClicked: root.deleteCustomTheme(root.confirmingDeleteTheme)
+                                    }
+                                }
+                            }
+                        }
+                    }
                     } // end Tab 4 Item wrapper
 
                 // Tab 5: WALLPAPER ────────────────────────────────
