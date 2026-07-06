@@ -396,7 +396,7 @@ SETTINGSEOF`
     // read from its own .conf file instead (see backfillCustomThemeColors).
     readonly property var bundledThemeNames: [
         "Catppuccin", "Dracula", "Eldritch", "Everforest", "Gruvbox", "Kanagawa",
-        "Material", "Monochrome", "NightFox", "Nord", "Rosepine", "Solarized", "TokyoNight"
+        "Material", "Monochrome", "NightFox", "Nord", "RosePine", "Solarized", "TokyoNight"
     ]
 
     Process {
@@ -5072,7 +5072,7 @@ MouseArea {
                                             "Catppuccin":"#1e1e2e","Dracula":"#282a36","Eldritch":"#212337",
                                             "Everforest":"#374247","Gruvbox":"#282828","Kanagawa":"#1f1f28",
                                             "Material":"#263238","Monochrome":"#252525","NightFox":"#131a24",
-                                            "Nord":"#2e3440","Rosepine":"#191724","Solarized":"#002b36",
+                                            "Nord":"#2e3440","RosePine":"#191724","Solarized":"#002b36",
                                             "TokyoNight":"#1a1b26"
                                         };
                                         return m[model.name] || "#1e1e2e";
@@ -5087,7 +5087,7 @@ MouseArea {
                                             "Catppuccin":"#cdd6f4","Dracula":"#f8f8f2","Eldritch":"#ebfafa",
                                             "Everforest":"#d3c6aa","Gruvbox":"#ebdbb2","Kanagawa":"#dcd7ba",
                                             "Material":"#eeffff","Monochrome":"#bebebe","NightFox":"#cdcecf",
-                                            "Nord":"#eceff4","Rosepine":"#e0def4","Solarized":"#839496",
+                                            "Nord":"#eceff4","RosePine":"#e0def4","Solarized":"#839496",
                                             "TokyoNight":"#c0caf5"
                                         };
                                         return m[model.name] || "#cdd6f4";
@@ -5112,7 +5112,7 @@ MouseArea {
                                             "Monochrome":["#bebebe","#a8a8a8","#999999","#888888","#777777","#666666","#555555","#444444"],
                                             "NightFox":  ["#719cd6","#9d79d6","#d67ad2","#f52a65","#f4a261","#dbc074","#63cdcf","#4d688e"],
                                             "Nord":      ["#88c0d0","#81a1c1","#5e81ac","#bf616a","#d08770","#ebcb8b","#a3be8c","#b48ead"],
-                                            "Rosepine":  ["#c4a7e7","#ebbcba","#eb6f92","#f6c177","#ea9a97","#9ccfd8","#31748f","#907aa9"],
+                                            "RosePine":  ["#c4a7e7","#ebbcba","#eb6f92","#f6c177","#ea9a97","#9ccfd8","#31748f","#907aa9"],
                                             "Solarized": ["#268bd2","#6c71c4","#d33682","#dc322f","#cb4b16","#b58900","#859900","#2aa198"],
                                             "TokyoNight":["#7aa2f7","#bb9af7","#f7768e","#ff9e64","#e0af68","#9ece6a","#73daca","#7dcfff"]
                                         };
@@ -5587,7 +5587,6 @@ MouseArea {
 
                                 Row {
                                     spacing: 12
-                                    anchors.right: parent.right
 
                                     Rectangle {
                                         width: cancelLabel.implicitWidth + 24
