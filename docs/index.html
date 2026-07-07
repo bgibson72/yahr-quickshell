@@ -1273,6 +1273,16 @@
         <h3 class="feat-title">Modular Config</h3>
         <p class="feat-desc">Hyprland config split into focused files: <code>monitors.conf</code>, <code>keybinds.conf</code>, <code>look-and-feel.conf</code>, and more. Easy to maintain.</p>
       </div>
+      <div class="feat-card fi fi-d1">
+        <span class="feat-icon">🖌️</span>
+        <h3 class="feat-title">Custom Theme Creator</h3>
+        <p class="feat-desc">Pick a background and up to 8 accent colors — every other color is derived automatically. Save, edit, and delete your own themes right from the grid.</p>
+      </div>
+      <div class="feat-card fi fi-d2">
+        <span class="feat-icon">🗂️</span>
+        <h3 class="feat-title">Configurable Dock</h3>
+        <p class="feat-desc">Pinned app launcher with adjustable screen edge, alignment, and window behavior (always on top, dodge, auto-hide) — independent of the bar.</p>
+      </div>
     </div>
   </div>
 </section>
@@ -1695,12 +1705,14 @@
     <div class="section-hd fi">
       <div class="section-label">🖼️ Screenshot Showcase</div>
       <h2 class="section-title">See it in action</h2>
-      <p class="section-sub">All 13 themes, widget panels, bar styles, and the SDDM login screen. Click any image to expand.</p>
+      <p class="section-sub">All 13 themes, custom theming, widget panels, the dock, bar styles, and the SDDM login screen. Click any image to expand.</p>
     </div>
 
     <div class="gallery-tabs fi">
       <button class="gtab active" onclick="switchGallery('themes',this)">🎨 Themes</button>
+      <button class="gtab" onclick="switchGallery('custom',this)">🖌️ Custom Theming</button>
       <button class="gtab" onclick="switchGallery('widgets',this)">🧩 Widgets</button>
+      <button class="gtab" onclick="switchGallery('dock',this)">🗂️ Dock</button>
       <button class="gtab" onclick="switchGallery('bar',this)">📊 Bar Styles</button>
       <button class="gtab" onclick="switchGallery('sddm',this)">🔐 Login Screen</button>
     </div>
@@ -1774,6 +1786,25 @@
       </div>
     </div>
 
+    <!-- Custom Theming Panel -->
+    <div class="gallery-panel" id="gp-custom">
+      <div class="gitem fi" onclick="openLB('https://raw.githubusercontent.com/bgibson72/yahr-quickshell/main/previews/custom_theme03.png','Theme grid with a saved custom theme (Crimson)')">
+        <img src="https://raw.githubusercontent.com/bgibson72/yahr-quickshell/main/previews/custom_theme03.png" alt="Custom theme grid card" loading="lazy">
+        <div class="g-overlay"><div class="g-overlay-icon">🔍</div><div class="g-overlay-label">View Full Size</div></div>
+        <div class="g-cap">Blank "+" tile &amp; saved theme cards</div>
+      </div>
+      <div class="gitem fi fi-d1" onclick="openLB('https://raw.githubusercontent.com/bgibson72/yahr-quickshell/main/previews/custom_theme02.png','Custom theme color editor')">
+        <img src="https://raw.githubusercontent.com/bgibson72/yahr-quickshell/main/previews/custom_theme02.png" alt="Custom theme editor" loading="lazy">
+        <div class="g-overlay"><div class="g-overlay-icon">🔍</div><div class="g-overlay-label">View Full Size</div></div>
+        <div class="g-cap">Color editor overlay</div>
+      </div>
+      <div class="gitem fi fi-d2" onclick="openLB('https://raw.githubusercontent.com/bgibson72/yahr-quickshell/main/previews/custom_theme01.png','Custom theme applied desktop-wide')">
+        <img src="https://raw.githubusercontent.com/bgibson72/yahr-quickshell/main/previews/custom_theme01.png" alt="Custom theme applied" loading="lazy">
+        <div class="g-overlay"><div class="g-overlay-icon">🔍</div><div class="g-overlay-label">View Full Size</div></div>
+        <div class="g-cap">Applied desktop-wide</div>
+      </div>
+    </div>
+
     <!-- Widgets Panel -->
     <div class="gallery-panel" id="gp-widgets">
       <div class="gitem fi" onclick="openLB('https://raw.githubusercontent.com/bgibson72/yahr-quickshell/main/previews/app_menu.png','App Launcher — Super + A')">
@@ -1820,6 +1851,20 @@
         <img src="https://raw.githubusercontent.com/bgibson72/yahr-quickshell/main/previews/wallpaper_picker.png" alt="Wallpaper Picker" loading="lazy">
         <div class="g-overlay"><div class="g-overlay-icon">🔍</div><div class="g-overlay-label">View Full Size</div></div>
         <div class="g-cap">Wallpaper Picker</div>
+      </div>
+    </div>
+
+    <!-- Dock Panel -->
+    <div class="gallery-panel" id="gp-dock">
+      <div class="gitem fi" onclick="openLB('https://raw.githubusercontent.com/bgibson72/yahr-quickshell/main/previews/dock01.png','Dock settings — show/floating, behavior, border, transparency')">
+        <img src="https://raw.githubusercontent.com/bgibson72/yahr-quickshell/main/previews/dock01.png" alt="Dock settings" loading="lazy">
+        <div class="g-overlay"><div class="g-overlay-icon">🔍</div><div class="g-overlay-label">View Full Size</div></div>
+        <div class="g-cap">Show, float, behavior &amp; style</div>
+      </div>
+      <div class="gitem fi fi-d1" onclick="openLB('https://raw.githubusercontent.com/bgibson72/yahr-quickshell/main/previews/dock02.png','Dock settings — position, alignment, pinned apps')">
+        <img src="https://raw.githubusercontent.com/bgibson72/yahr-quickshell/main/previews/dock02.png" alt="Dock position and pinned apps" loading="lazy">
+        <div class="g-overlay"><div class="g-overlay-icon">🔍</div><div class="g-overlay-label">View Full Size</div></div>
+        <div class="g-cap">Position &amp; pinned apps</div>
       </div>
     </div>
 
