@@ -8,7 +8,9 @@ Complete Arch Linux desktop environment featuring Hyprland + Quickshell with uni
 
 ## ✨ Features
 - 🎨 **13 Beautiful Themes** - Instant switching across all applications
-- 🖥️ **Quickshell Desktop** - Modern QML-based desktop environment with adjustable-opacity, flat UI
+- �️ **Custom Theme Creator** - Build your own palette from a background + accent colors; save, edit, and delete themes anytime
+- 🗂️ **Configurable Dock** - Pinned app launcher with adjustable position, behavior, and appearance
+- �🖥️ **Quickshell Desktop** - Modern QML-based desktop environment with adjustable-opacity, flat UI
 - ⚡ **Unified Theme System** - Synced themes for Hyprland, GTK, Kitty, Firefox, VSCodium, Discord, and more
 - 🎯 **GPU-Aware Installation** - Auto-detects and installs appropriate drivers (NVIDIA/AMD/Intel/Hybrid)
 - 🚀 **Fully Automated Installer** - One command from minimal Arch to complete desktop
@@ -195,6 +197,24 @@ Switch themes instantly with Super + T. All themes include matching wallpapers a
 ![solarized.png](previews/solarized.png)
 </details>
 
+### 🎨 Custom Theming
+
+Not feeling any of the 13 bundled themes? Build your own from scratch — pick a background color and up to 8 accent colors, and every other color (text, borders, surfaces) is derived automatically to match.
+
+![custom_theme03.png](previews/custom_theme03.png)
+
+A dedicated **Custom** tile sits at the end of the Theme tab's grid — click it to open the color editor. Enter 6-digit hex values for the background and any of the 8 accent slots you want to customize; unset slots fall back to sensible defaults derived from the background.
+
+![custom_theme02.png](previews/custom_theme02.png)
+
+- **Save & Apply** — updates the scratch "Custom" theme slot and switches to it immediately
+- **Save As…** — saves the palette as a brand-new, permanently recallable theme with its own name and grid card, sitting alongside the bundled themes
+- Saved custom themes get their own **edit** (✎) and **delete** (🗑) buttons directly on their grid card, so you can tweak or remove them anytime without hunting through menus
+- Every custom theme also gets a matching tinted Arch logo for `fastfetch`, generated automatically from its accent color
+
+![custom_theme01.png](previews/custom_theme01.png)
+
+Once saved, a custom theme syncs across the whole desktop just like any bundled theme — Hyprland borders, GTK apps, Kitty, bar/widgets, wallpaper accent, and more.
 
 ### Custom Widgets
 
@@ -242,7 +262,7 @@ Full-featured calendar with Google Calendar iCal URL support. Displays events, r
 ![settings.png](previews/settings.png)
 </details>
 
-A full-featured settings panel organized into seven tabs:
+A full-featured settings panel organized into tabs:
 
 **Quickshell tab**
 - **Clock** — 12/24-hour format, show/hide seconds
@@ -261,7 +281,7 @@ A full-featured settings panel organized into seven tabs:
 - **Workspace style** — numbered labels or dot indicators
 - **Min workspaces** — minimum number of workspace buttons shown
 
-**Theme tab** — visual theme selector (same as Super + T)
+**Theme tab** — visual theme selector (same as Super + T); includes the [Custom Theme Creator](#-custom-theming) for building, saving, editing, and deleting your own themes
 
 **Wallpaper tab**
 - **Theme Wallpaper** — grid of wallpapers matching the current theme
@@ -272,6 +292,12 @@ A full-featured settings panel organized into seven tabs:
 - **Window borders** — enable/disable and set border thickness
 
 **Monitors tab** — per-monitor resolution, refresh rate, and scale
+
+**SDDM tab** — configure the themed login screen
+
+**Dock tab** — see [Dock](#dock) below for the full list of options
+
+**About tab** — version info and links
 </details>
 
 <details>
@@ -340,6 +366,27 @@ The bar is fully customizable — mix and match any combination of style, layout
 - **Quick launch drawer** — toggle the expandable icon row (Kitty, Files, Firefox, Screenshot, Settings)
 - **Workspace style** — numbered labels or dot indicators
 - **Minimum workspaces** — set the minimum number of workspace buttons displayed
+
+
+### Dock
+
+A pinned-application dock/taskbar, fully configurable from Settings → Dock tab — position, behavior, and appearance are all independent of the bar's settings.
+
+![dock01.png](previews/dock01.png)
+
+**Dock configuration options:**
+- **Show dock** — toggle the dock on/off entirely
+- **Floating dock** — rounded, inset from the screen edge
+- **Window behavior** — Always on Top, Behind Windows, Dodge (windows shrink to avoid the dock), or Auto-Hide (hides until you hover the edge)
+- **Border** — optional border, thickness follows the Hyprland border size setting
+- **Transparency** — adjustable background opacity
+- **Screen edge** — Top, Bottom, Left, or Right
+- **Alignment** — Start, Center, or End along that edge
+- **Span full width/height** — taskbar-style background across the whole edge instead of hugging just the icons
+
+![dock02.png](previews/dock02.png)
+
+**Pinned Applications** — use the "+" button on the dock itself to add applications; right-click a pinned icon to unpin it, or manage the list directly from the Dock settings tab.
 
 
 ### System Integration
