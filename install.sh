@@ -783,7 +783,12 @@ check_dependencies() {
     fi
     
     if ! command_exists "thunar"; then
-        missing_recommended+=("thunar" "tumbler" "ffmpegthumbnailer" "thunar-archive-plugin" "thunar-media-tags-plugin" "thunar-volman" "file-roller")
+        missing_recommended+=("thunar" "tumbler" "ffmpegthumbnailer" "thunar-archive-plugin" "thunar-media-tags-plugin" "thunar-volman" "file-roller" "gvfs")
+    elif ! pacman -Qi gvfs &>/dev/null; then
+        # Thunar needs gvfs for "Move to Trash" to appear in its menus at
+        # all -- without it, only permanent "Delete" is offered, and the
+        # Trash Manager widget will always appear empty.
+        missing_recommended+=("gvfs")
     fi
     
     if ! command_exists "firefox"; then
