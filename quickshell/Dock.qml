@@ -24,6 +24,12 @@ Item {
     // happens to span the full edge (required in "dodge" mode for Hyprland
     // to honor the reserved space, per the wlr-layer-shell protocol).
     property bool spanFullWidth: false
+    // Individually toggle the built-in Settings/Trash utility icons off,
+    // e.g. if the user only wants pinned apps + the add button. The
+    // separator between pinned apps and the add button always stays put
+    // regardless of these (it's not tied to either icon's visibility).
+    property bool showSettingsIcon: true
+    property bool showTrashIcon: true
     // Each entry: { name, icon, exec, terminal, desktopId }
     property var pinnedApps: []
 
@@ -168,6 +174,7 @@ Item {
         }
 
         DockUtilityButton {
+            visible: dock.showSettingsIcon
             iconSize: dock.iconSize
             glyph: "\uf013"
             tooltip: "Settings"
@@ -176,6 +183,7 @@ Item {
         }
 
         DockUtilityButton {
+            visible: dock.showTrashIcon
             iconSize: dock.iconSize
             glyph: "\uf1f8"
             tooltip: "Trash"
@@ -218,6 +226,7 @@ Item {
         }
 
         DockUtilityButton {
+            visible: dock.showSettingsIcon
             iconSize: dock.iconSize
             glyph: "\uf013"
             tooltip: "Settings"
@@ -226,6 +235,7 @@ Item {
         }
 
         DockUtilityButton {
+            visible: dock.showTrashIcon
             iconSize: dock.iconSize
             glyph: "\uf1f8"
             tooltip: "Trash"

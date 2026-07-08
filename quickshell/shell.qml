@@ -42,6 +42,8 @@ ShellRoot {
     property bool dockShowBorder: false
     property int dockIconSize: 48
     property bool dockSpanFullWidth: false
+    property bool dockShowSettingsIcon: true
+    property bool dockShowTrashIcon: true
     property var dockPinnedApps: []
     property bool dockPickerVisible: false
     property string dockBehavior: "always-on-top"  // "always-on-top" | "behind-windows" | "dodge" | "auto-hide"
@@ -136,6 +138,8 @@ ShellRoot {
                         if (settings.dock.showBorder !== undefined) shellRoot.dockShowBorder = settings.dock.showBorder
                         if (settings.dock.iconSize !== undefined) shellRoot.dockIconSize = settings.dock.iconSize
                         if (settings.dock.spanFullWidth !== undefined) shellRoot.dockSpanFullWidth = settings.dock.spanFullWidth
+                        if (settings.dock.showSettingsIcon !== undefined) shellRoot.dockShowSettingsIcon = settings.dock.showSettingsIcon
+                        if (settings.dock.showTrashIcon !== undefined) shellRoot.dockShowTrashIcon = settings.dock.showTrashIcon
                         if (settings.dock.pinned !== undefined && Date.now() >= shellRoot.dockPinnedSaveGuardUntil) {
                             shellRoot.dockPinnedApps = settings.dock.pinned
                         }
@@ -1325,6 +1329,8 @@ ShellRoot {
                 showBorder: shellRoot.dockShowBorder
                 iconSize: shellRoot.dockIconSize
                 spanFullWidth: shellRoot.dockSpanFullWidth
+                showSettingsIcon: shellRoot.dockShowSettingsIcon
+                showTrashIcon: shellRoot.dockShowTrashIcon
                 pinnedApps: shellRoot.dockPinnedApps
 
                 onLaunchRequested: (execCmd, needsTerminal) => shellRoot.launchDockApp(execCmd, needsTerminal)

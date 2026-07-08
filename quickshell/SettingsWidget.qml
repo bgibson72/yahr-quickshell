@@ -6957,6 +6957,100 @@ MouseArea {
                                     }
                                 }
 
+                                // Show Settings icon toggle
+                                Row {
+                                    spacing: 12
+
+                                    Rectangle {
+                                        width: 48
+                                        height: 24
+                                        radius: 12
+                                        color: dockShowSettingsIconCheck.checked ? ThemeManager.accentGreen : Qt.rgba(1, 1, 1, 0.07)
+                                        Behavior on color { ColorAnimation { duration: 150 } }
+
+                                        Rectangle {
+                                            width: 18
+                                            height: 18
+                                            radius: 9
+                                            color: ThemeManager.fgPrimary
+                                            x: dockShowSettingsIconCheck.checked ? parent.width - width - 3 : 3
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            Behavior on x { NumberAnimation { duration: 200 } }
+                                        }
+
+                                        MouseArea {
+                                            anchors.fill: parent
+                                            cursorShape: Qt.PointingHandCursor
+                                            onClicked: {
+                                                dockShowSettingsIconCheck.checked = !dockShowSettingsIconCheck.checked
+                                                if (!root.settings.dock) root.settings.dock = {}
+                                                root.settings.dock.showSettingsIcon = dockShowSettingsIconCheck.checked
+                                                saveSettings()
+                                            }
+                                        }
+                                    }
+
+                                    Text {
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        text: "Show Settings icon"
+                                        font.family: ThemeManager.uiFont
+                                        font.pixelSize: 12
+                                        color: ThemeManager.fgPrimary
+                                    }
+
+                                    QtObject {
+                                        id: dockShowSettingsIconCheck
+                                        property bool checked: !root.settings.dock || root.settings.dock.showSettingsIcon !== false
+                                    }
+                                }
+
+                                // Show Trash icon toggle
+                                Row {
+                                    spacing: 12
+
+                                    Rectangle {
+                                        width: 48
+                                        height: 24
+                                        radius: 12
+                                        color: dockShowTrashIconCheck.checked ? ThemeManager.accentGreen : Qt.rgba(1, 1, 1, 0.07)
+                                        Behavior on color { ColorAnimation { duration: 150 } }
+
+                                        Rectangle {
+                                            width: 18
+                                            height: 18
+                                            radius: 9
+                                            color: ThemeManager.fgPrimary
+                                            x: dockShowTrashIconCheck.checked ? parent.width - width - 3 : 3
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            Behavior on x { NumberAnimation { duration: 200 } }
+                                        }
+
+                                        MouseArea {
+                                            anchors.fill: parent
+                                            cursorShape: Qt.PointingHandCursor
+                                            onClicked: {
+                                                dockShowTrashIconCheck.checked = !dockShowTrashIconCheck.checked
+                                                if (!root.settings.dock) root.settings.dock = {}
+                                                root.settings.dock.showTrashIcon = dockShowTrashIconCheck.checked
+                                                saveSettings()
+                                            }
+                                        }
+                                    }
+
+                                    Text {
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        text: "Show Trash icon"
+                                        font.family: ThemeManager.uiFont
+                                        font.pixelSize: 12
+                                        color: ThemeManager.fgPrimary
+                                    }
+
+                                    QtObject {
+                                        id: dockShowTrashIconCheck
+                                        property bool checked: !root.settings.dock || root.settings.dock.showTrashIcon !== false
+                                    }
+                                }
+
                                 // Transparency slider
                                 Column {
                                     spacing: 8
