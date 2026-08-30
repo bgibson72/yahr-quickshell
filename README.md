@@ -8,7 +8,7 @@ This repository is no longer maintained. The successor uses Hyprland Lua, Ghostt
 git clone https://github.com/bgibson72/yahr-shell.git
 cd yahr-shell
 ./install.sh
-
+```
 
 # YahrShell - Yet Another Hyprland Rice 🍚
 
