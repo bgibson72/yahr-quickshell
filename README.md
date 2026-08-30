@@ -1,3 +1,15 @@
+# Yahr Quickshell — archived
+
+**Development has moved to [yahr-shell](https://github.com/bgibson72/yahr-shell).**
+
+This repository is no longer maintained. The successor uses Hyprland Lua, Ghostty (not Kitty), and a rebuilt Quickshell desktop.
+
+```bash
+git clone https://github.com/bgibson72/yahr-shell.git
+cd yahr-shell
+./install.sh
+
+
 # YahrShell - Yet Another Hyprland Rice 🍚
 
 Complete Arch Linux desktop environment featuring Hyprland + Quickshell with unified theme system and comprehensive automated installation.
